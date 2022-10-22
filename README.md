@@ -24,13 +24,11 @@ bflow	P	S	flow
 flow	P	C	flow
 ```
 
-![example](https://raw.githubusercontent.com/pbauermeister/dfd/master/example.svg "Example")
+![simple example](https://raw.githubusercontent.com/pbauermeister/dfd/master/example.svg "Simple example")
 
-## Syntax
-See the [syntax specification][syntax].
+## Syntax and examples
 
-## Examples
-See the [examples page][examples].
+See the [documentation page][doc].
 
 ## Dependencies
 
@@ -53,5 +51,4 @@ usage: data_flow_diagram [-h]
 
 [src]: https://github.com/pbauermeister/dfd
 [pypi]: https://pypi.org/project/data-flow-diagram
-[syntax]: https://github.com/pbauermeister/dfd/tree/master/doc/SYNTAX.md
-[examples]: https://github.com/pbauermeister/dfd/tree/master/examples/EXAMPLES.md
+[doc]: https://github.com/pbauermeister/dfd/tree/master/doc/README.md
