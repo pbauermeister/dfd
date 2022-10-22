@@ -52,3 +52,7 @@ def mk_err_prefix(n: int, src_line: str) -> str:
 def mk_err_prefix_from(statement: Statement) -> str:
     n, src_line = statement.line_nr, statement.line
     return mk_err_prefix(n, src_line)
+
+
+class DfdException(Exception):
+    pass

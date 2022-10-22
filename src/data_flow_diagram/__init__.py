@@ -22,9 +22,6 @@ from typing import TextIO
 
 from .dfd import build
 
-def ok() -> bool:
-    return True
-
 
 def parse_args() -> argparse.Namespace:
     description, epilog = [each.strip() for each in __doc__.split('-----')[:2]]
@@ -98,6 +95,13 @@ def generate(input_fp: TextIO, output_path: str, percent_zoom: int,
     build(src, output_path, percent_zoom, bgcolor, format, debug)
 
 
+def extract_snippets(text: str) -> list[tuple[str, str]]:
+    rx = re.compile(r'^```\s*data_flow_diagram\s+(?P<output>.*?)\s*'
+                    r'^(?P<src>.*?)^\s*```', re.DOTALL | re.M)
+
+    return [(match['src'], match['output']) for match in rx.finditer(text)]
+
+
 def main() -> None:
     """Entry point for the application script"""
     args = parse_args()
@@ -110,17 +114,15 @@ def main() -> None:
 
     # markdown
     if args.markdown:
-        rx = re.compile(r'^```\s*data_flow_diagram\s+(?P<output>.*?)\s*'
-                        r'^(?P<src>.*?)^\s*```', re.DOTALL | re.M)
         md = inp.read()
-        for snippet in rx.finditer(md):
-            inp = io.StringIO(snippet['src'])
-            name = snippet['output']
+        for src, output in extract_snippets(md):
+            inp = io.StringIO(src)
+            name = output
             inp.name = name
             generate(inp, name, args.percent_zoom, args.debug,
                      args.background_color, args.format)
             print(f'{sys.argv[0]}: generated {name}', file=sys.stderr)
-        sys.exit(0)
+        return
 
     # treat output
     if args.output_file is None:
@@ -143,4 +145,4 @@ def main() -> None:
         # output to file
         generate(inp, name, args.percent_zoom, args.debug,
                  args.background_color, args.format)
-    sys.exit(0)
+    return

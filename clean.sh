@@ -1,4 +1,9 @@
 #!/bin/sh
 
 set -ex
-rm -rf dist/ src/*.egg-info/ || sudo rm -rf dist/ src/*.egg-info/
+
+clean() {
+    $1 rm -rf build/ dist/ src/*.egg-info/ $(find -name __pycache__)
+}
+
+clean || clean sudo

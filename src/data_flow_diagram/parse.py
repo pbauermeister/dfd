@@ -23,7 +23,7 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
             continue
 
         other = items_by_name[name]
-        raise RuntimeError(
+        raise model.DfdException(
             f'{error_prefix}Name "{name}" already exists '
             f'at line {other.line_nr+1}: {model.pack(other.line)}')
 
@@ -39,11 +39,11 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
                 nb_stars += 1
             if point == "*" or point in items_by_name:
                 continue
-            raise RuntimeError(
+            raise model.DfdException(
                 f'{error_prefix} {conn.type} links to {point}, '
                 f'which is not defined')
         if nb_stars == 2:
-            raise RuntimeError(
+            raise model.DfdException(
                 f'{error_prefix} {conn.type} may not link to two stars')
 
     return items_by_name
@@ -74,12 +74,13 @@ def parse(dfd_src: str) -> list[model.Statement]:
 
         error_prefix = model.mk_err_prefix(n, src_line)
         if f is None:
-            raise RuntimeError(f'{error_prefix}Unrecognized keyword "{word}"')
+            raise model.DfdException(f'{error_prefix}Unrecognized keyword '
+                                     f'"{word}"')
 
         try:
             statement = f(src_line, n)
-        except RuntimeError as e:
-            raise RuntimeError(f'{error_prefix}{e}"')
+        except model.DfdException as e:
+            raise model.DfdException(f'{error_prefix}{e}"')
 
         statements.append(statement)
     return statements
@@ -93,9 +94,9 @@ def split_args(dfd_line: str, n: int, last_is_optional: bool=False) -> list[str]
         terms.append(None)
     if len(terms)-1 != n:
         if not last_is_optional:
-            raise RuntimeError(f'Expected {n} argument(s)')
+            raise model.DfdException(f'Expected {n} argument(s)')
         else:
-            raise RuntimeError(f'Expected {n-1} or {n} argument')
+            raise model.DfdException(f'Expected {n-1} or {n} argument')
 
     return terms[1:]
 
