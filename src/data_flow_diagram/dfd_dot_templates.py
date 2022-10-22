@@ -32,8 +32,8 @@ CHANNEL_HORIZONTAL = """
 """.strip()
 
 
-DOT_FONT_EDGE = 'fontname="times-italic"'
-DOT_FONT_NODE = 'fontname="helvetica"'
+DOT_FONT_EDGE = 'fontname="times-italic" fontsize=10'
+DOT_FONT_NODE = 'fontname="helvetica" fontsize=10'
 
 DOT = """
 digraph D {{
