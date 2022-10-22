@@ -1,0 +1,15 @@
+style	vertical
+
+process	P	Process
+process	P2	Process 2
+entity	T	Terminal
+store	S	Store
+channel	C	Channel
+channel	C2	Channel 2b
+
+flow	P	C  	data
+bflow	P	S	config
+signal	P	P2	event
+flow 	P2	C2	more data
+flow	*	P2	ext data
+flow	P	T

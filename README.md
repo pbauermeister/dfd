@@ -5,6 +5,7 @@ diagrams as images in various formats (SVG, PNG, JPG, PDF, etc.) from
 source text files.
 
 The source for this project is [available here][src].
+The package page is [available here][pypi].
 
 ## Summary
 Data Flow Diagram are used to model the flow and processing of
@@ -44,5 +45,6 @@ usage: data_flow_diagram [-h]
 ```
 
 [src]: https://github.com/pbauermeister/dfd
+[pypi]: https://pypi.org/project/data-flow-diagram
 [syntax]: https://github.com/pbauermeister/dfd/tree/master/doc/SYNTAX.md
 [examples]: https://github.com/pbauermeister/dfd/tree/master/examples/EXAMPLES.md

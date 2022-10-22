@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+# Wrapper for development
+
+if __name__ == '__main__':
+    import src.data_flow_diagram as dfd
+    dfd.main()
