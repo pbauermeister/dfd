@@ -32,11 +32,14 @@ CHANNEL_HORIZONTAL = """
 """.strip()
 
 
+DOT_FONT_EDGE = 'fontname="times-italic"'
+DOT_FONT_NODE = 'fontname="helvetica"'
+
 DOT = """
 digraph D {{
   rankdir=LR
-  edge[color=gray fontname="times-italic"]
-  node[fontname=helvetica]
+  edge[color=gray """ + DOT_FONT_EDGE + """]
+  node[""" + DOT_FONT_NODE + """]
   {block}
 }}
 """.strip()

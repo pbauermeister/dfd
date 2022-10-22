@@ -10,9 +10,12 @@ import pathlib
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
+with open('version', encoding='utf-8') as f:
+    version = f.read().strip()
+
 setup(
     name="data_flow_diagram",
-    version="0.0.2",
+    version=version,
     description="Commandline tool to generate data flow diagrams from text",
     long_description=long_description,
     long_description_content_type="text/markdown",

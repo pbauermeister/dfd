@@ -9,3 +9,6 @@ banner2 "Linting"
 
 banner2 "Testing"
 ./test.sh
+
+banner2 "Making doc"
+./make-doc.sh

@@ -11,13 +11,20 @@ The package page is [available here][pypi].
 Data Flow Diagram are used to model the flow and processing of
 information through a system.
 
-Source text example:
+```data_flow_diagram example.svg
+process	P	Process
+process	P2	Process
+entity	E	Entity
+store	S	Store
+channel	C	Channel
 
-    A
-    B
-    C
+flow	E	P	flow
+signal	P	P2	signal
+bflow	P	S	flow
+flow	P	C	flow
+```
 
-![example](https://raw.githubusercontent.com/pbauermeister/dfd/master/doc/example-01.svg "Example")
+![example](https://raw.githubusercontent.com/pbauermeister/dfd/master/example.svg "Example")
 
 ## Syntax
 See the [syntax specification][syntax].

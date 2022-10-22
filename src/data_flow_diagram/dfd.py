@@ -49,8 +49,9 @@ class Generator:
 
     def generate_star(self, text: str) -> str:
         star_name = f'__star_{self.star_nr}__'
-        line = f'"{star_name}" [shape=none label="{text}"]'
+        line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
         self.lines.append(line)
+        self.star_nr += 1
         return star_name
 
     def generate_connection(self, conn: model.Connection,

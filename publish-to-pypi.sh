@@ -13,14 +13,17 @@
 #   setup.py
 #
 
-set -ex
+. ./set-ex.sh
+
+./build.sh
+
+
+banner2 "Publishing to Pypi"
 
 if [ ! -f .token ]; then
     echo "ERROR: please have a file named '.token' containing your pypi token"
     exit 1
 fi
-
-./clean.sh
 
 python3 setup.py sdist
 python3 -m twine upload --username __token__ dist/* \
