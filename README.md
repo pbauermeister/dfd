@@ -34,6 +34,7 @@ See the [documentation page][doc].
 
  * Python3
  * Python libraries: svgwrite, reportlab
+ * Graphviz
 
 ## Installing via pip3
 
@@ -46,7 +47,34 @@ See the [documentation page][doc].
 `data_flow_diagram -h` says:
 
 ```
-usage: data_flow_diagram [-h]
+usage: data_flow_diagram [-h] [--output-file OUTPUT_FILE] [--markdown]
+                         [--format FORMAT] [--percent-zoom PERCENT_ZOOM]
+                         [--background-color BACKGROUND_COLOR] [--debug]
+                         [INPUT_FILE]
+
+Command-line DFD diagram generator. Converts a textual description into a
+graphic file.
+
+positional arguments:
+  INPUT_FILE            UML sequence input file; if omitted, stdin is used
+
+options:
+  -h, --help            show this help message and exit
+  --output-file OUTPUT_FILE, -o OUTPUT_FILE
+                        output file name; pass '-' to use stdout; if
+                        omitted, use INPUT_FILE base name with '.svg'
+                        extension, or stdout
+  --markdown, -m        consider snippets between opening marker:
+                        ```data_flow_diagram OUTFILE, and closing marker:
+                        ``` allowing to generate all diagrams contained in
+                        an INPUT_FILE that is a markdown file
+  --format FORMAT, -f FORMAT
+                        output format: gif, jpg, tiff, bmp, pnm, eps, pdf,
+                        svg (any supported by reportlab); default is svg
+  --debug               emits debug messages
+
+See https://github.com/pbauermeister/dfd for information, syntax and
+examples.
 ```
 
 [src]: https://github.com/pbauermeister/dfd
