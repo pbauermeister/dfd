@@ -4,7 +4,7 @@
 
 ### Creating items
 
-```data_flow_diagram items.svg
+```data-flow-diagram items.svg
 # create a process bubble:
 process	P	Do something
 
@@ -21,7 +21,7 @@ channel	C	A channel
 
 ### Creating connections between items
 
-```data_flow_diagram connections.svg
+```data-flow-diagram connections.svg
 process	A1	A1
 process	A2	A2
 process	B1	B1
@@ -42,7 +42,7 @@ flow	E	*	an untargetted\nconnection
 ![Creating connections](./connections.svg)
 
 ### A simple complete example
-```data_flow_diagram complete-example.svg
+```data-flow-diagram complete-example.svg
 style	horizontal
 
 process	P	Acquire data

@@ -11,7 +11,7 @@ The package page is [available here][pypi].
 Data Flow Diagram are used to model the flow and processing of
 information through a system.
 
-```data_flow_diagram example.svg
+```data-flow-diagram example.svg
 process	P	Process
 process	P2	Process
 entity	E	Entity
@@ -39,15 +39,15 @@ See the [documentation page][doc].
 ## Installing via pip3
 
 ```
-[sudo] pip3 install data_flow_diagram
+[sudo] pip3 install data-flow-diagram
 ```
 
 ## Usage
 
-`data_flow_diagram -h` says:
+`data-flow-diagram -h` says:
 
 ```
-usage: data_flow_diagram [-h] [--output-file OUTPUT_FILE] [--markdown]
+usage: data-flow-diagram [-h] [--output-file OUTPUT_FILE] [--markdown]
                          [--format FORMAT] [--percent-zoom PERCENT_ZOOM]
                          [--background-color BACKGROUND_COLOR] [--debug]
                          [INPUT_FILE]
@@ -65,7 +65,7 @@ options:
                         omitted, use INPUT_FILE base name with '.svg'
                         extension, or stdout
   --markdown, -m        consider snippets between opening marker:
-                        ```data_flow_diagram OUTFILE, and closing marker:
+                        ```data-flow-diagram OUTFILE, and closing marker:
                         ``` allowing to generate all diagrams contained in
                         an INPUT_FILE that is a markdown file
   --format FORMAT, -f FORMAT

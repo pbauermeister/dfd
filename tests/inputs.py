@@ -1,11 +1,11 @@
 MD_OK = """
 Some text
-```data_flow_diagram diagram1.svg
+```data-flow-diagram diagram1.svg
 body 1
 ```
 
 Some more text
-```data_flow_diagram diagram2.svg
+```data-flow-diagram diagram2.svg
 body 2
 ```
 

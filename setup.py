@@ -7,13 +7,13 @@ https://packaging.python.org/guides/distributing-packages-using-setuptools/
 from setuptools import setup, find_packages
 import pathlib
 
-VERSION = "0.0.3.post1"
+VERSION = "0.0.4"
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
-    name="data_flow_diagram",
+    name="data-flow-diagram",
     version=VERSION,
     description="Commandline tool to generate data flow diagrams from text",
     long_description=long_description,
@@ -43,11 +43,11 @@ setup(
     package_data={
 #        "data_flow_diagram": ["tbdpackage__data.dat"],
     },
-    # The following would provide a command called `data_flow_diagram` which
+    # The following would provide a command called `data-flow-diagram` which
     # executes the function `main` from this package when invoked:
     entry_points={
         "console_scripts": [
-            "data_flow_diagram=data_flow_diagram:main",
+            "data-flow-diagram=data_flow_diagram:main",
         ],
     },
     project_urls={

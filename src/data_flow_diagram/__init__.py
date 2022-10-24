@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--markdown', '-m',
                         action='store_true',
                         help='consider snippets between opening marker: '
-                        '```data_flow_diagram OUTFILE, and closing marker: ``` '
+                        '```data-flow-diagram OUTFILE, and closing marker: ``` '
                         'allowing to generate all diagrams contained in an '
                         'INPUT_FILE that is a markdown file');
 
@@ -96,7 +96,7 @@ def generate(input_fp: TextIO, output_path: str, percent_zoom: int,
 
 
 def extract_snippets(text: str) -> list[tuple[str, str]]:
-    rx = re.compile(r'^```\s*data_flow_diagram\s+(?P<output>.*?)\s*'
+    rx = re.compile(r'^```\s*data-flow-diagram\s+(?P<output>.*?)\s*'
                     r'^(?P<src>.*?)^\s*```', re.DOTALL | re.M)
 
     return [(match['src'], match['output']) for match in rx.finditer(text)]
