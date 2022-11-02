@@ -13,6 +13,7 @@ def build(dfd_src: str, output_path: str, percent_zoom: int, bgcolor: str,
     """Take a DFD source and build the final image or document"""
     statements = parse.parse(dfd_src)
     items_by_name = parse.check(statements)
+    statements = filter_items(statements)
     gen = Generator()
     text = generate_dot(gen, statements, items_by_name)
     if debug:
@@ -122,3 +123,25 @@ def generate_dot(gen: Generator,
                 gen.generate_style(style)
 
     return gen.generate_dot_text()
+
+
+def filter_items(statements: list[model.Statement]) -> list[model.Statement]:
+    # collect used items
+    connected_items = set()
+    for statement in statements:
+        match statement:
+            case model.Connection() as conn: pass
+            case _: continue
+        for point in conn.src, conn.dst:
+            connected_items.add(point)
+
+    # filter out unconnected items
+    new_statements = []
+    for statement in statements:
+        match statement:
+            case model.Item() as item:
+                if item.hidable and item.name not in connected_items:
+                    continue
+        new_statements.append(statement)
+
+    return new_statements

@@ -59,3 +59,32 @@ bflow	S	P2	parameters
 flow	P2	C  	records
 ```
 ![Creating items](./complete-example.svg)
+
+### Items rendered only if used (hidable)
+
+Here, all items are rendered, even if not connected to anything:
+
+```data-flow-diagram show-all-items.svg
+style	horizontal
+
+process	P1	Process 1
+process	P2	Process 2
+process	P3	Process 3
+
+flow	P1	P2	connection
+```
+![Show all items](./show-all-items.svg)
+
+A `?` postfix to an item name indicates that the item shall be hidden if unused (i.e. not connected to anything).
+
+Here, *Process 3* is not rendered:
+
+```data-flow-diagram hide-if-unused.svg
+style	horizontal
+
+process	P1	Process 1
+process	P2?	Process 2
+process	P3?	Process 3
+flow	P1	P2	connection
+```
+![Hide if unused](./hide-if-unused.svg)

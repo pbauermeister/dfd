@@ -1,6 +1,7 @@
 """Parse DFD source text in our DSL"""
 
 from typing import Callable
+from typing import Tuple
 
 from . import model
 
@@ -101,6 +102,14 @@ def split_args(dfd_line: str, n: int, last_is_optional: bool=False) -> list[str]
     return terms[1:]
 
 
+def parse_item_name(name: str) -> Tuple[str, bool]:
+    """If name ends with ?, make it hidable"""
+    if name.endswith('?'):
+        return name[:-1], True
+    else:
+        return name, False
+
+
 def parse_style(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse style statement"""
     style = split_args(dfd_line, 1)[0]
@@ -110,25 +119,29 @@ def parse_style(dfd_line: str, line_nr: int) -> model.Statement:
 def parse_process(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse process statement"""
     name, text = split_args(dfd_line, 2)
-    return model.Item(line_nr, dfd_line, model.PROCESS, name, text)
+    name, hidable = parse_item_name(name)
+    return model.Item(line_nr, dfd_line, model.PROCESS, name, text, hidable)
 
 
 def parse_entity(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse entity statement"""
     name, text = split_args(dfd_line, 2)
-    return model.Item(line_nr, dfd_line, model.ENTITY, name, text)
+    name, hidable = parse_item_name(name)
+    return model.Item(line_nr, dfd_line, model.ENTITY, name, text, hidable)
 
 
 def parse_store(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse store statement"""
     name, text = split_args(dfd_line, 2)
-    return model.Item(line_nr, dfd_line, model.STORE, name, text)
+    name, hidable = parse_item_name(name)
+    return model.Item(line_nr, dfd_line, model.STORE, name, text, hidable)
 
 
 def parse_channel(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse channel statement"""
     name, text = split_args(dfd_line, 2)
-    return model.Item(line_nr, dfd_line, model.CHANNEL, name, text)
+    name, hidable = parse_item_name(name)
+    return model.Item(line_nr, dfd_line, model.CHANNEL, name, text, hidable)
 
 
 def parse_flow(dfd_line: str, line_nr: int) -> model.Statement:

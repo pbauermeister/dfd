@@ -1,7 +1,6 @@
 """Internal data model"""
 
 from dataclasses import dataclass
-
 @dataclass
 class Statement:
     line_nr: int
@@ -13,6 +12,7 @@ class Item(Statement):
     type: str
     name: str
     text: str
+    hidable: bool
 
 
 @dataclass
