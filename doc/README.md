@@ -89,6 +89,22 @@ flow	P1	P2	connection
 ```
 ![Hide if unused](./hide-if-unused.svg)
 
+### Markdown snippets
+
+With the option `--markdown` (e.g. `data-flow-diagram README.md --markdown`)
+you can embed code blocks that are recognized as Data Flow Diagram snippets.
+For each snippet, a graphic file is generated. A snippet can be defined by
+such a code block:
+
+    ```data-flow-diagram FILENAME.svg
+
+    ...DFD STATEMENTS...
+
+    ```
+
+Note that only code blocks delimited by triple-backticks fences are considered.
+Code blocks defined by quadruple-spaces indentation are ignored.
+
 ### Including files
 
 You can include a file. Here we include `included-1.dfd` (which defines P1 and
@@ -102,12 +118,16 @@ flow	P1	P2	connection
 ```
 ![Includer 1](./includer-1.svg)
 
-### Including snippet
+### Including rendered snippet
 
 You can include another snippet.
 
 Here we first define and generate the snippet `included-snippet-1.svg`:
 
+Code block start fence:
+    ```data-flow-diagram included-snippet-1.svg
+
+Code block body:
 ```data-flow-diagram included-snippet-1.svg
 process	P3	Process 3
 process	P4	Process 4
@@ -126,13 +146,17 @@ flow	P3	P4	connection
 ```
 ![Includer 2](./includer-2.svg)
 
-### Including snippet
+### Including not-rendered snippet
 
 You can include another snippet that is not rendered as graphic file.
 
 Here we first define the snippet `included-snippet-2`. The leading `<`
 mandates to not render it. Hence it needs no format extension.
 
+Code block start fence:
+    ```data-flow-diagram <included-snippet-2
+
+Code block body:
 ```data-flow-diagram <included-snippet-2
 process	P5	Process 5
 process	P6	Process 6
