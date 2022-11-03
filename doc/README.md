@@ -93,7 +93,7 @@ flow	P1	P2	connection
 
 With the option `--markdown` (e.g. `data-flow-diagram README.md --markdown`)
 you can embed code blocks that are recognized as Data Flow Diagram snippets.
-For each snippet, a graphic file is generated. A snippet can be defined by
+For each snippet, an image file is generated. A snippet can be defined by
 such a code block:
 
     ```data-flow-diagram FILENAME.svg
@@ -105,7 +105,7 @@ such a code block:
 Note that only code blocks delimited by triple-backticks fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored.
 
-The generated image can be used by e.g. `![Label](FILENAME.svg)`
+The generated image file can be used by e.g. `![Label](FILENAME.svg)`
 
 ## C. Including
 
@@ -141,7 +141,7 @@ process	P3	Process 3
 process	P4	Process 4
 ```
 
-Inserted image:  `![Included snippet](./included-snippet-1.svg)`
+Inserting the latter snippet image: `![Included snippet](./included-snippet-1.svg)`
 
 ![Included snippet](./included-snippet-1.svg)
 #### b. Includer snippet
@@ -160,7 +160,7 @@ flow	P3	P4	connection
 
 ### 3. Including not-rendered snippet
 
-You can include another snippet that is not rendered as graphic file.
+You can include another snippet that is not rendered as image file.
 #### a. Included snippet
 
 Here we first define the snippet `included-snippet-2`. The leading `<`
