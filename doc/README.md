@@ -1,8 +1,8 @@
 # Data Flow Diagram
 
-## Syntax
+## A. Syntax
 
-### Creating items
+### 1. Creating items
 
 ```data-flow-diagram items.svg
 # create a process bubble:
@@ -19,7 +19,7 @@ channel	C	A channel
 ```
 ![Creating items](./items.svg)
 
-### Creating connections between items
+### 2. Creating connections between items
 
 ```data-flow-diagram connections.svg
 process	A1	A1
@@ -41,7 +41,7 @@ flow	E	*	an untargetted\nconnection
 ```
 ![Creating connections](./connections.svg)
 
-### A simple complete example
+### 3. A simple complete example
 ```data-flow-diagram complete-example.svg
 style	horizontal
 
@@ -60,7 +60,7 @@ flow	P2	C  	records
 ```
 ![Creating items](./complete-example.svg)
 
-### Items rendered only if used (hidable)
+### 4. Items rendered only if used (hidable)
 
 Here, all items are rendered, even if not connected to anything:
 
@@ -89,7 +89,7 @@ flow	P1	P2	connection
 ```
 ![Hide if unused](./hide-if-unused.svg)
 
-### Markdown snippets
+## B. Markdown snippets
 
 With the option `--markdown` (e.g. `data-flow-diagram README.md --markdown`)
 you can embed code blocks that are recognized as Data Flow Diagram snippets.
@@ -107,7 +107,9 @@ Code blocks defined by quadruple-spaces indentation are ignored.
 
 The generated image can be used by e.g. `![Label](FILENAME.svg)`
 
-### Including files
+## C. Including
+
+### 1. Including files
 
 You can include a file. Here we include `included-1.dfd` (which defines P1 and
 P2) by `#include included-1.dfd`:
@@ -120,11 +122,11 @@ flow	P1	P2	connection
 ```
 ![Includer 1](./includer-1.svg)
 
-### Including rendered snippet
+### 2. Including rendered snippet
 
 You can include another snippet.
 
-#### Included snippet
+#### a. Included snippet
 
 Here we first define and generate the snippet `included-snippet-1.svg`.
 
@@ -142,7 +144,7 @@ process	P4	Process 4
 Inserted image:  `![Included snippet](./included-snippet-1.svg)`
 
 ![Included snippet](./included-snippet-1.svg)
-#### Includer snippet
+#### b. Includer snippet
 
 Then, we use the snippet `included-snippet-1.svg` (defined above) by
 `#include <included-snippet-1`. The leading `<` mandates to include a
@@ -156,10 +158,10 @@ flow	P3	P4	connection
 ```
 ![Includer 2](./includer-2.svg)
 
-### Including not-rendered snippet
+### 3. Including not-rendered snippet
 
 You can include another snippet that is not rendered as graphic file.
-#### Included snippet
+#### a. Included snippet
 
 Here we first define the snippet `included-snippet-2`. The leading `<`
 mandates to not render it. Hence it needs no format extension.
@@ -174,7 +176,7 @@ Code block body:
 process	P5	Process 5
 process	P6	Process 6
 ```
-#### Includer snippet
+#### b. Includer snippet
 
 Then, we use the snippet `included-snippet-2` (defined above) by
 `#include <included-snippet-2`, like in the previous section.
