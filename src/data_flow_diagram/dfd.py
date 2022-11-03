@@ -4,15 +4,18 @@ from typing import Optional
 
 from . import model
 from . import dot
-from . import parse
+from . import parser
 from . import dfd_dot_templates as TMPL
-
+from . import preprocessor
 
 def build(dfd_src: str, output_path: str, percent_zoom: int, bgcolor: str,
-          format: str, debug: bool) -> None:
+          format: str, debug: bool,
+          snippet_by_name: dict[str, str] = None) -> None:
     """Take a DFD source and build the final image or document"""
-    statements = parse.parse(dfd_src)
-    items_by_name = parse.check(statements)
+    dfd_src = preprocessor.preprocess(output_path, dfd_src, debug, snippet_by_name)
+
+    statements = parser.parse(dfd_src)
+    items_by_name = parser.check(statements)
     statements = filter_items(statements)
     gen = Generator()
     text = generate_dot(gen, statements, items_by_name)

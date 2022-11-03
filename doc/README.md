@@ -88,3 +88,63 @@ process	P3?	Process 3
 flow	P1	P2	connection
 ```
 ![Hide if unused](./hide-if-unused.svg)
+
+### Including files
+
+You can include a file. Here we include `included-1.dfd` (which defines P1 and
+P2) by `#include included-1.dfd`:
+
+```data-flow-diagram includer-1.svg
+style	horizontal
+
+#include included-1.dfd
+flow	P1	P2	connection
+```
+![Includer 1](./includer-1.svg)
+
+### Including snippet
+
+You can include another snippet.
+
+Here we first define and generate the snippet `included-snippet-1.svg`:
+
+```data-flow-diagram included-snippet-1.svg
+process	P3	Process 3
+process	P4	Process 4
+```
+![Included snippet](./included-snippet-1.svg)
+
+Then, we use the snippet `included-snippet-1.svg` (defined above) by
+`#include <included-snippet-1`. The leading `<` mandates to include a
+snippet. The output format extension, here `.svg`, must be ommitted.
+
+```data-flow-diagram includer-2.svg
+style	horizontal
+
+#include <included-snippet-1
+flow	P3	P4	connection
+```
+![Includer 2](./includer-2.svg)
+
+### Including snippet
+
+You can include another snippet that is not rendered as graphic file.
+
+Here we first define the snippet `included-snippet-2`. The leading `<`
+mandates to not render it. Hence it needs no format extension.
+
+```data-flow-diagram <included-snippet-2
+process	P5	Process 5
+process	P6	Process 6
+```
+
+Then, we use the snippet `included-snippet-2` (defined above) by
+`#include <included-snippet-2`, like in the previous section.
+
+```data-flow-diagram includer-3.svg
+style	horizontal
+
+#include <included-snippet-2
+flow	P5	P6	connection
+```
+![Includer 3](./includer-3.svg)

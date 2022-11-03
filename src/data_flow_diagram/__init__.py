@@ -19,6 +19,7 @@ import re
 import sys
 import tempfile
 from typing import TextIO
+from collections import Counter
 
 from .dfd import build
 
@@ -74,7 +75,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def generate(input_fp: TextIO, output_path: str, percent_zoom: int,
-             debug: bool, bgcolor: str, format: str) -> None:
+             debug: bool, bgcolor: str, format: str,
+             snippet_by_name: dict[str, str] = None) -> None:
     if debug:
         print(dict(input=input_fp.name,
                    output=output_path,
@@ -92,7 +94,8 @@ def generate(input_fp: TextIO, output_path: str, percent_zoom: int,
         #for cmd in cmds:
         #    print(cmd[0], ', '.join([repr(a) for a in cmd[1:]]))
 
-    build(src, output_path, percent_zoom, bgcolor, format, debug)
+    build(src, output_path, percent_zoom, bgcolor, format, debug,
+          snippet_by_name)
 
 
 def extract_snippets(text: str) -> list[tuple[str, str]]:
@@ -115,12 +118,22 @@ def main() -> None:
     # markdown
     if args.markdown:
         md = inp.read()
-        for src, output in extract_snippets(md):
+        snippets = extract_snippets(md)
+        snippet_by_name = {os.path.splitext(o)[0]:s for s, o in snippets}
+        names = [o for s, o in snippets]
+        counts = Counter(names)
+        multiples = {k:n for k, n in counts.items() if n>1}
+        if multiples:
+            raise RuntimeError(f'snippets defined multiple times: {multiples}')
+        for src, output in snippets:
+            if output.startswith('<'):
+                continue
             inp = io.StringIO(src)
             name = output
             inp.name = name
             generate(inp, name, args.percent_zoom, args.debug,
-                     args.background_color, args.format)
+                     args.background_color, args.format,
+                     snippet_by_name=snippet_by_name)
             print(f'{sys.argv[0]}: generated {name}', file=sys.stderr)
         return
 

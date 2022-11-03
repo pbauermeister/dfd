@@ -1,8 +1,10 @@
 # TODO
 
 P1:
-- optional get declared upon first use: process? / entity? / store? / channel?
-- #include file !recursion
+- #include file
+  - if -m, all snippets are available in {basename(output): src}
+  - if file is <basename, then use snippet
+  !recursion
 
 P2:
 - bgcolor

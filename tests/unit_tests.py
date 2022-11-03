@@ -7,7 +7,7 @@ import inputs
 
 sys.path.insert(0, "src")
 from data_flow_diagram import parse_args, extract_snippets, main
-from data_flow_diagram import parse
+from data_flow_diagram import parser
 from data_flow_diagram import model
 
 
@@ -77,32 +77,32 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_all_syntax_ok(self):
         try:
-            parse.parse(inputs.ALL_SYNTAX_OK)
+            parser.parse(inputs.ALL_SYNTAX_OK)
         except model.DfdException as e:
             self.fail(f'Unexpected syntax error: {e}')
 
     def test_parse_syntax_error(self):
         with self.assertRaises(model.DfdException,
                                msg='Undetected syntax error'):
-            parse.parse(inputs.SYNTAX_ERROR)
+            parser.parse(inputs.SYNTAX_ERROR)
 
     def test_parse_duplicate_item_error(self):
-        statements = parse.parse(inputs.DUPLICATE_ITEM_ERROR)
+        statements = parser.parse(inputs.DUPLICATE_ITEM_ERROR)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd duplicate item name'):
-            parse.check(statements)
+            parser.check(statements)
 
     def test_parse_missing_ref_error(self):
-        statements = parse.parse(inputs.MISSING_REF_ERROR)
+        statements = parser.parse(inputs.MISSING_REF_ERROR)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd missing reference'):
-            parse.check(statements)
+            parser.check(statements)
 
     def test_parse_double_error(self):
-        statements = parse.parse(inputs.DOUBLE_STAR_ERROR)
+        statements = parser.parse(inputs.DOUBLE_STAR_ERROR)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd double * reference'):
-            parse.check(statements)
+            parser.check(statements)
 
 
 
