@@ -65,8 +65,6 @@ flow	P2	C  	records
 Here, all items are rendered, even if not connected to anything:
 
 ```data-flow-diagram show-all-items.svg
-style	horizontal
-
 process	P1	Process 1
 process	P2	Process 2
 process	P3	Process 3
@@ -80,8 +78,6 @@ A `?` postfix to an item name indicates that the item shall be hidden if unused 
 Here, *Process 3* is not rendered:
 
 ```data-flow-diagram hide-if-unused.svg
-style	horizontal
-
 process	P1	Process 1
 process	P2?	Process 2
 process	P3?	Process 3
@@ -115,8 +111,6 @@ You can include a file. Here we include `included-1.dfd` (which defines P1 and
 P2) by `#include included-1.dfd`:
 
 ```data-flow-diagram includer-1.svg
-style	horizontal
-
 #include included-1.dfd
 flow	P1	P2	connection
 ```
@@ -151,8 +145,6 @@ Then, we use the snippet `included-snippet-1.svg` (defined above) by
 snippet. The output format extension, here `.svg`, must be ommitted.
 
 ```data-flow-diagram includer-2.svg
-style	horizontal
-
 #include <included-snippet-1
 flow	P3	P4	connection
 ```
@@ -182,8 +174,6 @@ Then, we use the snippet `included-snippet-2` (defined above) by
 `#include <included-snippet-2`, like in the previous section.
 
 ```data-flow-diagram includer-3.svg
-style	horizontal
-
 #include <included-snippet-2
 flow	P5	P6	connection
 ```
