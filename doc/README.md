@@ -105,6 +105,8 @@ such a code block:
 Note that only code blocks delimited by triple-backticks fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored.
 
+The generated image can be used by e.g. `![Label](FILENAME.svg)`
+
 ### Including files
 
 You can include a file. Here we include `included-1.dfd` (which defines P1 and
@@ -122,17 +124,25 @@ flow	P1	P2	connection
 
 You can include another snippet.
 
-Here we first define and generate the snippet `included-snippet-1.svg`:
+#### Included snippet
+
+Here we first define and generate the snippet `included-snippet-1.svg`.
 
 Code block start fence:
+
     ```data-flow-diagram included-snippet-1.svg
 
 Code block body:
+
 ```data-flow-diagram included-snippet-1.svg
 process	P3	Process 3
 process	P4	Process 4
 ```
+
+Inserted image:  `![Included snippet](./included-snippet-1.svg)`
+
 ![Included snippet](./included-snippet-1.svg)
+#### Includer snippet
 
 Then, we use the snippet `included-snippet-1.svg` (defined above) by
 `#include <included-snippet-1`. The leading `<` mandates to include a
@@ -149,18 +159,22 @@ flow	P3	P4	connection
 ### Including not-rendered snippet
 
 You can include another snippet that is not rendered as graphic file.
+#### Included snippet
 
 Here we first define the snippet `included-snippet-2`. The leading `<`
 mandates to not render it. Hence it needs no format extension.
 
 Code block start fence:
+
     ```data-flow-diagram <included-snippet-2
 
 Code block body:
+
 ```data-flow-diagram <included-snippet-2
 process	P5	Process 5
 process	P6	Process 6
 ```
+#### Includer snippet
 
 Then, we use the snippet `included-snippet-2` (defined above) by
 `#include <included-snippet-2`, like in the previous section.
