@@ -3,6 +3,9 @@
 
 (
     cd doc
+
+    rm -f *.svg
+
     for doc in *.md; do
 	../data-flow-diagram $doc --markdown
     done

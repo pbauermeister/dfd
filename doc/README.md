@@ -2,13 +2,21 @@
 
 ## A. Syntax
 
-DFD source files consist of a list of statements, one per line.
-### 1. Creating items
+DFD source files consist of a list of statements, one per line:
 
-```data-flow-diagram items.svg
+```
 # Line beginning with "#" are comments.
 # Empty lines are allowed.
 
+DFD_STATEMENT
+DFD_STATEMENT
+...
+```
+### 1. Creating items
+
+Items can be `process`, `entity`, `store` or `channel`.
+
+```data-flow-diagram items.svg
 # create a process bubble:
 process	P	Do something
 
@@ -24,6 +32,8 @@ channel	C	A channel
 ![Creating items](./items.svg)
 
 ### 2. Creating connections between items
+
+Connections can be `flow`, `bflow` or `signal`.
 
 ```data-flow-diagram connections.svg
 process	A1	A1
@@ -46,6 +56,7 @@ flow	E	*	an untargetted\nconnection
 ![Creating connections](./connections.svg)
 
 ### 3. A simple complete example
+
 ```data-flow-diagram complete-example.svg
 style	horizontal
 
@@ -99,7 +110,7 @@ A snippet can be defined by such a code block:
 
     ```data-flow-diagram FILENAME.svg
 
-    ...DFD STATEMENTS...
+    ...DFD_STATEMENTS...
 
     ```
 
@@ -125,10 +136,10 @@ The includer does it like this:
 
 where `FILENAME` is the path of the includee, which contains DFD statements.
 
-In the markdown case, includee snippers can be defined as follows:
+In the markdown case, includee snippets can be defined as follows:
 
     ```data-flow-diagram NAME
-    STATEMENTS
+    DFD_STATEMENTS
     ```
 
 and the includer:
