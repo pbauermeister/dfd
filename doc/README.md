@@ -125,7 +125,7 @@ The includer does it like this:
 
 where `FILENAME` is the path of the includee, which contains DFD statements.
 
-With markdown, includee snippers can be defined as follows:
+In the markdown case, includee snippers can be defined as follows:
 
     ```data-flow-diagram NAME
     STATEMENTS
@@ -177,7 +177,7 @@ must be ommitted.
 
     flow	P3	P4	connection
     ```
-![Includer 2](./includer-1.svg)
+![Includer 1](./includer-1.svg)
 
 ### 3. Including snippet without generating an image for the includee
 
@@ -201,4 +201,4 @@ The includer works exactly like in the previous section.
 
     flow	P5	P6	connection
     ```
-![Includer 3](./includer-2.svg)
+![Includer 2](./includer-2.svg)
