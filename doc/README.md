@@ -1,10 +1,15 @@
-# Data Flow Diagram
+# Data Flow Diagram (DFD)
 
 ## A. Syntax
 
+DFD source files consist of a list of statements, one per line.
 ### 1. Creating items
 
 ```data-flow-diagram items.svg
+
+# Line beginning with "#" are comments.
+# Empty lines are allowed.
+
 # create a process bubble:
 process	P	Do something
 
@@ -105,10 +110,31 @@ The generated image file can be used by e.g. `![Label](FILENAME.svg)`
 
 ## C. Including
 
+Including allows you to reuse a DFD portion (the includee) into another DFD
+(the includer).
+
+The includer does it like this:
+
+    #include FILENAME
+
+where `FILENAME` is the path of the includee, which contains DFD statements.
+
+With markdown, includee snippers can be defined as follows:
+
+    ```data-flow-diagram NAME
+    STATEMENTS
+    ```
+
+and the includer:
+
+    #include <NAME
+
+Read on for more details.
+
 ### 1. Including files
 
-You can include a file. Here we include `included-1.dfd` (which defines P1 and
-P2) by `#include included-1.dfd`:
+You can include a file as includee. Here we include `included-1.dfd`
+(which defines P1 and P2) by `#include included-1.dfd`:
 
 ```data-flow-diagram includer-1.svg
 #include included-1.dfd
@@ -118,9 +144,9 @@ flow	P1	P2	connection
 
 ### 2. Including rendered snippet
 
-You can include another snippet.
+When using `--markdown`, you can include another snippet of the same document.
 
-#### a. Included snippet
+#### a. Includee
 
 Here we first define and generate the snippet `included-snippet-1.svg`.
 
@@ -138,7 +164,7 @@ process	P4	Process 4
 Inserting the latter snippet image: `![Included snippet](./included-snippet-1.svg)`
 
 ![Included snippet](./included-snippet-1.svg)
-#### b. Includer snippet
+#### b. Includer
 
 Then, we use the snippet `included-snippet-1.svg` (defined above) by
 `#include <included-snippet-1`. The leading `<` mandates to include a
@@ -152,8 +178,9 @@ flow	P3	P4	connection
 
 ### 3. Including not-rendered snippet
 
-You can include another snippet that is not rendered as image file.
-#### a. Included snippet
+Like above, you can include another snippet of the same document, but without
+rendering said snippet as image file.
+#### a. Includee
 
 Here we first define the snippet `included-snippet-2`. The leading `<`
 mandates to not render it. Hence it needs no format extension.
@@ -168,7 +195,7 @@ Code block body:
 process	P5	Process 5
 process	P6	Process 6
 ```
-#### b. Includer snippet
+#### b. Includer
 
 Then, we use the snippet `included-snippet-2` (defined above) by
 `#include <included-snippet-2`, like in the previous section.
