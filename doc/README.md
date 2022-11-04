@@ -14,8 +14,12 @@ DFD_STATEMENT
 ```
 ### 1. Creating items
 
-Items can be `process`, `entity`, `store` or `channel`.
+Items syntax is:
+```ITEM NAME LABEL```
 
+where ITEM can be `process`, `entity`, `store` or `channel`.
+
+Example:
 ```data-flow-diagram items.svg
 # create a process bubble:
 process	P	Do something
@@ -33,8 +37,12 @@ channel	C	A channel
 
 ### 2. Creating connections between items
 
-Connections can be `flow`, `bflow` or `signal`.
+Connections syntax is:
+```CONNECTION FROM_NAME TO_NAME LABEL```
 
+where CONNECTION can be `flow`, `bflow` or `signal`.
+
+Example:
 ```data-flow-diagram connections.svg
 process	A1	A1
 process	A2	A2
@@ -45,15 +53,23 @@ process	C2	C2
 process D	D
 process E	E
 
-# create all types of connections:
+# create a directed flow:
 flow	A1	A2	a flow
+
+# create a bi-directional flow:
 bflow	B1	B2	a bi-directional flow
+
+# create a directed signal:
 signal	C1	C2	a signal
 
-flow	*	D	an unsourced\nconnection
-flow	E	*	an untargetted\nconnection
+# create untargetted connections
+flow	*	D	an unsourced\nflow
+signal	E	*	an untargetted\nsignal
 ```
 ![Creating connections](./connections.svg)
+
+That's it! With items and connections, you can create any DFD diagram of
+arbitrary complexity.
 
 ### 3. A simple complete example
 

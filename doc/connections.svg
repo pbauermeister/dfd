@@ -83,19 +83,19 @@
 <g id="node10" class="node">
 <title>__star_1__</title>
 <text text-anchor="middle" x="269.5" y="-237" font-family="Times,serif" font-style="italic" font-size="10.00">an untargetted</text>
-<text text-anchor="middle" x="269.5" y="-226" font-family="Times,serif" font-style="italic" font-size="10.00">connection</text>
+<text text-anchor="middle" x="269.5" y="-226" font-family="Times,serif" font-style="italic" font-size="10.00">signal</text>
 </g>
 <!-- E&#45;&gt;__star_1__ -->
 <g id="edge5" class="edge">
 <title>E&#45;&gt;__star_1__</title>
-<path fill="none" stroke="gray" d="M70.19,-234C104.93,-234 167.13,-234 212.64,-234"/>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M70.19,-234C104.93,-234 167.13,-234 212.64,-234"/>
 <polygon fill="gray" stroke="gray" points="212.66,-237.5 222.66,-234 212.66,-230.5 212.66,-237.5"/>
 </g>
 <!-- __star_0__ -->
 <g id="node9" class="node">
 <title>__star_0__</title>
 <text text-anchor="middle" x="43" y="-183" font-family="Times,serif" font-style="italic" font-size="10.00">an unsourced</text>
-<text text-anchor="middle" x="43" y="-172" font-family="Times,serif" font-style="italic" font-size="10.00">connection</text>
+<text text-anchor="middle" x="43" y="-172" font-family="Times,serif" font-style="italic" font-size="10.00">flow</text>
 </g>
 <!-- __star_0__&#45;&gt;D -->
 <g id="edge4" class="edge">
