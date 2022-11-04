@@ -6,7 +6,6 @@ DFD source files consist of a list of statements, one per line.
 ### 1. Creating items
 
 ```data-flow-diagram items.svg
-
 # Line beginning with "#" are comments.
 # Empty lines are allowed.
 
@@ -142,7 +141,7 @@ flow	P1	P2	connection
 ```
 ![Includer 1](./includer-1.svg)
 
-### 2. Including rendered snippet
+### 2. Including snippet
 
 When using `--markdown`, you can include another snippet of the same document.
 
@@ -176,14 +175,13 @@ flow	P3	P4	connection
 ```
 ![Includer 2](./includer-2.svg)
 
-### 3. Including not-rendered snippet
+### 3. Including snippet without generating an image for the includee
 
-Like above, you can include another snippet of the same document, but without
-rendering said snippet as image file.
+Like above, but without generating an image for the includee snippet.
 #### a. Includee
 
 Here we first define the snippet `included-snippet-2`. The leading `<`
-mandates to not render it. Hence it needs no format extension.
+mandates to not generate an image for it. Hence it needs no format extension.
 
 Code block start fence:
 
