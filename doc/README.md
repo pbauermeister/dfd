@@ -93,14 +93,19 @@ flow	P1	P2	connection
 
 With the option `--markdown` (e.g. `data-flow-diagram README.md --markdown`)
 you can embed code blocks that are recognized as Data Flow Diagram snippets.
-For each snippet, an image file is generated. A snippet can be defined by
-such a code block:
+For each snippet, an image file is generated.
+
+A snippet can be defined by such a code block:
 
     ```data-flow-diagram FILENAME.svg
 
     ...DFD STATEMENTS...
 
     ```
+
+The opening fence ```` ```data-flow-diagram FILENAME.svg ```` must specify
+`data-flow-diagram` as formatter, followed by an output file name with
+extension.
 
 Note that only code blocks delimited by triple-backticks fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored.
