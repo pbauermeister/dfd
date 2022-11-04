@@ -1,6 +1,6 @@
 import os.path
 
-def preprocess(src_name, dfd_src: str, debug: bool,
+def preprocess(src_name: str, dfd_src: str, debug: bool,
                snippet_by_name: dict[str, str] = None) -> str:
 
     src_lines = dfd_src.splitlines()
