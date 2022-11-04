@@ -166,13 +166,29 @@ Read on for more details.
 
 ### 1. Including files
 
-You can include a file as includee. Here we include the file `includee.dfd`
-(which defines P1 and P2) by `#include includee.dfd`:
+You can include a file as includee.
+
+Say we have a file named `includee.dfd` containing:
+```
+process	P1	Process 1
+process	P2	Process 2
+```
+
+In any other DFD we can include the file `includee.dfd` by
+`#include includee.dfd`:
 
 ```data-flow-diagram includer.svg
 #include includee.dfd
 flow	P1	P2	connection
 ```
+
+It is equivalent to having:
+```
+process	P1	Process 1
+process	P2	Process 2
+flow	P1	P2	connection
+```
+
 ![Includer 1](./includer.svg)
 
 ### 2. Including snippet
