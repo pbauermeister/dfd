@@ -162,6 +162,8 @@ and the includer:
 
     #include <NAME
 
+Currently, recursive inclusion is not supported.
+
 Read on for more details.
 
 ### 1. Including files
