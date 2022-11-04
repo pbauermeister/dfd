@@ -105,7 +105,9 @@ such a code block:
 Note that only code blocks delimited by triple-backticks fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored.
 
-The generated image file can be used by e.g. `![Label](FILENAME.svg)`
+A generated image file can be used by e.g. `![Label](FILENAME.svg)`.
+
+The source file of the present page is using the markdown feature.
 
 ## C. Including
 
@@ -132,11 +134,11 @@ Read on for more details.
 
 ### 1. Including files
 
-You can include a file as includee. Here we include `included-1.dfd`
-(which defines P1 and P2) by `#include included-1.dfd`:
+You can include a file as includee. Here we include `includee-1.dfd`
+(which defines P1 and P2) by `#include includee-1.dfd`:
 
 ```data-flow-diagram includer-1.svg
-#include included-1.dfd
+#include includee-1.dfd
 flow	P1	P2	connection
 ```
 ![Includer 1](./includer-1.svg)
@@ -147,32 +149,29 @@ When using `--markdown`, you can include another snippet of the same document.
 
 #### a. Includee
 
-Here we first define and generate the snippet `included-snippet-1.svg`.
+Here we first define and generate the snippet `includee-snippet-1.svg`.
 
-Code block start fence:
+    ```data-flow-diagram includee-snippet-1.svg
+    process	P3	Process 3
+    process	P4	Process 4
+    ```
 
-    ```data-flow-diagram included-snippet-1.svg
+The includee generated image can be used: `![Included snippet](./includee-snippet-1.svg)`
 
-Code block body:
-
-```data-flow-diagram included-snippet-1.svg
-process	P3	Process 3
-process	P4	Process 4
-```
-
-Inserting the latter snippet image: `![Included snippet](./included-snippet-1.svg)`
-
-![Included snippet](./included-snippet-1.svg)
+![Included snippet](./includee-snippet-1.svg)
 #### b. Includer
 
-Then, we use the snippet `included-snippet-1.svg` (defined above) by
-`#include <included-snippet-1`. The leading `<` mandates to include a
-snippet. The output format extension, here `.svg`, must be ommitted.
+Then, we use the snippet `includee-snippet-1.svg` (defined above) by
+`#include <includee-snippet-1`. The leading `<` mandates to include a
+snippet. The output format extension, here `.svg` for `includee-snippet-1`,
+must be ommitted.
 
-```data-flow-diagram includer-2.svg
-#include <included-snippet-1
-flow	P3	P4	connection
-```
+    ```data-flow-diagram includer-2.svg
+
+    #include <includee-snippet-1
+
+    flow	P3	P4	connection
+    ```
 ![Includer 2](./includer-2.svg)
 
 ### 3. Including snippet without generating an image for the includee
@@ -180,26 +179,20 @@ flow	P3	P4	connection
 Like above, but without generating an image for the includee snippet.
 #### a. Includee
 
-Here we first define the snippet `included-snippet-2`. The leading `<`
+Here we first define the snippet `includee-snippet-2`. The leading `<`
 mandates to not generate an image for it. Hence it needs no format extension.
 
-Code block start fence:
-
-    ```data-flow-diagram <included-snippet-2
-
-Code block body:
-
-```data-flow-diagram <included-snippet-2
-process	P5	Process 5
-process	P6	Process 6
-```
+    ```data-flow-diagram <includee-snippet-2
+    process	P5	Process 5
+    process	P6	Process 6
+    ```
 #### b. Includer
 
-Then, we use the snippet `included-snippet-2` (defined above) by
-`#include <included-snippet-2`, like in the previous section.
+Then, we use the snippet `includee-snippet-2` (defined above) by
+`#include <includee-snippet-2`, like in the previous section.
 
-```data-flow-diagram includer-3.svg
-#include <included-snippet-2
-flow	P5	P6	connection
-```
+    ```data-flow-diagram includer-3.svg
+    #include <includee-snippet-2
+    flow	P5	P6	connection
+    ```
 ![Includer 3](./includer-3.svg)
