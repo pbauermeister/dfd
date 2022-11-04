@@ -9,21 +9,21 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 40)">
 <title>D</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-40 244.34,-40 244.34,4 -4,4"/>
-<!-- P1 -->
+<!-- P3 -->
 <g id="node1" class="node">
-<title>P1</title>
+<title>P3</title>
 <ellipse fill="none" stroke="black" cx="37.09" cy="-18" rx="37.17" ry="18"/>
-<text text-anchor="middle" x="37.09" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">Process 1</text>
+<text text-anchor="middle" x="37.09" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">Process 3</text>
 </g>
-<!-- P2 -->
+<!-- P4 -->
 <g id="node2" class="node">
-<title>P2</title>
+<title>P4</title>
 <ellipse fill="none" stroke="black" cx="203.26" cy="-18" rx="37.17" ry="18"/>
-<text text-anchor="middle" x="203.26" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">Process 2</text>
+<text text-anchor="middle" x="203.26" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">Process 4</text>
 </g>
-<!-- P1&#45;&gt;P2 -->
+<!-- P3&#45;&gt;P4 -->
 <g id="edge1" class="edge">
-<title>P1&#45;&gt;P2</title>
+<title>P3&#45;&gt;P4</title>
 <path fill="none" stroke="gray" d="M74.52,-18C98.43,-18 129.92,-18 155.65,-18"/>
 <polygon fill="gray" stroke="gray" points="155.92,-21.5 165.92,-18 155.92,-14.5 155.92,-21.5"/>
 <text text-anchor="middle" x="120.17" y="-21" font-family="Times,serif" font-style="italic" font-size="10.00">connection</text>

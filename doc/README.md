@@ -139,14 +139,14 @@ Read on for more details.
 
 ### 1. Including files
 
-You can include a file as includee. Here we include `includee-1.dfd`
-(which defines P1 and P2) by `#include includee-1.dfd`:
+You can include a file as includee. Here we include `includee.dfd`
+(which defines P1 and P2) by `#include includee.dfd`:
 
-```data-flow-diagram includer-1.svg
-#include includee-1.dfd
+```data-flow-diagram includer.svg
+#include includee.dfd
 flow	P1	P2	connection
 ```
-![Includer 1](./includer-1.svg)
+![Includer 1](./includer.svg)
 
 ### 2. Including snippet
 
@@ -171,13 +171,13 @@ Then, we use the snippet `includee-snippet-1.svg` (defined above) by
 snippet. The output format extension, here `.svg` for `includee-snippet-1`,
 must be ommitted.
 
-    ```data-flow-diagram includer-2.svg
+    ```data-flow-diagram includer-1.svg
 
     #include <includee-snippet-1
 
     flow	P3	P4	connection
     ```
-![Includer 2](./includer-2.svg)
+![Includer 2](./includer-1.svg)
 
 ### 3. Including snippet without generating an image for the includee
 
@@ -195,10 +195,10 @@ mandates to not generate an image for it. Hence it needs no format extension.
 
 The includer works exactly like in the previous section.
 
-    ```data-flow-diagram includer-3.svg
+    ```data-flow-diagram includer-2.svg
 
     #include <includee-snippet-2
 
     flow	P5	P6	connection
     ```
-![Includer 3](./includer-3.svg)
+![Includer 3](./includer-2.svg)
