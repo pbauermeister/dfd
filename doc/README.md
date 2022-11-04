@@ -193,11 +193,12 @@ mandates to not generate an image for it. Hence it needs no format extension.
     ```
 #### b. Includer
 
-Then, we use the snippet `includee-snippet-2` (defined above) by
-`#include <includee-snippet-2`, like in the previous section.
+The includer works exactly like in the previous section.
 
     ```data-flow-diagram includer-3.svg
+
     #include <includee-snippet-2
+
     flow	P5	P6	connection
     ```
 ![Includer 3](./includer-3.svg)
