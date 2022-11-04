@@ -14,10 +14,9 @@ DFD_STATEMENT
 ```
 ### 1. Creating items
 
-Items syntax is:
-```ITEM NAME LABEL```
-
-where ITEM can be `process`, `entity`, `store` or `channel`.
+Synopsis:
+- ```ITEM NAME LABEL```
+- where ITEM can be `process`, `entity`, `store` or `channel`.
 
 Example:
 ```data-flow-diagram items.svg
@@ -37,10 +36,9 @@ channel	C	A channel
 
 ### 2. Creating connections between items
 
-Connections syntax is:
-```CONNECTION FROM_NAME TO_NAME LABEL```
-
-where CONNECTION can be `flow`, `bflow` or `signal`.
+Synopsis:
+- ```CONNECTION FROM_NAME TO_NAME LABEL```
+- where CONNECTION can be `flow`, `bflow` or `signal`.
 
 Example:
 ```data-flow-diagram connections.svg
@@ -93,7 +91,7 @@ flow	P2	C  	records
 
 ### 4. Items rendered only if used (hidable)
 
-Here, all items are rendered, even if not connected to anything:
+By default, all items are rendered, even if not connected to anything:
 
 ```data-flow-diagram show-all-items.svg
 process	P1	Process 1
@@ -104,7 +102,8 @@ flow	P1	P2	connection
 ```
 ![Show all items](./show-all-items.svg)
 
-A `?` postfix to an item name indicates that the item shall be hidden if unused (i.e. not connected to anything).
+A `?` postfix to an item name indicates that, if unused (i.e. not connected to
+anything), the item shall be hidden.
 
 Here, *Process 3* is not rendered:
 
@@ -118,7 +117,8 @@ flow	P1	P2	connection
 
 ## B. Markdown snippets
 
-With the option `--markdown` (e.g. `data-flow-diagram README.md --markdown`)
+With the command line option `--markdown` (e.g.
+`data-flow-diagram README.md --markdown`)
 you can embed code blocks that are recognized as Data Flow Diagram snippets.
 For each snippet, an image file is generated.
 
@@ -166,7 +166,7 @@ Read on for more details.
 
 ### 1. Including files
 
-You can include a file as includee. Here we include `includee.dfd`
+You can include a file as includee. Here we include the file `includee.dfd`
 (which defines P1 and P2) by `#include includee.dfd`:
 
 ```data-flow-diagram includer.svg
@@ -195,8 +195,8 @@ The includee generated image can be used: `![Included snippet](./includee-snippe
 
 Then, we use the snippet `includee-snippet-1.svg` (defined above) by
 `#include <includee-snippet-1`. The leading `<` mandates to include a
-snippet. The output format extension, here `.svg` for `includee-snippet-1`,
-must be ommitted.
+snippet and not a file. The output format extension (here `.svg` for
+`includee-snippet-1`) must be ommitted.
 
     ```data-flow-diagram includer-1.svg
 
