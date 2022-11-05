@@ -18,10 +18,10 @@ entity	E	Entity
 store	S	Store
 channel	C	Channel
 
-flow	E	P	flow
-signal	P	P2	signal
-bflow	P	S	flow
-flow	P	C	flow
+E  --> P	flow
+P  ::> P2	signal
+P  <-> S	bidirectional flow
+P  --> C	flow
 ```
 
 ![simple example](https://raw.githubusercontent.com/pbauermeister/dfd/master/example.svg "Simple example")
