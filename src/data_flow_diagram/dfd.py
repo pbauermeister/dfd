@@ -1,23 +1,20 @@
 """Run the generation process"""
 
+import sys
 from typing import Optional
 
-from . import model
-from . import dot
-from . import parser
 from . import dfd_dot_templates as TMPL
-from . import scanner
+from . import dot, model, parser, scanner
 
-def build(provenance: model.SourceLine,
-          dfd_src: str, output_path: str, percent_zoom: int, bgcolor: str,
-          format: str, debug: bool,
-          snippet_by_name: dict[str, model.Snippet] = None) -> None:
+
+def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
+          percent_zoom: int, bgcolor: str, format: str, debug: bool,
+          snippet_by_name: model.SnippetByName = None) -> None:
     """Take a DFD source and build the final image or document"""
-
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, debug)
     statements = parser.parse(lines, debug)
     items_by_name = parser.check(statements)
-    statements = filter_items(statements)
+    statements = filter_statements(statements)
 
     gen = Generator()
     text = generate_dot(gen, statements, items_by_name)
@@ -60,8 +57,8 @@ class Generator:
         self.star_nr += 1
         return star_name
 
-    def generate_connection(self, conn: model.Connection,
-                            src_item: model.Item, dst_item: model.Item) -> None:
+    def generate_connection(self, conn: model.Connection, src_item: model.Item,
+                            dst_item: model.Item) -> None:
         text = conn.text or ''
         src_port = dst_port = ""
 
@@ -106,8 +103,7 @@ class Generator:
         return text
 
 
-def generate_dot(gen: Generator,
-                 statements: list[model.Statement],
+def generate_dot(gen: Generator, statements: model.Statements,
                  items_by_name: dict[str, model.Item]) -> str:
     """Iterate over statements and generate a dot source file"""
     def get_item(name: str) -> Optional[model.Item]:
@@ -129,7 +125,7 @@ def generate_dot(gen: Generator,
     return gen.generate_dot_text()
 
 
-def filter_items(statements: list[model.Statement]) -> list[model.Statement]:
+def filter_statements(statements: model.Statements) -> model.Statements:
     # collect used items
     connected_items = set()
     for statement in statements:

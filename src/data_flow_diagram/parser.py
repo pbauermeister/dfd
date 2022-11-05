@@ -6,7 +6,7 @@ from typing import Callable, Tuple
 from . import model
 
 
-def check(statements: list[model.Statement]) -> dict[str, model.Item]:
+def check(statements: model.Statements) -> dict[str, model.Item]:
     """Check that all statement make sense"""
 
     # collect items
@@ -24,9 +24,10 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
             continue
 
         other = items_by_name[name]
+        other_text = model.pack(other.source.text)
         raise model.DfdException(
             f'{error_prefix}Name "{name}" already exists '
-            f'at line {other.source.line_nr+1}: {model.pack(other.source.text)}')
+            f'at line {other.source.line_nr+1}: {other_text}')
 
     # check references and values
     for statement in statements:
@@ -45,16 +46,17 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
                 f'which is not defined')
         if nb_stars == 2:
             raise model.DfdException(
-                f'{error_prefix}Connection "{conn.type}" may not link to two stars')
+                f'{error_prefix}Connection "{conn.type}" may not link to two '
+                f'stars')
 
     return items_by_name
 
 
-def parse(source_lines: list[model.SourceLine],
-          debug: bool = False) -> list[model.Statement]:
+def parse(source_lines: model.SourceLines, debug: bool = False,
+         ) -> model.Statements:
     """Parse the DFD source text as list of statements"""
 
-    statements: list[model.Statement] = []
+    statements: model.Statements = []
 
     for n, source in enumerate(source_lines):
         src_line = source.text

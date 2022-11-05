@@ -3,9 +3,9 @@ import os
 from . import model
 
 def scan(provenance: model.SourceLine, input: str,
-         snippet_by_name: dict[str, model.Snippet] = None,
-         debug: bool = False) -> list[model.SourceLine]:
-    output: list[model.SourceLine] = []
+         snippet_by_name: model.SnippetByName = None, debug: bool = False,
+        ) -> model.SourceLines:
+    output: model.SourceLines = []
     if provenance is None:
         provenance = model.SourceLine("", provenance, None, 0)
     _scan(input, provenance, output, snippet_by_name)
@@ -24,8 +24,8 @@ def scan(provenance: model.SourceLine, input: str,
 
 
 def _scan(input: str, parent: model.SourceLine,
-         output: list[model.SourceLine] = None,
-         snippet_by_name: dict[str, model.Snippet] = None) -> None:
+          output: model.SourceLines = None,
+          snippet_by_name: model.SnippetByName = None) -> None:
     for nr, line in enumerate(input.splitlines()):
         if not line.strip():
             continue
@@ -37,9 +37,8 @@ def _scan(input: str, parent: model.SourceLine,
             output.append(source_line)
 
 
-def include(line: str, parent: model.SourceLine,
-            output: list[model.SourceLine],
-            snippet_by_name: dict[str, model.Snippet] = None) -> None:
+def include(line: str, parent: model.SourceLine, output: model.SourceLines,
+            snippet_by_name: model.SnippetByName = None) -> None:
     pair = line.split(maxsplit=1)
     name = pair[1]
     prefix = model.mk_err_prefix_from(parent)

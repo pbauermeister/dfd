@@ -74,43 +74,34 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def call_build(provenance: model.SourceLine,
-               input_fp: TextIO, output_path: str, percent_zoom: int,
-               debug: bool, bgcolor: str, format: str,
-               snippet_by_name: dict[str, model.Snippet] = None) -> None:
-    src = input_fp.read()
-    dfd.build(provenance, src, output_path, percent_zoom, bgcolor, format,
-                debug, snippet_by_name)
-
-
 def handle_markdown_source(args: argparse.Namespace, provenance: str,
                            input_fp: TextIO) -> None:
     text = input_fp.read()
     snippets = markdown.extract_snippets(text)
+    markdown.check_snippets_unicity(provenance, snippets)
     snippets_params = markdown.make_snippets_params(provenance, snippets)
     for params in snippets_params:
-        call_build(params.root, params.input_fp, params.file_name,
-                    args.percent_zoom, args.debug,
-                    args.background_color, args.format,
-                    snippet_by_name=params.snippet_by_name)
+        dfd.build(params.root, params.input_fp.read(), params.file_name,
+                  args.percent_zoom, args.background_color, args.format,
+                  args.debug, snippet_by_name=params.snippet_by_name)
         print(f'{sys.argv[0]}: generated {params.file_name}', file=sys.stderr)
 
 
 def handle_dfd_source(args: argparse.Namespace, provenance: str,
-                     input_fp: TextIO, output_path: str, ) -> None:
+                      input_fp: TextIO, output_path: str) -> None:
     root = model.SourceLine("", provenance, None, None)
     if output_path == '-':
         # output to stdout
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, 'file.svg')
-            call_build(root, input_fp, path, args.percent_zoom, args.debug,
-                       args.background_color, args.format)
+            dfd.build(root, input_fp.read(), path, args.percent_zoom,
+                      args.background_color, args.format, args.debug)
             with open(path) as f:
                 print(f.read())
     else:
         # output to file
-        call_build(root, input_fp, output_path, args.percent_zoom, args.debug,
-                   args.background_color, args.format)
+        dfd.build(root, input_fp.read(), output_path, args.percent_zoom,
+                  args.background_color, args.format, args.debug, )
 
 
 def run(args: argparse.Namespace) -> None:
@@ -130,7 +121,8 @@ def run(args: argparse.Namespace) -> None:
     # adjust output
     if args.output_file is None:
         if args.INPUT_FILE is not None:
-            output_path = os.path.splitext(args.INPUT_FILE)[0] + '.' + args.format
+            basename = os.path.splitext(args.INPUT_FILE)[0]
+            output_path = basename + '.' + args.format
         else:
             output_path = '-'
     else:

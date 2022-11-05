@@ -32,7 +32,7 @@ class Snippet(Base):
 class SourceLine(Base):
     text: str  # after pre-processor
     raw_text: str
-    parent: SourceLine
+    parent: SourceLine  # https://stackoverflow.com/a/62521947
     line_nr: int
 
 
@@ -99,3 +99,10 @@ def mk_err_prefix_from(src: SourceLine) -> str:
 
 class DfdException(Exception):
     pass
+
+
+# Handy type aliases
+Snippets = list[Snippet]
+SourceLines = list[SourceLine]
+Statements = list[Statement]
+SnippetByName = dict[str, Snippet]
