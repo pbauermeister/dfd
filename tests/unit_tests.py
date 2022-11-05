@@ -6,10 +6,11 @@ import contextlib
 import inputs
 
 sys.path.insert(0, "src")
-from data_flow_diagram import parse_args, extract_snippets, main
+
+from data_flow_diagram import parse_args, main
 from data_flow_diagram import parser, scanner
 from data_flow_diagram import model
-
+from data_flow_diagram.markdown import extract_snippets
 
 def is_svg(text: str) -> bool:
     text = text.strip()
@@ -48,7 +49,10 @@ class UnitTest(unittest.TestCase):
 
     def test_input_md(self) -> None:
         result = extract_snippets(inputs.MD_OK)
-        expected = inputs.MD_EXPECTED
+        expected = [
+            model.Snippet(**inputs.MD_EXPECTED[0]),
+            model.Snippet(**inputs.MD_EXPECTED[1]),
+        ]
         self.assertSequenceEqual(
             result, expected,
             'Extraction of snippets in MD text')

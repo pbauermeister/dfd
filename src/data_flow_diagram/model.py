@@ -76,6 +76,8 @@ SIGNAL  = 'signal'
 
 
 def pack(src_line: str) -> str:
+    if src_line is None:
+        return '<none>'
     return ' '.join(src_line.split())
 
 

@@ -8,8 +8,7 @@ examples.
 
 -----
 
-This module does pretty much all the work for now.
-
+This module parses the commandline args, prepares the I/Os and calls the stuff.
 """
 
 import argparse
@@ -19,10 +18,10 @@ import re
 import sys
 import tempfile
 from typing import TextIO
-from collections import Counter
 
-from .dfd import build
-from. import model
+from . import dfd
+from . import model
+from . import markdown
 
 
 def parse_args() -> argparse.Namespace:
@@ -79,103 +78,74 @@ def call_build(provenance: model.SourceLine,
                input_fp: TextIO, output_path: str, percent_zoom: int,
                debug: bool, bgcolor: str, format: str,
                snippet_by_name: dict[str, model.Snippet] = None) -> None:
-    if debug:
-        print(dict(input=input_fp.name,
-                   output=output_path,
-                   percent_zoom=percent_zoom,
-                   debug=debug,
-                   bgcolor=bgcolor,
-                   format=format,
-        ), file=sys.stderr)
-
     src = input_fp.read()
-
-    if debug:
-        print(src, file=sys.stderr)
-        print("----------", file=sys.stderr)
-        #for cmd in cmds:
-        #    print(cmd[0], ', '.join([repr(a) for a in cmd[1:]]))
-
-    try:
-        build(provenance, src, output_path, percent_zoom, bgcolor, format, debug,
-              snippet_by_name)
-    except model.DfdException as e:
-        print('ERROR:', e, file=sys.stdout)
-        sys.exit(1)
+    dfd.build(provenance, src, output_path, percent_zoom, bgcolor, format,
+                debug, snippet_by_name)
 
 
-def extract_snippets(text: str) -> list[model.Snippet]:
-    rx = re.compile(r'^```\s*data-flow-diagram\s+(?P<output>.*?)\s*'
-                    r'^(?P<src>.*?)^\s*```', re.DOTALL | re.M)
+def handle_markdown_source(args: argparse.Namespace, provenance: str,
+                           input_fp: TextIO) -> None:
+    text = input_fp.read()
+    snippets = markdown.extract_snippets(text)
+    snippets_params = markdown.make_snippets_params(provenance, snippets)
+    for params in snippets_params:
+        call_build(params.root, params.input_fp, params.file_name,
+                    args.percent_zoom, args.debug,
+                    args.background_color, args.format,
+                    snippet_by_name=params.snippet_by_name)
+        print(f'{sys.argv[0]}: generated {params.file_name}', file=sys.stderr)
 
-    return [
-        model.Snippet(
-            text=match['src'],
-            name=os.path.splitext(match['output'])[0],
-            output=match['output'],
-            line_nr=len(text[:match.start()].splitlines()))
-        for match in rx.finditer(text)]
+
+def handle_dfd_source(args: argparse.Namespace, provenance: str,
+                     input_fp: TextIO, output_path: str, ) -> None:
+    root = model.SourceLine("", provenance, None, None)
+    if output_path == '-':
+        # output to stdout
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, 'file.svg')
+            call_build(root, input_fp, path, args.percent_zoom, args.debug,
+                       args.background_color, args.format)
+            with open(path) as f:
+                print(f.read())
+    else:
+        # output to file
+        call_build(root, input_fp, output_path, args.percent_zoom, args.debug,
+                   args.background_color, args.format)
+
+
+def run(args: argparse.Namespace) -> None:
+    # adjust input
+    if args.INPUT_FILE is None:
+        input_fp = sys.stdin
+        provenance = '<stdin>'
+    else:
+        input_fp = open(args.INPUT_FILE)
+        provenance = f'<file:{args.INPUT_FILE}>'
+
+    # markdown source
+    if args.markdown:
+        handle_markdown_source(args, provenance, input_fp)
+        return
+
+    # adjust output
+    if args.output_file is None:
+        if args.INPUT_FILE is not None:
+            output_path = os.path.splitext(args.INPUT_FILE)[0] + '.' + args.format
+        else:
+            output_path = '-'
+    else:
+        output_path = args.output_file
+
+    # DFD source
+    handle_dfd_source(args, provenance, input_fp, output_path)
 
 
 def main() -> None:
     """Entry point for the application script"""
     args = parse_args()
 
-    # treat input
-    if args.INPUT_FILE is None:
-        inp = sys.stdin
-        provenance = '<stdin>'
-    else:
-        inp = open(args.INPUT_FILE)
-        provenance = f'<file:{args.INPUT_FILE}>'
-
-    # markdown
-    if args.markdown:
-        md = inp.read()
-        snippets = extract_snippets(md)
-        snippet_by_name = {s.name:s for s in snippets}
-        names = snippet_by_name.keys()
-        counts = Counter(names)
-        multiples = {k:n for k, n in counts.items() if n>1}
-        if multiples:
-            raise RuntimeError(f'snippets defined multiple times: {multiples}')
-        for snippet in snippets:
-            if snippet.output.startswith('<'):
-                # snippet w/o output, maybe just as includee
-                continue
-            # snippet with output
-            inp = io.StringIO(snippet.text)
-            snippet_provenance = f'{provenance}<snippet:{snippet.output}>'
-            snippet_root = model.SourceLine("", snippet_provenance,
-                                            None, snippet.line_nr)
-            file_name = inp.name =snippet.output
-            call_build(snippet_root,
-                       inp, file_name, args.percent_zoom, args.debug,
-                       args.background_color, args.format,
-                       snippet_by_name=snippet_by_name)
-            print(f'{sys.argv[0]}: generated {file_name}', file=sys.stderr)
-        return
-
-    # treat output
-    if args.output_file is None:
-        if args.INPUT_FILE is not None:
-            name = os.path.splitext(args.INPUT_FILE)[0] + '.' + args.format
-        else:
-            name = '-'
-    else:
-        name = args.output_file
-
-    root = model.SourceLine("", provenance, None, None)
-    if name == '-':
-        # output to stdout
-        with tempfile.TemporaryDirectory() as d:
-            path = os.path.join(d, 'file.svg')
-            call_build(root, inp, path, args.percent_zoom, args.debug,
-                       args.background_color, args.format)
-            with open(path) as f:
-                print(f.read())
-    else:
-        # output to file
-        call_build(root, inp, name, args.percent_zoom, args.debug,
-                   args.background_color, args.format)
-    return
+    try:
+        run(args)
+    except model.DfdException as e:
+        print('ERROR:', e, file=sys.stdout)
+        sys.exit(1)
