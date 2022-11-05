@@ -7,7 +7,7 @@ https://packaging.python.org/guides/distributing-packages-using-setuptools/
 from setuptools import setup, find_packages
 import pathlib
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")

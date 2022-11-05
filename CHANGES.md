@@ -1,5 +1,8 @@
 ## Changes
 
+# Version 1.1.1
+- Fix bug with left/bidir arrows.
+
 # Version 1.1.0
 - Upon error, print error stack trace.
 - Items: label can be ommitted.
