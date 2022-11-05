@@ -5,5 +5,6 @@ process	P4	Process 4
 
 ```data-flow-diagram includer-1.svg
 #include <included-snippet-1
-flow	P3	P4	connection
+
+P3 --> P4	connection
 ```

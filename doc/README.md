@@ -69,6 +69,31 @@ signal	E	*	an untargetted\nsignal
 That's it! With items and connections, you can create any DFD diagram of
 arbitrary complexity.
 
+Syntactic sugars make source easier on the eye:
+
+| Keyword      | Syntactic sugar                    |
+| -------------| -----------------------------------|
+| `flow   A B` | `A --> B` <br/> or <br/>` B <-- A` |
+| `bflow  A B` | `A <-> B` <br/> or <br/> `B <-> A` |
+| `signal A B` | `A ::> B` <br/> or <br/> `B <:: A` |
+
+The shaft of the arrow can be of arbitrary lengh, so `->` , `-->` and `------->`
+are equivalent.
+
+```data-flow-diagram connections-sugar.svg
+process	P1	P1
+process	P2	P2
+
+P1 --> P2	a flow
+P1 <-> P2	a bi-directional flow
+P1 ::> P2	a signal
+
+*  --> P2	an unsourced\nflow
+P1 ::> *	an untargetted\nsignal
+```
+![Creating connections](./connections-sugar.svg)
+
+
 ### 3. A simple complete example
 
 ```data-flow-diagram complete-example.svg
@@ -80,12 +105,12 @@ entity	T	Device
 store	S	Configuration
 channel	C	API
 
-flow	T	P	raw data
-flow	P	P2	raw records
-signal	*	P	clock
-bflow	S	P2	parameters
+T  --> P 	raw data
+P  --> P2	raw records
+*  ::> P 	clock
+S  <-> P2	parameters
 
-flow	P2	C  	records
+P2 --> C  	records
 ```
 ![Creating items](./complete-example.svg)
 
@@ -98,7 +123,7 @@ process	P1	Process 1
 process	P2	Process 2
 process	P3	Process 3
 
-flow	P1	P2	connection
+P1 --> P2	connection
 ```
 ![Show all items](./show-all-items.svg)
 
@@ -111,7 +136,8 @@ Here, *Process 3* is not rendered:
 process	P1	Process 1
 process	P2?	Process 2
 process	P3?	Process 3
-flow	P1	P2	connection
+
+P1 --> P2	connection
 ```
 ![Hide if unused](./hide-if-unused.svg)
 
@@ -181,14 +207,16 @@ In any other DFD we can include the file `includee.dfd` by
 
 ```data-flow-diagram includer.svg
 #include includee.dfd
-flow	P1	P2	connection
+
+P1 --> P2	connection
 ```
 
 It is equivalent to having:
 ```
 process	P1	Process 1
 process	P2	Process 2
-flow	P1	P2	connection
+
+P1 --> P2	connection
 ```
 
 ![Includer 1](./includer.svg)
@@ -220,7 +248,7 @@ snippet and not a file. The output format extension (here `.svg` for
 
     #include <includee-snippet-1
 
-    flow	P3	P4	connection
+    P3 --> P4	connection
     ```
 ![Includer 1](./includer-1.svg)
 
@@ -244,6 +272,6 @@ The includer works exactly like in the previous section.
 
     #include <includee-snippet-2
 
-    flow	P5	P6	connection
+    P5 --> P6	connection
     ```
 ![Includer 2](./includer-2.svg)

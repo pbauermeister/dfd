@@ -1,3 +1,4 @@
 process	P5	Process 5
 process	P6	Process 6
-flow	P5	P6	connection
+
+P5 --> P6	connection

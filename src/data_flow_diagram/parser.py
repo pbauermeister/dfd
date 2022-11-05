@@ -1,7 +1,7 @@
 """Parse DFD source text in our DSL"""
 
-from typing import Callable
-from typing import Tuple
+import re
+from typing import Callable, Tuple
 
 from . import model
 
@@ -59,7 +59,12 @@ def parse(dfd_src: str) -> list[model.Statement]:
     for n, src_line in enumerate(src_lines):
         src_line = src_line.strip()
         if not src_line or src_line.startswith('#'): continue
-        terms = src_line.split()
+        error_prefix = model.mk_err_prefix(n, src_line)
+
+        # syntactic sugars may rewrite the line
+        line = apply_syntactic_sugars(src_line)
+
+        terms = line.split()
         word = terms[0]
 
         f: Callable[[str, int], model.Statement] = {
@@ -73,13 +78,12 @@ def parse(dfd_src: str) -> list[model.Statement]:
             model.SIGNAL: parse_signal,
         }.get(word)
 
-        error_prefix = model.mk_err_prefix(n, src_line)
         if f is None:
             raise model.DfdException(f'{error_prefix}Unrecognized keyword '
                                      f'"{word}"')
 
         try:
-            statement = f(src_line, n)
+            statement = f(line, n)
         except model.DfdException as e:
             raise model.DfdException(f'{error_prefix}{e}"')
 
@@ -160,3 +164,34 @@ def parse_signal(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(dfd_line, 3, True)
     return model.Connection(line_nr, dfd_line, model.SIGNAL, src, dst, text)
+
+def apply_syntactic_sugars(src_line: str) -> str:
+    terms = src_line.split()
+    if len(terms) < 3:
+        return src_line
+
+    op = terms[1]
+
+    new_line = ''
+    if re.match(r'-+>', op):
+            parts = src_line.split(maxsplit=3)
+            new_line = '\t'.join(['flow', parts[0], parts[2], parts[3]])
+    elif re.match(r'<-+', op):
+            parts = src_line.split(maxsplit=3)
+            new_line = '\t'.join(['flow', parts[2], parts[0], parts[3]])
+
+    elif re.match(r'<-+>', op):
+            parts = src_line.split(maxsplit=3)
+            new_line = '\t'.join(['bflow', parts[0], parts[2], parts[3]])
+
+    elif re.match(r':+>', op):
+            parts = src_line.split(maxsplit=3)
+            new_line = '\t'.join(['signal', parts[0], parts[2], parts[3]])
+    elif re.match(r'<:+', op):
+            parts = src_line.split(maxsplit=3)
+            new_line = '\t'.join(['signal', parts[2], parts[0], parts[3]])
+
+    if new_line:
+        return new_line
+    else:
+        return src_line
