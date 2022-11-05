@@ -7,18 +7,18 @@ import inputs
 
 sys.path.insert(0, "src")
 from data_flow_diagram import parse_args, extract_snippets, main
-from data_flow_diagram import parser
+from data_flow_diagram import parser, scanner
 from data_flow_diagram import model
 
 
-def is_svg(text):
+def is_svg(text: str) -> bool:
     text = text.strip()
     return text.startswith('<?xml') and text.endswith('</svg>')
 
 
 class UnitTest(unittest.TestCase):
 
-    def test_parse_args(self):
+    def test_parse_args(self) -> None:
 
         # replace cmdline args
         a1 = 'my-file'
@@ -46,14 +46,14 @@ class UnitTest(unittest.TestCase):
             args.INPUT_FILE, a1,
             'Commandline positional arg mismatch')
 
-    def test_input_md(self):
+    def test_input_md(self) -> None:
         result = extract_snippets(inputs.MD_OK)
         expected = inputs.MD_EXPECTED
         self.assertSequenceEqual(
             result, expected,
             'Extraction of snippets in MD text')
 
-    def test_output_stdout(self):
+    def test_output_stdout(self) -> None:
         old_stdin = sys.stdin
         sys.stdin = io.StringIO("process P Process")  # DFD
 
@@ -75,31 +75,36 @@ class UnitTest(unittest.TestCase):
         self.assertTrue(is_svg(out),
                          'Output to stdout is not SVG')
 
-    def test_parse_all_syntax_ok(self):
+    def test_parse_all_syntax_ok(self) -> None:
+        l = scanner.scan(None, inputs.ALL_SYNTAX_OK)
         try:
-            parser.parse(inputs.ALL_SYNTAX_OK)
+            parser.parse(l)
         except model.DfdException as e:
             self.fail(f'Unexpected syntax error: {e}')
 
-    def test_parse_syntax_error(self):
+    def test_parse_syntax_error(self) -> None:
+        l = scanner.scan(None, inputs.SYNTAX_ERROR)
         with self.assertRaises(model.DfdException,
                                msg='Undetected syntax error'):
-            parser.parse(inputs.SYNTAX_ERROR)
+            parser.parse(l)
 
-    def test_parse_duplicate_item_error(self):
-        statements = parser.parse(inputs.DUPLICATE_ITEM_ERROR)
+    def test_parse_duplicate_item_error(self) -> None:
+        l = scanner.scan(None, inputs.DUPLICATE_ITEM_ERROR)
+        statements = parser.parse(l)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd duplicate item name'):
             parser.check(statements)
 
-    def test_parse_missing_ref_error(self):
-        statements = parser.parse(inputs.MISSING_REF_ERROR)
+    def test_parse_missing_ref_error(self) -> None:
+        l = scanner.scan(None, inputs.MISSING_REF_ERROR)
+        statements = parser.parse(l)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd missing reference'):
             parser.check(statements)
 
-    def test_parse_double_error(self):
-        statements = parser.parse(inputs.DOUBLE_STAR_ERROR)
+    def test_parse_double_error(self) -> None:
+        l = scanner.scan(None, inputs.DOUBLE_STAR_ERROR)
+        statements = parser.parse(l)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd double * reference'):
             parser.check(statements)

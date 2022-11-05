@@ -1,10 +1,44 @@
 """Internal data model"""
 
+from __future__ import annotations
+
+import dataclasses
+import json
 from dataclasses import dataclass
+from typing import Any
+
+def repr(o: Any) -> str:
+    name: str = o.__class__.__name__
+    val: str = json.dumps(dataclasses.asdict(o), indent='  ')
+    return f'{name} {val}'
+
+
 @dataclass
-class Statement:
+class Base:
+    def __repr__(self) -> str:
+        return (self.__class__.__name__ + ' '
+                + json.dumps(dataclasses.asdict(self), indent='  '))
+
+
+@dataclass
+class Snippet(Base):
+    text: str
+    name: str
+    output: str
     line_nr: int
-    line: str
+
+
+@dataclass
+class SourceLine(Base):
+    text: str  # after pre-processor
+    raw_text: str
+    parent: SourceLine
+    line_nr: int
+
+
+@dataclass
+class Statement(Base):
+    source: SourceLine
 
 
 @dataclass
@@ -45,13 +79,20 @@ def pack(src_line: str) -> str:
     return ' '.join(src_line.split())
 
 
-def mk_err_prefix(n: int, src_line: str) -> str:
-    return f'line {n+1}: {pack(src_line)}\n'
+def mk_err_prefix_from(src: SourceLine) -> str:
 
+    def _add_to_stack(stack: list[str], src: SourceLine) -> None:
+        if src.line_nr is None:
+            stack += [f'  {pack(src.raw_text)}']
+        else:
+            stack += [f'  line {src.line_nr+1}: {pack(src.raw_text)}']
+        if src.parent:
+            _add_to_stack(stack, src.parent)
 
-def mk_err_prefix_from(statement: Statement) -> str:
-    n, src_line = statement.line_nr, statement.line
-    return mk_err_prefix(n, src_line)
+    stack: list[str] = ['(most recent first)']
+    _add_to_stack(stack, src)
+    stack += ['']
+    return '\n'.join(stack) + 'Error: '
 
 
 class DfdException(Exception):

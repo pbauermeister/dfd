@@ -12,7 +12,7 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
     # collect items
     items_by_name: dict[str, model.Item] = {}
     for statement in statements:
-        error_prefix = model.mk_err_prefix_from(statement)
+        error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Item() as item: pass
             case _: continue
@@ -26,11 +26,11 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
         other = items_by_name[name]
         raise model.DfdException(
             f'{error_prefix}Name "{name}" already exists '
-            f'at line {other.line_nr+1}: {model.pack(other.line)}')
+            f'at line {other.source.line_nr+1}: {model.pack(other.source.text)}')
 
     # check references and values
     for statement in statements:
-        error_prefix = model.mk_err_prefix_from(statement)
+        error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Connection() as conn: pass
             case _: continue
@@ -41,33 +41,35 @@ def check(statements: list[model.Statement]) -> dict[str, model.Item]:
             if point == "*" or point in items_by_name:
                 continue
             raise model.DfdException(
-                f'{error_prefix} {conn.type} links to {point}, '
+                f'{error_prefix}Connection "{conn.type}" links to "{point}", '
                 f'which is not defined')
         if nb_stars == 2:
             raise model.DfdException(
-                f'{error_prefix} {conn.type} may not link to two stars')
+                f'{error_prefix}Connection "{conn.type}" may not link to two stars')
 
     return items_by_name
 
 
-def parse(dfd_src: str) -> list[model.Statement]:
+def parse(source_lines: list[model.SourceLine],
+          debug: bool = False) -> list[model.Statement]:
     """Parse the DFD source text as list of statements"""
 
     statements: list[model.Statement] = []
 
-    src_lines = dfd_src.splitlines()
-    for n, src_line in enumerate(src_lines):
+    for n, source in enumerate(source_lines):
+        src_line = source.text
+
         src_line = src_line.strip()
         if not src_line or src_line.startswith('#'): continue
-        error_prefix = model.mk_err_prefix(n, src_line)
+        error_prefix = model.mk_err_prefix_from(source)
 
         # syntactic sugars may rewrite the line
         line = apply_syntactic_sugars(src_line)
+        source.text = line  # fixup text
 
-        terms = line.split()
-        word = terms[0]
+        word = source.text.split()[0]
 
-        f: Callable[[str, int], model.Statement] = {
+        f: Callable[[model.SourceLine], model.Statement] = {
             model.STYLE: parse_style,
             model.PROCESS: parse_process,
             model.ENTITY: parse_entity,
@@ -83,11 +85,14 @@ def parse(dfd_src: str) -> list[model.Statement]:
                                      f'"{word}"')
 
         try:
-            statement = f(line, n)
+            statement = f(source)
         except model.DfdException as e:
             raise model.DfdException(f'{error_prefix}{e}"')
 
         statements.append(statement)
+
+    if debug:
+        for s in statements: print(model.repr(s))
     return statements
 
 
@@ -118,56 +123,56 @@ def parse_item_name(name: str) -> Tuple[str, bool]:
         return name, False
 
 
-def parse_style(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
-    style = split_args(dfd_line, 1)[0]
-    return model.Style(line_nr, dfd_line, style)
+    style = split_args(source.text, 1)[0]
+    return model.Style(source, style)
 
 
-def parse_process(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_process(source: model.SourceLine) -> model.Statement:
     """Parse process statement"""
-    name, text = split_args(dfd_line, 2, True, True)
+    name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(line_nr, dfd_line, model.PROCESS, name, text, hidable)
+    return model.Item(source, model.PROCESS, name, text, hidable)
 
 
-def parse_entity(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_entity(source: model.SourceLine) -> model.Statement:
     """Parse entity statement"""
-    name, text = split_args(dfd_line, 2, True, True)
+    name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(line_nr, dfd_line, model.ENTITY, name, text, hidable)
+    return model.Item(source, model.ENTITY, name, text, hidable)
 
 
-def parse_store(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_store(source: model.SourceLine) -> model.Statement:
     """Parse store statement"""
-    name, text = split_args(dfd_line, 2, True, True)
+    name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(line_nr, dfd_line, model.STORE, name, text, hidable)
+    return model.Item(source, model.STORE, name, text, hidable)
 
 
-def parse_channel(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_channel(source: model.SourceLine) -> model.Statement:
     """Parse channel statement"""
-    name, text = split_args(dfd_line, 2, True, True)
+    name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(line_nr, dfd_line, model.CHANNEL, name, text, hidable)
+    return model.Item(source, model.CHANNEL, name, text, hidable)
 
 
-def parse_flow(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_flow(source: model.SourceLine) -> model.Statement:
     """Parse flow statement"""
-    src, dst, text = split_args(dfd_line, 3, True)
-    return model.Connection(line_nr, dfd_line, model.FLOW, src, dst, text)
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.FLOW, src, dst, text)
 
 
-def parse_bflow(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
-    src, dst, text = split_args(dfd_line, 3, True)
-    return model.Connection(line_nr, dfd_line, model.BFLOW, src, dst, text)
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.BFLOW, src, dst, text)
 
 
-def parse_signal(dfd_line: str, line_nr: int) -> model.Statement:
+def parse_signal(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
-    src, dst, text = split_args(dfd_line, 3, True)
-    return model.Connection(line_nr, dfd_line, model.SIGNAL, src, dst, text)
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.SIGNAL, src, dst, text)
 
 def apply_syntactic_sugars(src_line: str) -> str:
     terms = src_line.split()

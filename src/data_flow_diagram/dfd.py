@@ -6,17 +6,19 @@ from . import model
 from . import dot
 from . import parser
 from . import dfd_dot_templates as TMPL
-from . import preprocessor
+from . import scanner
 
-def build(dfd_src: str, output_path: str, percent_zoom: int, bgcolor: str,
+def build(provenance: model.SourceLine,
+          dfd_src: str, output_path: str, percent_zoom: int, bgcolor: str,
           format: str, debug: bool,
-          snippet_by_name: dict[str, str] = None) -> None:
+          snippet_by_name: dict[str, model.Snippet] = None) -> None:
     """Take a DFD source and build the final image or document"""
-    dfd_src = preprocessor.preprocess(output_path, dfd_src, debug, snippet_by_name)
 
-    statements = parser.parse(dfd_src)
+    lines = scanner.scan(provenance, dfd_src, snippet_by_name, debug)
+    statements = parser.parse(lines, debug)
     items_by_name = parser.check(statements)
     statements = filter_items(statements)
+
     gen = Generator()
     text = generate_dot(gen, statements, items_by_name)
     if debug:
@@ -31,8 +33,8 @@ class Generator:
 
     def append(self, line:str, statement: model.Statement) -> None:
         self.lines.append('')
-        source = model.pack(statement.line)
-        self.lines.append(f'/* {statement.line_nr}: {source} */')
+        text = model.pack(statement.source.text)
+        self.lines.append(f'/* {statement.source.line_nr}: {text} */')
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
@@ -112,7 +114,6 @@ def generate_dot(gen: Generator,
         return None if name == '*' else items_by_name[name]
 
     for statement in statements:
-        error_prefix = model.mk_err_prefix_from(statement)
         match statement:
             case model.Item() as item:
                 gen.generate_item(item)

@@ -217,17 +217,17 @@ Read on for more details.
 
 You can include a file as includee.
 
-Say we have a file named `includee.dfd` containing:
+Say we have a file named `includee.part` containing:
 ```
 process	P1	Process 1
 process	P2	Process 2
 ```
 
-In any other DFD we can include the file `includee.dfd` by
-`#include includee.dfd`:
+In any other DFD we can include the file `includee.part` by
+`#include includee.part`:
 
 ```data-flow-diagram includer.svg
-#include includee.dfd
+#include includee.part
 
 P1 --> P2	connection
 ```
