@@ -184,21 +184,21 @@ def apply_syntactic_sugars(src_line: str) -> str:
     op = terms[1]
 
     new_line = ''
-    if re.match(r'-+>', op):
+    if re.fullmatch(r'-+>', op):
             parts = src_line.split(maxsplit=3)
             new_line = '\t'.join(['flow', parts[0], parts[2], parts[3]])
-    elif re.match(r'<-+', op):
+    elif re.fullmatch(r'<-+', op):
             parts = src_line.split(maxsplit=3)
             new_line = '\t'.join(['flow', parts[2], parts[0], parts[3]])
 
-    elif re.match(r'<-+>', op):
+    elif re.fullmatch(r'<-+>', op):
             parts = src_line.split(maxsplit=3)
             new_line = '\t'.join(['bflow', parts[0], parts[2], parts[3]])
 
-    elif re.match(r':+>', op):
+    elif re.fullmatch(r':+>', op):
             parts = src_line.split(maxsplit=3)
             new_line = '\t'.join(['signal', parts[0], parts[2], parts[3]])
-    elif re.match(r'<:+', op):
+    elif re.fullmatch(r'<:+', op):
             parts = src_line.split(maxsplit=3)
             new_line = '\t'.join(['signal', parts[2], parts[0], parts[3]])
 
