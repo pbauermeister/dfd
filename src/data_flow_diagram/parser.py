@@ -91,12 +91,16 @@ def parse(dfd_src: str) -> list[model.Statement]:
     return statements
 
 
-def split_args(dfd_line: str, n: int, last_is_optional: bool=False) -> list[str]:
+def split_args(dfd_line: str, n: int, last_is_optional: bool=False,
+               make_last_from_previous: bool=False) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
 
     terms = dfd_line.split(maxsplit=n)
     if len(terms)-1 == n-1 and last_is_optional:
-        terms.append(None)
+        if make_last_from_previous:
+            terms.append(terms[-1])
+        else:
+            terms.append(None)
     if len(terms)-1 != n:
         if not last_is_optional:
             raise model.DfdException(f'Expected {n} argument(s)')
@@ -122,28 +126,28 @@ def parse_style(dfd_line: str, line_nr: int) -> model.Statement:
 
 def parse_process(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse process statement"""
-    name, text = split_args(dfd_line, 2)
+    name, text = split_args(dfd_line, 2, True, True)
     name, hidable = parse_item_name(name)
     return model.Item(line_nr, dfd_line, model.PROCESS, name, text, hidable)
 
 
 def parse_entity(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse entity statement"""
-    name, text = split_args(dfd_line, 2)
+    name, text = split_args(dfd_line, 2, True, True)
     name, hidable = parse_item_name(name)
     return model.Item(line_nr, dfd_line, model.ENTITY, name, text, hidable)
 
 
 def parse_store(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse store statement"""
-    name, text = split_args(dfd_line, 2)
+    name, text = split_args(dfd_line, 2, True, True)
     name, hidable = parse_item_name(name)
     return model.Item(line_nr, dfd_line, model.STORE, name, text, hidable)
 
 
 def parse_channel(dfd_line: str, line_nr: int) -> model.Statement:
     """Parse channel statement"""
-    name, text = split_args(dfd_line, 2)
+    name, text = split_args(dfd_line, 2, True, True)
     name, hidable = parse_item_name(name)
     return model.Item(line_nr, dfd_line, model.CHANNEL, name, text, hidable)
 

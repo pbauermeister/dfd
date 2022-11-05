@@ -16,7 +16,8 @@ DFD_STATEMENT
 
 Synopsis:
 - ```ITEM NAME LABEL```
-- where ITEM can be `process`, `entity`, `store` or `channel`.
+- where ITEM can be `process`, `entity`, `store` or `channel`,
+- and NAME shall be sort, without whitespaces.
 
 Example:
 ```data-flow-diagram items.svg
@@ -34,6 +35,25 @@ channel	C	A channel
 ```
 ![Creating items](./items.svg)
 
+#### Optional label
+
+The LABEL can be ommitted, in which case the NAME is used in lieu:
+
+```data-flow-diagram items-unlabelled.svg
+# create a process bubble:
+process	PROC
+
+# create a terminal rectangle:
+entity	ENTITY
+
+# create a store:
+store	STORE
+
+# create a channel
+channel	CHAN
+```
+![Creating items](./items-unlabelled.svg)
+
 ### 2. Creating connections between items
 
 Synopsis:
@@ -42,14 +62,14 @@ Synopsis:
 
 Example:
 ```data-flow-diagram connections.svg
-process	A1	A1
-process	A2	A2
-process	B1	B1
-process	B2	B2
-process	C1	C1
-process	C2	C2
-process D	D
-process E	E
+process	A1
+process	A2
+process	B1
+process	B2
+process	C1
+process	C2
+process D
+process E
 
 # create a directed flow:
 flow	A1	A2	a flow
@@ -69,20 +89,21 @@ signal	E	*	an untargetted\nsignal
 That's it! With items and connections, you can create any DFD diagram of
 arbitrary complexity.
 
+#### Syntactic sugars
 Syntactic sugars make source easier on the eye:
 
-| Keyword      | Syntactic sugar                    |
-| -------------| -----------------------------------|
-| `flow   A B` | `A --> B` <br/> or <br/>` B <-- A` |
-| `bflow  A B` | `A <-> B` <br/> or <br/> `B <-> A` |
-| `signal A B` | `A ::> B` <br/> or <br/> `B <:: A` |
+| Statement with keyword      | Equivalent with syntactic sugar    |
+| ----------------------------| -----------------------------------|
+| `flow   A B`                | `A --> B` <br/> or <br/>` B <-- A` |
+| `bflow  A B`                | `A <-> B` <br/> or <br/> `B <-> A` |
+| `signal A B`                | `A ::> B` <br/> or <br/> `B <:: A` |
 
 The shaft of the arrow can be of arbitrary lengh, so `->` , `-->` and `------->`
 are equivalent.
 
 ```data-flow-diagram connections-sugar.svg
-process	P1	P1
-process	P2	P2
+process	P1
+process	P2
 
 P1 --> P2	a flow
 P1 <-> P2	a bi-directional flow
