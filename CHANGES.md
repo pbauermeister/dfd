@@ -1,5 +1,10 @@
 ## Changes
 
+# Version 1.1.2
+- Snippet reference and ungenerated snippet were marked with '<'; now
+  use '#' instead.
+- Detect include (infinite) recursions and print error.
+
 # Version 1.1.1
 - Fix bug with left/bidir arrows.
 
