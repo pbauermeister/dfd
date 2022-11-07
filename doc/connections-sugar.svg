@@ -29,11 +29,19 @@
 <text text-anchor="middle" x="154.5" y="-108" font-family="Times,serif" font-style="italic" font-size="10.00">a flow</text>
 </g>
 <!-- P1&#45;&gt;P2 -->
+<g id="edge2" class="edge">
+<title>P1&#45;&gt;P2</title>
+<path fill="none" stroke="gray" d="M77.14,-90.8C85.8,-88.23 95.18,-85.73 104,-84 147.57,-75.43 198.58,-71.37 232.11,-69.51"/>
+<polygon fill="gray" stroke="gray" points="75.9,-87.52 67.39,-93.83 77.97,-94.21 75.9,-87.52"/>
+<polygon fill="gray" stroke="gray" points="232.54,-72.99 242.35,-68.97 232.18,-66 232.54,-72.99"/>
+<text text-anchor="middle" x="154.5" y="-87" font-family="Times,serif" font-style="italic" font-size="10.00">a bi&#45;directional flow</text>
+</g>
+<!-- P1&#45;&gt;P2 -->
 <g id="edge3" class="edge">
 <title>P1&#45;&gt;P2</title>
-<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M67.39,-93.83C78.37,-90.29 91.73,-86.41 104,-84 147.57,-75.43 198.58,-71.37 232.11,-69.51"/>
-<polygon fill="gray" stroke="gray" points="232.54,-72.99 242.35,-68.97 232.18,-66 232.54,-72.99"/>
-<text text-anchor="middle" x="154.5" y="-87" font-family="Times,serif" font-style="italic" font-size="10.00">a signal</text>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M58.19,-87.1C69.45,-76.43 86.21,-62.93 104,-57 147.43,-42.52 200.81,-50.43 234.75,-58.4"/>
+<polygon fill="gray" stroke="gray" points="234.08,-61.84 244.63,-60.85 235.76,-55.05 234.08,-61.84"/>
+<text text-anchor="middle" x="154.5" y="-60" font-family="Times,serif" font-style="italic" font-size="10.00">a signal</text>
 </g>
 <!-- __star_1__ -->
 <g id="node4" class="node">
@@ -47,13 +55,6 @@
 <path fill="none" stroke="gray" stroke-dasharray="5,2" d="M67.45,-109.87C78.45,-113.35 91.8,-117.26 104,-120 139.86,-128.06 180.71,-134.28 212.73,-138.51"/>
 <polygon fill="gray" stroke="gray" points="212.43,-142 222.79,-139.81 213.33,-135.05 212.43,-142"/>
 </g>
-<!-- P2&#45;&gt;P1 -->
-<g id="edge2" class="edge">
-<title>P2&#45;&gt;P1</title>
-<path fill="none" stroke="gray" d="M245.37,-59.61C212.79,-49.14 152.02,-34.61 104,-52 88.82,-57.5 74.77,-68.7 64.1,-79.11"/>
-<polygon fill="gray" stroke="gray" points="61.41,-76.85 56.95,-86.46 66.43,-81.73 61.41,-76.85"/>
-<text text-anchor="middle" x="154.5" y="-55" font-family="Times,serif" font-style="italic" font-size="10.00">a bi&#45;directional flow</text>
-</g>
 <!-- __star_0__ -->
 <g id="node3" class="node">
 <title>__star_0__</title>
@@ -63,8 +64,8 @@
 <!-- __star_0__&#45;&gt;P2 -->
 <g id="edge4" class="edge">
 <title>__star_0__&#45;&gt;P2</title>
-<path fill="none" stroke="gray" d="M86.02,-20.52C118.89,-23.25 165.5,-28.83 205,-40 216.36,-43.21 228.33,-48.07 238.78,-52.84"/>
-<polygon fill="gray" stroke="gray" points="237.34,-56.03 247.88,-57.15 240.34,-49.71 237.34,-56.03"/>
+<path fill="none" stroke="gray" d="M86.14,-22.94C118.88,-27.29 165.25,-34.56 205,-45 215.46,-47.75 226.63,-51.5 236.64,-55.18"/>
+<polygon fill="gray" stroke="gray" points="235.59,-58.53 246.19,-58.79 238.07,-51.98 235.59,-58.53"/>
 </g>
 </g>
 </svg>
