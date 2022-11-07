@@ -207,9 +207,9 @@ In the markdown case, includee snippets can be defined as follows:
 
 and the includer:
 
-    #include <NAME
+    #include #NAME
 
-Currently, recursive inclusion is not supported.
+Nested inclusions are supported, except if they generate an endless loop (recursion).
 
 Read on for more details.
 
@@ -258,16 +258,18 @@ Here we first define and generate the snippet `includee-snippet-1.svg`.
 The includee generated image can be used: `![Included snippet](./includee-snippet-1.svg)`
 
 ![Included snippet](./includee-snippet-1.svg)
+
 #### b. Includer
 
 Then, we use the snippet `includee-snippet-1.svg` (defined above) by
-`#include <includee-snippet-1`. The leading `<` mandates to include a
-snippet and not a file. The output format extension (here `.svg` for
+`#include <includee-snippet-1`. The leading `#` mandates to include a
+snippet and not a file. Think of it like an anchor to the markdown snippet.
+The output format extension (here `.svg` for
 `includee-snippet-1`) must be ommitted.
 
     ```data-flow-diagram includer-1.svg
 
-    #include <includee-snippet-1
+    #include #includee-snippet-1
 
     P3 --> P4	connection
     ```
@@ -276,12 +278,13 @@ snippet and not a file. The output format extension (here `.svg` for
 ### 3. Including snippet without generating an image for the includee
 
 Like above, but without generating an image for the includee snippet.
+
 #### a. Includee
 
-Here we first define the snippet `includee-snippet-2`. The leading `<`
+Here we first define the snippet `includee-snippet-2`. A leading `#`
 mandates to not generate an image for it. Hence it needs no format extension.
 
-    ```data-flow-diagram <includee-snippet-2
+    ```data-flow-diagram #includee-snippet-2
     process	P5	Process 5
     process	P6	Process 6
     ```
@@ -291,8 +294,47 @@ The includer works exactly like in the previous section.
 
     ```data-flow-diagram includer-2.svg
 
-    #include <includee-snippet-2
+    #include #includee-snippet-2
 
     P5 --> P6	connection
     ```
 ![Includer 2](./includer-2.svg)
+
+### 4. Nested includes
+
+The following markdown defines nested snippets:
+
+    ```data-flow-diagram #snippet-1
+    process	P1
+    process	P2
+    ```
+
+    ```data-flow-diagram #snippet-2
+    #include #snippet-1
+    process	P3
+    ```
+
+    ```data-flow-diagram nested-include.svg
+    #include #snippet-2
+    P1 --> P3	connection
+    P2 --> P3	connection
+    ```
+
+This yields the image: <br/>
+![Nested](./nested-include.svg)
+
+Such a snippet (which includes itself) involves an infinite recursion:
+
+    ```data-flow-diagram snippet-recursive.svg
+    process	P1
+    #include #snippet-recursive
+    ```
+and would cause this error during image generation:
+```
+ERROR: (most recent first)
+  line 2: #include #snippet-recursive
+  line 1: <snippet #snippet-recursive>
+  line 2: #include #snippet-recursive
+  line 329: <file:README.md><snippet:snippet-recursive.svg>
+Error: Recursive include of "#snippet-recursive"
+```

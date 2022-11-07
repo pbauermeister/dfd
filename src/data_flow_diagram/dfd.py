@@ -45,7 +45,7 @@ class Generator:
             case model.CHANNEL:
                 line = TMPL.CHANNEL.format(**item.__dict__)
             case _:
-                prefix = model.mk_err_prefix_from(item)
+                prefix = model.mk_err_prefix_from(item.source)
                 raise model.DfdException(f'{prefix}Unsupported item type '
                                          f'"{item.type}"')
         self.append(line, item)
@@ -87,7 +87,7 @@ class Generator:
             case model.SIGNAL:
                 attrs += ' style=dashed'
             case _:
-                prefix = model.mk_err_prefix_from(conn)
+                prefix = model.mk_err_prefix_from(conn.source)
                 raise model.DfdException(f'{prefix}Unsupported connection type '
                                          f'"{conn.type}"')
 

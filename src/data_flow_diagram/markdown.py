@@ -38,7 +38,7 @@ def make_snippets_params(provenance: str, snippets: model.Snippets,
 
     for snippet in snippets:
         # snippet w/o output, maybe just as includee
-        if snippet.output.startswith('<'):
+        if snippet.output.startswith('#'):
             continue
 
         # snippet with output

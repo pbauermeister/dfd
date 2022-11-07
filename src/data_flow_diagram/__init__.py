@@ -22,6 +22,7 @@ from typing import TextIO
 from . import dfd
 from . import model
 from . import markdown
+from . import dot
 
 
 def parse_args() -> argparse.Namespace:
@@ -134,6 +135,9 @@ def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     """Entry point for the application script"""
+
+    dot.check_installed()
+
     args = parse_args()
 
     try:
