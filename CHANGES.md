@@ -1,18 +1,23 @@
-## Changes
+# Changes
 
-# Version 1.2.3
+## version 1.3.x:
+- Style vertical: is supported
+- Style context: for context (top-level) diagrams
+- Add undirected flow (uflow aka '--')
+
+## Version 1.2.3
 - Snippet reference and ungenerated snippet were marked with '<'; now
   use '#' instead.
 - Detect include (infinite) recursions and print error.
 - Can print its own version.
 
-# Version 1.1.1
+## Version 1.1.1
 - Fix bug with left/bidir arrows.
 
-# Version 1.1.0
+## Version 1.1.0
 - Upon error, print error stack trace.
 - Items: label can be ommitted.
 - Connections: syntactic sugars with arrows.
 
-# Version 1.0.0
+## Version 1.0.0
 - Initial release.
