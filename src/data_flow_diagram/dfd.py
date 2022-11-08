@@ -15,18 +15,20 @@ def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
     statements = parser.parse(lines, debug)
     items_by_name = parser.check(statements)
     statements = filter_statements(statements)
+    statements, graph_options = handle_options(statements)
 
-    gen = Generator()
+    gen = Generator(graph_options)
     text = generate_dot(gen, statements, items_by_name)
     if debug:
         print(text)
-    dot.generate_image(text, output_path, format)
+    dot.generate_image(graph_options, text, output_path, format)
 
 
 class Generator:
-    def __init__(self) -> None:
+    def __init__(self, graph_options: model.GraphOptions) -> None:
         self.lines: list[str] = []
         self.star_nr = 0
+        self.graph_options = graph_options
 
     def append(self, line:str, statement: model.Statement) -> None:
         self.lines.append('')
@@ -37,7 +39,8 @@ class Generator:
     def generate_item(self, item: model.Item) -> None:
         match item.type:
             case model.PROCESS:
-                line = f'"{item.name}" [shape=ellipse label="{item.text}"]'
+                shape = 'circle' if self.graph_options.is_context else 'ellipse'
+                line = f'"{item.name}" [shape={shape} label="{item.text}"]'
             case model.ENTITY:
                 line = f'"{item.name}" [shape=rectangle label="{item.text}"]'
             case model.STORE:
@@ -98,8 +101,21 @@ class Generator:
         pass
 
     def generate_dot_text(self) -> str:
+        graph_params = []
+        if self.graph_options.is_context:
+            graph_params.append(TMPL.GRAPH_PARAMS_CONTEXT_DIAGRAM)
+
+        if self.graph_options.is_vertical:
+            graph_params.append('rankdir=TB')
+        else:
+            graph_params.append('rankdir=LR')
+
         block = '\n'.join(self.lines).replace('\n', '\n  ')
-        text = TMPL.DOT.format(block=block).replace('\n  \n', '\n\n')
+        text = TMPL.DOT.format(
+            block=block,
+            graph_params='\n  '.join(graph_params),
+        ).replace('\n  \n', '\n\n')
+        print(text)
         return text
 
 
@@ -145,3 +161,26 @@ def filter_statements(statements: model.Statements) -> model.Statements:
         new_statements.append(statement)
 
     return new_statements
+
+
+def handle_options(statements: model.Statements) -> tuple[
+        model.Statements, model.GraphOptions]:
+    new_statements = []
+    options = model.GraphOptions()
+    for statement in statements:
+        match statement:
+            case model.Style() as style:
+                match style.style:
+                    case 'vertical':
+                        options.is_vertical = True
+                    case 'context':
+                        options.is_context = True
+                    case _:
+                        prefix = model.mk_err_prefix_from(statement.source)
+                        raise model.DfdException(f'{prefix}Unsupported style '
+                                                 f'"{style.style}"')
+
+                continue
+        new_statements.append(statement)
+
+    return new_statements, options

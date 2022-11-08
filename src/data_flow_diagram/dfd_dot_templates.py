@@ -37,9 +37,12 @@ DOT_FONT_NODE = 'fontname="helvetica" fontsize=10'
 
 DOT = """
 digraph D {{
-  rankdir=LR
+  {graph_params}
   edge[color=gray """ + DOT_FONT_EDGE + """]
   node[""" + DOT_FONT_NODE + """]
   {block}
 }}
 """.strip()
+
+
+GRAPH_PARAMS_CONTEXT_DIAGRAM = 'graph [overlap=scale, mindist=.25]'

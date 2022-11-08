@@ -3,9 +3,16 @@
 import subprocess
 import sys
 
+from . import model
 
-def generate_image(text: str, output_path: str, format: str) -> None:
-    cmd = ['dot', f'-T{format}',  f'-o{output_path}']
+def generate_image(graph_options: model.GraphOptions,
+                   text: str, output_path: str, format: str) -> None:
+    if graph_options.is_context:
+        engine = 'circo'
+    else:
+        engine = 'dot'
+
+    cmd = [engine, f'-T{format}',  f'-o{output_path}']
     subprocess.run(cmd, input=text, encoding='utf-8')
     #print('Generated:', output_path, file=sys.stderr)
 

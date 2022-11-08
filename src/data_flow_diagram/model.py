@@ -75,6 +75,12 @@ BFLOW   = 'bflow'
 SIGNAL  = 'signal'
 
 
+@dataclass
+class GraphOptions():
+    is_vertical: bool = False
+    is_context: bool = False
+
+
 def pack(src_line: str) -> str:
     if src_line is None:
         return '<none>'

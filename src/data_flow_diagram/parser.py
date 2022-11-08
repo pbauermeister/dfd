@@ -176,6 +176,7 @@ def parse_signal(source: model.SourceLine) -> model.Statement:
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.SIGNAL, src, dst, text)
 
+
 def apply_syntactic_sugars(src_line: str) -> str:
     terms = src_line.split()
     if len(terms) < 3:
@@ -183,24 +184,30 @@ def apply_syntactic_sugars(src_line: str) -> str:
 
     op = terms[1]
 
+    def fmt(verb: str, args: list[str], swap: bool = False) -> str:
+        array = [verb] + args
+        del array[2]  # remove arrow
+        if swap:
+            array[1], array[2] = array[2], array[1]
+        return '\t'.join(array)
+
     new_line = ''
     if re.fullmatch(r'-+>', op):
             parts = src_line.split(maxsplit=3)
-            new_line = '\t'.join(['flow', parts[0], parts[2], parts[3]])
+            new_line = fmt('flow', parts)
     elif re.fullmatch(r'<-+', op):
-            parts = src_line.split(maxsplit=3)
-            new_line = '\t'.join(['flow', parts[2], parts[0], parts[3]])
+            new_line = fmt('flow', parts, swap=True)
 
     elif re.fullmatch(r'<-+>', op):
             parts = src_line.split(maxsplit=3)
-            new_line = '\t'.join(['bflow', parts[0], parts[2], parts[3]])
+            new_line = fmt('bflow', parts)
 
     elif re.fullmatch(r':+>', op):
             parts = src_line.split(maxsplit=3)
-            new_line = '\t'.join(['signal', parts[0], parts[2], parts[3]])
+            new_line = fmt('signal', parts)
     elif re.fullmatch(r'<:+', op):
             parts = src_line.split(maxsplit=3)
-            new_line = '\t'.join(['signal', parts[2], parts[0], parts[3]])
+            new_line = fmt('signal', parts, swap=True)
 
     if new_line:
         return new_line
