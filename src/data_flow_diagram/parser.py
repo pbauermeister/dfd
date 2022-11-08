@@ -79,6 +79,7 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             model.CHANNEL: parse_channel,
             model.FLOW: parse_flow,
             model.BFLOW: parse_bflow,
+            model.UFLOW: parse_uflow,
             model.SIGNAL: parse_signal,
         }.get(word)
 
@@ -160,7 +161,7 @@ def parse_channel(source: model.SourceLine) -> model.Statement:
 
 
 def parse_flow(source: model.SourceLine) -> model.Statement:
-    """Parse flow statement"""
+    """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.FLOW, src, dst, text)
 
@@ -169,6 +170,12 @@ def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.BFLOW, src, dst, text)
+
+
+def parse_uflow(source: model.SourceLine) -> model.Statement:
+    """Parse undirected flow flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.UFLOW, src, dst, text)
 
 
 def parse_signal(source: model.SourceLine) -> model.Statement:
@@ -193,21 +200,25 @@ def apply_syntactic_sugars(src_line: str) -> str:
 
     new_line = ''
     if re.fullmatch(r'-+>', op):
-            parts = src_line.split(maxsplit=3)
-            new_line = fmt('flow', parts)
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('flow', parts)
     elif re.fullmatch(r'<-+', op):
-            new_line = fmt('flow', parts, swap=True)
+        new_line = fmt('flow', parts, swap=True)
 
     elif re.fullmatch(r'<-+>', op):
-            parts = src_line.split(maxsplit=3)
-            new_line = fmt('bflow', parts)
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('bflow', parts)
+
+    elif re.fullmatch(r'--+', op):
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('uflow', parts)
 
     elif re.fullmatch(r':+>', op):
-            parts = src_line.split(maxsplit=3)
-            new_line = fmt('signal', parts)
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('signal', parts)
     elif re.fullmatch(r'<:+', op):
-            parts = src_line.split(maxsplit=3)
-            new_line = fmt('signal', parts, swap=True)
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('signal', parts, swap=True)
 
     if new_line:
         return new_line

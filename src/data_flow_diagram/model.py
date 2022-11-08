@@ -72,6 +72,7 @@ NONE    = 'none'
 
 FLOW    = 'flow'
 BFLOW   = 'bflow'
+UFLOW   = 'uflow'
 SIGNAL  = 'signal'
 
 
