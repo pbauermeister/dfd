@@ -203,6 +203,7 @@ def apply_syntactic_sugars(src_line: str) -> str:
         parts = src_line.split(maxsplit=3)
         new_line = fmt('flow', parts)
     elif re.fullmatch(r'<-+', op):
+        parts = src_line.split(maxsplit=3)
         new_line = fmt('flow', parts, swap=True)
 
     elif re.fullmatch(r'<-+>', op):

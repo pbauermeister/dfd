@@ -177,6 +177,8 @@ def handle_options(statements: model.Statements) -> tuple[
                         options.is_vertical = True
                     case 'context':
                         options.is_context = True
+                    case 'horizontal':
+                        options.is_vertical = False
                     case _:
                         prefix = model.mk_err_prefix_from(statement.source)
                         raise model.DfdException(f'{prefix}Unsupported style '
