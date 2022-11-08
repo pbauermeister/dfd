@@ -52,9 +52,8 @@
 <!-- P&#45;&gt;C -->
 <g id="edge4" class="edge">
 <title>P&#45;&gt;C:c</title>
-<path fill="none" stroke="gray" d="M171.82,-85.95C178.88,-83.78 186.5,-81.5 193.58,-79.5 252.19,-62.95 323.11,-45.55 349.76,-39.1"/>
-<polygon fill="gray" stroke="gray" points="350.61,-42.5 359.51,-36.75 348.97,-35.69 350.61,-42.5"/>
-<text text-anchor="middle" x="237.58" y="-82.5" font-family="Times,serif" font-style="italic" font-size="10.00">flow</text>
+<path fill="none" stroke="gray" d="M171.82,-85.95C178.88,-83.78 186.5,-81.5 193.58,-79.5 262.73,-59.98 349,-39.27 359.51,-36.75"/>
+<text text-anchor="middle" x="237.58" y="-82.5" font-family="Times,serif" font-style="italic" font-size="10.00">undirected flow</text>
 </g>
 <!-- E -->
 <g id="node3" class="node">

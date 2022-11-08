@@ -21,7 +21,7 @@ channel	C	Channel
 E  --> P	flow
 P  ::> P2	signal
 P  <-> S	bidirectional flow
-P  --> C	flow
+P  --- C	undirected flow
 ```
 
 ![simple example](https://raw.githubusercontent.com/pbauermeister/dfd/master/example.svg "Simple example")

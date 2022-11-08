@@ -68,6 +68,8 @@ process	B1
 process	B2
 process	C1
 process	C2
+process	D1
+process	D2
 process D
 process E
 
@@ -79,6 +81,9 @@ bflow	B1	B2	a bi-directional flow
 
 # create a directed signal:
 signal	C1	C2	a signal
+
+# create an undirected flow:
+uflow	D1	D2	an undirected flow
 
 # create untargetted connections
 flow	*	D	an unsourced\nflow
@@ -96,6 +101,7 @@ Syntactic sugars make source easier on the eye:
 | ----------------------------| -----------------------------------|
 | `flow   A B`                | `A --> B` <br/> or <br/>` B <-- A` |
 | `bflow  A B`                | `A <-> B` <br/> or <br/> `B <-> A` |
+| `uflow  A B`                | `A --- B` <br/> or <br/> `B <-> A` |
 | `signal A B`                | `A ::> B` <br/> or <br/> `B <:: A` |
 
 The shaft of the arrow can be of arbitrary lengh, so `->` , `-->` and `------->`
@@ -118,8 +124,6 @@ P1 ::> *	an untargetted\nsignal
 ### 3. A simple complete example
 
 ```data-flow-diagram complete-example.svg
-style	horizontal
-
 process	P	Acquire data
 process	P2	Compute
 entity	T	Device
@@ -161,6 +165,54 @@ process	P3?	Process 3
 P1 --> P2	connection
 ```
 ![Hide if unused](./hide-if-unused.svg)
+
+### 5. Context diagrams
+
+A top-level, so-called "Context Diagram" can be created by specifying `style context`:
+
+```data-flow-diagram context.svg
+style context
+
+process	P	The System
+entity  E1  Entity 1
+entity  E2  Entity 2
+entity  E3  Entity 3
+entity  E4  Entity 4
+
+E1  --> P   flow
+E2  <-- P   flow
+E3  <-> P   flow
+E4  ::> P   signal
+```
+![Context diagram](./context.svg)
+
+Note that there should be exactly one process.
+
+### 6. Diagram direction
+
+By default, the graph direction is horizontal, so `style horizontal` is implied:
+
+```data-flow-diagram horizontal.svg
+style horizontal
+
+process	P1
+process P2
+
+P1 --> P2
+```
+![Horizontal](./horizontal.svg)
+
+For a top-down direction, use `style vertical`:
+
+```data-flow-diagram vertical.svg
+style vertical
+
+process	P1
+process P2
+
+P1 --> P2
+```
+![Vertical](./vertical.svg)
 
 ## B. Markdown snippets
 
