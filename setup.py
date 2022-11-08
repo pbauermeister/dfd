@@ -7,15 +7,12 @@ https://packaging.python.org/guides/distributing-packages-using-setuptools/
 from setuptools import setup, find_packages
 import pathlib
 
-with open('VERSION', encoding='utf-8') as f:
-    VERSION = f.read().strip()
-
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="data-flow-diagram",
-    version=VERSION,
+    version="1.2.2-post1",
     description="Commandline tool to generate data flow diagrams from text",
     long_description=long_description,
     long_description_content_type="text/markdown",
