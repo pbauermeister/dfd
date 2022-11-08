@@ -7,7 +7,8 @@ https://packaging.python.org/guides/distributing-packages-using-setuptools/
 from setuptools import setup, find_packages
 import pathlib
 
-VERSION = "1.2.1"
+with open('VERSION', encoding='utf-8') as f:
+    VERSION = f.read().strip()
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
@@ -43,6 +44,7 @@ setup(
     package_data={
 #        "data_flow_diagram": ["tbdpackage__data.dat"],
     },
+#    data_files=[('data_flow_diagram', ["VERSION"])],
     # The following would provide a command called `data-flow-diagram` which
     # executes the function `main` from this package when invoked:
     entry_points={

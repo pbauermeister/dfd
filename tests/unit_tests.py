@@ -39,6 +39,7 @@ class UnitTest(unittest.TestCase):
                     'percent_zoom',
                     'background_color',
                     'debug',
+                    'version',
                     ])
         self.assertSetEqual(
             set(args.__dict__.keys()), keys,

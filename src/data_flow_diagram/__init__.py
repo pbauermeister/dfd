@@ -14,6 +14,7 @@ This module parses the commandline args, prepares the I/Os and calls the stuff.
 import argparse
 import io
 import os
+import pkg_resources
 import re
 import sys
 import tempfile
@@ -24,6 +25,7 @@ from . import model
 from . import markdown
 from . import dot
 
+VERSION = pkg_resources.require("data-flow-diagram")[0].version
 
 def parse_args() -> argparse.Namespace:
     description, epilog = [each.strip() for each in __doc__.split('-----')[:2]]
@@ -71,7 +73,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--debug',
                         action='store_true',
                         default=False,
-                        help='emits debug messages')
+                        help='emit debug messages')
+
+    parser.add_argument('--version', '-V',
+                        action='store_true',
+                        help='print the version and exit')
+
     return parser.parse_args()
 
 
@@ -139,6 +146,9 @@ def main() -> None:
     dot.check_installed()
 
     args = parse_args()
+    if args.version:
+        print('data-flow-diagram', VERSION)
+        sys.exit(0)
 
     try:
         run(args)
