@@ -282,7 +282,7 @@ A snippet can be defined by such a code block:
 
     ```data-flow-diagram FILENAME.svg
 
-    ...DFD_STATEMENTS...
+    DFD_STATEMENTS
 
     ```
 
@@ -290,8 +290,27 @@ The opening fence ```` ```data-flow-diagram FILENAME.svg ```` must specify
 `data-flow-diagram` as formatter, followed by an output file name with
 extension.
 
+Some markdown viewers have issues with non-standard formatters on the opening
+fence, so an arbitrary number of whitespaces can be inserted between the
+opening ```` ``` ```` and the `data-flow-diagram` formatter, like:
+
+    ```
+    data-flow-diagram FILENAME.svg
+
+    DFD_STATEMENTS
+
+    ```
+
 Note that only code blocks delimited by triple-backticks fences are considered.
-Code blocks defined by quadruple-spaces indentation are ignored.
+Code blocks defined by quadruple-spaces indentation are ignored:
+
+
+        data-flow-diagram FILENAME.svg
+
+        DFD_STATEMENTS
+
+        indented code blocks are not captured.
+
 
 A generated image file can be used by e.g. `![Label](FILENAME.svg)`.
 
