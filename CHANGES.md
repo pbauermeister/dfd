@@ -1,9 +1,17 @@
 # Changes
 
-## version 1.3.x:
-- Style vertical: is supported
-- Style context: for context (top-level) diagrams
-- Add undirected flow (uflow aka '--')
+## Version 1.4.0:
+- Processes hav very light grey backgrounds.
+- Add the 'none' item type.
+- Connections with reversed direction affect the items placements.
+- A '?' postfix to a connection, removes the edge constraint.
+- Fix formatting of '\n' for Store and Channel (which are HTML nodes).
+- Colorize error messages.
+
+## Version 1.3.x:
+- Style vertical: is supported.
+- Style context: for context (top-level) diagrams.
+- Add undirected flow (uflow aka '--').
 
 ## Version 1.2.3
 - Snippet reference and ungenerated snippet were marked with '<'; now
