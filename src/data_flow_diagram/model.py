@@ -55,7 +55,7 @@ class Connection(Statement):
     src: str
     dst: str
     text: str
-
+    reversed: bool = False
 
 @dataclass
 class Style(Statement):

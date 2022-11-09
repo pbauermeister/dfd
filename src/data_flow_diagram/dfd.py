@@ -94,12 +94,15 @@ class Generator:
         attrs = f'label="{text}"'
         match conn.type:
             case model.FLOW:
-                pass
+                if conn.reversed:
+                    attrs += ' dir=back'
             case model.BFLOW:
                 attrs += ' dir=both'
             case model.UFLOW:
                 attrs += ' dir=none'
             case model.SIGNAL:
+                if conn.reversed:
+                    attrs += ' dir=back'
                 attrs += ' style=dashed'
             case _:
                 prefix = model.mk_err_prefix_from(conn.source)

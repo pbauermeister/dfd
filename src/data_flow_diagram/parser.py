@@ -81,6 +81,8 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             model.BFLOW: parse_bflow,
             model.UFLOW: parse_uflow,
             model.SIGNAL: parse_signal,
+            'flow.r': parse_flow_r,
+            'signal.r': parse_signal_r,
         }.get(word)
 
         if f is None:
@@ -166,6 +168,12 @@ def parse_flow(source: model.SourceLine) -> model.Statement:
     return model.Connection(source, model.FLOW, src, dst, text)
 
 
+def parse_flow_r(source: model.SourceLine) -> model.Statement:
+    """Parse directional reversed flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.FLOW, src, dst, text, True)
+
+
 def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
@@ -182,6 +190,12 @@ def parse_signal(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.SIGNAL, src, dst, text)
+
+
+def parse_signal_r(source: model.SourceLine) -> model.Statement:
+    """Parse reversed signal statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.SIGNAL, src, dst, text, True)
 
 
 def apply_syntactic_sugars(src_line: str) -> str:
@@ -204,7 +218,7 @@ def apply_syntactic_sugars(src_line: str) -> str:
         new_line = fmt('flow', parts)
     elif re.fullmatch(r'<-+', op):
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('flow', parts, swap=True)
+        new_line = fmt('flow.r', parts)#, swap=True)
 
     elif re.fullmatch(r'<-+>', op):
         parts = src_line.split(maxsplit=3)
@@ -219,7 +233,7 @@ def apply_syntactic_sugars(src_line: str) -> str:
         new_line = fmt('signal', parts)
     elif re.fullmatch(r'<:+', op):
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('signal', parts, swap=True)
+        new_line = fmt('signal.r', parts)#, swap=True)
 
     if new_line:
         return new_line
