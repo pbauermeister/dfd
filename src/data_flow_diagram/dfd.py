@@ -1,7 +1,7 @@
 """Run the generation process"""
 
 import sys
-from typing import Optional
+from typing import Optional, Any
 
 from . import dfd_dot_templates as TMPL
 from . import dot, model, parser, scanner
@@ -44,14 +44,24 @@ class Generator:
             case model.ENTITY:
                 line = f'"{item.name}" [shape=rectangle label="{item.text}"]'
             case model.STORE:
-                line = TMPL.STORE.format(**item.__dict__)
+                d = self._item_to_html_dict(item)
+                line = TMPL.STORE.format(**d)
             case model.CHANNEL:
-                line = TMPL.CHANNEL.format(**item.__dict__)
+                d = self._item_to_html_dict(item)
+                if self.graph_options.is_vertical:
+                    line = TMPL.CHANNEL_HORIZONTAL.format(**d)
+                else:
+                    line = TMPL.CHANNEL.format(**d)
             case _:
                 prefix = model.mk_err_prefix_from(item.source)
                 raise model.DfdException(f'{prefix}Unsupported item type '
                                          f'"{item.type}"')
         self.append(line, item)
+
+    def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
+        d = item.__dict__
+        d['text'] = d['text'].replace('\\n', '<br/>')
+        return d
 
     def generate_star(self, text: str) -> str:
         star_name = f'__star_{self.star_nr}__'
