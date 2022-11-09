@@ -76,6 +76,7 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             model.PROCESS: parse_process,
             model.ENTITY: parse_entity,
             model.STORE: parse_store,
+            model.NONE: parse_none,
             model.CHANNEL: parse_channel,
             model.FLOW: parse_flow,
             model.BFLOW: parse_bflow,
@@ -153,6 +154,13 @@ def parse_store(source: model.SourceLine) -> model.Statement:
     name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
     return model.Item(source, model.STORE, name, text, hidable)
+
+
+def parse_none(source: model.SourceLine) -> model.Statement:
+    """Parse none statement"""
+    name, text = split_args(source.text, 2, True, True)
+    name, hidable = parse_item_name(name)
+    return model.Item(source, model.NONE, name, text, hidable)
 
 
 def parse_channel(source: model.SourceLine) -> model.Statement:

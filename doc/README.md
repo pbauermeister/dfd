@@ -16,7 +16,7 @@ DFD_STATEMENT
 
 Synopsis:
 - ```ITEM NAME LABEL```
-- where ITEM can be `process`, `entity`, `store` or `channel`,
+- where ITEM can be `process`, `entity`, `store`, `channel` or `none`,
 - and NAME shall be sort, without whitespaces.
 
 Example:
@@ -32,8 +32,24 @@ store	S	A store
 
 # create a channel
 channel	C	A channel
+
+# create a point
+none	N	A point
+
 ```
 ![Creating items](./items.svg)
+
+
+- A process is a functional unit that processes inputs and generates outputs.
+
+- An entity is an external actor, outside the scope of the model.
+
+- A store holds data.
+
+- A channel is altering significantly the course of flows, in data or
+  timely manner. APIs are channels.
+
+- A point is any item that is e.g. repeated from an upper level.
 
 #### Optional label
 
@@ -51,6 +67,9 @@ store	STORE
 
 # create a channel
 channel	CHAN
+
+# create a point
+none	POINT
 ```
 ![Creating items](./items-unlabelled.svg)
 

@@ -46,6 +46,8 @@ class Generator:
             case model.STORE:
                 d = self._item_to_html_dict(item)
                 line = TMPL.STORE.format(**d)
+            case model.NONE:
+                line = f'"{item.name}" [shape=none label="{item.text}"]'
             case model.CHANNEL:
                 d = self._item_to_html_dict(item)
                 if self.graph_options.is_vertical:
