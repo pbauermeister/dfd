@@ -153,5 +153,8 @@ def main() -> None:
     try:
         run(args)
     except model.DfdException as e:
-        print('ERROR:', e, file=sys.stdout)
+        text = f'ERROR: {e}'
+        if sys.stderr.isatty():
+            text = f'\033[31m{text}\033[0m'
+        print(text, file=sys.stderr)
         sys.exit(1)
