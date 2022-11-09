@@ -233,6 +233,44 @@ P1 --> P2
 ```
 ![Vertical](./vertical.svg)
 
+### 7. Relaxed constraints
+
+The placement of items is constrained by both their declaration
+order, and also attempt to minimize connection lengths. In the following
+diagram, P2 is slightly shifted to shorten `P1 --> P3`:
+```data-flow-diagram constraint.svg
+style vertical
+
+process	P1
+process P2
+process P3
+
+P1 -->  P2
+P2 -->  P3
+P1 -->  P3
+```
+![Constraint](./constraint.svg)
+
+Sometimes, especially in complex diagrams, adding a connection can bring
+a constraint that is not desired. It is possible turn off the constraint posed
+by any given connectio, by appending a `?` to the connection:
+```data-flow-diagram constraint-relaxed.svg
+style vertical
+
+process	P1
+process P2
+process P3
+
+P1 -->  P2
+P2 -->  P3
+#P1 -->? P3
+# equivalent to: flow? P1 P3
+```
+![Relaxed](./constraint-relaxed.svg)
+
+- We can see that `P1 --> P3` did not lead `P2` to be shifted.
+
+
 ## B. Markdown snippets
 
 With the command line option `--markdown` (e.g.

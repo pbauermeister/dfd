@@ -78,12 +78,23 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             model.STORE: parse_store,
             model.NONE: parse_none,
             model.CHANNEL: parse_channel,
+
             model.FLOW: parse_flow,
             model.BFLOW: parse_bflow,
             model.UFLOW: parse_uflow,
             model.SIGNAL: parse_signal,
+
+            model.FLOW+'?': parse_flow_q,
+            model.BFLOW+'?': parse_bflow_q,
+            model.UFLOW+'?': parse_uflow_q,
+            model.SIGNAL+'?': parse_signal_q,
+
             'flow.r': parse_flow_r,
             'signal.r': parse_signal_r,
+
+            'flow.r?': parse_flow_r_q,
+            'signal.r?': parse_signal_r_q,
+
         }.get(word)
 
         if f is None:
@@ -205,6 +216,41 @@ def parse_signal_r(source: model.SourceLine) -> model.Statement:
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.SIGNAL, src, dst, text, True)
 
+def parse_flow_q(source: model.SourceLine) -> model.Statement:
+    """Parse directional flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.FLOW, src, dst, text, relaxed=True)
+
+
+def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
+    """Parse directional reversed flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.FLOW, src, dst, text, True, relaxed=True)
+
+
+def parse_bflow_q(source: model.SourceLine) -> model.Statement:
+    """Parse bidirectional flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.BFLOW, src, dst, text, relaxed=True)
+
+
+def parse_uflow_q(source: model.SourceLine) -> model.Statement:
+    """Parse undirected flow flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.UFLOW, src, dst, text, relaxed=True)
+
+
+def parse_signal_q(source: model.SourceLine) -> model.Statement:
+    """Parse signal statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.SIGNAL, src, dst, text, relaxed=True)
+
+
+def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
+    """Parse reversed signal statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.SIGNAL, src, dst, text, True, relaxed=True)
+
 
 def apply_syntactic_sugars(src_line: str) -> str:
     terms = src_line.split()
@@ -221,27 +267,33 @@ def apply_syntactic_sugars(src_line: str) -> str:
         return '\t'.join(array)
 
     new_line = ''
-    if re.fullmatch(r'-+>', op):
+    if re.fullmatch(r'-+>[?]?', op):
+        q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('flow', parts)
-    elif re.fullmatch(r'<-+', op):
+        new_line = fmt('flow'+q, parts)
+    elif re.fullmatch(r'<-+[?]?', op):
+        q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('flow.r', parts)#, swap=True)
+        new_line = fmt('flow.r'+q, parts)#, swap=True)
 
-    elif re.fullmatch(r'<-+>', op):
+    elif re.fullmatch(r'<-+>[?]?', op):
+        q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('bflow', parts)
+        new_line = fmt('bflow'+q, parts)
 
-    elif re.fullmatch(r'--+', op):
+    elif re.fullmatch(r'--+[?]?', op):
+        q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('uflow', parts)
+        new_line = fmt('uflow'+q, parts)
 
-    elif re.fullmatch(r':+>', op):
+    elif re.fullmatch(r':+>[?]?', op):
+        q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('signal', parts)
-    elif re.fullmatch(r'<:+', op):
+        new_line = fmt('signal'+q, parts)
+    elif re.fullmatch(r'<:+[?]?', op):
+        q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('signal.r', parts)#, swap=True)
+        new_line = fmt('signal.r'+q, parts)#, swap=True)
 
     if new_line:
         return new_line

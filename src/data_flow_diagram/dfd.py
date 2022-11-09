@@ -39,8 +39,14 @@ class Generator:
     def generate_item(self, item: model.Item) -> None:
         match item.type:
             case model.PROCESS:
-                shape = 'circle' if self.graph_options.is_context else 'ellipse'
-                line = f'"{item.name}" [shape={shape} label="{item.text}"]'
+                if self.graph_options.is_context:
+                    shape = 'circle'
+                    fc = 'white'
+                else:
+                    shape = 'ellipse'
+                    fc = '"#eeeeee"'
+                line = (f'"{item.name}" [shape={shape} label="{item.text}" '
+                        f'fillcolor={fc} style=filled]')
             case model.ENTITY:
                 line = f'"{item.name}" [shape=rectangle label="{item.text}"]'
             case model.STORE:
@@ -110,6 +116,8 @@ class Generator:
                 prefix = model.mk_err_prefix_from(conn.source)
                 raise model.DfdException(f'{prefix}Unsupported connection type '
                                          f'"{conn.type}"')
+        if conn.relaxed:
+            attrs += ' constraint=false'
 
         line = f'"{src_name}"{src_port} -> "{dst_name}"{dst_port} [{attrs}]'
         self.append(line, conn)

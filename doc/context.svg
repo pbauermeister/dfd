@@ -12,7 +12,7 @@
 <!-- P -->
 <g id="node1" class="node">
 <title>P</title>
-<ellipse fill="none" stroke="black" cx="175.9" cy="-168.14" rx="43.62" ry="43.62"/>
+<ellipse fill="white" stroke="black" cx="175.9" cy="-168.14" rx="43.62" ry="43.62"/>
 <text text-anchor="middle" x="175.9" y="-165.64" font-family="Helvetica,sans-Serif" font-size="10.00">The System</text>
 </g>
 <!-- E1 -->

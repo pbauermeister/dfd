@@ -56,6 +56,7 @@ class Connection(Statement):
     dst: str
     text: str
     reversed: bool = False
+    relaxed: bool = False
 
 @dataclass
 class Style(Statement):

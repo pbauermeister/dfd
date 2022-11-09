@@ -12,7 +12,7 @@
 <!-- PROC -->
 <g id="node1" class="node">
 <title>PROC</title>
-<ellipse fill="none" stroke="black" cx="62" cy="-18" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="62" cy="-18" rx="27" ry="18"/>
 <text text-anchor="middle" x="62" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">PROC</text>
 </g>
 <!-- ENTITY -->

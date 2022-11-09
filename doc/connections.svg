@@ -12,13 +12,13 @@
 <!-- A1 -->
 <g id="node1" class="node">
 <title>A1</title>
-<ellipse fill="none" stroke="black" cx="43" cy="-18" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="43" cy="-18" rx="27" ry="18"/>
 <text text-anchor="middle" x="43" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">A1</text>
 </g>
 <!-- A2 -->
 <g id="node2" class="node">
 <title>A2</title>
-<ellipse fill="none" stroke="black" cx="269.5" cy="-18" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="269.5" cy="-18" rx="27" ry="18"/>
 <text text-anchor="middle" x="269.5" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">A2</text>
 </g>
 <!-- A1&#45;&gt;A2 -->
@@ -31,13 +31,13 @@
 <!-- B1 -->
 <g id="node3" class="node">
 <title>B1</title>
-<ellipse fill="none" stroke="black" cx="43" cy="-72" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="43" cy="-72" rx="27" ry="18"/>
 <text text-anchor="middle" x="43" y="-69.5" font-family="Helvetica,sans-Serif" font-size="10.00">B1</text>
 </g>
 <!-- B2 -->
 <g id="node4" class="node">
 <title>B2</title>
-<ellipse fill="none" stroke="black" cx="269.5" cy="-72" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="269.5" cy="-72" rx="27" ry="18"/>
 <text text-anchor="middle" x="269.5" y="-69.5" font-family="Helvetica,sans-Serif" font-size="10.00">B2</text>
 </g>
 <!-- B1&#45;&gt;B2 -->
@@ -51,13 +51,13 @@
 <!-- C1 -->
 <g id="node5" class="node">
 <title>C1</title>
-<ellipse fill="none" stroke="black" cx="43" cy="-126" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="43" cy="-126" rx="27" ry="18"/>
 <text text-anchor="middle" x="43" y="-123.5" font-family="Helvetica,sans-Serif" font-size="10.00">C1</text>
 </g>
 <!-- C2 -->
 <g id="node6" class="node">
 <title>C2</title>
-<ellipse fill="none" stroke="black" cx="269.5" cy="-126" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="269.5" cy="-126" rx="27" ry="18"/>
 <text text-anchor="middle" x="269.5" y="-123.5" font-family="Helvetica,sans-Serif" font-size="10.00">C2</text>
 </g>
 <!-- C1&#45;&gt;C2 -->
@@ -70,13 +70,13 @@
 <!-- D1 -->
 <g id="node7" class="node">
 <title>D1</title>
-<ellipse fill="none" stroke="black" cx="43" cy="-180" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="43" cy="-180" rx="27" ry="18"/>
 <text text-anchor="middle" x="43" y="-177.5" font-family="Helvetica,sans-Serif" font-size="10.00">D1</text>
 </g>
 <!-- D2 -->
 <g id="node8" class="node">
 <title>D2</title>
-<ellipse fill="none" stroke="black" cx="269.5" cy="-180" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="269.5" cy="-180" rx="27" ry="18"/>
 <text text-anchor="middle" x="269.5" y="-177.5" font-family="Helvetica,sans-Serif" font-size="10.00">D2</text>
 </g>
 <!-- D1&#45;&gt;D2 -->
@@ -88,13 +88,13 @@
 <!-- D -->
 <g id="node9" class="node">
 <title>D</title>
-<ellipse fill="none" stroke="black" cx="269.5" cy="-234" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="269.5" cy="-234" rx="27" ry="18"/>
 <text text-anchor="middle" x="269.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">D</text>
 </g>
 <!-- E -->
 <g id="node10" class="node">
 <title>E</title>
-<ellipse fill="none" stroke="black" cx="43" cy="-288" rx="27" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="43" cy="-288" rx="27" ry="18"/>
 <text text-anchor="middle" x="43" y="-285.5" font-family="Helvetica,sans-Serif" font-size="10.00">E</text>
 </g>
 <!-- __star_1__ -->

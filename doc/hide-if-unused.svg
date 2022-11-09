@@ -12,13 +12,13 @@
 <!-- P1 -->
 <g id="node1" class="node">
 <title>P1</title>
-<ellipse fill="none" stroke="black" cx="37.09" cy="-18" rx="37.17" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="37.09" cy="-18" rx="37.17" ry="18"/>
 <text text-anchor="middle" x="37.09" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">Process 1</text>
 </g>
 <!-- P2 -->
 <g id="node2" class="node">
 <title>P2</title>
-<ellipse fill="none" stroke="black" cx="203.26" cy="-18" rx="37.17" ry="18"/>
+<ellipse fill="#eeeeee" stroke="black" cx="203.26" cy="-18" rx="37.17" ry="18"/>
 <text text-anchor="middle" x="203.26" y="-15.5" font-family="Helvetica,sans-Serif" font-size="10.00">Process 2</text>
 </g>
 <!-- P1&#45;&gt;P2 -->
