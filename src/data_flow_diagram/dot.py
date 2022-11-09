@@ -8,7 +8,7 @@ from . import model
 def generate_image(graph_options: model.GraphOptions,
                    text: str, output_path: str, format: str) -> None:
     if graph_options.is_context:
-        engine = 'circo'
+        engine = 'neato'  # circo is not as good
     else:
         engine = 'dot'
 

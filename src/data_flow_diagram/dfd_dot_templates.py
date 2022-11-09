@@ -45,4 +45,4 @@ digraph D {{
 """.strip()
 
 
-GRAPH_PARAMS_CONTEXT_DIAGRAM = 'graph [overlap=scale, mindist=.67]'
+GRAPH_PARAMS_CONTEXT_DIAGRAM = 'edge [len=2.25]'
