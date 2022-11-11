@@ -22,7 +22,7 @@ Synopsis:
 Example:
 ```data-flow-diagram items.svg
 # create a process bubble:
-process	P	Do something
+process	P	A Process
 
 # create a terminal rectangle:
 entity	T	An entity
@@ -270,6 +270,27 @@ P2 -->  P3
 
 - We can see that `P1 --> P3` did not lead `P2` to be shifted.
 
+### 8. Items and connections attributes
+
+Rendering attributes can be added by prefixing the label by
+`[NAME=VALUE ...]` using Graphviz attributes syntax:
+
+```data-flow-diagram attributes.svg
+style vertical
+
+process	P1  [fillcolor=red] Red bg
+process P2  [color=red fontcolor=blue] Red border,\nblue text
+process P3  [fontcolor=white fillcolor=blue color=blue] Inverted blue
+
+P1 -->  P2  [color=red fontcolor=red] red
+P2 -->  P3  [color=blue] blue arrow
+P1 -->  P3  [penwidth=2] thick
+```
+![Attributes](./attributes.svg)
+
+For possible attributes, see:
+- https://graphviz.org/docs/edges/
+- https://graphviz.org/docs/nodes/
 
 ## B. Markdown snippets
 

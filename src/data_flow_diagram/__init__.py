@@ -25,7 +25,11 @@ from . import model
 from . import markdown
 from . import dot
 
-VERSION = pkg_resources.require("data-flow-diagram")[0].version
+try:
+    VERSION = pkg_resources.require("data-flow-diagram")[0].version
+except pkg_resources.DistributionNotFound:
+    VERSION = 'undefined'
+
 
 def parse_args() -> argparse.Namespace:
     description, epilog = [each.strip() for each in __doc__.split('-----')[:2]]

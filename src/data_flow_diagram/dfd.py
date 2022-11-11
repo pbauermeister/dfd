@@ -37,6 +37,7 @@ class Generator:
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
+        attrs = item.attrs or ''
         match item.type:
             case model.PROCESS:
                 if self.graph_options.is_context:
@@ -46,14 +47,15 @@ class Generator:
                     shape = 'ellipse'
                     fc = '"#eeeeee"'
                 line = (f'"{item.name}" [shape={shape} label="{item.text}" '
-                        f'fillcolor={fc} style=filled]')
+                        f'fillcolor={fc} style=filled {attrs}]')
             case model.ENTITY:
-                line = f'"{item.name}" [shape=rectangle label="{item.text}"]'
+                line = (f'"{item.name}" [shape=rectangle label="{item.text}" '
+                        f'{attrs}]')
             case model.STORE:
                 d = self._item_to_html_dict(item)
                 line = TMPL.STORE.format(**d)
             case model.NONE:
-                line = f'"{item.name}" [shape=none label="{item.text}"]'
+                line = f'"{item.name}" [shape=none label="{item.text}" {attrs}]'
             case model.CHANNEL:
                 d = self._item_to_html_dict(item)
                 if self.graph_options.is_vertical:
@@ -100,6 +102,8 @@ class Generator:
                 dst_port = ':x:c'
 
         attrs = f'label="{text}"'
+        if conn.attrs: attrs += ' ' + conn.attrs
+
         match conn.type:
             case model.FLOW:
                 if conn.reversed:

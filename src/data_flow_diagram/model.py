@@ -42,21 +42,25 @@ class Statement(Base):
 
 
 @dataclass
-class Item(Statement):
+class Drawable(Statement):
     type: str
-    name: str
     text: str
+    attrs: str
+
+
+@dataclass
+class Item(Drawable):
+    name: str
     hidable: bool
 
 
 @dataclass
-class Connection(Statement):
-    type: str
+class Connection(Drawable):
     src: str
     dst: str
-    text: str
     reversed: bool = False
     relaxed: bool = False
+
 
 @dataclass
 class Style(Statement):

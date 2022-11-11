@@ -106,6 +106,10 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
         except model.DfdException as e:
             raise model.DfdException(f'{error_prefix}{e}"')
 
+        match statement:
+            case model.Drawable() as drawable:
+                parse_drawable_attrs(drawable)
+
         statements.append(statement)
 
     if debug:
@@ -150,106 +154,112 @@ def parse_process(source: model.SourceLine) -> model.Statement:
     """Parse process statement"""
     name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.PROCESS, name, text, hidable)
+    return model.Item(source, model.PROCESS, text, "", name, hidable)
 
 
 def parse_entity(source: model.SourceLine) -> model.Statement:
     """Parse entity statement"""
     name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.ENTITY, name, text, hidable)
+    return model.Item(source, model.ENTITY, text, "", name, hidable)
 
 
 def parse_store(source: model.SourceLine) -> model.Statement:
     """Parse store statement"""
     name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.STORE, name, text, hidable)
+    return model.Item(source, model.STORE, text, "", name, hidable)
 
 
 def parse_none(source: model.SourceLine) -> model.Statement:
     """Parse none statement"""
     name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.NONE, name, text, hidable)
+    return model.Item(source, model.NONE, text, "", name, hidable)
 
 
 def parse_channel(source: model.SourceLine) -> model.Statement:
     """Parse channel statement"""
     name, text = split_args(source.text, 2, True, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.CHANNEL, name, text, hidable)
+    return model.Item(source, model.CHANNEL, text, "", name, hidable)
 
 
 def parse_flow(source: model.SourceLine) -> model.Statement:
     """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, src, dst, text)
+    return model.Connection(source, model.FLOW, text, "", src, dst)
 
 
 def parse_flow_r(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, src, dst, text, True)
+    return model.Connection(source, model.FLOW, text, "", src, dst, True)
 
 
 def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.BFLOW, src, dst, text)
+    return model.Connection(source, model.BFLOW, text, "", src, dst)
 
 
 def parse_uflow(source: model.SourceLine) -> model.Statement:
     """Parse undirected flow flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.UFLOW, src, dst, text)
+    return model.Connection(source, model.UFLOW, text, "", src, dst)
 
 
 def parse_signal(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, src, dst, text)
+    return model.Connection(source, model.SIGNAL, text, "", src, dst)
 
 
 def parse_signal_r(source: model.SourceLine) -> model.Statement:
     """Parse reversed signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, src, dst, text, True)
+    return model.Connection(source, model.SIGNAL, text, "", src, dst, True)
 
 def parse_flow_q(source: model.SourceLine) -> model.Statement:
     """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, src, dst, text, relaxed=True)
+    return model.Connection(source, model.FLOW, text, "", src, dst,
+                            relaxed=True)
 
 
 def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, src, dst, text, True, relaxed=True)
+    return model.Connection(source, model.FLOW, text, "", src, dst, True,
+                            relaxed=True)
 
 
 def parse_bflow_q(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.BFLOW, src, dst, text, relaxed=True)
+    return model.Connection(source, model.BFLOW, text, "", src, dst,
+                            relaxed=True)
 
 
 def parse_uflow_q(source: model.SourceLine) -> model.Statement:
     """Parse undirected flow flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.UFLOW, src, dst, text, relaxed=True)
+    return model.Connection(source, model.UFLOW, text, "", src, dst,
+                            relaxed=True)
 
 
 def parse_signal_q(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, src, dst, text, relaxed=True)
+    return model.Connection(source, model.SIGNAL, text, "", src, dst,
+                            relaxed=True)
 
 
 def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
     """Parse reversed signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, src, dst, text, True, relaxed=True)
+    return model.Connection(source, model.SIGNAL, text, "", src, dst, True,
+                            relaxed=True)
 
 
 def apply_syntactic_sugars(src_line: str) -> str:
@@ -299,3 +309,14 @@ def apply_syntactic_sugars(src_line: str) -> str:
         return new_line
     else:
         return src_line
+
+
+def parse_drawable_attrs(drawable: model.Drawable) -> None:
+    if drawable.text and drawable.text.startswith('['):
+        parts = drawable.text[1:].split(']', 1)
+        drawable.attrs = parts[0]
+        drawable.text = parts[1].strip()
+
+        match drawable:
+            case model.Item() as item:
+                item.text = item.text or item.name
