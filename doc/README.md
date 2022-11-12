@@ -292,7 +292,9 @@ For possible attributes, see:
 - https://graphviz.org/docs/edges/
 - https://graphviz.org/docs/nodes/
 
-### 9. Text wrapping and line brakes
+Currently, attributes do not apply to `store` nor `channel`.
+
+### 9. Text wrapping and line breaks
 
 Newlines can be inserted in any label by means of `\n`.
 
