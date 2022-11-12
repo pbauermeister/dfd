@@ -302,7 +302,8 @@ Lines are wrapped by default by:
 - 20 columns for items, and
 - 14 columns for connections:
 
-```data-flow-diagram wrapping-1.svg
+```
+data-flow-diagram wrapping-1.svg
 style vertical
 
 process	P1  Do this and this and also this
@@ -321,7 +322,6 @@ Bigger number of columns:
 
 ```data-flow-diagram wrapping-2.svg
 #include #wrapping-1
-
 style item-text-width 40
 style connection-text-width 40
 ```
@@ -331,7 +331,6 @@ Smaller number of columns:
 
 ```data-flow-diagram wrapping-3.svg
 #include #wrapping-1
-
 style item-text-width 8
 style connection-text-width 6
 ```
