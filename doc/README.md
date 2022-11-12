@@ -314,23 +314,28 @@ P2 -->  P1  result\nof doing all that
 ![Wrapping-1](./wrapping-1.svg)
 
 The column widths can be changed by
-`style item-text-width N` and
-`style connection-text-width N` respectively:
+- `style item-text-width N` and
+- `style connection-text-width N` respectively.
+
+Bigger number of columns:
 
 ```data-flow-diagram wrapping-2.svg
-style vertical
+#include #wrapping-1
 
 style item-text-width 40
 style connection-text-width 40
-
-process	P1  Do this and this and also this
-process P2  Do\nthat and that and also that
-
-P1 -->  P2  result of doing all this
-P2 -->  P1  result\nof doing all that
 ```
 ![Wrapping-2](./wrapping-2.svg)
 
+Smaller number of columns:
+
+```data-flow-diagram wrapping-3.svg
+#include #wrapping-1
+
+style item-text-width 8
+style connection-text-width 6
+```
+![Wrapping-2](./wrapping-3.svg)
 
 ## B. Markdown snippets
 
