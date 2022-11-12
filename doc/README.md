@@ -39,7 +39,6 @@ none	N	A point
 ```
 ![Creating items](./items.svg)
 
-
 - A process is a functional unit that processes inputs and generates outputs.
 
 - An entity is an external actor, outside the scope of the model.
@@ -50,28 +49,6 @@ none	N	A point
   timely manner. APIs are channels.
 
 - A point is any item that is e.g. repeated from an upper level.
-
-#### Optional label
-
-The LABEL can be ommitted, in which case the NAME is used in lieu:
-
-```data-flow-diagram items-unlabelled.svg
-# create a process bubble:
-process	PROC
-
-# create a terminal rectangle:
-entity	ENTITY
-
-# create a store:
-store	STORE
-
-# create a channel
-channel	CHAN
-
-# create a point
-none	POINT
-```
-![Creating items](./items-unlabelled.svg)
 
 ### 2. Creating connections between items
 
@@ -113,7 +90,7 @@ signal	E	*	an untargetted signal
 That's it! With items and connections, you can create any DFD diagram of
 arbitrary complexity.
 
-#### Syntactic sugars
+### 3. Syntactic sugars
 Syntactic sugars make source easier on the eye:
 
 | Statement with keyword      | Equivalent with syntactic sugar    |
@@ -139,8 +116,68 @@ P1 ::> *	an untargetted signal
 ```
 ![Creating connections](./connections-sugar.svg)
 
+### 4. Optional label
 
-### 3. A simple complete example
+The LABEL can be ommitted, in which case:
+- for items, the NAME is used as LABEL,
+- for connections, no LABEL is rendered:
+
+```data-flow-diagram items-unlabelled.svg
+# create a process bubble:
+process	PROC
+
+# create a terminal rectangle:
+entity	ENTITY
+
+# create a store:
+store	STORE
+
+# create a channel
+channel	CHAN
+
+# create a point
+none	POINT
+
+# connection
+PROC --> CHAN
+```
+![Creating items](./items-unlabelled.svg)
+
+### 5. Styling
+
+#### a. Per-diagram
+
+The keyword `style` defines rendering parameters for the whole
+diagram:
+
+| Style statement                 | Effect                                                       |
+| --------------------------------| -------------------------------------------------------------|
+| `style context`                 | Makes the diagram a context diagram.                         |
+| `style horizontal`              | Layouts flows in the horizontal direction (the default).     |
+| `style vertical`                | Layouts flows in the vertical direction.                     |
+| `style item-text-width N`       | Sets the items labels wrapping to use N chars columns.       |
+| `style connection-text-width N` | Sets the connections labels wrapping to use N chars columns. |
+
+A style apply to the whole diagram, whatever where it is declared in
+the source. If a style is re-defined, the last declaration applies.
+
+#### b. Per-item or per-connection
+
+Styling can be applied to a specific item or connection by prefixing
+the label by Graphviz attributes in the form.
+
+```
+process NAME    [ATTRIBUTES ...] LABEL
+
+ITEM1 --> ITEM2 [ATTRIBUTES ...] LABEL
+```
+#### Examples
+
+See examples below.
+
+## B. Details with examples
+
+### 1. A simple complete example
 
 ```data-flow-diagram complete-example.svg
 process	P	Acquire data
@@ -158,7 +195,7 @@ P2 --> C  	records
 ```
 ![Creating items](./complete-example.svg)
 
-### 4. Items rendered only if used (hidable)
+### 2. Items rendered only if used (hidable)
 
 By default, all items are rendered, even if not connected to anything:
 
@@ -185,7 +222,7 @@ P1 --> P2	connection
 ```
 ![Hide if unused](./hide-if-unused.svg)
 
-### 5. Context diagrams
+### 3. Context diagrams
 
 A top-level, so-called "Context Diagram" can be created by specifying `style context`:
 
@@ -207,7 +244,7 @@ E4  ::> P   signal
 
 Note that there should be exactly one process.
 
-### 6. Diagram direction
+### 4. Diagram direction
 
 By default, the graph direction is horizontal, so `style horizontal` is implied:
 
@@ -233,11 +270,12 @@ P1 --> P2
 ```
 ![Vertical](./vertical.svg)
 
-### 7. Relaxed constraints
+### 5. Relaxed constraints
 
-The placement of items is constrained by both their declaration
-order, and also attempt to minimize connection lengths. In the following
-diagram, P2 is slightly shifted to shorten `P1 --> P3`:
+By default, the placement of items is constrained by both their
+declaration order, and also attempt to minimize connection lengths. In
+the following diagram, P2 is slightly shifted to shorten `P1 --> P3`:
+
 ```data-flow-diagram constraint.svg
 style vertical
 
@@ -253,7 +291,7 @@ P1 -->  P3
 
 Sometimes, especially in complex diagrams, adding a connection can bring
 a constraint that is not desired. It is possible turn off the constraint posed
-by any given connectio, by appending a `?` to the connection:
+by any given connection, by appending a `?` to the connection:
 ```data-flow-diagram constraint-relaxed.svg
 style vertical
 
@@ -263,14 +301,15 @@ process P3
 
 P1 -->  P2
 P2 -->  P3
-#P1 -->? P3
+P1 -->? P3
 # equivalent to: flow? P1 P3
 ```
 ![Relaxed](./constraint-relaxed.svg)
 
-- We can see that `P1 --> P3` did not lead `P2` to be shifted.
+- We can see that `P1 --> P3` did not lead `P2` to be shifted. This
+  way, the P1 -> P2 -> P3 alignment reflects a more natural flow.
 
-### 8. Items and connections attributes
+### 6. Items and connections attributes
 
 Rendering attributes can be added by prefixing the label by
 `[NAME=VALUE ...]` using Graphviz attributes syntax:
@@ -294,7 +333,7 @@ For possible attributes, see:
 
 Currently, attributes do not apply to `store` nor `channel`.
 
-### 9. Text wrapping and line breaks
+### 7. Text wrapping and line breaks
 
 Newlines can be inserted in any label by means of `\n`.
 
@@ -336,7 +375,7 @@ style connection-text-width 6
 ```
 ![Wrapping-2](./wrapping-3.svg)
 
-## B. Markdown snippets
+## C. Markdown snippets
 
 With the command line option `--markdown` (e.g.
 `data-flow-diagram README.md --markdown`)
