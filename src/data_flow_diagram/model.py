@@ -7,6 +7,9 @@ import json
 from dataclasses import dataclass
 from typing import Any
 
+from . import config
+
+
 def repr(o: Any) -> str:
     name: str = o.__class__.__name__
     val: str = json.dumps(dataclasses.asdict(o), indent='  ')
@@ -65,6 +68,7 @@ class Connection(Drawable):
 @dataclass
 class Style(Statement):
     style: str
+    value: Any = None
 
 
 STYLE   = 'style'
@@ -85,6 +89,8 @@ SIGNAL  = 'signal'
 class GraphOptions():
     is_vertical: bool = False
     is_context: bool = False
+    item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
+    connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
 
 
 def pack(src_line: str) -> str:

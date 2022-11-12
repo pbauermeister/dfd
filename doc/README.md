@@ -105,8 +105,8 @@ signal	C1	C2	a signal
 uflow	D1	D2	an undirected flow
 
 # create untargetted connections
-flow	*	D	an unsourced\nflow
-signal	E	*	an untargetted\nsignal
+flow	*	D	an unsourced flow
+signal	E	*	an untargetted signal
 ```
 ![Creating connections](./connections.svg)
 
@@ -134,8 +134,8 @@ P1 --> P2	a flow
 P1 <-> P2	a bi-directional flow
 P1 ::> P2	a signal
 
-*  --> P2	an unsourced\nflow
-P1 ::> *	an untargetted\nsignal
+*  --> P2	an unsourced flow
+P1 ::> *	an untargetted signal
 ```
 ![Creating connections](./connections-sugar.svg)
 
@@ -279,7 +279,7 @@ Rendering attributes can be added by prefixing the label by
 style vertical
 
 process	P1  [fillcolor=red] Red bg
-process P2  [color=red fontcolor=blue] Red border,\nblue text
+process P2  [color=red fontcolor=blue] Red border, blue text
 process P3  [fontcolor=white fillcolor=blue color=blue] Inverted blue
 
 P1 -->  P2  [color=red fontcolor=red] red
@@ -291,6 +291,44 @@ P1 -->  P3  [penwidth=2] thick
 For possible attributes, see:
 - https://graphviz.org/docs/edges/
 - https://graphviz.org/docs/nodes/
+
+### 9. Text wrapping and line brakes
+
+Newlines can be inserted in any label by means of `\n`.
+
+Lines are wrapped by default by:
+- 20 columns for items, and
+- 14 columns for connections:
+
+```data-flow-diagram wrapping-1.svg
+style vertical
+
+process	P1  Do this and this and also this
+process P2  Do\n that and that and also that
+
+P1 -->  P2  result of doing all this
+P2 -->  P1  result\nof doing all that
+```
+![Wrapping-1](./wrapping-1.svg)
+
+The column widths can be changed by
+`style item-text-width N` and
+`style connection-text-width N` respectively:
+
+```data-flow-diagram wrapping-2.svg
+style vertical
+
+style item-text-width 40
+style connection-text-width 40
+
+process	P1  Do this and this and also this
+process P2  Do\nthat and that and also that
+
+P1 -->  P2  result of doing all this
+P2 -->  P1  result\nof doing all that
+```
+![Wrapping-2](./wrapping-2.svg)
+
 
 ## B. Markdown snippets
 

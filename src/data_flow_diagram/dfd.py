@@ -1,10 +1,11 @@
 """Run the generation process"""
 
 import sys
-from typing import Optional, Any
+import textwrap
+from typing import Any, Optional
 
 from . import dfd_dot_templates as TMPL
-from . import dot, model, parser, scanner
+from . import dot, model, parser, scanner, config
 
 
 def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
@@ -24,6 +25,12 @@ def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
     dot.generate_image(graph_options, text, output_path, format)
 
 
+def wrap(text: str, cols: int) -> str:
+    res: list[str] = []
+    for each in text.strip().split('\\n'):
+        res += textwrap.wrap(each, width=cols, break_long_words=False) or ['']
+    return '\\n'.join(res)
+
 class Generator:
     def __init__(self, graph_options: model.GraphOptions) -> None:
         self.lines: list[str] = []
@@ -37,6 +44,7 @@ class Generator:
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
+        text = wrap(item.text, self.graph_options.item_text_width)
         attrs = item.attrs or ''
         match item.type:
             case model.PROCESS:
@@ -46,16 +54,16 @@ class Generator:
                 else:
                     shape = 'ellipse'
                     fc = '"#eeeeee"'
-                line = (f'"{item.name}" [shape={shape} label="{item.text}" '
+                line = (f'"{item.name}" [shape={shape} label="{text}" '
                         f'fillcolor={fc} style=filled {attrs}]')
             case model.ENTITY:
-                line = (f'"{item.name}" [shape=rectangle label="{item.text}" '
+                line = (f'"{item.name}" [shape=rectangle label="{text}" '
                         f'{attrs}]')
             case model.STORE:
                 d = self._item_to_html_dict(item)
                 line = TMPL.STORE.format(**d)
             case model.NONE:
-                line = f'"{item.name}" [shape=none label="{item.text}" {attrs}]'
+                line = f'"{item.name}" [shape=none label="{text}" {attrs}]'
             case model.CHANNEL:
                 d = self._item_to_html_dict(item)
                 if self.graph_options.is_vertical:
@@ -74,6 +82,8 @@ class Generator:
         return d
 
     def generate_star(self, text: str) -> str:
+        print(text)
+        text = wrap(text, self.graph_options.item_text_width)
         star_name = f'__star_{self.star_nr}__'
         line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
         self.lines.append(line)
@@ -83,6 +93,8 @@ class Generator:
     def generate_connection(self, conn: model.Connection, src_item: model.Item,
                             dst_item: model.Item) -> None:
         text = conn.text or ''
+        text = wrap(text, self.graph_options.connection_text_width)
+
         src_port = dst_port = ""
 
         if not src_item:
@@ -197,6 +209,7 @@ def handle_options(statements: model.Statements) -> tuple[
     new_statements = []
     options = model.GraphOptions()
     for statement in statements:
+        prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Style() as style:
                 match style.style:
@@ -206,8 +219,18 @@ def handle_options(statements: model.Statements) -> tuple[
                         options.is_context = True
                     case 'horizontal':
                         options.is_vertical = False
+                    case 'item-text-width':
+                        try:
+                            options.item_text_width = int(style.value)
+                        except ValueError as e:
+                            raise model.DfdException(f'{prefix}{e}"')
+                    case 'connection-text-width':
+                        try:
+                            options.connection_text_width = int(style.value)
+                        except ValueError as e:
+                            raise model.DfdException(f'{prefix}{e}"')
+
                     case _:
-                        prefix = model.mk_err_prefix_from(statement.source)
                         raise model.DfdException(f'{prefix}Unsupported style '
                                                  f'"{style.style}"')
 

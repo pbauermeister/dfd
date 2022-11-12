@@ -146,8 +146,8 @@ def parse_item_name(name: str) -> Tuple[str, bool]:
 
 def parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
-    style = split_args(source.text, 1)[0]
-    return model.Style(source, style)
+    style, value = split_args(source.text, 2, True)
+    return model.Style(source, style, value)
 
 
 def parse_process(source: model.SourceLine) -> model.Statement:

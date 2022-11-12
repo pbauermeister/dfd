@@ -1,12 +1,18 @@
 # Changes
 
-## Version 1.4.0:
-- Processes hav very light grey backgrounds.
+## Version 1.5.0:
+- Wrap labels by `style item-text-width N` (default N=20).
+- and `style connection-text-width N` (default N=14).
+
+## Version 1.4.1:
+- Processes have very light grey backgrounds.
 - Add the 'none' item type.
 - Connections with reversed direction affect the items placements.
 - A '?' postfix to a connection, removes the edge constraint.
 - Fix formatting of '\n' for Store and Channel (which are HTML nodes).
 - Colorize error messages.
+- Add drawable attributes as [ATTRS...] prefix before labels.
+
 
 ## Version 1.3.x:
 - Style vertical: is supported.

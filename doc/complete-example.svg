@@ -57,16 +57,16 @@
 <!-- S -->
 <g id="node4" class="node">
 <title>S</title>
-<polygon fill="black" stroke="transparent" points="145.92,-110 145.92,-114 216.92,-114 216.92,-110 145.92,-110"/>
+<polygon fill="black" stroke="transparent" points="145.92,-110 145.92,-114 215.92,-114 215.92,-110 145.92,-110"/>
 <text text-anchor="start" x="147.92" y="-98" font-family="Helvetica,sans-Serif" font-size="10.00">Configuration</text>
-<polygon fill="black" stroke="transparent" points="145.92,-87 145.92,-91 216.92,-91 216.92,-87 145.92,-87"/>
+<polygon fill="black" stroke="transparent" points="145.92,-87 145.92,-91 215.92,-91 215.92,-87 145.92,-87"/>
 </g>
 <!-- S&#45;&gt;P2 -->
 <g id="edge4" class="edge">
 <title>S&#45;&gt;P2</title>
-<path fill="none" stroke="gray" d="M236.54,-92.35C261.81,-88.35 291.43,-83.66 315.18,-79.9"/>
-<polygon fill="gray" stroke="gray" points="235.87,-88.91 226.54,-93.93 236.96,-95.83 235.87,-88.91"/>
-<polygon fill="gray" stroke="gray" points="315.97,-83.32 325.3,-78.3 314.87,-76.4 315.97,-83.32"/>
+<path fill="none" stroke="gray" d="M236.12,-92.42C261.51,-88.4 291.34,-83.67 315.23,-79.89"/>
+<polygon fill="gray" stroke="gray" points="235.41,-88.99 226.08,-94.01 236.5,-95.9 235.41,-88.99"/>
+<polygon fill="gray" stroke="gray" points="316.08,-83.3 325.41,-78.28 314.98,-76.39 316.08,-83.3"/>
 <text text-anchor="middle" x="275.33" y="-93" font-family="Times,serif" font-style="italic" font-size="10.00">parameters</text>
 </g>
 <!-- __star_0__ -->
