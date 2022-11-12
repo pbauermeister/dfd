@@ -97,7 +97,7 @@ Syntactic sugars make source easier on the eye:
 | ----------------------------| -----------------------------------|
 | `flow   A B`                | `A --> B` <br/> or <br/>` B <-- A` |
 | `bflow  A B`                | `A <-> B` <br/> or <br/> `B <-> A` |
-| `uflow  A B`                | `A --- B` <br/> or <br/> `B <-> A` |
+| `uflow  A B`                | `A --- B` <br/> or <br/> `B --- A` |
 | `signal A B`                | `A ::> B` <br/> or <br/> `B <:: A` |
 
 The shaft of the arrow can be of arbitrary lengh, so `->` , `-->` and `------->`
