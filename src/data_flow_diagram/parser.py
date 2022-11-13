@@ -3,6 +3,7 @@
 import re
 from typing import Callable, Tuple
 
+from . import dfd_dot_templates as TMPL
 from . import model
 
 
@@ -105,6 +106,10 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             statement = f(source)
         except model.DfdException as e:
             raise model.DfdException(f'{error_prefix}{e}"')
+
+        match statement:
+            case model.Item() as item:
+                parse_item_external(item)
 
         match statement:
             case model.Drawable() as drawable:
@@ -320,3 +325,8 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
         match drawable:
             case model.Item() as item:
                 item.text = item.text or item.name
+
+
+def parse_item_external(item: model.Item) -> None:
+    if ':' in item.name:
+        item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
