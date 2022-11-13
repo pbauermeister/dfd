@@ -3,8 +3,8 @@
 
 ./build.sh
 
-pip3 uninstall data-flow-diagram || true
-sudo pip3 uninstall data-flow-diagram
+yes | pip3 uninstall data-flow-diagram || true
+yes | sudo pip3 uninstall data-flow-diagram
 
 python3 setup.py build
 
