@@ -14,16 +14,15 @@ This module parses the commandline args, prepares the I/Os and calls the stuff.
 import argparse
 import io
 import os
-import pkg_resources
 import re
 import sys
 import tempfile
 from typing import TextIO
 
-from . import dfd
-from . import model
-from . import markdown
-from . import dot
+import pkg_resources
+
+from . import dfd, dot, markdown, model
+from .error import print_error
 
 try:
     VERSION = pkg_resources.require("data-flow-diagram")[0].version
@@ -158,7 +157,5 @@ def main() -> None:
         run(args)
     except model.DfdException as e:
         text = f'ERROR: {e}'
-        if sys.stderr.isatty():
-            text = f'\033[31m{text}\033[0m'
-        print(text, file=sys.stderr)
+        print_error(text)
         sys.exit(1)
