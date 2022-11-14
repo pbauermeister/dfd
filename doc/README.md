@@ -453,7 +453,7 @@ Eventually, signals are here to drive processes, and `control`s
 represent any kind of logic involving events.
 
 The following example models a lamp that can be switched on by a
-push-button:
+push-button, and will automatically turn off after a timeout:
 
 ```data-flow-diagram realtime.svg
 entity	Clock
