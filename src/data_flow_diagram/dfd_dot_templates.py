@@ -34,6 +34,9 @@ CHANNEL_HORIZONTAL = """
 
 DOT_FONT_EDGE = 'fontname="times-italic" fontsize=10'
 DOT_FONT_NODE = 'fontname="helvetica" fontsize=10'
+DOT_FONT_GRAPH = 'fontname="helvetica" fontsize=9'
+
+DOT_GRAPH_TITLE = """graph[label="[ {title} ]" """ + DOT_FONT_GRAPH + """]"""
 
 DOT = """
 digraph D {{

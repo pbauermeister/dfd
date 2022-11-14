@@ -73,6 +73,11 @@ def parse_args() -> argparse.Namespace:
                         ' https://developer.mozilla.org/en-US/docs/Web/CSS/color_value'
                         ' for a list of valid names; default is white')
 
+    parser.add_argument('--no-graph-title',
+                        action='store_true',
+                        default=False,
+                        help='suppress graph title')
+
     parser.add_argument('--debug',
                         action='store_true',
                         default=False,
@@ -85,7 +90,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def handle_markdown_source(args: argparse.Namespace, provenance: str,
+def handle_markdown_source(options: model.Options, provenance: str,
                            input_fp: TextIO) -> None:
     text = input_fp.read()
     snippets = markdown.extract_snippets(text)
@@ -93,26 +98,23 @@ def handle_markdown_source(args: argparse.Namespace, provenance: str,
     snippets_params = markdown.make_snippets_params(provenance, snippets)
     for params in snippets_params:
         dfd.build(params.root, params.input_fp.read(), params.file_name,
-                  args.percent_zoom, args.background_color, args.format,
-                  args.debug, snippet_by_name=params.snippet_by_name)
+                  options, snippet_by_name=params.snippet_by_name)
         print(f'{sys.argv[0]}: generated {params.file_name}', file=sys.stderr)
 
 
-def handle_dfd_source(args: argparse.Namespace, provenance: str,
+def handle_dfd_source(options: model.Options, provenance: str,
                       input_fp: TextIO, output_path: str) -> None:
     root = model.SourceLine("", provenance, None, None)
     if output_path == '-':
         # output to stdout
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, 'file.svg')
-            dfd.build(root, input_fp.read(), path, args.percent_zoom,
-                      args.background_color, args.format, args.debug)
+            dfd.build(root, input_fp.read(), path, options)
             with open(path) as f:
                 print(f.read())
     else:
         # output to file
-        dfd.build(root, input_fp.read(), output_path, args.percent_zoom,
-                  args.background_color, args.format, args.debug, )
+        dfd.build(root, input_fp.read(), output_path, options)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -124,9 +126,17 @@ def run(args: argparse.Namespace) -> None:
         input_fp = open(args.INPUT_FILE)
         provenance = f'<file:{args.INPUT_FILE}>'
 
+    options = model.Options(
+        args.format,
+        args.percent_zoom,
+        args.background_color,
+        args.no_graph_title,
+        args.debug,
+    )
+
     # markdown source
     if args.markdown:
-        handle_markdown_source(args, provenance, input_fp)
+        handle_markdown_source(options, provenance, input_fp)
         return
 
     # adjust output
@@ -140,7 +150,7 @@ def run(args: argparse.Namespace) -> None:
         output_path = args.output_file
 
     # DFD source
-    handle_dfd_source(args, provenance, input_fp, output_path)
+    handle_dfd_source(options, provenance, input_fp, output_path)
 
 
 def main() -> None:

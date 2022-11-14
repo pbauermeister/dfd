@@ -1,28 +1,35 @@
 """Run the generation process"""
 
+import os.path
 import sys
 import textwrap
 from typing import Any, Optional
 
+from . import config
 from . import dfd_dot_templates as TMPL
-from . import dot, model, parser, scanner, config
+from . import dot, model, parser, scanner
 
 
 def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
-          percent_zoom: int, bgcolor: str, format: str, debug: bool,
+          options: model.Options,
           snippet_by_name: model.SnippetByName = None) -> None:
     """Take a DFD source and build the final image or document"""
-    lines = scanner.scan(provenance, dfd_src, snippet_by_name, debug)
-    statements = parser.parse(lines, debug)
+    lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
+    statements = parser.parse(lines, options.debug)
     items_by_name = parser.check(statements)
     statements = filter_statements(statements)
     statements, graph_options = handle_options(statements)
 
+    if options.no_graph_title:
+        title = None
+    else:
+        title = os.path.splitext(output_path)[0]
+
     gen = Generator(graph_options)
-    text = generate_dot(gen, statements, items_by_name)
-    if debug:
+    text = generate_dot(gen, title, statements, items_by_name)
+    if options.debug:
         print(text)
-    dot.generate_image(graph_options, text, output_path, format)
+    dot.generate_image(graph_options, text, output_path, options.format)
 
 
 def wrap(text: str, cols: int) -> str:
@@ -82,7 +89,6 @@ class Generator:
         return d
 
     def generate_star(self, text: str) -> str:
-        print(text)
         text = wrap(text, self.graph_options.item_text_width)
         star_name = f'__star_{self.star_nr}__'
         line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
@@ -141,10 +147,13 @@ class Generator:
     def generate_style(self, style: model.Style) -> None:
         pass
 
-    def generate_dot_text(self) -> str:
+    def generate_dot_text(self, title: str) -> str:
         graph_params = []
         if self.graph_options.is_context:
             graph_params.append(TMPL.GRAPH_PARAMS_CONTEXT_DIAGRAM)
+
+        if title:
+            graph_params.append(TMPL.DOT_GRAPH_TITLE.format(title=title))
 
         if self.graph_options.is_vertical:
             graph_params.append('rankdir=TB')
@@ -153,6 +162,7 @@ class Generator:
 
         block = '\n'.join(self.lines).replace('\n', '\n  ')
         text = TMPL.DOT.format(
+            title=title,
             block=block,
             graph_params='\n  '.join(graph_params),
         ).replace('\n  \n', '\n\n')
@@ -160,7 +170,7 @@ class Generator:
         return text
 
 
-def generate_dot(gen: Generator, statements: model.Statements,
+def generate_dot(gen: Generator, title: str, statements: model.Statements,
                  items_by_name: dict[str, model.Item]) -> str:
     """Iterate over statements and generate a dot source file"""
     def get_item(name: str) -> Optional[model.Item]:
@@ -179,7 +189,7 @@ def generate_dot(gen: Generator, statements: model.Statements,
             case model.Style() as style:
                 gen.generate_style(style)
 
-    return gen.generate_dot_text()
+    return gen.generate_dot_text(title)
 
 
 def filter_statements(statements: model.Statements) -> model.Statements:

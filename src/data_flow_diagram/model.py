@@ -124,3 +124,12 @@ Snippets = list[Snippet]
 SourceLines = list[SourceLine]
 Statements = list[Statement]
 SnippetByName = dict[str, Snippet]
+
+
+@dataclass
+class Options:
+    format: str
+    percent_zoom: int
+    background_color: str
+    no_graph_title: bool
+    debug: bool

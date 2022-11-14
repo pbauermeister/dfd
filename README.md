@@ -71,6 +71,7 @@ options:
   --format FORMAT, -f FORMAT
                         output format: gif, jpg, tiff, bmp, pnm, eps, pdf,
                         svg (any supported by reportlab); default is svg
+  --no-graph-title      suppress graph title
   --debug               emits debug messages
 
 See https://github.com/pbauermeister/dfd for information, syntax and
