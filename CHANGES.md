@@ -1,5 +1,9 @@
 # Changes
 
+## Version 1.1.0:
+- Add continuous flow (cflow or -->>)
+- Add control (may only connect to signals)
+
 ## Version 1.6.0:
 - Dependencies:
   - items with name #SNIPPET:[NAME] or FILE:[NAME] refer to another graph,
