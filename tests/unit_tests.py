@@ -38,6 +38,7 @@ class UnitTest(unittest.TestCase):
                     'format',
                     'percent_zoom',
                     'background_color',
+                    'no_graph_title',
                     'debug',
                     'version',
                     ])
