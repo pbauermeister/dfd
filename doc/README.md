@@ -124,22 +124,22 @@ The LABEL can be ommitted, in which case:
 
 ```data-flow-diagram items-unlabelled.svg
 # create a process bubble:
-process	PROC
+process	Process
 
 # create a terminal rectangle:
-entity	ENTITY
+entity	Entity
 
 # create a store:
-store	STORE
+store	Store
 
 # create a channel
-channel	CHAN
+channel	Channel
 
 # create a point
-none	POINT
+none	Point
 
 # connection
-PROC --> CHAN
+Process --> Channel
 ```
 ![Creating items](./items-unlabelled.svg)
 
@@ -306,7 +306,7 @@ P1 -->? P3
 ```
 ![Relaxed](./constraint-relaxed.svg)
 
-- We can see that `P1 --> P3` did not lead `P2` to be shifted. This
+- You can see that `P1 --> P3` did not lead `P2` to be shifted. This
   way, the P1 -> P2 -> P3 alignment reflects a more natural flow.
 
 ### 6. Items and connections attributes
@@ -449,13 +449,13 @@ Read on for more details.
 
 You can include a file as includee.
 
-Say we have a file named `includee.part` containing:
+Say you have a file named `includee.part` containing:
 ```
 process	P1	Process 1
 process	P2	Process 2
 ```
 
-In any other DFD we can include the file `includee.part` by
+In any other DFD, you can include the file `includee.part` by
 `#include includee.part`:
 
 ```data-flow-diagram includer.svg
@@ -480,7 +480,7 @@ When using `--markdown`, you can include another snippet of the same document.
 
 #### a. Includee
 
-Here we first define and generate the snippet `includee-snippet-1.svg`.
+Here, you first define and generate the snippet `includee-snippet-1.svg`.
 
     ```data-flow-diagram includee-snippet-1.svg
     process	P3	Process 3
@@ -570,3 +570,127 @@ ERROR: (most recent first)
   line 329: <file:README.md><snippet:snippet-recursive.svg>
 Error: Recursive include of "#snippet-recursive"
 ```
+
+## D. Dependencies
+
+It as a good practice to split a functional diagram in many sub-diagrams
+(nested or not), each one of low to medium complexity.
+
+The benefit of better readability comes with a drawback for the writer:
+maintaining consistancy. To ease this, the "dependencies" feature comes to help.
+
+You can re-declare items already declared in other graphs. This has the following effects:
+1. The item is rendered "ghosted",
+2. Inter-dependencies are checked, and result in errors if a reference is not found,
+   or of wrong type.
+
+Synopsis:
+- `ITEM GRAPH:[NAME]  [LABEL]`
+- where `GRAPH` can be `#SNIPPET_NAME` or `FILENAME.EXT`
+
+Examples:
+- `none    #MyGraph1:`
+- `process #MyGraph1:MyItem`
+- `process #MyGraph1:MyItem My item`
+- `none    MyGraph2.dfd:`
+- `process MyGraph2.dfd:MyItem`
+- `process MyGraph2.dfd:MyItem My item`
+
+### 1. Using dependencies
+#### a. Referring to another snippet
+
+Supposing you have this (referred) snippet:
+```
+data-flow-diagram Feature-1.svg
+process	This    Do this
+```
+![Feature-1](./Feature-1.svg)
+
+In another graph (the referrer), you can refer to the whole referred graph by a `none` item:
+```data-flow-diagram Referrer-1.svg
+# Externals:
+none #Feature-1:
+
+# Internals:
+process	That    Do that
+
+Feature-1 --> That
+```
+![Referrer](./Referrer-1.svg)
+- `#Feature1` refers to the `Feature-1` snippet,
+- `:` without an item name, refers to the whole referred graph.
+- The referred graph must be used by its graph name, without the
+  `#` snippet prefix; here `Feature-1`.
+
+You can also refer to items inside the referred graph, by declaring an referrer of
+the same type, and specifying the referred item name:
+```data-flow-diagram Referrer-2.svg
+# Externals:
+process #Feature-1:This
+
+# Internals:
+process	That    Do that
+
+This --> That
+```
+![Referrer](./Referrer-2.svg)
+- `#Feature1` refers to the `Feature-1` snippet.
+- `:This` refers to the item named `This` in the referred snippet.
+- `process` must be used, in order to be of the same type as the referred item.
+- The referred item must be used by its item name; here `This`.
+- Since the label is omitted, the name is use instead.
+
+If the referred item has a label that the referrer wants to use, the referrer
+must re-declare the label:
+```data-flow-diagram Referrer-3.svg
+# Externals:
+process #Feature-1:This Do this
+
+# Internals:
+process	That    Do that
+
+This --> That
+```
+![Referrer](./Referrer-3.svg)
+
+#### b. Referring to another DFD file
+
+All the latter can be done with referred graph as separate file, instead as snippet.
+
+In such case, the file name of the referred graph shall be used.
+
+Supposing you have a file named `Feature-2.dfd`, and containing:
+
+```
+process These	Do these
+```
+
+You can refer to the above graph as follows:
+```data-flow-diagram dependant-4.svg
+# Externals:
+none    Feature-2.dfd:
+process Feature-2.dfd:These
+
+# Internals:
+process	That    Do that
+
+Feature-2   --> That
+That        --> These
+```
+![Dependant](./dependant-4.svg)
+- `Feature-2.dfd` refers to the `Feature-2.dfd` file.
+- The `Feature-2` name (without `.dfd` extension) must be further used.
+- The same other rules (e.g. accessing items of the referred graph) apply as
+  with snippets.
+
+### 2. Checking the dependencies
+
+Dependencies checking lead to error, if any of the following applies:
+- The referred graph (snippet or file) does not exist (or is not readable).
+- If one refers to a whole graph, the referrer is not of type `none`.
+- If one refers to an item of a graph,
+  - the referred item does not exist,
+  - the referrer and referred items are not of the same type.
+
+To turn off the checking, specify the `--no-check-dependencies` flag to the
+command line.
