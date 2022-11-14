@@ -1,5 +1,14 @@
 # Changes
 
+## Version 1.6.0:
+- Dependencies:
+  - items with name #SNIPPET:[NAME] or FILE:[NAME] refer to another graph,
+  - referred item is rendered "ghosted",
+  - dependencies are checked (unless --no-check-dependencies is passed).
+- Add graph title (unless --no-graph-title is passed).
+- Error in snippets of MD files: display line number relative to MD file (not snippet).
+- Colorize error messages.
+
 ## Version 1.5.0:
 - Wrap labels by `style item-text-width N` (default N=20).
 - and `style connection-text-width N` (default N=14).
