@@ -344,5 +344,8 @@ def parse_item_external(item: model.Item, dependencies: model.GraphDependencies)
         if not item.text:
             item.text = item.name
 
-        dependency = model.GraphDependency(parts[0], parts[1] or None, item.source)
+        dependency = model.GraphDependency(parts[0],
+                                           parts[1] or None,
+                                           item.type,
+                                           item.source)
         dependencies.append(dependency)

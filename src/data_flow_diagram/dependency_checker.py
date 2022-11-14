@@ -36,6 +36,10 @@ def check(dependencies: model.GraphDependencies, snippet_by_name: model.SnippetB
 
         # if only graph is targetted, we're done
         if dep.to_item is None:
+            if dep.to_type != model.NONE:
+                errors.append(f'{prefix}A whole graph may only be referred to '
+                              f'by an item of type "{model.NONE}", and not '
+                              f'"{dep.to_type}"')
             continue
 
         # scan and parse
@@ -43,8 +47,15 @@ def check(dependencies: model.GraphDependencies, snippet_by_name: model.SnippetB
         statements, _ = parser.parse(lines, options.debug)
 
         # find name
-        if has_item(dep.to_item, statements):
+        item = find_item(dep.to_item, statements)
+        if item:
+            if dep.to_type != item.type:
+                errors.append(f'{prefix}Referred item "{dep.to_item}" is of '
+                              f'type "{item.type}", but is referred to as '
+                              f'type "{dep.to_type}"')
+
             continue  # Found!
+
         errors.append(f'{prefix}Referring to unknown item name "{dep.to_item}"'
                       f' of {what} "{name}"')
 
@@ -53,10 +64,10 @@ def check(dependencies: model.GraphDependencies, snippet_by_name: model.SnippetB
         raise model.DfdException('\n\n'.join(errors))
 
 
-def has_item(name: str, statements: model.Statements) -> bool:
+def find_item(name: str, statements: model.Statements) -> model.Item:
     for statement in statements:
         match statement:
             case model.Item() as item:
                 if item.name == name:
-                    return True
-    return False
+                    return statement
+    return None

@@ -148,6 +148,7 @@ class Options:
 class GraphDependency:
     to_graph: str
     to_item: str
+    to_type: str
     source: SourceLine
 
 GraphDependencies = list[GraphDependency]
