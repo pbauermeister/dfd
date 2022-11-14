@@ -606,7 +606,7 @@ process	This    Do this
 ```
 ![Feature-1](./Feature-1.svg)
 
-In another graph (the referrer), you can refer to the whole referred graph by a `none` item:
+In another graph (the referrer), you can refer to the **whole referred graph** by a `none` item:
 ```data-flow-diagram Referrer-1.svg
 # Externals:
 none #Feature-1:
@@ -617,12 +617,12 @@ process	That    Do that
 Feature-1 --> That
 ```
 ![Referrer](./Referrer-1.svg)
-- `#Feature1` refers to the `Feature-1` snippet,
+- `#Feature-1` refers to the `Feature-1` snippet,
 - `:` without an item name, refers to the whole referred graph.
 - The referred graph must be used by its graph name, without the
   `#` snippet prefix; here `Feature-1`.
 
-You can also refer to items inside the referred graph, by declaring an referrer of
+You can also refer to **items inside the referred graph**, by declaring a referrer of
 the same type, and specifying the referred item name:
 ```data-flow-diagram Referrer-2.svg
 # Externals:
@@ -634,7 +634,7 @@ process	That    Do that
 This --> That
 ```
 ![Referrer](./Referrer-2.svg)
-- `#Feature1` refers to the `Feature-1` snippet.
+- `#Feature-1` refers to the `Feature-1` snippet.
 - `:This` refers to the item named `This` in the referred snippet.
 - `process` must be used, in order to be of the same type as the referred item.
 - The referred item must be used by its item name; here `This`.
@@ -655,7 +655,7 @@ This --> That
 
 #### b. Referring to another DFD file
 
-All the latter can be done with referred graph as separate file, instead as snippet.
+All the latter can be done with referred graph as separate **file**, instead of snippet.
 
 In such case, the file name of the referred graph shall be used.
 
@@ -685,10 +685,10 @@ That        --> These
 
 ### 2. Checking the dependencies
 
-Dependencies checking lead to error, if any of the following applies:
+Dependencies checking lead to error, if any of the following is found:
 - The referred graph (snippet or file) does not exist (or is not readable).
-- If one refers to a whole graph, the referrer is not of type `none`.
-- If one refers to an item of a graph,
+- When referring to a whole graph, the referrer is not of type `none`.
+- When referring to an item of a graph,
   - the referred item does not exist,
   - the referrer and referred items are not of the same type.
 
