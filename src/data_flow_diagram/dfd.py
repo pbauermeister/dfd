@@ -7,7 +7,7 @@ from typing import Any, Optional
 
 from . import config
 from . import dfd_dot_templates as TMPL
-from . import dot, model, parser, scanner
+from . import dot, model, parser, scanner, dependency_checker
 
 
 def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
@@ -15,7 +15,9 @@ def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
           snippet_by_name: model.SnippetByName = None) -> None:
     """Take a DFD source and build the final image or document"""
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
-    statements = parser.parse(lines, options.debug)
+    statements, dependencies = parser.parse(lines, options.debug)
+    if dependencies and not options.no_check_dependencies:
+        dependency_checker.check(dependencies, snippet_by_name, options)
     items_by_name = parser.check(statements)
     statements = filter_statements(statements)
     statements, graph_options = handle_options(statements)

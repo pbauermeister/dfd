@@ -1,5 +1,6 @@
 """Parse DFD source text in our DSL"""
 
+import os.path
 import re
 from typing import Callable, Tuple
 
@@ -54,10 +55,11 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
 
 
 def parse(source_lines: model.SourceLines, debug: bool = False,
-         ) -> model.Statements:
+         ) -> tuple[model.Statements, model.GraphDependencies]:
     """Parse the DFD source text as list of statements"""
 
     statements: model.Statements = []
+    dependencies: model.GraphDependencies = []
 
     for n, source in enumerate(source_lines):
         src_line = source.text
@@ -109,7 +111,7 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
 
         match statement:
             case model.Item() as item:
-                parse_item_external(item)
+                parse_item_external(item, dependencies)
                 item.text = item.text or item.name
 
         match statement:
@@ -120,7 +122,7 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
 
     if debug:
         for s in statements: print(model.repr(s))
-    return statements
+    return statements, dependencies
 
 
 def split_args(dfd_line: str, n: int, last_is_optional: bool=False) -> list[str]:
@@ -325,7 +327,7 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
                 item.text = item.text or item.name
 
 
-def parse_item_external(item: model.Item) -> None:
+def parse_item_external(item: model.Item, dependencies: model.GraphDependencies) -> None:
     parts = item.name.split(':')
     if len(parts) > 1:
         item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
@@ -334,5 +336,13 @@ def parse_item_external(item: model.Item) -> None:
         else:
             item.name = parts[-2]
 
+        if item.name.startswith('#'):
+            item.name = item.name[1:]
+        else:
+            item.name = os.path.splitext(item.name)[0]
+
         if not item.text:
             item.text = item.name
+
+        dependency = model.GraphDependency(parts[0], parts[1] or None, item.source)
+        dependencies.append(dependency)

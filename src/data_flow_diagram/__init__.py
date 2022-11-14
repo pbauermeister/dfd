@@ -78,6 +78,11 @@ def parse_args() -> argparse.Namespace:
                         default=False,
                         help='suppress graph title')
 
+    parser.add_argument('--no-check-dependencies',
+                        action='store_true',
+                        default=False,
+                        help='suppress dependencies checking')
+
     parser.add_argument('--debug',
                         action='store_true',
                         default=False,
@@ -131,6 +136,7 @@ def run(args: argparse.Namespace) -> None:
         args.percent_zoom,
         args.background_color,
         args.no_graph_title,
+        args.no_check_dependencies,
         args.debug,
     )
 

@@ -39,6 +39,7 @@ class UnitTest(unittest.TestCase):
                     'percent_zoom',
                     'background_color',
                     'no_graph_title',
+                    'no_check_dependencies',
                     'debug',
                     'version',
                     ])
@@ -96,21 +97,21 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_duplicate_item_error(self) -> None:
         l = scanner.scan(None, inputs.DUPLICATE_ITEM_ERROR)
-        statements = parser.parse(l)
+        statements, _ = parser.parse(l)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd duplicate item name'):
             parser.check(statements)
 
     def test_parse_missing_ref_error(self) -> None:
         l = scanner.scan(None, inputs.MISSING_REF_ERROR)
-        statements = parser.parse(l)
+        statements, _ = parser.parse(l)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd missing reference'):
             parser.check(statements)
 
     def test_parse_double_error(self) -> None:
         l = scanner.scan(None, inputs.DOUBLE_STAR_ERROR)
-        statements = parser.parse(l)
+        statements, _ = parser.parse(l)
         with self.assertRaises(model.DfdException,
                                msg='Undetectd double * reference'):
             parser.check(statements)

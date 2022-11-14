@@ -86,7 +86,7 @@ SIGNAL  = 'signal'
 
 
 @dataclass
-class GraphOptions():
+class GraphOptions:
     is_vertical: bool = False
     is_context: bool = False
     item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
@@ -132,4 +132,14 @@ class Options:
     percent_zoom: int
     background_color: str
     no_graph_title: bool
+    no_check_dependencies: bool
     debug: bool
+
+
+@dataclass
+class GraphDependency:
+    to_graph: str
+    to_item: str
+    source: SourceLine
+
+GraphDependencies = list[GraphDependency]
