@@ -328,7 +328,7 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
 
 
 def parse_item_external(item: model.Item, dependencies: model.GraphDependencies) -> None:
-    parts = item.name.split(':')
+    parts = item.name.split(':', 1)
     if len(parts) > 1:
         item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
         if parts[-1]:

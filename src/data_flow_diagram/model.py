@@ -37,6 +37,7 @@ class SourceLine(Base):
     raw_text: str
     parent: SourceLine  # https://stackoverflow.com/a/62521947
     line_nr: int
+    is_container: bool = False
 
 
 @dataclass
@@ -105,7 +106,14 @@ def mk_err_prefix_from(src: SourceLine) -> str:
         if src.line_nr is None:
             stack += [f'  {pack(src.raw_text)}']
         else:
-            stack += [f'  line {src.line_nr+1}: {pack(src.raw_text)}']
+            if src.parent and src.parent.is_container:
+                nr = src.parent.line_nr+1
+                delta = src.line_nr+1
+                final = nr + delta
+                stack += [f'  line {final}: {pack(src.raw_text)}']
+            else:
+                nr = src.line_nr+1
+                stack += [f'  line {nr}: {pack(src.raw_text)}']
         if src.parent:
             _add_to_stack(stack, src.parent)
 

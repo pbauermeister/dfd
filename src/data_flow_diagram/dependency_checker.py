@@ -46,7 +46,7 @@ def check(dependencies: model.GraphDependencies, snippet_by_name: model.SnippetB
         if has_item(dep.to_item, statements):
             continue  # Found!
         errors.append(f'{prefix}Referring to unknown item name "{dep.to_item}"'
-                      f' inside {what} "{name}"')
+                      f' of {what} "{name}"')
 
     if errors:
         errors.insert(0, 'Dependency error(s) found:')

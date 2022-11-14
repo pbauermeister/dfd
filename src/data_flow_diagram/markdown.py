@@ -18,15 +18,18 @@ SnippetContexts = list[SnippetContext]
 
 
 def extract_snippets(text: str) -> model.Snippets:
-    rx = re.compile(r'^```\s*data-flow-diagram\s+(?P<output>.*?)\s*'
+    rx = re.compile(r'^```(?P<head>\s*)'
+                    r'data-flow-diagram\s+'
+                    r'(?P<output>.*?)\s*'
                     r'^(?P<src>.*?)^\s*```', re.DOTALL | re.M)
 
     return [
         model.Snippet(
-            text=match['src'],
+            text=match['head'] + match['src'],
             name=os.path.splitext(match['output'])[0],
             output=match['output'],
-            line_nr=len(text[:match.start()].splitlines()))
+            line_nr=len(text[:match.start()].splitlines()),
+            )
         for match in rx.finditer(text)]
         # FIXME: have text a TextIO and find in streaming
 
@@ -45,7 +48,8 @@ def make_snippets_params(provenance: str, snippets: model.Snippets,
         input_fp = io.StringIO(snippet.text)
         snippet_provenance = f'{provenance}<snippet:{snippet.output}>'
         root = model.SourceLine("", snippet_provenance,
-                                None, snippet.line_nr)
+                                None, snippet.line_nr,
+                                is_container=True)
         file_name = input_fp.name = snippet.output
         res.append(SnippetContext(root, input_fp, file_name, snippet_by_name))
 
