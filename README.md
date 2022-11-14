@@ -88,6 +88,8 @@ options:
                         output format: gif, jpg, tiff, bmp, pnm, eps, pdf,
                         svg (any supported by reportlab); default is svg
   --no-graph-title      suppress graph title
+  --no-check-dependencies
+                        suppress dependencies checking
   --debug               emits debug messages
 
 See https://github.com/pbauermeister/dfd for information, syntax and
