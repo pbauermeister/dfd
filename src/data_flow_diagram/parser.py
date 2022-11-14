@@ -110,6 +110,7 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
         match statement:
             case model.Item() as item:
                 parse_item_external(item)
+                item.text = item.text or item.name
 
         match statement:
             case model.Drawable() as drawable:
@@ -122,16 +123,13 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
     return statements
 
 
-def split_args(dfd_line: str, n: int, last_is_optional: bool=False,
-               make_last_from_previous: bool=False) -> list[str]:
+def split_args(dfd_line: str, n: int, last_is_optional: bool=False) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
 
     terms = dfd_line.split(maxsplit=n)
     if len(terms)-1 == n-1 and last_is_optional:
-        if make_last_from_previous:
-            terms.append(terms[-1])
-        else:
-            terms.append(None)
+        terms.append(None)
+
     if len(terms)-1 != n:
         if not last_is_optional:
             raise model.DfdException(f'Expected {n} argument(s)')
@@ -157,35 +155,35 @@ def parse_style(source: model.SourceLine) -> model.Statement:
 
 def parse_process(source: model.SourceLine) -> model.Statement:
     """Parse process statement"""
-    name, text = split_args(source.text, 2, True, True)
+    name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
     return model.Item(source, model.PROCESS, text, "", name, hidable)
 
 
 def parse_entity(source: model.SourceLine) -> model.Statement:
     """Parse entity statement"""
-    name, text = split_args(source.text, 2, True, True)
+    name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
     return model.Item(source, model.ENTITY, text, "", name, hidable)
 
 
 def parse_store(source: model.SourceLine) -> model.Statement:
     """Parse store statement"""
-    name, text = split_args(source.text, 2, True, True)
+    name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
     return model.Item(source, model.STORE, text, "", name, hidable)
 
 
 def parse_none(source: model.SourceLine) -> model.Statement:
     """Parse none statement"""
-    name, text = split_args(source.text, 2, True, True)
+    name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
     return model.Item(source, model.NONE, text, "", name, hidable)
 
 
 def parse_channel(source: model.SourceLine) -> model.Statement:
     """Parse channel statement"""
-    name, text = split_args(source.text, 2, True, True)
+    name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
     return model.Item(source, model.CHANNEL, text, "", name, hidable)
 
@@ -328,5 +326,13 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
 
 
 def parse_item_external(item: model.Item) -> None:
-    if ':' in item.name:
+    parts = item.name.split(':')
+    if len(parts) > 1:
         item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
+        if parts[-1]:
+            item.name = parts[-1]
+        else:
+            item.name = parts[-2]
+
+        if not item.text:
+            item.text = item.name
