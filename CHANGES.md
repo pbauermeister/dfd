@@ -1,6 +1,6 @@
 # Changes
 
-## Version 1.1.0:
+## Version 1.7.0:
 - Add continuous flow (cflow or -->>)
 - Add control (may only connect to signals)
 

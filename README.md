@@ -7,6 +7,22 @@ source text files.
 The source for this project is [available here][src].
 The package page is [available here][pypi].
 
+## Scope
+
+The present tool allows to create diagrams following the "Structured
+Analysis / Stuctured Design" (SA/SD) modelling technique as described
+by Edward Yourdon.
+
+SA/RT (which is SA/SD with a real-time extension), can be found in the
+design of real-time and embedded systems.
+Example: [Firmware modelling of the Active Descent
+System](https://www.spyr.ch/ps/ads/qm/node18.html) of the [Rosetta
+Lander](https://en.wikipedia.org/wiki/Rosetta_(spacecraft))
+spacecraft.
+
+Surprisingly, SA/RT is also well-suited to the analyse and design of
+web micro-services and IoT architectures.
+
 ## Summary
 Data Flow Diagram are used to model the flow and processing of
 information through a system.
