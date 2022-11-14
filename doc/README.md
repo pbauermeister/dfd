@@ -9,11 +9,11 @@ Analysis / Stuctured Design" (SA/SD) modelling technique as described
 by Edward Yourdon.
 
 SA/RT (which is SA/SD with a real-time extension), can be found in the
-design of real-time systems.
-
+design of real-time and embedded systems.
 Example: [Firmware modelling of the Active Descent
 System](https://www.spyr.ch/ps/ads/qm/node18.html) of the [Rosetta
-Lander](https://en.wikipedia.org/wiki/Rosetta_(spacecraft)) spacecraft.
+Lander](https://en.wikipedia.org/wiki/Rosetta_(spacecraft))
+spacecraft.
 
 Surprisingly, SA/RT is also well-suited to the analyse and design of
 web micro-services architectures.
