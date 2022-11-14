@@ -75,6 +75,7 @@ class Style(Statement):
 STYLE   = 'style'
 
 PROCESS = 'process'
+CONTROL = 'control'
 ENTITY  = 'entity'
 STORE   = 'store'
 CHANNEL = 'channel'
@@ -82,6 +83,7 @@ NONE    = 'none'
 
 FLOW    = 'flow'
 BFLOW   = 'bflow'
+CFLOW   = 'cflow'
 UFLOW   = 'uflow'
 SIGNAL  = 'signal'
 

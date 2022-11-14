@@ -41,11 +41,17 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
         for point in conn.src, conn.dst:
             if point == "*":
                 nb_stars += 1
-            if point == "*" or point in items_by_name:
-                continue
-            raise model.DfdException(
-                f'{error_prefix}Connection "{conn.type}" links to "{point}", '
-                f'which is not defined')
+            if point != "*":
+                if point not in items_by_name:
+                    raise model.DfdException(
+                        f'{error_prefix}Connection "{conn.type}" links to "{point}", '
+                        f'which is not defined')
+                if items_by_name[point].type == model.CONTROL and conn.type != model.SIGNAL:
+                    raise model.DfdException(
+                        f'{error_prefix}Connection to {model.CONTROL} "{point}" is '
+                        f'of type "{conn.type}", however only connections of type '
+                        f'"{model.SIGNAL}" are allowed')
+
         if nb_stars == 2:
             raise model.DfdException(
                 f'{error_prefix}Connection "{conn.type}" may not link to two '
@@ -77,17 +83,20 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
         f: Callable[[model.SourceLine], model.Statement] = {
             model.STYLE: parse_style,
             model.PROCESS: parse_process,
+            model.CONTROL: parse_control,
             model.ENTITY: parse_entity,
             model.STORE: parse_store,
             model.NONE: parse_none,
             model.CHANNEL: parse_channel,
 
             model.FLOW: parse_flow,
+            model.CFLOW: parse_cflow,
             model.BFLOW: parse_bflow,
             model.UFLOW: parse_uflow,
             model.SIGNAL: parse_signal,
 
             model.FLOW+'?': parse_flow_q,
+            model.CFLOW+'?': parse_cflow_q,
             model.BFLOW+'?': parse_bflow_q,
             model.UFLOW+'?': parse_uflow_q,
             model.SIGNAL+'?': parse_signal_q,
@@ -162,6 +171,13 @@ def parse_process(source: model.SourceLine) -> model.Statement:
     return model.Item(source, model.PROCESS, text, "", name, hidable)
 
 
+def parse_control(source: model.SourceLine) -> model.Statement:
+    """Parse control statement"""
+    name, text = split_args(source.text, 2, True)
+    name, hidable = parse_item_name(name)
+    return model.Item(source, model.CONTROL, text, "", name, hidable)
+
+
 def parse_entity(source: model.SourceLine) -> model.Statement:
     """Parse entity statement"""
     name, text = split_args(source.text, 2, True)
@@ -202,6 +218,12 @@ def parse_flow_r(source: model.SourceLine) -> model.Statement:
     return model.Connection(source, model.FLOW, text, "", src, dst, True)
 
 
+def parse_cflow(source: model.SourceLine) -> model.Statement:
+    """Parse directional flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.CFLOW, text, "", src, dst)
+
+
 def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
@@ -236,6 +258,13 @@ def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.FLOW, text, "", src, dst, True,
+                            relaxed=True)
+
+
+def parse_cflow_q(source: model.SourceLine) -> model.Statement:
+    """Parse directional flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.CFLOW, text, "", src, dst,
                             relaxed=True)
 
 
@@ -290,6 +319,15 @@ def apply_syntactic_sugars(src_line: str) -> str:
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
         new_line = fmt('flow.r'+q, parts)#, swap=True)
+
+    if re.fullmatch(r'-+>>[?]?', op):
+        q = '?' if op.endswith('?') else ''
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('cflow'+q, parts)
+    elif re.fullmatch(r'<<-+[?]?', op):
+        q = '?' if op.endswith('?') else ''
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt('cflow.r'+q, parts)#, swap=True)
 
     elif re.fullmatch(r'<-+>[?]?', op):
         q = '?' if op.endswith('?') else ''

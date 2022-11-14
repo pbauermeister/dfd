@@ -65,6 +65,10 @@ class Generator:
                     fc = '"#eeeeee"'
                 line = (f'"{item.name}" [shape={shape} label="{text}" '
                         f'fillcolor={fc} style=filled {attrs}]')
+            case model.CONTROL:
+                fc = '"#eeeeee"'
+                line = (f'"{item.name}" [shape=ellipse label="{text}" '
+                        f'fillcolor={fc} style="filled,dashed" {attrs}]')
             case model.ENTITY:
                 line = (f'"{item.name}" [shape=rectangle label="{text}" '
                         f'{attrs}]')
@@ -130,6 +134,8 @@ class Generator:
                     attrs += ' dir=back'
             case model.BFLOW:
                 attrs += ' dir=both'
+            case model.CFLOW:
+                attrs += ' arrowhead=veevee'
             case model.UFLOW:
                 attrs += ' dir=none'
             case model.SIGNAL:
