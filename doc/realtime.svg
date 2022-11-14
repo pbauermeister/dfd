@@ -57,8 +57,8 @@
 <g id="edge6" class="edge">
 <title>Power&#45;&gt;Driver</title>
 <path fill="none" stroke="gray" d="M191.15,-46.04C207.62,-46.13 227.18,-46.31 255.68,-47.06"/>
-<polygon fill="gray" stroke="gray" points="275.75,-47.64 265.62,-51.85 270.75,-47.5 265.75,-47.35 265.75,-47.35 265.75,-47.35 270.75,-47.5 265.88,-42.85 275.75,-47.64 275.75,-47.64"/>
-<polygon fill="gray" stroke="gray" points="265.75,-47.35 255.62,-51.56 260.75,-47.21 255.75,-47.07 255.75,-47.07 255.75,-47.07 260.75,-47.21 255.88,-42.57 265.75,-47.35 265.75,-47.35"/>
+<polygon fill="gray" stroke="gray" points="265.65,-50.85 275.75,-47.64 265.85,-43.85 265.65,-50.85"/>
+<polygon fill="gray" stroke="gray" points="255.65,-50.56 265.75,-47.35 255.85,-43.57 255.65,-50.56"/>
 <text text-anchor="middle" x="233.5" y="-50" font-family="Times,serif" font-style="italic" font-size="10.00">voltage</text>
 </g>
 <!-- Timer&#45;&gt;Button -->

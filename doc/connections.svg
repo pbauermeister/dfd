@@ -45,8 +45,8 @@
 <g id="edge2" class="edge">
 <title>B1&#45;&gt;B2</title>
 <path fill="none" stroke="gray" d="M70.37,-100C101.79,-100 154.86,-100 193.18,-100"/>
-<polygon fill="gray" stroke="gray" points="213.24,-100 203.24,-104.5 208.24,-100 203.24,-100 203.24,-100 203.24,-100 208.24,-100 203.24,-95.5 213.24,-100 213.24,-100"/>
-<polygon fill="gray" stroke="gray" points="203.24,-100 193.24,-104.5 198.24,-100 193.24,-100 193.24,-100 193.24,-100 198.24,-100 193.24,-95.5 203.24,-100 203.24,-100"/>
+<polygon fill="gray" stroke="gray" points="203.24,-103.5 213.24,-100 203.24,-96.5 203.24,-103.5"/>
+<polygon fill="gray" stroke="gray" points="193.24,-103.5 203.24,-100 193.24,-96.5 193.24,-103.5"/>
 <text text-anchor="middle" x="140" y="-114" font-family="Times,serif" font-style="italic" font-size="10.00">a continuous</text>
 <text text-anchor="middle" x="140" y="-103" font-family="Times,serif" font-style="italic" font-size="10.00">flow</text>
 </g>

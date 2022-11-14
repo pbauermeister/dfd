@@ -87,8 +87,8 @@
 <g id="edge5" class="edge">
 <title>Device&#45;&gt;Acquire</title>
 <path fill="none" stroke="gray" d="M54.24,-145C78.63,-145 115.96,-145 148.4,-145"/>
-<polygon fill="gray" stroke="gray" points="168.82,-145 158.82,-149.5 163.82,-145 158.82,-145 158.82,-145 158.82,-145 163.82,-145 158.82,-140.5 168.82,-145 168.82,-145"/>
-<polygon fill="gray" stroke="gray" points="158.82,-145 148.82,-149.5 153.82,-145 148.82,-145 148.82,-145 148.82,-145 153.82,-145 148.82,-140.5 158.82,-145 158.82,-145"/>
+<polygon fill="gray" stroke="gray" points="158.82,-148.5 168.82,-145 158.82,-141.5 158.82,-148.5"/>
+<polygon fill="gray" stroke="gray" points="148.82,-148.5 158.82,-145 148.82,-141.5 148.82,-148.5"/>
 <text text-anchor="middle" x="111.5" y="-159" font-family="Times,serif" font-style="italic" font-size="10.00">continuous raw</text>
 <text text-anchor="middle" x="111.5" y="-148" font-family="Times,serif" font-style="italic" font-size="10.00">data</text>
 </g>

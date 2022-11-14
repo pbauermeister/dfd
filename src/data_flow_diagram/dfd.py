@@ -135,7 +135,7 @@ class Generator:
             case model.BFLOW:
                 attrs += ' dir=both'
             case model.CFLOW:
-                attrs += ' arrowhead=veevee'
+                attrs += ' arrowhead=normalnormal'
             case model.UFLOW:
                 attrs += ' dir=none'
             case model.SIGNAL:
