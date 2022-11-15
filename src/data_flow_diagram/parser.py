@@ -102,9 +102,11 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             model.SIGNAL+'?': parse_signal_q,
 
             'flow.r': parse_flow_r,
+            'cflow.r': parse_cflow_r,
             'signal.r': parse_signal_r,
 
             'flow.r?': parse_flow_r_q,
+            'cflow.r?': parse_cflow_r_q,
             'signal.r?': parse_signal_r_q,
 
         }.get(word)
@@ -219,10 +221,14 @@ def parse_flow_r(source: model.SourceLine) -> model.Statement:
 
 
 def parse_cflow(source: model.SourceLine) -> model.Statement:
-    """Parse directional flow statement"""
+    """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.CFLOW, text, "", src, dst)
 
+def parse_cflow_r(source: model.SourceLine) -> model.Statement:
+    """Parse continuous flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.CFLOW, text, "", src, dst, True)
 
 def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
@@ -262,9 +268,15 @@ def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
 
 
 def parse_cflow_q(source: model.SourceLine) -> model.Statement:
-    """Parse directional flow statement"""
+    """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.CFLOW, text, "", src, dst,
+                            relaxed=True)
+
+def parse_cflow_r_q(source: model.SourceLine) -> model.Statement:
+    """Parse continuous flow statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Connection(source, model.CFLOW, text, "", src, dst, True,
                             relaxed=True)
 
 

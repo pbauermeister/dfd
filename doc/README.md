@@ -70,7 +70,10 @@ Synopsis:
 Example:
 ```data-flow-diagram items.svg
 # create a process bubble:
-process	P	A Process
+process	P	A process
+
+# create a control bubble:
+control K  	A control
 
 # create a terminal rectangle:
 entity	T	An entity
@@ -165,6 +168,7 @@ process	P2
 P1 --> P2	a flow
 P1 <-> P2	a bi-directional flow
 P1 ::> P2	a signal
+P1 <<- P2       a continuous back flow
 
 *  --> P2	an unsourced flow
 P1 ::> *	an untargetted signal

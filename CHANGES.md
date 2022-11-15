@@ -1,5 +1,8 @@
 # Changes
 
+## Version 1.7.1:
+- Support continuous back- and relaxed- flows.
+
 ## Version 1.7.0:
 - Add continuous flow (cflow or -->>)
 - Add control (may only connect to signals)

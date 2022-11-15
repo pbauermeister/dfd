@@ -135,7 +135,11 @@ class Generator:
             case model.BFLOW:
                 attrs += ' dir=both'
             case model.CFLOW:
-                attrs += ' arrowhead=normalnormal'
+                if conn.reversed:
+                    attrs += ' dir=back'
+                    attrs += ' arrowtail=normalnormal'
+                else:
+                    attrs += ' arrowhead=normalnormal'
             case model.UFLOW:
                 attrs += ' dir=none'
             case model.SIGNAL:
