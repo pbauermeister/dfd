@@ -49,7 +49,6 @@ See the [documentation page][doc].
 ## Dependencies
 
  * Python3
- * Python libraries: svgwrite, reportlab
  * Graphviz
 
 ## Installing via pip3
@@ -86,7 +85,7 @@ options:
                         an INPUT_FILE that is a markdown file
   --format FORMAT, -f FORMAT
                         output format: gif, jpg, tiff, bmp, pnm, eps, pdf,
-                        svg (any supported by reportlab); default is svg
+                        svg (any supported by Graphviz); default is svg
   --no-graph-title      suppress graph title
   --no-check-dependencies
                         suppress dependencies checking

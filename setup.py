@@ -33,7 +33,7 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     python_requires=">=3.10, <4",
-    install_requires=["svgwrite", "svglib"],
+    install_requires=[],
     extras_require={
         "dev": ["check-manifest"],
         "test": ["coverage"],

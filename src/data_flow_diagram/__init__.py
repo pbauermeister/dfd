@@ -58,7 +58,7 @@ def parse_args() -> argparse.Namespace:
                         required=False,
                         default='svg',
                         help='output format: gif, jpg, tiff, bmp, pnm, eps, '
-                        'pdf, svg (any supported by reportlab); default is svg')
+                        'pdf, svg (any supported by Graphviz); default is svg')
 
     parser.add_argument('--percent-zoom', '-p',
                         required=False,
