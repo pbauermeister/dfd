@@ -1,11 +1,14 @@
 # Changes
 
+## Version 1.8.0:
+- Add frames,
+
 ## Version 1.7.1:
 - Support continuous back- and relaxed- flows.
 
 ## Version 1.7.0:
-- Add continuous flow (cflow or -->>)
-- Add control (may only connect to signals)
+- Add continuous flow (cflow or -->>).
+- Add control (may only connect to signals).
 
 ## Version 1.6.0:
 - Dependencies:
@@ -14,7 +17,6 @@
   - dependencies are checked (unless --no-check-dependencies is passed).
 - Add graph title (unless --no-graph-title is passed).
 - Error in snippets of MD files: display line number relative to MD file (not snippet).
-- Colorize error messages.
 
 ## Version 1.5.0:
 - Wrap labels by `style item-text-width N` (default N=20).

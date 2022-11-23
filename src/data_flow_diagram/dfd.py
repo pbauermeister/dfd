@@ -44,6 +44,7 @@ class Generator:
     def __init__(self, graph_options: model.GraphOptions) -> None:
         self.lines: list[str] = []
         self.star_nr = 0
+        self.frame_nr = 0
         self.graph_options = graph_options
 
     def append(self, line:str, statement: model.Statement) -> None:
@@ -159,6 +160,18 @@ class Generator:
     def generate_style(self, style: model.Style) -> None:
         pass
 
+    def generate_frame(self, frame: model.Frame) -> None:
+        self.append(f'subgraph cluster_{self.frame_nr} {{', frame)
+        self.frame_nr += 1
+
+        self.lines.append(f'  label="{frame.text}"')
+        if frame.attrs:
+            self.lines.append(f'  {frame.attrs}')
+
+        for item in frame.items:
+            self.lines.append(f'  "{item}"')
+        self.lines.append('}')
+
     def generate_dot_text(self, title: str) -> str:
         graph_params = []
         if self.graph_options.is_context:
@@ -200,6 +213,9 @@ def generate_dot(gen: Generator, title: str, statements: model.Statements,
 
             case model.Style() as style:
                 gen.generate_style(style)
+
+            case model.Frame() as frame:
+                gen.generate_frame(frame)
 
     return gen.generate_dot_text(title)
 

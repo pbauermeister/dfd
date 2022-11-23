@@ -7,3 +7,18 @@ P1:
 P2:
 - #option ARGS: like cmdline args
 - #dot inline-code
+
+Tests:
+- omit label
+- arrows
+- #include snippets and file
+- vertical
+- context
+- attrs
+- A -> B vs B <- A
+- relaxed
+- none
+- wrapping, style *-text-width
+- dependencies
+- all connections, back and relaxed
+- control

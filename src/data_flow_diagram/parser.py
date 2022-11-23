@@ -31,7 +31,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             f'{error_prefix}Name "{name}" already exists '
             f'at line {other.source.line_nr+1}: {other_text}')
 
-    # check references and values
+    # check references and values of connections
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
@@ -56,6 +56,27 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             raise model.DfdException(
                 f'{error_prefix}Connection "{conn.type}" may not link to two '
                 f'stars')
+
+    # check references of frames
+    framed_items: set[str] = set()
+    for statement in statements:
+        error_prefix = model.mk_err_prefix_from(statement.source)
+        match statement:
+            case model.Frame() as frame: pass
+            case _: continue
+        if not frame.items:
+            raise model.DfdException(
+                f'{error_prefix}Frame is empty')
+        for name in frame.items:
+            if name not in items_by_name:
+                raise model.DfdException(
+                    f'{error_prefix}Frame includes "{name}", '
+                    f'which is not defined')
+            if name in framed_items:
+                raise model.DfdException(
+                    f'{error_prefix}Item "{name}", '
+                    f'is in multiple frames')
+            framed_items.add(name)
 
     return items_by_name
 
@@ -108,6 +129,8 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             'flow.r?': parse_flow_r_q,
             'cflow.r?': parse_cflow_r_q,
             'signal.r?': parse_signal_r_q,
+
+            model.FRAME: parse_frame,
 
         }.get(word)
 
@@ -399,3 +422,17 @@ def parse_item_external(item: model.Item, dependencies: model.GraphDependencies)
                                            item.type,
                                            item.source)
         dependencies.append(dependency)
+
+
+def parse_frame(source: model.SourceLine) -> model.Statement:
+    """Parse frame statement"""
+    parts = source.text.split('=', maxsplit=1)
+    if len(parts) == 1:
+        text = ''
+    else:
+        text = parts[1].strip()
+
+    items = parts[0].split()[1:]
+    type = ''  # so far there is only one type of frame
+    attrs = 'style=dashed'
+    return model.Frame(source, type, text, attrs, items)

@@ -67,6 +67,11 @@ class Connection(Drawable):
 
 
 @dataclass
+class Frame(Drawable):
+    items: list[str]
+
+
+@dataclass
 class Style(Statement):
     style: str
     value: Any = None
@@ -86,6 +91,8 @@ BFLOW   = 'bflow'
 CFLOW   = 'cflow'
 UFLOW   = 'uflow'
 SIGNAL  = 'signal'
+
+FRAME   = 'frame'
 
 
 @dataclass

@@ -230,9 +230,54 @@ process NAME    [ATTRIBUTES ...] LABEL
 
 ITEM1 --> ITEM2 [ATTRIBUTES ...] LABEL
 ```
+
 #### Examples
 
 See examples below.
+
+### 6. Frames
+
+Synopsis:
+- `frame ITEM ITEM... [= [ATTRIBUTES ...] LABEL]`
+
+Basic frame:
+```data-flow-diagram frame.svg
+process	P1
+process	P2
+process P3
+
+frame P1 P2 = A frame
+
+P1 --> P3
+P3 --> P2
+```
+![Frames](./frame.svg)
+
+Frame without label:
+```data-flow-diagram frame-without-label.svg
+process	P1
+process	P2
+process P3
+
+frame P1 P2
+
+P1 --> P3
+P3 --> P2
+```
+![Frames](./frame-without-label.svg)
+
+Frame with styling:
+```data-flow-diagram frame-blue.svg
+process	P1
+process	P2
+process P3
+
+frame P1 P2 = [style=solid color=blue fontcolor=blue] A blue\nsolid frame
+
+P1 --> P3
+P3 --> P2
+```
+![Frames](./frame-blue.svg)
 
 ## C. Details with examples
 
