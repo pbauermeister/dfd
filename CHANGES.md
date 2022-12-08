@@ -1,7 +1,10 @@
 # Changes
 
+## Version 1.9.0:
+- Allow line continuation with a trailing backslash
+
 ## Version 1.8.0:
-- Add frames,
+- Add frames
 
 ## Version 1.7.1:
 - Support continuous back- and relaxed- flows.

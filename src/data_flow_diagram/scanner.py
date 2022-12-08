@@ -1,12 +1,24 @@
 import os
+import re
 
 from . import model
+
+# Regex to transform lines like:
+#   abc\
+#   def
+# into:
+#   abcdef
+RX_LINE_CONT = re.compile('[\\\\]\\s*\n\\s*', re.MULTILINE)
 
 def scan(provenance: model.SourceLine, input: str,
          snippet_by_name: model.SnippetByName = None, debug: bool = False,
         ) -> model.SourceLines:
     output: model.SourceLines = []
     includes: set[str] = set()
+
+    # stitch continuated lines
+    input = RX_LINE_CONT.sub('', input)
+
     if provenance is None:
         provenance = model.SourceLine("", provenance, None, 0)
     _scan(input, provenance, output, snippet_by_name, includes)
