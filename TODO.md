@@ -1,6 +1,8 @@
 # TODO
 
 P1:
+- consider \l and \r when wrapping lines
+- Redefine ITEM? by ITEM!
 - percent_zoom, default 75?
 - bg color
 
