@@ -57,6 +57,17 @@ See the [documentation page][doc].
 [sudo] pip3 install data-flow-diagram
 ```
 
+## Installation troubleshooting
+
+If you get an error at runtime like:
+```
+ModuleNotFoundError: No module named 'reportlab.graphics._renderPM'
+```
+you may have to reinstall reportlab:
+```
+[sudo] python3 -m pip install --upgrade --force-reinstall reportlab
+```
+
 ## Usage
 
 `data-flow-diagram -h` says:
