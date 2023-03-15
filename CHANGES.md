@@ -1,5 +1,8 @@
 # Changes
 
+## Version 1.9.1:
+- Add troubleshooting in README.md.
+
 ## Version 1.9.0:
 - Allow line continuation with a trailing backslash
 
