@@ -19,8 +19,8 @@ def repr(o: Any) -> str:
 @dataclass
 class Base:
     def __repr__(self) -> str:
-        return (self.__class__.__name__ + ' '
-                + json.dumps(dataclasses.asdict(self), indent='  '))
+        return (self.__class__.__name__ + ' ' +
+                json.dumps(dataclasses.asdict(self), indent='  '))
 
 
 @dataclass
@@ -77,22 +77,22 @@ class Style(Statement):
     value: Any = None
 
 
-STYLE   = 'style'
+STYLE = 'style'
 
 PROCESS = 'process'
 CONTROL = 'control'
-ENTITY  = 'entity'
-STORE   = 'store'
+ENTITY = 'entity'
+STORE = 'store'
 CHANNEL = 'channel'
-NONE    = 'none'
+NONE = 'none'
 
-FLOW    = 'flow'
-BFLOW   = 'bflow'
-CFLOW   = 'cflow'
-UFLOW   = 'uflow'
-SIGNAL  = 'signal'
+FLOW = 'flow'
+BFLOW = 'bflow'
+CFLOW = 'cflow'
+UFLOW = 'uflow'
+SIGNAL = 'signal'
 
-FRAME   = 'frame'
+FRAME = 'frame'
 
 
 @dataclass
@@ -116,12 +116,12 @@ def mk_err_prefix_from(src: SourceLine) -> str:
             stack += [f'  {pack(src.raw_text)}']
         else:
             if src.parent and src.parent.is_container:
-                nr = src.parent.line_nr+1
-                delta = src.line_nr+1
+                nr = src.parent.line_nr + 1
+                delta = src.line_nr + 1
                 final = nr + delta
                 stack += [f'  line {final}: {pack(src.raw_text)}']
             else:
-                nr = src.line_nr+1
+                nr = src.line_nr + 1
                 stack += [f'  line {nr}: {pack(src.raw_text)}']
         if src.parent:
             _add_to_stack(stack, src.parent)
@@ -159,5 +159,6 @@ class GraphDependency:
     to_item: str
     to_type: str
     source: SourceLine
+
 
 GraphDependencies = list[GraphDependency]

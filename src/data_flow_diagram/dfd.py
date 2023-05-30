@@ -1,7 +1,7 @@
 """Run the generation process"""
 
 import os.path
-import sys
+import re
 import textwrap
 from typing import Any, Optional
 
@@ -40,21 +40,29 @@ def wrap(text: str, cols: int) -> str:
         res += textwrap.wrap(each, width=cols, break_long_words=False) or ['']
     return '\\n'.join(res)
 
+
 class Generator:
+    RX_NUMBERED_NAME = re.compile(r'(\d+[.])(.*)')
+
     def __init__(self, graph_options: model.GraphOptions) -> None:
         self.lines: list[str] = []
         self.star_nr = 0
         self.frame_nr = 0
         self.graph_options = graph_options
 
-    def append(self, line:str, statement: model.Statement) -> None:
+    def append(self, line: str, statement: model.Statement) -> None:
         self.lines.append('')
         text = model.pack(statement.source.text)
         self.lines.append(f'/* {statement.source.line_nr}: {text} */')
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
-        text = wrap(item.text, self.graph_options.item_text_width)
+        text = item.text
+        hits = self.RX_NUMBERED_NAME.findall(text)
+        if hits:
+            text = '\\n'.join(hits[0])
+
+        text = wrap(text, self.graph_options.item_text_width)
         attrs = item.attrs or ''
         match item.type:
             case model.PROCESS:
@@ -127,7 +135,8 @@ class Generator:
                 dst_port = ':x:c'
 
         attrs = f'label="{text}"'
-        if conn.attrs: attrs += ' ' + conn.attrs
+        if conn.attrs:
+            attrs += ' ' + conn.attrs
 
         match conn.type:
             case model.FLOW:
@@ -191,7 +200,7 @@ class Generator:
             block=block,
             graph_params='\n  '.join(graph_params),
         ).replace('\n  \n', '\n\n')
-        #print(text)
+        # print(text)
         return text
 
 

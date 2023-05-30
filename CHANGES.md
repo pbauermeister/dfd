@@ -1,5 +1,8 @@
 # Changes
 
+## Version 1.10.0:
+- When item text is numbered, add newline after the number.
+
 ## Version 1.9.1:
 - Add troubleshooting in README.md.
 
