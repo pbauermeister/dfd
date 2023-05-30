@@ -57,14 +57,14 @@ class Generator:
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
-        text = item.text
-        hits = self.RX_NUMBERED_NAME.findall(text)
+        copy = model.Item(**item.__dict__)
+        hits = self.RX_NUMBERED_NAME.findall(copy.text)
         if hits:
-            text = '\\n'.join(hits[0])
+            copy.text = '\\n'.join(hits[0])
 
-        text = wrap(text, self.graph_options.item_text_width)
-        attrs = item.attrs or ''
-        match item.type:
+        copy.text = wrap(copy.text, self.graph_options.item_text_width)
+        attrs = copy.attrs or ''
+        match copy.type:
             case model.PROCESS:
                 if self.graph_options.is_context:
                     shape = 'circle'
@@ -72,30 +72,30 @@ class Generator:
                 else:
                     shape = 'ellipse'
                     fc = '"#eeeeee"'
-                line = (f'"{item.name}" [shape={shape} label="{text}" '
+                line = (f'"{copy.name}" [shape={shape} label="{copy.text}" '
                         f'fillcolor={fc} style=filled {attrs}]')
             case model.CONTROL:
                 fc = '"#eeeeee"'
-                line = (f'"{item.name}" [shape=ellipse label="{text}" '
+                line = (f'"{copy.name}" [shape=ellipse label="{copy.text}" '
                         f'fillcolor={fc} style="filled,dashed" {attrs}]')
             case model.ENTITY:
-                line = (f'"{item.name}" [shape=rectangle label="{text}" '
+                line = (f'"{copy.name}" [shape=rectangle label="{copy.text}" '
                         f'{attrs}]')
             case model.STORE:
-                d = self._item_to_html_dict(item)
+                d = self._item_to_html_dict(copy)
                 line = TMPL.STORE.format(**d)
             case model.NONE:
-                line = f'"{item.name}" [shape=none label="{text}" {attrs}]'
+                line = f'"{copy.name}" [shape=none label="{copy.text}" {attrs}]'
             case model.CHANNEL:
-                d = self._item_to_html_dict(item)
+                d = self._item_to_html_dict(copy)
                 if self.graph_options.is_vertical:
                     line = TMPL.CHANNEL_HORIZONTAL.format(**d)
                 else:
                     line = TMPL.CHANNEL.format(**d)
             case _:
-                prefix = model.mk_err_prefix_from(item.source)
+                prefix = model.mk_err_prefix_from(copy.source)
                 raise model.DfdException(f'{prefix}Unsupported item type '
-                                         f'"{item.type}"')
+                                         f'"{copy.type}"')
         self.append(line, item)
 
     def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:

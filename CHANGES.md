@@ -1,6 +1,6 @@
 # Changes
 
-## Version 1.10.0:
+## Version 1.10.1:
 - When item text is numbered, add newline after the number.
 
 ## Version 1.9.1:
