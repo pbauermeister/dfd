@@ -49,7 +49,7 @@ def check(
 
         # scan and parse
         lines = scanner.scan(dep.source, text, snippet_by_name, options.debug)
-        statements, _ = parser.parse(lines, options.debug)
+        statements, _, _ = parser.parse(lines, options.debug)
 
         # find name
         item = find_item(dep.to_item, statements)

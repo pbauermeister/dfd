@@ -97,11 +97,12 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
 def parse(
     source_lines: model.SourceLines,
     debug: bool = False,
-) -> tuple[model.Statements, model.GraphDependencies]:
+) -> tuple[model.Statements, model.GraphDependencies, model.Attribs]:
     """Parse the DFD source text as list of statements"""
 
     statements: model.Statements = []
     dependencies: model.GraphDependencies = []
+    attribs: model.Attribs = {}
 
     for n, source in enumerate(source_lines):
         src_line = source.text
@@ -142,6 +143,7 @@ def parse(
             'cflow.r?': parse_cflow_r_q,
             'signal.r?': parse_signal_r_q,
             model.FRAME: parse_frame,
+            model.ATTRIB: parse_attrib,
         }.get(word)
 
         if f is None:
@@ -163,12 +165,16 @@ def parse(
             case model.Drawable() as drawable:
                 parse_drawable_attrs(drawable)
 
+        match statement:
+            case model.Attrib() as attrib:
+                attribs[attrib.alias] = attrib
+
         statements.append(statement)
 
     if debug:
         for s in statements:
             print(model.repr(s))
-    return statements, dependencies
+    return statements, dependencies, attribs
 
 
 def split_args(
@@ -201,6 +207,12 @@ def parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
     style, value = split_args(source.text, 2, True)
     return model.Style(source, style, value)
+
+
+def parse_attrib(source: model.SourceLine) -> model.Statement:
+    """Parse attrib name text"""
+    alias, text = split_args(source.text, 2, True)
+    return model.Attrib(source, alias, text)
 
 
 def parse_process(source: model.SourceLine) -> model.Statement:

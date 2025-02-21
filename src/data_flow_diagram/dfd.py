@@ -1,13 +1,14 @@
 """Run the generation process"""
 
 import os.path
+import pprint
 import re
 import textwrap
 from typing import Any, Optional
 
-from . import config
+from . import config, dependency_checker
 from . import dfd_dot_templates as TMPL
-from . import dot, model, parser, scanner, dependency_checker
+from . import dot, model, parser, scanner
 
 
 def build(
@@ -19,7 +20,7 @@ def build(
 ) -> None:
     """Take a DFD source and build the final image or document"""
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
-    statements, dependencies = parser.parse(lines, options.debug)
+    statements, dependencies, attribs = parser.parse(lines, options.debug)
     if dependencies and not options.no_check_dependencies:
         dependency_checker.check(dependencies, snippet_by_name, options)
     items_by_name = parser.check(statements)
@@ -27,11 +28,11 @@ def build(
     statements, graph_options = handle_options(statements)
 
     if options.no_graph_title:
-        title = None
+        title = ""
     else:
         title = os.path.splitext(output_path)[0]
 
-    gen = Generator(graph_options)
+    gen = Generator(graph_options, attribs)
     text = generate_dot(gen, title, statements, items_by_name)
     if options.debug:
         print(text)
@@ -48,11 +49,15 @@ def wrap(text: str, cols: int) -> str:
 class Generator:
     RX_NUMBERED_NAME = re.compile(r'(\d+[.])(.*)')
 
-    def __init__(self, graph_options: model.GraphOptions) -> None:
+    def __init__(
+        self, graph_options: model.GraphOptions, attribs: model.Attribs
+    ) -> None:
         self.lines: list[str] = []
         self.star_nr = 0
         self.frame_nr = 0
         self.graph_options = graph_options
+        self.attribs = attribs
+        self.attribs_rx = self._compile_attribs_names(attribs)
 
     def append(self, line: str, statement: model.Statement) -> None:
         self.lines.append('')
@@ -68,6 +73,8 @@ class Generator:
 
         copy.text = wrap(copy.text, self.graph_options.item_text_width)
         attrs = copy.attrs or ''
+        attrs = self._expand_attribs(attrs, item)
+
         match copy.type:
             case model.PROCESS:
                 if self.graph_options.is_context:
@@ -114,6 +121,33 @@ class Generator:
         d['text'] = d['text'].replace('\\n', '<br/>')
         return d
 
+    def _compile_attribs_names(
+        self, attribs: model.Attribs
+    ) -> re.Pattern | None:
+        if not attribs:
+            return None
+        names = [re.escape(k) for k in attribs.keys()]
+        pattern = '|'.join(names)
+        return re.compile(pattern)
+
+    def _expand_attribs(self, attrs: str, item: model.Item) -> str:
+        def replacer(m: re.Match[str]) -> str:
+            alias = m[0]
+            if alias not in self.attribs:
+                prefix = model.mk_err_prefix_from(item.source)
+                raise model.DfdException(
+                    f'{prefix}Alias '
+                    f'"{alias}" '
+                    f'not found in '
+                    f'{pprint.pformat(self.attribs)}'
+                )
+
+            return self.attribs[alias].text
+
+        return (
+            self.attribs_rx.sub(replacer, attrs) if self.attribs_rx else attrs
+        )
+
     def generate_star(self, text: str) -> str:
         text = wrap(text, self.graph_options.item_text_width)
         star_name = f'__star_{self.star_nr}__'
@@ -147,8 +181,9 @@ class Generator:
                 dst_port = ':x:c'
 
         attrs = f'label="{text}"'
+
         if conn.attrs:
-            attrs += ' ' + conn.attrs
+            attrs += ' ' + self._expand_attribs(conn.attrs, src_item)
 
         match conn.type:
             case model.FLOW:

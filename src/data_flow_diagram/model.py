@@ -80,6 +80,15 @@ class Style(Statement):
     value: Any = None
 
 
+@dataclass
+class Attrib(Statement):
+    alias: str
+    text: str
+
+
+Attribs = dict[str, Attrib]
+
+
 STYLE = 'style'
 
 PROCESS = 'process'
@@ -96,6 +105,8 @@ UFLOW = 'uflow'
 SIGNAL = 'signal'
 
 FRAME = 'frame'
+
+ATTRIB = 'attrib'
 
 
 @dataclass
