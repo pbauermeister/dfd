@@ -19,8 +19,11 @@ def repr(o: Any) -> str:
 @dataclass
 class Base:
     def __repr__(self) -> str:
-        return (self.__class__.__name__ + ' ' +
-                json.dumps(dataclasses.asdict(self), indent='  '))
+        return (
+            self.__class__.__name__
+            + ' '
+            + json.dumps(dataclasses.asdict(self), indent='  ')
+        )
 
 
 @dataclass

@@ -39,9 +39,9 @@ setup(
         "test": ["coverage"],
     },
     package_data={
-#        "data_flow_diagram": ["tbdpackage__data.dat"],
+        #        "data_flow_diagram": ["tbdpackage__data.dat"],
     },
-#    data_files=[('data_flow_diagram', ["VERSION"])],
+    #    data_files=[('data_flow_diagram', ["VERSION"])],
     # The following would provide a command called `data-flow-diagram` which
     # executes the function `main` from this package when invoked:
     entry_points={
@@ -51,8 +51,8 @@ setup(
     },
     project_urls={
         "Bug Reports": "https://github.com/pbauermeister/dfd/issues",
-#        "Funding": "https://donate.pypi.org",
-#        "Say Thanks!": "http://saythanks.io/to/example",
+        #        "Funding": "https://donate.pypi.org",
+        #        "Say Thanks!": "http://saythanks.io/to/example",
         "Source": "https://github.com/pbauermeister/dfd",
     },
 )

@@ -1,0 +1,23 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/build": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/__pycache__": true,
+    "**/*.egg-info": true
+  },
+  "editor.formatOnSave": true,
+  "python.editor.defaultFormatter": "ms-python.black-formatter",
+  "python.autoComplete.extraPaths": [
+    "~/.local/lib/python3.12/site-packages"
+  ],
+  "python.analysis.extraPaths": [
+    "~/.local/lib/python3.12/site-packages"
+  ],
+  "black-formatter.args": [
+    "--skip-string-normalization",
+    "--line-length",
+    "80"
+  ]
+}

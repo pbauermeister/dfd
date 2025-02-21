@@ -10,9 +10,13 @@ from . import model
 #   abcdef
 RX_LINE_CONT = re.compile('[\\\\]\\s*\n\\s*', re.MULTILINE)
 
-def scan(provenance: model.SourceLine, input: str,
-         snippet_by_name: model.SnippetByName = None, debug: bool = False,
-        ) -> model.SourceLines:
+
+def scan(
+    provenance: model.SourceLine,
+    input: str,
+    snippet_by_name: model.SnippetByName = None,
+    debug: bool = False,
+) -> model.SourceLines:
     output: model.SourceLines = []
     includes: set[str] = set()
 
@@ -24,7 +28,7 @@ def scan(provenance: model.SourceLine, input: str,
     _scan(input, provenance, output, snippet_by_name, includes)
 
     if debug:
-        print('=' * 40);
+        print('=' * 40)
         print(provenance)
         print('----------')
         print(input)
@@ -36,10 +40,13 @@ def scan(provenance: model.SourceLine, input: str,
     return output
 
 
-def _scan(input: str, parent: model.SourceLine,
-          output: model.SourceLines,
-          snippet_by_name: model.SnippetByName,
-          includes: set[str]) -> None:
+def _scan(
+    input: str,
+    parent: model.SourceLine,
+    output: model.SourceLines,
+    snippet_by_name: model.SnippetByName,
+    includes: set[str],
+) -> None:
     for nr, line in enumerate(input.splitlines()):
         if not line.strip():
             continue
@@ -51,9 +58,13 @@ def _scan(input: str, parent: model.SourceLine,
             output.append(source_line)
 
 
-def include(line: str, parent: model.SourceLine, output: model.SourceLines,
-            snippet_by_name: model.SnippetByName,
-            includes: set[str]) -> None:
+def include(
+    line: str,
+    parent: model.SourceLine,
+    output: model.SourceLines,
+    snippet_by_name: model.SnippetByName,
+    includes: set[str],
+) -> None:
     pair = line.split(maxsplit=1)
     name = pair[1]
     prefix = model.mk_err_prefix_from(parent)
@@ -68,13 +79,15 @@ def include(line: str, parent: model.SourceLine, output: model.SourceLines,
         if not snippet_by_name:
             raise model.DfdException(
                 f'{prefix}source is not markdown, '
-                f'cannot include snippet "{name}".')
+                f'cannot include snippet "{name}".'
+            )
         name0 = name
         name = name[1:]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
             raise model.DfdException(
-                f'{prefix}included snippet "{name}" not found.')
+                f'{prefix}included snippet "{name}" not found.'
+            )
 
         _scan(snippet.text, caller, output, snippet_by_name, includes)
 
@@ -82,7 +95,8 @@ def include(line: str, parent: model.SourceLine, output: model.SourceLines,
         # include from file
         if not os.path.exists(name):
             raise model.DfdException(
-                f'{prefix}included file "{name}" not found.')
+                f'{prefix}included file "{name}" not found.'
+            )
         with open(name, encoding='utf-8') as f:
             text = f.read()
         _scan(text, caller, output, snippet_by_name, includes)

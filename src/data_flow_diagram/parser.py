@@ -16,8 +16,10 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
-            case model.Item() as item: pass
-            case _: continue
+            case model.Item() as item:
+                pass
+            case _:
+                continue
         name = item.name
 
         # make sure there are no duplicates
@@ -29,14 +31,17 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
         other_text = model.pack(other.source.text)
         raise model.DfdException(
             f'{error_prefix}Name "{name}" already exists '
-            f'at line {other.source.line_nr+1}: {other_text}')
+            f'at line {other.source.line_nr+1}: {other_text}'
+        )
 
     # check references and values of connections
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
-            case model.Connection() as conn: pass
-            case _: continue
+            case model.Connection() as conn:
+                pass
+            case _:
+                continue
         nb_stars = 0
         for point in conn.src, conn.dst:
             if point == "*":
@@ -45,44 +50,54 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 if point not in items_by_name:
                     raise model.DfdException(
                         f'{error_prefix}Connection "{conn.type}" links to "{point}", '
-                        f'which is not defined')
-                if items_by_name[point].type == model.CONTROL and conn.type != model.SIGNAL:
+                        f'which is not defined'
+                    )
+                if (
+                    items_by_name[point].type == model.CONTROL
+                    and conn.type != model.SIGNAL
+                ):
                     raise model.DfdException(
                         f'{error_prefix}Connection to {model.CONTROL} "{point}" is '
                         f'of type "{conn.type}", however only connections of type '
-                        f'"{model.SIGNAL}" are allowed')
+                        f'"{model.SIGNAL}" are allowed'
+                    )
 
         if nb_stars == 2:
             raise model.DfdException(
                 f'{error_prefix}Connection "{conn.type}" may not link to two '
-                f'stars')
+                f'stars'
+            )
 
     # check references of frames
     framed_items: set[str] = set()
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
-            case model.Frame() as frame: pass
-            case _: continue
+            case model.Frame() as frame:
+                pass
+            case _:
+                continue
         if not frame.items:
-            raise model.DfdException(
-                f'{error_prefix}Frame is empty')
+            raise model.DfdException(f'{error_prefix}Frame is empty')
         for name in frame.items:
             if name not in items_by_name:
                 raise model.DfdException(
                     f'{error_prefix}Frame includes "{name}", '
-                    f'which is not defined')
+                    f'which is not defined'
+                )
             if name in framed_items:
                 raise model.DfdException(
-                    f'{error_prefix}Item "{name}", '
-                    f'is in multiple frames')
+                    f'{error_prefix}Item "{name}", ' f'is in multiple frames'
+                )
             framed_items.add(name)
 
     return items_by_name
 
 
-def parse(source_lines: model.SourceLines, debug: bool = False,
-         ) -> tuple[model.Statements, model.GraphDependencies]:
+def parse(
+    source_lines: model.SourceLines,
+    debug: bool = False,
+) -> tuple[model.Statements, model.GraphDependencies]:
     """Parse the DFD source text as list of statements"""
 
     statements: model.Statements = []
@@ -92,7 +107,8 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
         src_line = source.text
 
         src_line = src_line.strip()
-        if not src_line or src_line.startswith('#'): continue
+        if not src_line or src_line.startswith('#'):
+            continue
         error_prefix = model.mk_err_prefix_from(source)
 
         # syntactic sugars may rewrite the line
@@ -109,34 +125,29 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
             model.STORE: parse_store,
             model.NONE: parse_none,
             model.CHANNEL: parse_channel,
-
             model.FLOW: parse_flow,
             model.CFLOW: parse_cflow,
             model.BFLOW: parse_bflow,
             model.UFLOW: parse_uflow,
             model.SIGNAL: parse_signal,
-
-            model.FLOW+'?': parse_flow_q,
-            model.CFLOW+'?': parse_cflow_q,
-            model.BFLOW+'?': parse_bflow_q,
-            model.UFLOW+'?': parse_uflow_q,
-            model.SIGNAL+'?': parse_signal_q,
-
+            model.FLOW + '?': parse_flow_q,
+            model.CFLOW + '?': parse_cflow_q,
+            model.BFLOW + '?': parse_bflow_q,
+            model.UFLOW + '?': parse_uflow_q,
+            model.SIGNAL + '?': parse_signal_q,
             'flow.r': parse_flow_r,
             'cflow.r': parse_cflow_r,
             'signal.r': parse_signal_r,
-
             'flow.r?': parse_flow_r_q,
             'cflow.r?': parse_cflow_r_q,
             'signal.r?': parse_signal_r_q,
-
             model.FRAME: parse_frame,
-
         }.get(word)
 
         if f is None:
-            raise model.DfdException(f'{error_prefix}Unrecognized keyword '
-                                     f'"{word}"')
+            raise model.DfdException(
+                f'{error_prefix}Unrecognized keyword ' f'"{word}"'
+            )
 
         try:
             statement = f(source)
@@ -155,18 +166,21 @@ def parse(source_lines: model.SourceLines, debug: bool = False,
         statements.append(statement)
 
     if debug:
-        for s in statements: print(model.repr(s))
+        for s in statements:
+            print(model.repr(s))
     return statements, dependencies
 
 
-def split_args(dfd_line: str, n: int, last_is_optional: bool=False) -> list[str]:
+def split_args(
+    dfd_line: str, n: int, last_is_optional: bool = False
+) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
 
     terms = dfd_line.split(maxsplit=n)
-    if len(terms)-1 == n-1 and last_is_optional:
+    if len(terms) - 1 == n - 1 and last_is_optional:
         terms.append(None)
 
-    if len(terms)-1 != n:
+    if len(terms) - 1 != n:
         if not last_is_optional:
             raise model.DfdException(f'Expected {n} argument(s)')
         else:
@@ -248,10 +262,12 @@ def parse_cflow(source: model.SourceLine) -> model.Statement:
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.CFLOW, text, "", src, dst)
 
+
 def parse_cflow_r(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.CFLOW, text, "", src, dst, True)
+
 
 def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
@@ -276,59 +292,69 @@ def parse_signal_r(source: model.SourceLine) -> model.Statement:
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(source, model.SIGNAL, text, "", src, dst, True)
 
+
 def parse_flow_q(source: model.SourceLine) -> model.Statement:
     """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, text, "", src, dst,
-                            relaxed=True)
+    return model.Connection(
+        source, model.FLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, text, "", src, dst, True,
-                            relaxed=True)
+    return model.Connection(
+        source, model.FLOW, text, "", src, dst, True, relaxed=True
+    )
 
 
 def parse_cflow_q(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CFLOW, text, "", src, dst,
-                            relaxed=True)
+    return model.Connection(
+        source, model.CFLOW, text, "", src, dst, relaxed=True
+    )
+
 
 def parse_cflow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CFLOW, text, "", src, dst, True,
-                            relaxed=True)
+    return model.Connection(
+        source, model.CFLOW, text, "", src, dst, True, relaxed=True
+    )
 
 
 def parse_bflow_q(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.BFLOW, text, "", src, dst,
-                            relaxed=True)
+    return model.Connection(
+        source, model.BFLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_uflow_q(source: model.SourceLine) -> model.Statement:
     """Parse undirected flow flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.UFLOW, text, "", src, dst,
-                            relaxed=True)
+    return model.Connection(
+        source, model.UFLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_signal_q(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, text, "", src, dst,
-                            relaxed=True)
+    return model.Connection(
+        source, model.SIGNAL, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
     """Parse reversed signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, text, "", src, dst, True,
-                            relaxed=True)
+    return model.Connection(
+        source, model.SIGNAL, text, "", src, dst, True, relaxed=True
+    )
 
 
 def apply_syntactic_sugars(src_line: str) -> str:
@@ -349,39 +375,39 @@ def apply_syntactic_sugars(src_line: str) -> str:
     if re.fullmatch(r'-+>[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('flow'+q, parts)
+        new_line = fmt('flow' + q, parts)
     elif re.fullmatch(r'<-+[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('flow.r'+q, parts)#, swap=True)
+        new_line = fmt('flow.r' + q, parts)  # , swap=True)
 
     if re.fullmatch(r'-+>>[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('cflow'+q, parts)
+        new_line = fmt('cflow' + q, parts)
     elif re.fullmatch(r'<<-+[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('cflow.r'+q, parts)#, swap=True)
+        new_line = fmt('cflow.r' + q, parts)  # , swap=True)
 
     elif re.fullmatch(r'<-+>[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('bflow'+q, parts)
+        new_line = fmt('bflow' + q, parts)
 
     elif re.fullmatch(r'--+[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('uflow'+q, parts)
+        new_line = fmt('uflow' + q, parts)
 
     elif re.fullmatch(r':+>[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('signal'+q, parts)
+        new_line = fmt('signal' + q, parts)
     elif re.fullmatch(r'<:+[?]?', op):
         q = '?' if op.endswith('?') else ''
         parts = src_line.split(maxsplit=3)
-        new_line = fmt('signal.r'+q, parts)#, swap=True)
+        new_line = fmt('signal.r' + q, parts)  # , swap=True)
 
     if new_line:
         return new_line
@@ -400,7 +426,9 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
                 item.text = item.text or item.name
 
 
-def parse_item_external(item: model.Item, dependencies: model.GraphDependencies) -> None:
+def parse_item_external(
+    item: model.Item, dependencies: model.GraphDependencies
+) -> None:
     parts = item.name.split(':', 1)
     if len(parts) > 1:
         item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
@@ -417,10 +445,9 @@ def parse_item_external(item: model.Item, dependencies: model.GraphDependencies)
         if not item.text:
             item.text = item.name
 
-        dependency = model.GraphDependency(parts[0],
-                                           parts[1] or None,
-                                           item.type,
-                                           item.source)
+        dependency = model.GraphDependency(
+            parts[0], parts[1] or None, item.type, item.source
+        )
         dependencies.append(dependency)
 
 

@@ -1,4 +1,3 @@
-
 MD_OK = """
 Some text
 ```data-flow-diagram diagram1.svg
@@ -17,7 +16,7 @@ Yet more text
 Baby
 ```
 """
-#MD_EXPECTED = [('body 1\n', 'diagram1.svg'), ('body 2\n', 'diagram2.svg')]
+# MD_EXPECTED = [('body 1\n', 'diagram1.svg'), ('body 2\n', 'diagram2.svg')]
 MD_EXPECTED = [
     dict(text='body 1\n', name='diagram1', output='diagram1.svg', line_nr=2),
     dict(text='\nbody 2\n', name='diagram2', output='diagram2.svg', line_nr=7),

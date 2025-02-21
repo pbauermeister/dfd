@@ -12,6 +12,7 @@ from data_flow_diagram import parser, scanner
 from data_flow_diagram import model
 from data_flow_diagram.markdown import extract_snippets
 
+
 def is_svg(text: str) -> bool:
     text = text.strip()
     return text.startswith('<?xml') and text.endswith('</svg>')
@@ -32,23 +33,26 @@ class UnitTest(unittest.TestCase):
             # restore
             sys.argv = old_argv
 
-        keys = set(['INPUT_FILE',
-                    'output_file',
-                    'markdown',
-                    'format',
-                    'percent_zoom',
-                    'background_color',
-                    'no_graph_title',
-                    'no_check_dependencies',
-                    'debug',
-                    'version',
-                    ])
+        keys = set(
+            [
+                'INPUT_FILE',
+                'output_file',
+                'markdown',
+                'format',
+                'percent_zoom',
+                'background_color',
+                'no_graph_title',
+                'no_check_dependencies',
+                'debug',
+                'version',
+            ]
+        )
         self.assertSetEqual(
-            set(args.__dict__.keys()), keys,
-            'Commandline args mismatch')
+            set(args.__dict__.keys()), keys, 'Commandline args mismatch'
+        )
         self.assertEqual(
-            args.INPUT_FILE, a1,
-            'Commandline positional arg mismatch')
+            args.INPUT_FILE, a1, 'Commandline positional arg mismatch'
+        )
 
     def test_input_md(self) -> None:
         result = extract_snippets(inputs.MD_OK)
@@ -57,8 +61,8 @@ class UnitTest(unittest.TestCase):
             model.Snippet(**inputs.MD_EXPECTED[1]),
         ]
         self.assertSequenceEqual(
-            result, expected,
-            'Extraction of snippets in MD text')
+            result, expected, 'Extraction of snippets in MD text'
+        )
 
     def test_output_stdout(self) -> None:
         old_stdin = sys.stdin
@@ -79,8 +83,7 @@ class UnitTest(unittest.TestCase):
 
         # get and analyze SVG
         out = f.getvalue().strip()
-        self.assertTrue(is_svg(out),
-                         'Output to stdout is not SVG')
+        self.assertTrue(is_svg(out), 'Output to stdout is not SVG')
 
     def test_parse_all_syntax_ok(self) -> None:
         l = scanner.scan(None, inputs.ALL_SYNTAX_OK)
@@ -91,31 +94,34 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_syntax_error(self) -> None:
         l = scanner.scan(None, inputs.SYNTAX_ERROR)
-        with self.assertRaises(model.DfdException,
-                               msg='Undetected syntax error'):
+        with self.assertRaises(
+            model.DfdException, msg='Undetected syntax error'
+        ):
             parser.parse(l)
 
     def test_parse_duplicate_item_error(self) -> None:
         l = scanner.scan(None, inputs.DUPLICATE_ITEM_ERROR)
         statements, _ = parser.parse(l)
-        with self.assertRaises(model.DfdException,
-                               msg='Undetectd duplicate item name'):
+        with self.assertRaises(
+            model.DfdException, msg='Undetectd duplicate item name'
+        ):
             parser.check(statements)
 
     def test_parse_missing_ref_error(self) -> None:
         l = scanner.scan(None, inputs.MISSING_REF_ERROR)
         statements, _ = parser.parse(l)
-        with self.assertRaises(model.DfdException,
-                               msg='Undetectd missing reference'):
+        with self.assertRaises(
+            model.DfdException, msg='Undetectd missing reference'
+        ):
             parser.check(statements)
 
     def test_parse_double_error(self) -> None:
         l = scanner.scan(None, inputs.DOUBLE_STAR_ERROR)
         statements, _ = parser.parse(l)
-        with self.assertRaises(model.DfdException,
-                               msg='Undetectd double * reference'):
+        with self.assertRaises(
+            model.DfdException, msg='Undetectd double * reference'
+        ):
             parser.check(statements)
-
 
 
 if __name__ == '__main__':

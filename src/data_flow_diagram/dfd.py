@@ -10,9 +10,13 @@ from . import dfd_dot_templates as TMPL
 from . import dot, model, parser, scanner, dependency_checker
 
 
-def build(provenance: model.SourceLine, dfd_src: str, output_path: str,
-          options: model.Options,
-          snippet_by_name: model.SnippetByName = None) -> None:
+def build(
+    provenance: model.SourceLine,
+    dfd_src: str,
+    output_path: str,
+    options: model.Options,
+    snippet_by_name: model.SnippetByName = None,
+) -> None:
     """Take a DFD source and build the final image or document"""
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
     statements, dependencies = parser.parse(lines, options.debug)
@@ -72,15 +76,21 @@ class Generator:
                 else:
                     shape = 'ellipse'
                     fc = '"#eeeeee"'
-                line = (f'"{copy.name}" [shape={shape} label="{copy.text}" '
-                        f'fillcolor={fc} style=filled {attrs}]')
+                line = (
+                    f'"{copy.name}" [shape={shape} label="{copy.text}" '
+                    f'fillcolor={fc} style=filled {attrs}]'
+                )
             case model.CONTROL:
                 fc = '"#eeeeee"'
-                line = (f'"{copy.name}" [shape=ellipse label="{copy.text}" '
-                        f'fillcolor={fc} style="filled,dashed" {attrs}]')
+                line = (
+                    f'"{copy.name}" [shape=ellipse label="{copy.text}" '
+                    f'fillcolor={fc} style="filled,dashed" {attrs}]'
+                )
             case model.ENTITY:
-                line = (f'"{copy.name}" [shape=rectangle label="{copy.text}" '
-                        f'{attrs}]')
+                line = (
+                    f'"{copy.name}" [shape=rectangle label="{copy.text}" '
+                    f'{attrs}]'
+                )
             case model.STORE:
                 d = self._item_to_html_dict(copy)
                 line = TMPL.STORE.format(**d)
@@ -94,8 +104,9 @@ class Generator:
                     line = TMPL.CHANNEL.format(**d)
             case _:
                 prefix = model.mk_err_prefix_from(copy.source)
-                raise model.DfdException(f'{prefix}Unsupported item type '
-                                         f'"{copy.type}"')
+                raise model.DfdException(
+                    f'{prefix}Unsupported item type ' f'"{copy.type}"'
+                )
         self.append(line, item)
 
     def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
@@ -111,8 +122,9 @@ class Generator:
         self.star_nr += 1
         return star_name
 
-    def generate_connection(self, conn: model.Connection, src_item: model.Item,
-                            dst_item: model.Item) -> None:
+    def generate_connection(
+        self, conn: model.Connection, src_item: model.Item, dst_item: model.Item
+    ) -> None:
         text = conn.text or ''
         text = wrap(text, self.graph_options.connection_text_width)
 
@@ -158,8 +170,9 @@ class Generator:
                 attrs += ' style=dashed'
             case _:
                 prefix = model.mk_err_prefix_from(conn.source)
-                raise model.DfdException(f'{prefix}Unsupported connection type '
-                                         f'"{conn.type}"')
+                raise model.DfdException(
+                    f'{prefix}Unsupported connection type ' f'"{conn.type}"'
+                )
         if conn.relaxed:
             attrs += ' constraint=false'
 
@@ -204,9 +217,14 @@ class Generator:
         return text
 
 
-def generate_dot(gen: Generator, title: str, statements: model.Statements,
-                 items_by_name: dict[str, model.Item]) -> str:
+def generate_dot(
+    gen: Generator,
+    title: str,
+    statements: model.Statements,
+    items_by_name: dict[str, model.Item],
+) -> str:
     """Iterate over statements and generate a dot source file"""
+
     def get_item(name: str) -> Optional[model.Item]:
         return None if name == '*' else items_by_name[name]
 
@@ -234,8 +252,10 @@ def filter_statements(statements: model.Statements) -> model.Statements:
     connected_items = set()
     for statement in statements:
         match statement:
-            case model.Connection() as conn: pass
-            case _: continue
+            case model.Connection() as conn:
+                pass
+            case _:
+                continue
         for point in conn.src, conn.dst:
             connected_items.add(point)
 
@@ -251,8 +271,9 @@ def filter_statements(statements: model.Statements) -> model.Statements:
     return new_statements
 
 
-def handle_options(statements: model.Statements) -> tuple[
-        model.Statements, model.GraphOptions]:
+def handle_options(
+    statements: model.Statements,
+) -> tuple[model.Statements, model.GraphOptions]:
     new_statements = []
     options = model.GraphOptions()
     for statement in statements:
@@ -278,8 +299,9 @@ def handle_options(statements: model.Statements) -> tuple[
                             raise model.DfdException(f'{prefix}{e}"')
 
                     case _:
-                        raise model.DfdException(f'{prefix}Unsupported style '
-                                                 f'"{style.style}"')
+                        raise model.DfdException(
+                            f'{prefix}Unsupported style ' f'"{style.style}"'
+                        )
 
                 continue
         new_statements.append(statement)

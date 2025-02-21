@@ -12,7 +12,7 @@ SA/RT (which is SA/SD with a real-time extension), can be found in the
 design of real-time and embedded systems.
 Example: [Firmware modelling of the Active Descent
 System](https://www.spyr.ch/ps/ads/qm/node18.html) of the [Rosetta
-Lander](https://en.wikipedia.org/wiki/Rosetta_(spacecraft))
+Lander](<https://en.wikipedia.org/wiki/Rosetta_(spacecraft)>)
 spacecraft.
 
 #### a. Context diagram
@@ -44,6 +44,7 @@ web and micro-services architectures.
 ### 3. Other diagrams (out of scope)
 
 Other diagrams notably used in system analysis and design, including:
+
 - State Transition Diagram (STD)
 - Entity-Relationship Diagram (ERD)
 - Data Structure Diagram (DSD)
@@ -62,14 +63,17 @@ DFD_STATEMENT
 DFD_STATEMENT
 ...
 ```
+
 ### 1. Creating items
 
 Synopsis:
-- ```ITEM NAME LABEL```
+
+- `ITEM NAME LABEL`
 - where ITEM can be `process`, `entity`, `store`, `channel` or `none`,
 - and NAME shall be sort, without whitespaces.
 
 Example:
+
 ```data-flow-diagram items.svg
 # create a process bubble:
 process	P	A process
@@ -90,6 +94,7 @@ channel	C	A channel
 none	N	A point
 
 ```
+
 ![Creating items](./items.svg)
 
 - A process is a functional unit that processes inputs and generates outputs.
@@ -106,11 +111,13 @@ none	N	A point
 ### 2. Creating connections between items
 
 Synopsis:
-- ```CONNECTION FROM_NAME TO_NAME LABEL```
+
+- `CONNECTION FROM_NAME TO_NAME LABEL`
 - where CONNECTION can be `flow`, 'cflow', `bflow` or `signal`.
 - Items of type `control` can only be linked by `signal` connections.
 
 Example:
+
 ```data-flow-diagram connections.svg
 process	A1
 process	A2
@@ -144,21 +151,23 @@ uflow	E1	E2	an undirected flow
 flow	*	X	an unsourced flow
 signal	Y	*	an untargetted signal
 ```
+
 ![Creating connections](./connections.svg)
 
 That's it! With items and connections, you can create any DFD diagram of
 arbitrary complexity.
 
 ### 3. Syntactic sugars
+
 Syntactic sugars make source easier on the eye:
 
-| Statement with keyword      | Equivalent with syntactic sugar    |
-| ----------------------------| -----------------------------------|
-| `flow   A B`                | `A --> B` <br/> or <br/>` B <-- A` |
-| `cflow  A B`                | `A ->> B` <br/> or <br/> `B <<- A` |
-| `bflow  A B`                | `A <-> B` <br/> or <br/> `B <-> A` |
-| `uflow  A B`                | `A --- B` <br/> or <br/> `B --- A` |
-| `signal A B`                | `A ::> B` <br/> or <br/> `B <:: A` |
+| Statement with keyword | Equivalent with syntactic sugar    |
+| ---------------------- | ---------------------------------- |
+| `flow   A B`           | `A --> B` <br/> or <br/>` B <-- A` |
+| `cflow  A B`           | `A ->> B` <br/> or <br/> `B <<- A` |
+| `bflow  A B`           | `A <-> B` <br/> or <br/> `B <-> A` |
+| `uflow  A B`           | `A --- B` <br/> or <br/> `B --- A` |
+| `signal A B`           | `A ::> B` <br/> or <br/> `B <:: A` |
 
 The shaft of the arrow can be of arbitrary lengh, so `->` , `-->` and `------->`
 are equivalent.
@@ -175,11 +184,13 @@ P1 <<- P2       a continuous back flow
 *  --> P2	an unsourced flow
 P1 ::> *	an untargetted signal
 ```
+
 ![Creating connections](./connections-sugar.svg)
 
 ### 4. Optional label
 
 The LABEL can be ommitted, in which case:
+
 - for items, the NAME is used as LABEL,
 - for connections, no LABEL is rendered:
 
@@ -202,6 +213,7 @@ none	Point
 # connection
 Process --> Channel
 ```
+
 ![Creating items](./items-unlabelled.svg)
 
 ### 5. Styling
@@ -212,7 +224,7 @@ The keyword `style` defines rendering parameters for the whole
 diagram:
 
 | Style statement                 | Effect                                                       |
-| --------------------------------| -------------------------------------------------------------|
+| ------------------------------- | ------------------------------------------------------------ |
 | `style context`                 | Makes the diagram a context diagram.                         |
 | `style horizontal`              | Layouts flows in the horizontal direction (the default).     |
 | `style vertical`                | Layouts flows in the vertical direction.                     |
@@ -240,9 +252,11 @@ See examples below.
 ### 6. Frames
 
 Synopsis:
+
 - `frame ITEM ITEM... [= [ATTRIBUTES ...] LABEL]`
 
 Basic frame:
+
 ```data-flow-diagram frame.svg
 process	P1
 process	P2
@@ -253,9 +267,11 @@ frame P1 P2 = A frame
 P1 --> P3
 P3 --> P2
 ```
+
 ![Frames](./frame.svg)
 
 Frame without label:
+
 ```data-flow-diagram frame-without-label.svg
 process	P1
 process	P2
@@ -266,9 +282,11 @@ frame P1 P2
 P1 --> P3
 P3 --> P2
 ```
+
 ![Frames](./frame-without-label.svg)
 
 Frame with styling:
+
 ```data-flow-diagram frame-blue.svg
 process	P1
 process	P2
@@ -279,6 +297,7 @@ frame P1 P2 = [style=solid color=blue fontcolor=blue] A blue\nsolid frame
 P1 --> P3
 P3 --> P2
 ```
+
 ![Frames](./frame-blue.svg)
 
 ## C. Details with examples
@@ -304,6 +323,7 @@ Config	<->  Compute	parameters
 
 Compute --> API  	records
 ```
+
 ![Creating items](./complete-example.svg)
 
 ### 2. Items rendered only if used (hidable)
@@ -317,12 +337,13 @@ process	P3	Process 3
 
 P1 --> P2	connection
 ```
+
 ![Show all items](./show-all-items.svg)
 
 A `?` postfix to an item name indicates that, if unused (i.e. not connected to
 anything), the item shall be hidden.
 
-Here, *Process 3* is not rendered:
+Here, _Process 3_ is not rendered:
 
 ```data-flow-diagram hide-if-unused.svg
 process	P1	Process 1
@@ -331,6 +352,7 @@ process	P3?	Process 3
 
 P1 --> P2	connection
 ```
+
 ![Hide if unused](./hide-if-unused.svg)
 
 ### 3. Context diagrams
@@ -351,6 +373,7 @@ E2  <-- P   flow
 E3  <-> P   flow
 E4  ::> P   signal
 ```
+
 ![Context diagram](./context.svg)
 
 Note that there should be exactly one process.
@@ -367,6 +390,7 @@ process P2
 
 P1 --> P2
 ```
+
 ![Horizontal](./horizontal.svg)
 
 For a top-down direction, use `style vertical`:
@@ -379,6 +403,7 @@ process P2
 
 P1 --> P2
 ```
+
 ![Vertical](./vertical.svg)
 
 ### 5. Relaxed constraints
@@ -398,11 +423,13 @@ P1 -->  P2
 P2 -->  P3
 P1 -->  P3
 ```
+
 ![Constraint](./constraint.svg)
 
 Sometimes, especially in complex diagrams, adding a connection can bring
 a constraint that is not desired. It is possible turn off the constraint posed
 by any given connection, by appending a `?` to the connection:
+
 ```data-flow-diagram constraint-relaxed.svg
 style vertical
 
@@ -415,6 +442,7 @@ P2 -->  P3
 P1 -->? P3
 # equivalent to: flow? P1 P3
 ```
+
 ![Relaxed](./constraint-relaxed.svg)
 
 - You can see that `P1 --> P3` did not lead `P2` to be shifted. This
@@ -436,9 +464,11 @@ P1 -->  P2  [color=red fontcolor=red] red
 P2 -->  P3  [color=blue] blue arrow
 P1 -->  P3  [penwidth=2] thick
 ```
+
 ![Attributes](./attributes.svg)
 
 For possible attributes, see:
+
 - https://graphviz.org/docs/edges/
 - https://graphviz.org/docs/nodes/
 
@@ -449,6 +479,7 @@ Currently, attributes do not apply to `store` nor `channel`.
 Newlines can be inserted in any label by means of `\n`.
 
 Lines are wrapped by default by:
+
 - 20 columns for items, and
 - 14 columns for connections:
 
@@ -462,9 +493,11 @@ process P2  Do\n that and that and also that
 P1 -->  P2  result of doing all this
 P2 -->  P1  result\nof doing all that
 ```
+
 ![Wrapping-1](./wrapping-1.svg)
 
 The column widths can be changed by
+
 - `style item-text-width N` and
 - `style connection-text-width N` respectively.
 
@@ -475,6 +508,7 @@ Bigger number of columns:
 style item-text-width 40
 style connection-text-width 40
 ```
+
 ![Wrapping-2](./wrapping-2.svg)
 
 Smaller number of columns:
@@ -484,6 +518,7 @@ Smaller number of columns:
 style item-text-width 8
 style connection-text-width 6
 ```
+
 ![Wrapping-2](./wrapping-3.svg)
 
 ### 8. Real-time aspects (SA/RT)
@@ -524,7 +559,9 @@ Clock	::> Timer	tick
 Driver	--> Lamp	voltage
 Power	->> Driver	voltage
 ```
+
 ![Real-time](./realtime.svg)
+
 - The timer has an internal hidden state, e.g. a counter.
 - While the lamp is on, one can re-trigger the timeout by a push.
 - The electrical voltage is here represented by flows.
@@ -544,13 +581,13 @@ A snippet can be defined by such a code block:
 
     ```
 
-The opening fence ```` ```data-flow-diagram FILENAME.svg ```` must specify
+The opening fence ` ```data-flow-diagram FILENAME.svg ` must specify
 `data-flow-diagram` as formatter, followed by an output file name with
 extension.
 
 Some markdown viewers have issues with non-standard formatters on the opening
 fence, so an arbitrary number of whitespaces can be inserted between the
-opening ```` ``` ```` and the `data-flow-diagram` formatter, like:
+opening ` ``` ` and the `data-flow-diagram` formatter, like:
 
     ```
     data-flow-diagram FILENAME.svg
@@ -562,13 +599,11 @@ opening ```` ``` ```` and the `data-flow-diagram` formatter, like:
 Note that only code blocks delimited by triple-backticks fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored:
 
-
         data-flow-diagram FILENAME.svg
 
         DFD_STATEMENTS
 
         indented code blocks are not captured.
-
 
 A generated image file can be used by e.g. `![Label](FILENAME.svg)`.
 
@@ -604,6 +639,7 @@ Read on for more details.
 You can include a file as includee.
 
 Say you have a file named `includee.part` containing:
+
 ```
 process	P1	Process 1
 process	P2	Process 2
@@ -619,6 +655,7 @@ P1 --> P2	connection
 ```
 
 It is equivalent to having:
+
 ```
 process	P1	Process 1
 process	P2	Process 2
@@ -659,6 +696,7 @@ The output format extension (here `.svg` for
 
     P3 --> P4	connection
     ```
+
 ![Includer 1](./includer-1.svg)
 
 ### 3. Including snippet without generating an image for the includee
@@ -674,6 +712,7 @@ mandates to not generate an image for it. Hence it needs no format extension.
     process	P5	Process 5
     process	P6	Process 6
     ```
+
 #### b. Includer
 
 The includer works exactly like in the previous section.
@@ -684,6 +723,7 @@ The includer works exactly like in the previous section.
 
     P5 --> P6	connection
     ```
+
 ![Includer 2](./includer-2.svg)
 
 ### 4. Nested includes
@@ -715,7 +755,9 @@ Such a snippet (which includes itself) involves an infinite recursion:
     process	P1
     #include #snippet-recursive
     ```
+
 and would cause this error during image generation:
+
 ```
 ERROR: (most recent first)
   line 2: #include #snippet-recursive
@@ -734,15 +776,18 @@ The benefit of better readability comes with a drawback for the writer:
 maintaining consistancy. To ease this, the "dependencies" feature comes to help.
 
 You can re-declare items already declared in other graphs. This has the following effects:
+
 1. The item is rendered "ghosted",
 2. Inter-dependencies are checked, and result in errors if a reference is not found,
    or of wrong type.
 
 Synopsis:
+
 - `ITEM GRAPH:[NAME]  [LABEL]`
 - where `GRAPH` can be `#SNIPPET_NAME` or `FILENAME.EXT`
 
 Examples:
+
 - `none    #MyGraph1:`
 - `process #MyGraph1:MyItem`
 - `process #MyGraph1:MyItem My item`
@@ -751,16 +796,20 @@ Examples:
 - `process MyGraph2.dfd:MyItem My item`
 
 ### 1. Using dependencies
+
 #### a. Referring to another snippet
 
 Supposing you have this (referred) snippet:
+
 ```
 data-flow-diagram Feature-1.svg
 process	This    Do this
 ```
+
 ![Feature-1](./Feature-1.svg)
 
 In another graph (the referrer), you can refer to the **whole referred graph** by a `none` item:
+
 ```data-flow-diagram Referrer-1.svg
 # Externals:
 none #Feature-1:
@@ -770,7 +819,9 @@ process	That    Do that
 
 Feature-1 --> That
 ```
+
 ![Referrer](./Referrer-1.svg)
+
 - `#Feature-1` refers to the `Feature-1` snippet,
 - `:` without an item name, refers to the whole referred graph.
 - The referred graph must be used by its graph name, without the
@@ -778,6 +829,7 @@ Feature-1 --> That
 
 You can also refer to **items inside the referred graph**, by declaring a referrer of
 the same type, and specifying the referred item name:
+
 ```data-flow-diagram Referrer-2.svg
 # Externals:
 process #Feature-1:This
@@ -787,7 +839,9 @@ process	That    Do that
 
 This --> That
 ```
+
 ![Referrer](./Referrer-2.svg)
+
 - `#Feature-1` refers to the `Feature-1` snippet.
 - `:This` refers to the item named `This` in the referred snippet.
 - `process` must be used, in order to be of the same type as the referred item.
@@ -796,6 +850,7 @@ This --> That
 
 If the referred item has a label that the referrer wants to use, the referrer
 must re-declare the label:
+
 ```data-flow-diagram Referrer-3.svg
 # Externals:
 process #Feature-1:This Do this
@@ -805,6 +860,7 @@ process	That    Do that
 
 This --> That
 ```
+
 ![Referrer](./Referrer-3.svg)
 
 #### b. Referring to another DFD file
@@ -820,6 +876,7 @@ process These	Do these
 ```
 
 You can refer to the above graph as follows:
+
 ```data-flow-diagram dependant-4.svg
 # Externals:
 none    Feature-2.dfd:
@@ -831,7 +888,9 @@ process	That    Do that
 Feature-2   --> That
 That        --> These
 ```
+
 ![Dependant](./dependant-4.svg)
+
 - `Feature-2.dfd` refers to the `Feature-2.dfd` file.
 - The `Feature-2` name (without `.dfd` extension) must be further used.
 - The same other rules (e.g. accessing items of the referred graph) apply as
@@ -840,6 +899,7 @@ That        --> These
 ### 2. Checking the dependencies
 
 Dependencies checking lead to error, if any of the following is found:
+
 - The referred graph (snippet or file) does not exist (or is not readable).
 - When referring to a whole graph, the referrer is not of type `none`.
 - When referring to an item of a graph,
