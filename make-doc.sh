@@ -1,7 +1,7 @@
 #!/bin/bash
 . ./set-ex.sh
 
-#OPTS=--debug
+OPTS=--debug
 OPTS=
 
 (
@@ -18,4 +18,4 @@ OPTS=
     done
 )
 
-./data-flow-diagram README.md --markdown
+./data-flow-diagram $OPTS README.md --markdown

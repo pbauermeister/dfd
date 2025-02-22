@@ -450,6 +450,8 @@ P1 -->? P3
 
 ### 6. Items and connections attributes
 
+#### a. Inline attributes
+
 Rendering attributes can be added by prefixing the label by
 `[NAME=VALUE ...]` using Graphviz attributes syntax:
 
@@ -473,6 +475,58 @@ For possible attributes, see:
 - https://graphviz.org/docs/nodes/
 
 Currently, attributes do not apply to `store` nor `channel`.
+
+#### b. Attribute aliases
+
+The `attrib ALIAS attributes...` statement allows to define aliases for
+arbitrary attributes.
+
+Using aliases makes subsequent declarations shorter and helps avoid duplication
+of attributes.
+
+Choosing alias names having functional or stylistic meanings adds clarity to the
+source text.
+
+Multiple aliases can be used for an item. Aliases can be
+mixed with inline attributes.
+
+```data-flow-diagram attributes-alias.svg
+style vertical
+
+# stylistic aliases
+
+attrib GREEN    color=green fontcolor=green
+
+# functional aliases for nodes
+
+attrib START    penwidth=2 fillcolor=lightgrey
+attrib ABNORMAL fillcolor=red fontcolor=white color=invis
+attrib END      penwidth=2 fillcolor=lightgrey color=grey
+
+# functional aliases for connections
+
+attrib ALERT    color=red fontcolor=red
+attrib OK       color=green fontcolor=green
+attrib FIXUP    color=blue fontcolor=blue
+
+# graph
+
+control P0  [START] Start
+process	P1  System check
+process P2  [ABNORMAL] Malfunction state
+
+# using multiple aliases:
+process P3  [END GREEN] Done
+
+P0 ::>  P1  trigger
+P1 -->  P2  [ALERT] issue found
+P2 -->  P1  [FIXUP] issue fixed
+
+# using an alias and an inline attribute:
+P1 -->  P3  [OK penwidth=2] all OK
+```
+
+![Attributes](./attributes-alias.svg)
 
 ### 7. Text wrapping and line breaks
 

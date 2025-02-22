@@ -41,6 +41,9 @@ test: ## run tests
 ################################################################################
 # Release:: ##
 
+doc: ## remake doc
+	./make-doc.sh
+
 publish-to-pypi: ## publish to Pypi
 	./publish-to-pypi.sh
 
