@@ -30,6 +30,8 @@ require: ## install needed dev+install tools, in venv
 	. .venv/bin/activate && \
 	pip install setuptools twine
 
+all: venv require black lint test doc clean ## make all, except publish
+
 ################################################################################
 # Quality:: ##
 
