@@ -12,9 +12,9 @@ RX_LINE_CONT = re.compile('[\\\\]\\s*\n\\s*', re.MULTILINE)
 
 
 def scan(
-    provenance: model.SourceLine,
+    provenance: model.SourceLine | None,
     input: str,
-    snippet_by_name: model.SnippetByName = None,
+    snippet_by_name: model.SnippetByName | None = None,
     debug: bool = False,
 ) -> model.SourceLines:
     output: model.SourceLines = []
@@ -44,7 +44,7 @@ def _scan(
     input: str,
     parent: model.SourceLine,
     output: model.SourceLines,
-    snippet_by_name: model.SnippetByName,
+    snippet_by_name: model.SnippetByName | None,
     includes: set[str],
 ) -> None:
     for nr, line in enumerate(input.splitlines()):
@@ -62,7 +62,7 @@ def include(
     line: str,
     parent: model.SourceLine,
     output: model.SourceLines,
-    snippet_by_name: model.SnippetByName,
+    snippet_by_name: model.SnippetByName | None,
     includes: set[str],
 ) -> None:
     pair = line.split(maxsplit=1)

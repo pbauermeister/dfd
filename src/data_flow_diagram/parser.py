@@ -118,7 +118,7 @@ def parse(
 
         word = source.text.split()[0]
 
-        f: Callable[[model.SourceLine], model.Statement] = {
+        f = {
             model.STYLE: parse_style,
             model.PROCESS: parse_process,
             model.CONTROL: parse_control,
@@ -182,9 +182,9 @@ def split_args(
 ) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
 
-    terms = dfd_line.split(maxsplit=n)
+    terms: list[str] = dfd_line.split(maxsplit=n)
     if len(terms) - 1 == n - 1 and last_is_optional:
-        terms.append(None)
+        terms.append('')
 
     if len(terms) - 1 != n:
         if not last_is_optional:

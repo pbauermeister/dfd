@@ -16,7 +16,7 @@ def build(
     dfd_src: str,
     output_path: str,
     options: model.Options,
-    snippet_by_name: model.SnippetByName = None,
+    snippet_by_name: model.SnippetByName | None = None,
 ) -> None:
     """Take a DFD source and build the final image or document"""
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
@@ -73,7 +73,7 @@ class Generator:
 
         copy.text = wrap(copy.text, self.graph_options.item_text_width)
         attrs = copy.attrs or ''
-        attrs = self._expand_attribs(attrs, item)
+        attrs = self._expand_attribs(attrs)
 
         match copy.type:
             case model.PROCESS:
@@ -123,20 +123,19 @@ class Generator:
 
     def _compile_attribs_names(
         self, attribs: model.Attribs
-    ) -> re.Pattern | None:
+    ) -> re.Pattern[str] | None:
         if not attribs:
             return None
         names = [re.escape(k) for k in attribs.keys()]
         pattern = '|'.join(names)
         return re.compile(pattern)
 
-    def _expand_attribs(self, attrs: str, item: model.Item) -> str:
+    def _expand_attribs(self, attrs: str) -> str:
         def replacer(m: re.Match[str]) -> str:
             alias = m[0]
             if alias not in self.attribs:
-                prefix = model.mk_err_prefix_from(item.source)
                 raise model.DfdException(
-                    f'{prefix}Alias '
+                    f'Alias '
                     f'"{alias}" '
                     f'not found in '
                     f'{pprint.pformat(self.attribs)}'
@@ -157,7 +156,10 @@ class Generator:
         return star_name
 
     def generate_connection(
-        self, conn: model.Connection, src_item: model.Item, dst_item: model.Item
+        self,
+        conn: model.Connection,
+        src_item: model.Item | None,
+        dst_item: model.Item | None,
     ) -> None:
         text = conn.text or ''
         text = wrap(text, self.graph_options.connection_text_width)
@@ -183,7 +185,7 @@ class Generator:
         attrs = f'label="{text}"'
 
         if conn.attrs:
-            attrs += ' ' + self._expand_attribs(conn.attrs, src_item)
+            attrs += ' ' + self._expand_attribs(conn.attrs)
 
         match conn.type:
             case model.FLOW:

@@ -56,10 +56,7 @@ class UnitTest(unittest.TestCase):
 
     def test_input_md(self) -> None:
         result = extract_snippets(inputs.MD_OK)
-        expected = [
-            model.Snippet(**inputs.MD_EXPECTED[0]),
-            model.Snippet(**inputs.MD_EXPECTED[1]),
-        ]
+        expected = inputs.MD_EXPECTED
         self.assertSequenceEqual(
             result, expected, 'Extraction of snippets in MD text'
         )
@@ -101,7 +98,7 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_duplicate_item_error(self) -> None:
         l = scanner.scan(None, inputs.DUPLICATE_ITEM_ERROR)
-        statements, _ = parser.parse(l)
+        statements, _, _ = parser.parse(l)
         with self.assertRaises(
             model.DfdException, msg='Undetectd duplicate item name'
         ):
@@ -109,7 +106,7 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_missing_ref_error(self) -> None:
         l = scanner.scan(None, inputs.MISSING_REF_ERROR)
-        statements, _ = parser.parse(l)
+        statements, _, _ = parser.parse(l)
         with self.assertRaises(
             model.DfdException, msg='Undetectd missing reference'
         ):
@@ -117,7 +114,7 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_double_error(self) -> None:
         l = scanner.scan(None, inputs.DOUBLE_STAR_ERROR)
-        statements, _ = parser.parse(l)
+        statements, _, _ = parser.parse(l)
         with self.assertRaises(
             model.DfdException, msg='Undetectd double * reference'
         ):

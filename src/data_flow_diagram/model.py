@@ -37,8 +37,8 @@ class Snippet(Base):
 @dataclass
 class SourceLine(Base):
     text: str  # after pre-processor
-    raw_text: str
-    parent: SourceLine  # https://stackoverflow.com/a/62521947
+    raw_text: str | None
+    parent: SourceLine | None  # https://stackoverflow.com/a/62521947
     line_nr: int
     is_container: bool = False
 
@@ -117,7 +117,7 @@ class GraphOptions:
     connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
 
 
-def pack(src_line: str) -> str:
+def pack(src_line: str | None) -> str:
     if src_line is None:
         return '<none>'
     return ' '.join(src_line.split())
@@ -170,7 +170,7 @@ class Options:
 @dataclass
 class GraphDependency:
     to_graph: str
-    to_item: str
+    to_item: str | None
     to_type: str
     source: SourceLine
 

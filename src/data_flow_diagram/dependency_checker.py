@@ -5,7 +5,7 @@ from . import model, scanner, parser
 
 def check(
     dependencies: model.GraphDependencies,
-    snippet_by_name: model.SnippetByName,
+    snippet_by_name: model.SnippetByName | None,
     options: model.Options,
 ) -> None:
 
@@ -73,7 +73,7 @@ def check(
         raise model.DfdException('\n\n'.join(errors))
 
 
-def find_item(name: str, statements: model.Statements) -> model.Item:
+def find_item(name: str, statements: model.Statements) -> model.Item | None:
     for statement in statements:
         match statement:
             case model.Item() as item:
