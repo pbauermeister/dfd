@@ -26,25 +26,34 @@ venv: # setup a local .venv and tell how to activate it
 	@echo "Now please run:"
 	@echo ". .venv/bin/activate"
 
+require: ## install needed dev+install tools, in venv
+	. .venv/bin/activate && \
+	pip install setuptools twine
+
 ################################################################################
 # Quality:: ##
 
 black: ## run black (changes shall be committed)
+	. .venv/bin/activate && \
 	black --skip-string-normalization --line-length 80 .
 
 lint: ## lint source files
+	. .venv/bin/activate && \
 	./lint.sh
 
 test: ## run tests
+	. .venv/bin/activate && \
 	./test.sh
 
 ################################################################################
 # Release:: ##
 
 doc: ## remake doc
+	. .venv/bin/activate && \
 	./make-doc.sh
 
-publish-to-pypi: ## publish to Pypi
+publish-to-pypi: venv ## publish to Pypi
+	. .venv/bin/activate && \
 	./publish-to-pypi.sh
 
 ################################################################################
