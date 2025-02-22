@@ -12,7 +12,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="data-flow-diagram",
-    version="1.10.1",
+    version="1.11.0",
     description="Commandline tool to generate data flow diagrams from text",
     long_description=long_description,
     long_description_content_type="text/markdown",
