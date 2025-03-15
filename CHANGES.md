@@ -1,8 +1,18 @@
 # Changes
 
+## Version 1.11.1:
+
+Bug fixes:
+- Apply attribs on frames.
+- Attribs are matched by whole names, so e.g. DATA and DATABASE will work.
+
+Improvements:
+- 'make install' to install locally.
+- CHANGES.md is read by setup.py to deduce the version.
+
 ## Version 1.11.0:
 
--
+- Keyword "attrib" to define styles.
 
 ## Version 1.10.1:
 

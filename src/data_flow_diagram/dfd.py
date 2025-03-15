@@ -126,7 +126,7 @@ class Generator:
     ) -> re.Pattern[str] | None:
         if not attribs:
             return None
-        names = [re.escape(k) for k in attribs.keys()]
+        names = ['\\b' + re.escape(k) + '\\b' for k in attribs.keys()]
         pattern = '|'.join(names)
         return re.compile(pattern)
 
@@ -225,7 +225,8 @@ class Generator:
 
         self.lines.append(f'  label="{frame.text}"')
         if frame.attrs:
-            self.lines.append(f'  {frame.attrs}')
+            attrs = self._expand_attribs(frame.attrs)
+            self.lines.append(f'  {attrs}')
 
         for item in frame.items:
             self.lines.append(f'  "{item}"')

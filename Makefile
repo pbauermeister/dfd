@@ -48,6 +48,12 @@ test: ## run tests
 	./test.sh
 
 ################################################################################
+# Local:: ##
+
+install: ## install locally
+	pip install . --break-system-packages
+
+################################################################################
 # Release:: ##
 
 doc: ## remake doc

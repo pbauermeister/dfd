@@ -10,9 +10,15 @@ import pathlib
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
+# extract version
+with open(here / "CHANGES.md") as f:
+    lines = f.read().splitlines()
+    lines = [l[2:] for l in lines if l.startswith('##')]
+    version = lines[0].strip().split(':', 1)[0].split()[-1].strip()
+
 setup(
     name="data-flow-diagram",
-    version="1.11.0",
+    version=version,
     description="Commandline tool to generate data flow diagrams from text",
     long_description=long_description,
     long_description_content_type="text/markdown",
