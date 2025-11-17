@@ -1,4 +1,4 @@
-## Version 1.12.1:
+## Version 1.12.1.post3:
 
 - CHANGES.md is read by setup.py to deduce the version.
 

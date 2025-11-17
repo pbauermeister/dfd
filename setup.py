@@ -13,10 +13,9 @@ changes = """
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
+changes = (here / "CHANGES.md").read_text(encoding="utf-8")
 
 # extract version
-with open(here / "CHANGES.md", encoding="utf-8") as f:
-    changes = f.read()
 lines = changes.splitlines()
 lines = [l[2:] for l in lines if l.startswith('##')]
 version = lines[0].strip().split(':', 1)[0].split()[-1].strip()
