@@ -1,9 +1,9 @@
 STORE = """
 "{name}" [shape=none label=<
   <TABLE BORDER="0">
-    <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-    <TR><TD>{text}</TD></TR>
-    <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    <TR><TD BGCOLOR="{color}" WIDTH="6"></TD></TR>
+    <TR><TD><FONT COLOR="{fontcolor}">{text}</FONT></TD></TR>
+    <TR><TD BGCOLOR="{color}" WIDTH="6"></TD></TR>
   </TABLE>>]
 """.strip()
 
@@ -13,11 +13,11 @@ CHANNEL = """
   <TABLE BORDER="0">
     <TR>
       <TD WIDTH="48"></TD>
-      <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+      <TD BGCOLOR="{color}" WIDTH="0" PORT="x"><BR/><BR/></TD>
       <TD WIDTH="48"></TD>
     </TR>
     <TR>
-      <TD COLSPAN="3">{text}</TD>
+      <TD COLSPAN="3"><FONT COLOR="{fontcolor}">{text}</FONT></TD>
     </TR>
   </TABLE>>]
 """.strip()
@@ -26,8 +26,8 @@ CHANNEL = """
 CHANNEL_HORIZONTAL = """
 "{name}" [shape=none label=<
   <TABLE BORDER="0">
-    <TR><TD BGCOLOR="black" PORT="x"></TD></TR>
-    <TR><TD>{text}</TD></TR>
+    <TR><TD BGCOLOR="{color}" PORT="x"></TD></TR>
+    <TR><TD><FONT COLOR="{fontcolor}">{text}</FONT></TD></TR>
   </TABLE>>]
 """.strip()
 

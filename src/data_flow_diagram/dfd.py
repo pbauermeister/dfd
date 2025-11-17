@@ -99,12 +99,12 @@ class Generator:
                     f'{attrs}]'
                 )
             case model.STORE:
-                d = self._item_to_html_dict(copy)
+                d = self._attrib_to_dict(copy, attrs)
                 line = TMPL.STORE.format(**d)
             case model.NONE:
                 line = f'"{copy.name}" [shape=none label="{copy.text}" {attrs}]'
             case model.CHANNEL:
-                d = self._item_to_html_dict(copy)
+                d = self._attrib_to_dict(copy, attrs)
                 if self.graph_options.is_vertical:
                     line = TMPL.CHANNEL_HORIZONTAL.format(**d)
                 else:
@@ -115,6 +115,15 @@ class Generator:
                     f'{prefix}Unsupported item type ' f'"{copy.type}"'
                 )
         self.append(line, item)
+
+    def _attrib_to_dict(self, item: model.Item, attrs: str) -> dict[str, str]:
+        d = self._item_to_html_dict(item)
+        d.update({'fontcolor': 'black', 'color': 'black'})
+        attrs_d = {
+            k: v for k, v in [each.split('=', 1) for each in attrs.split()]
+        }
+        d.update(attrs_d)
+        return d
 
     def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
         d = item.__dict__

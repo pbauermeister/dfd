@@ -8,6 +8,10 @@ from setuptools import setup, find_packages
 import pathlib
 
 CHANGES = """
+
+## Version 1.12.0:
+- Support style (and hence attrib) on Stores and Channels.
+
 ## Version 1.11.1.post2:
 
 Bug fixes:
