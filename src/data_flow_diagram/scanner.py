@@ -8,7 +8,7 @@ from . import model
 #   def
 # into:
 #   abcdef
-RX_LINE_CONT = re.compile('[\\\\]\\s*\n\\s*', re.MULTILINE)
+RX_LINE_CONT = re.compile("[\\\\]\\s*\n\\s*", re.MULTILINE)
 
 
 def scan(
@@ -21,21 +21,21 @@ def scan(
     includes: set[str] = set()
 
     # stitch continuated lines
-    input = RX_LINE_CONT.sub('', input)
+    input = RX_LINE_CONT.sub("", input)
 
     if provenance is None:
         provenance = model.SourceLine("", provenance, None, 0)
     _scan(input, provenance, output, snippet_by_name, includes)
 
     if debug:
-        print('=' * 40)
+        print("=" * 40)
         print(provenance)
-        print('----------')
+        print("----------")
         print(input)
-        print('----------')
+        print("----------")
         for l in output:
             print(model.repr(l))
-        print('=' * 40)
+        print("=" * 40)
 
     return output
 
@@ -52,7 +52,7 @@ def _scan(
             continue
         source_line = model.SourceLine(line, line, parent, nr)
         pair = line.split(maxsplit=1)
-        if len(pair) == 2 and pair[0] == '#include':
+        if len(pair) == 2 and pair[0] == "#include":
             include(line, source_line, output, snippet_by_name, includes)
         else:
             output.append(source_line)
@@ -73,30 +73,25 @@ def include(
         raise model.DfdException(f'{prefix}Recursive include of "{name}"')
     includes.add(name)
 
-    caller = model.SourceLine("", f'<snippet {name}>', parent, 0)
-    if name.startswith('#'):
+    caller = model.SourceLine("", f"<snippet {name}>", parent, 0)
+    if name.startswith("#"):
         # include from MD snippet
         if not snippet_by_name:
             raise model.DfdException(
-                f'{prefix}source is not markdown, '
-                f'cannot include snippet "{name}".'
+                f"{prefix}source is not markdown, " f'cannot include snippet "{name}".'
             )
         name0 = name
         name = name[1:]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
-            raise model.DfdException(
-                f'{prefix}included snippet "{name}" not found.'
-            )
+            raise model.DfdException(f'{prefix}included snippet "{name}" not found.')
 
         _scan(snippet.text, caller, output, snippet_by_name, includes)
 
     else:
         # include from file
         if not os.path.exists(name):
-            raise model.DfdException(
-                f'{prefix}included file "{name}" not found.'
-            )
-        with open(name, encoding='utf-8') as f:
+            raise model.DfdException(f'{prefix}included file "{name}" not found.')
+        with open(name, encoding="utf-8") as f:
             text = f.read()
         _scan(text, caller, output, snippet_by_name, includes)

@@ -54,7 +54,7 @@ digraph D {{
 )
 
 
-GRAPH_PARAMS_CONTEXT_DIAGRAM = 'edge [len=2.25]'
+GRAPH_PARAMS_CONTEXT_DIAGRAM = "edge [len=2.25]"
 
 
-ITEM_EXTERNAL_ATTRS = 'fillcolor=white color=grey fontcolor=grey'
+ITEM_EXTERNAL_ATTRS = "fillcolor=white color=grey fontcolor=grey"

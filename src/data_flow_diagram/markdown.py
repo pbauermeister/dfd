@@ -21,18 +21,18 @@ SnippetContexts = list[SnippetContext]
 
 def extract_snippets(text: str) -> model.Snippets:
     rx = re.compile(
-        r'^```(?P<head>\s*)'
-        r'data-flow-diagram\s+'
-        r'(?P<output>.*?)\s*'
-        r'^(?P<src>.*?)^\s*```',
+        r"^```(?P<head>\s*)"
+        r"data-flow-diagram\s+"
+        r"(?P<output>.*?)\s*"
+        r"^(?P<src>.*?)^\s*```",
         re.DOTALL | re.M,
     )
 
     return [
         model.Snippet(
-            text=match['head'] + match['src'],
-            name=os.path.splitext(match['output'])[0],
-            output=match['output'],
+            text=match["head"] + match["src"],
+            name=os.path.splitext(match["output"])[0],
+            output=match["output"],
             line_nr=len(text[: match.start()].splitlines()),
         )
         for match in rx.finditer(text)
@@ -49,12 +49,12 @@ def make_snippets_params(
 
     for snippet in snippets:
         # snippet w/o output, maybe just as includee
-        if snippet.output.startswith('#'):
+        if snippet.output.startswith("#"):
             continue
 
         # snippet with output
         input_fp = io.StringIO(snippet.text)
-        snippet_provenance = f'{provenance}<snippet:{snippet.output}>'
+        snippet_provenance = f"{provenance}<snippet:{snippet.output}>"
         root = model.SourceLine(
             "", snippet_provenance, None, snippet.line_nr, is_container=True
         )
@@ -72,5 +72,5 @@ def check_snippets_unicity(provenance: str, snippets: model.Snippets) -> None:
         root = model.SourceLine("", provenance, None, None)
         error_prefix = model.mk_err_prefix_from(root)
         raise model.DfdException(
-            f'{error_prefix}Snippets defined multiple ' f'times: {multiples}'
+            f"{error_prefix}Snippets defined multiple " f"times: {multiples}"
         )

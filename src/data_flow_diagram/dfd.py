@@ -41,13 +41,13 @@ def build(
 
 def wrap(text: str, cols: int) -> str:
     res: list[str] = []
-    for each in text.strip().split('\\n'):
-        res += textwrap.wrap(each, width=cols, break_long_words=False) or ['']
-    return '\\n'.join(res)
+    for each in text.strip().split("\\n"):
+        res += textwrap.wrap(each, width=cols, break_long_words=False) or [""]
+    return "\\n".join(res)
 
 
 class Generator:
-    RX_NUMBERED_NAME = re.compile(r'(\d+[.])(.*)')
+    RX_NUMBERED_NAME = re.compile(r"(\d+[.])(.*)")
 
     def __init__(
         self, graph_options: model.GraphOptions, attribs: model.Attribs
@@ -60,32 +60,32 @@ class Generator:
         self.attribs_rx = self._compile_attribs_names(attribs)
 
     def append(self, line: str, statement: model.Statement) -> None:
-        self.lines.append('')
+        self.lines.append("")
         text = model.pack(statement.source.text)
-        self.lines.append(f'/* {statement.source.line_nr}: {text} */')
+        self.lines.append(f"/* {statement.source.line_nr}: {text} */")
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
         copy = model.Item(**item.__dict__)
         hits = self.RX_NUMBERED_NAME.findall(copy.text)
         if hits:
-            copy.text = '\\n'.join(hits[0])
+            copy.text = "\\n".join(hits[0])
 
         copy.text = wrap(copy.text, self.graph_options.item_text_width)
-        attrs = copy.attrs or ''
+        attrs = copy.attrs or ""
         attrs = self._expand_attribs(attrs)
 
         match copy.type:
             case model.PROCESS:
                 if self.graph_options.is_context:
-                    shape = 'circle'
-                    fc = 'white'
+                    shape = "circle"
+                    fc = "white"
                 else:
-                    shape = 'ellipse'
+                    shape = "ellipse"
                     fc = '"#eeeeee"'
                 line = (
                     f'"{copy.name}" [shape={shape} label="{copy.text}" '
-                    f'fillcolor={fc} style=filled {attrs}]'
+                    f"fillcolor={fc} style=filled {attrs}]"
                 )
             case model.CONTROL:
                 fc = '"#eeeeee"'
@@ -95,8 +95,7 @@ class Generator:
                 )
             case model.ENTITY:
                 line = (
-                    f'"{copy.name}" [shape=rectangle label="{copy.text}" '
-                    f'{attrs}]'
+                    f'"{copy.name}" [shape=rectangle label="{copy.text}" ' f"{attrs}]"
                 )
             case model.STORE:
                 d = self._attrib_to_dict(copy, attrs)
@@ -112,31 +111,27 @@ class Generator:
             case _:
                 prefix = model.mk_err_prefix_from(copy.source)
                 raise model.DfdException(
-                    f'{prefix}Unsupported item type ' f'"{copy.type}"'
+                    f"{prefix}Unsupported item type " f'"{copy.type}"'
                 )
         self.append(line, item)
 
     def _attrib_to_dict(self, item: model.Item, attrs: str) -> dict[str, str]:
         d = self._item_to_html_dict(item)
-        d.update({'fontcolor': 'black', 'color': 'black'})
-        attrs_d = {
-            k: v for k, v in [each.split('=', 1) for each in attrs.split()]
-        }
+        d.update({"fontcolor": "black", "color": "black"})
+        attrs_d = {k: v for k, v in [each.split("=", 1) for each in attrs.split()]}
         d.update(attrs_d)
         return d
 
     def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
         d = item.__dict__
-        d['text'] = d['text'].replace('\\n', '<br/>')
+        d["text"] = d["text"].replace("\\n", "<br/>")
         return d
 
-    def _compile_attribs_names(
-        self, attribs: model.Attribs
-    ) -> re.Pattern[str] | None:
+    def _compile_attribs_names(self, attribs: model.Attribs) -> re.Pattern[str] | None:
         if not attribs:
             return None
-        names = ['\\b' + re.escape(k) + '\\b' for k in attribs.keys()]
-        pattern = '|'.join(names)
+        names = ["\\b" + re.escape(k) + "\\b" for k in attribs.keys()]
+        pattern = "|".join(names)
         return re.compile(pattern)
 
     def _expand_attribs(self, attrs: str) -> str:
@@ -144,21 +139,19 @@ class Generator:
             alias = m[0]
             if alias not in self.attribs:
                 raise model.DfdException(
-                    f'Alias '
+                    f"Alias "
                     f'"{alias}" '
-                    f'not found in '
-                    f'{pprint.pformat(self.attribs)}'
+                    f"not found in "
+                    f"{pprint.pformat(self.attribs)}"
                 )
 
             return self.attribs[alias].text
 
-        return (
-            self.attribs_rx.sub(replacer, attrs) if self.attribs_rx else attrs
-        )
+        return self.attribs_rx.sub(replacer, attrs) if self.attribs_rx else attrs
 
     def generate_star(self, text: str) -> str:
         text = wrap(text, self.graph_options.item_text_width)
-        star_name = f'__star_{self.star_nr}__'
+        star_name = f"__star_{self.star_nr}__"
         line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
         self.lines.append(line)
         self.star_nr += 1
@@ -170,57 +163,57 @@ class Generator:
         src_item: model.Item | None,
         dst_item: model.Item | None,
     ) -> None:
-        text = conn.text or ''
+        text = conn.text or ""
         text = wrap(text, self.graph_options.connection_text_width)
 
         src_port = dst_port = ""
 
         if not src_item:
             src_name = self.generate_star(text)
-            text = ''
+            text = ""
         else:
             src_name = src_item.name
             if src_item.type == model.CHANNEL:
-                src_port = ':x:c'
+                src_port = ":x:c"
 
         if not dst_item:
             dst_name = self.generate_star(text)
-            text = ''
+            text = ""
         else:
             dst_name = dst_item.name
             if dst_item.type == model.CHANNEL:
-                dst_port = ':x:c'
+                dst_port = ":x:c"
 
         attrs = f'label="{text}"'
 
         if conn.attrs:
-            attrs += ' ' + self._expand_attribs(conn.attrs)
+            attrs += " " + self._expand_attribs(conn.attrs)
 
         match conn.type:
             case model.FLOW:
                 if conn.reversed:
-                    attrs += ' dir=back'
+                    attrs += " dir=back"
             case model.BFLOW:
-                attrs += ' dir=both'
+                attrs += " dir=both"
             case model.CFLOW:
                 if conn.reversed:
-                    attrs += ' dir=back'
-                    attrs += ' arrowtail=normalnormal'
+                    attrs += " dir=back"
+                    attrs += " arrowtail=normalnormal"
                 else:
-                    attrs += ' arrowhead=normalnormal'
+                    attrs += " arrowhead=normalnormal"
             case model.UFLOW:
-                attrs += ' dir=none'
+                attrs += " dir=none"
             case model.SIGNAL:
                 if conn.reversed:
-                    attrs += ' dir=back'
-                attrs += ' style=dashed'
+                    attrs += " dir=back"
+                attrs += " style=dashed"
             case _:
                 prefix = model.mk_err_prefix_from(conn.source)
                 raise model.DfdException(
-                    f'{prefix}Unsupported connection type ' f'"{conn.type}"'
+                    f"{prefix}Unsupported connection type " f'"{conn.type}"'
                 )
         if conn.relaxed:
-            attrs += ' constraint=false'
+            attrs += " constraint=false"
 
         line = f'"{src_name}"{src_port} -> "{dst_name}"{dst_port} [{attrs}]'
         self.append(line, conn)
@@ -229,17 +222,17 @@ class Generator:
         pass
 
     def generate_frame(self, frame: model.Frame) -> None:
-        self.append(f'subgraph cluster_{self.frame_nr} {{', frame)
+        self.append(f"subgraph cluster_{self.frame_nr} {{", frame)
         self.frame_nr += 1
 
         self.lines.append(f'  label="{frame.text}"')
         if frame.attrs:
             attrs = self._expand_attribs(frame.attrs)
-            self.lines.append(f'  {attrs}')
+            self.lines.append(f"  {attrs}")
 
         for item in frame.items:
             self.lines.append(f'  "{item}"')
-        self.lines.append('}')
+        self.lines.append("}")
 
     def generate_dot_text(self, title: str) -> str:
         graph_params = []
@@ -250,16 +243,16 @@ class Generator:
             graph_params.append(TMPL.DOT_GRAPH_TITLE.format(title=title))
 
         if self.graph_options.is_vertical:
-            graph_params.append('rankdir=TB')
+            graph_params.append("rankdir=TB")
         else:
-            graph_params.append('rankdir=LR')
+            graph_params.append("rankdir=LR")
 
-        block = '\n'.join(self.lines).replace('\n', '\n  ')
+        block = "\n".join(self.lines).replace("\n", "\n  ")
         text = TMPL.DOT.format(
             title=title,
             block=block,
-            graph_params='\n  '.join(graph_params),
-        ).replace('\n  \n', '\n\n')
+            graph_params="\n  ".join(graph_params),
+        ).replace("\n  \n", "\n\n")
         # print(text)
         return text
 
@@ -273,7 +266,7 @@ def generate_dot(
     """Iterate over statements and generate a dot source file"""
 
     def get_item(name: str) -> Optional[model.Item]:
-        return None if name == '*' else items_by_name[name]
+        return None if name == "*" else items_by_name[name]
 
     for statement in statements:
         match statement:
@@ -328,18 +321,18 @@ def handle_options(
         match statement:
             case model.Style() as style:
                 match style.style:
-                    case 'vertical':
+                    case "vertical":
                         options.is_vertical = True
-                    case 'context':
+                    case "context":
                         options.is_context = True
-                    case 'horizontal':
+                    case "horizontal":
                         options.is_vertical = False
-                    case 'item-text-width':
+                    case "item-text-width":
                         try:
                             options.item_text_width = int(style.value)
                         except ValueError as e:
                             raise model.DfdException(f'{prefix}{e}"')
-                    case 'connection-text-width':
+                    case "connection-text-width":
                         try:
                             options.connection_text_width = int(style.value)
                         except ValueError as e:
@@ -347,7 +340,7 @@ def handle_options(
 
                     case _:
                         raise model.DfdException(
-                            f'{prefix}Unsupported style ' f'"{style.style}"'
+                            f"{prefix}Unsupported style " f'"{style.style}"'
                         )
 
                 continue

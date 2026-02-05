@@ -15,33 +15,33 @@ def check(
         prefix = model.mk_err_prefix_from(dep.source)
 
         # load source text
-        if dep.to_graph.startswith('#'):
+        if dep.to_graph.startswith("#"):
             # from snippet
             name = dep.to_graph[1:]
             if name not in snippet_by_name:
                 errors.append(f'{prefix}Referring to unknown snippet "{name}"')
                 continue
             text = snippet_by_name[name].text
-            what = 'snippet'
+            what = "snippet"
         else:
             # from file
             name = dep.to_graph
             try:
-                with open(name, encoding='utf-8') as f:
+                with open(name, encoding="utf-8") as f:
                     text = f.read()
             except FileNotFoundError as e:
                 if name in snippet_by_name:
                     errors.append(f'{prefix}{e}. Did you mean "#{name}" ?')
                 else:
-                    errors.append(f'{prefix}{e}')
+                    errors.append(f"{prefix}{e}")
                 continue
-            what = 'file'
+            what = "file"
 
         # if only graph is targetted, we're done
         if dep.to_item is None:
             if dep.to_type != model.NONE:
                 errors.append(
-                    f'{prefix}A whole graph may only be referred to '
+                    f"{prefix}A whole graph may only be referred to "
                     f'by an item of type "{model.NONE}", and not '
                     f'"{dep.to_type}"'
                 )
@@ -69,8 +69,8 @@ def check(
         )
 
     if errors:
-        errors.insert(0, 'Dependency error(s) found:')
-        raise model.DfdException('\n\n'.join(errors))
+        errors.insert(0, "Dependency error(s) found:")
+        raise model.DfdException("\n\n".join(errors))
 
 
 def find_item(name: str, statements: model.Statements) -> model.Item | None:

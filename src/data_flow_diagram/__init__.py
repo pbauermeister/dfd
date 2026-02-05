@@ -27,96 +27,96 @@ from .error import print_error
 try:
     VERSION = pkg_resources.require("data-flow-diagram")[0].version
 except pkg_resources.DistributionNotFound:
-    VERSION = 'undefined'
+    VERSION = "undefined"
 
 
 def parse_args() -> argparse.Namespace:
-    description, epilog = [each.strip() for each in __doc__.split('-----')[:2]]
+    description, epilog = [each.strip() for each in __doc__.split("-----")[:2]]
 
     parser = argparse.ArgumentParser(description=description, epilog=epilog)
 
     parser.add_argument(
-        'INPUT_FILE',
-        action='store',
+        "INPUT_FILE",
+        action="store",
         default=None,
-        nargs='?',
-        help='UML sequence input file; ' 'if omitted, stdin is used',
+        nargs="?",
+        help="UML sequence input file; " "if omitted, stdin is used",
     )
 
     parser.add_argument(
-        '--output-file',
-        '-o',
+        "--output-file",
+        "-o",
         required=False,
-        help='output file name; pass \'-\' to use stdout; '
-        'if omitted, use INPUT_FILE base name with \'.svg\' '
-        'extension, or stdout',
+        help="output file name; pass '-' to use stdout; "
+        "if omitted, use INPUT_FILE base name with '.svg' "
+        "extension, or stdout",
     )
 
     parser.add_argument(
-        '--markdown',
-        '-m',
-        action='store_true',
-        help='consider snippets between opening marker: '
-        '```data-flow-diagram OUTFILE, and closing marker: ``` '
-        'allowing to generate all diagrams contained in an '
-        'INPUT_FILE that is a markdown file',
+        "--markdown",
+        "-m",
+        action="store_true",
+        help="consider snippets between opening marker: "
+        "```data-flow-diagram OUTFILE, and closing marker: ``` "
+        "allowing to generate all diagrams contained in an "
+        "INPUT_FILE that is a markdown file",
     )
 
     parser.add_argument(
-        '--format',
-        '-f',
+        "--format",
+        "-f",
         required=False,
-        default='svg',
-        help='output format: gif, jpg, tiff, bmp, pnm, eps, '
-        'pdf, svg (any supported by Graphviz); default is svg',
+        default="svg",
+        help="output format: gif, jpg, tiff, bmp, pnm, eps, "
+        "pdf, svg (any supported by Graphviz); default is svg",
     )
 
     parser.add_argument(
-        '--percent-zoom',
-        '-p',
+        "--percent-zoom",
+        "-p",
         required=False,
         default=100,
         type=int,
-        help='magnification percentage; default is 100',
+        help="magnification percentage; default is 100",
     )
 
     parser.add_argument(
-        '--background-color',
-        '-b',
+        "--background-color",
+        "-b",
         required=False,
-        default='white',
-        help='background color name (including \'none\' for'
-        ' transparent) in web color notation; see'
-        ' https://developer.mozilla.org/en-US/docs/Web/CSS/color_value'
-        ' for a list of valid names; default is white',
+        default="white",
+        help="background color name (including 'none' for"
+        " transparent) in web color notation; see"
+        " https://developer.mozilla.org/en-US/docs/Web/CSS/color_value"
+        " for a list of valid names; default is white",
     )
 
     parser.add_argument(
-        '--no-graph-title',
-        action='store_true',
+        "--no-graph-title",
+        action="store_true",
         default=False,
-        help='suppress graph title',
+        help="suppress graph title",
     )
 
     parser.add_argument(
-        '--no-check-dependencies',
-        action='store_true',
+        "--no-check-dependencies",
+        action="store_true",
         default=False,
-        help='suppress dependencies checking',
+        help="suppress dependencies checking",
     )
 
     parser.add_argument(
-        '--debug',
-        action='store_true',
+        "--debug",
+        action="store_true",
         default=False,
-        help='emit debug messages',
+        help="emit debug messages",
     )
 
     parser.add_argument(
-        '--version',
-        '-V',
-        action='store_true',
-        help='print the version and exit',
+        "--version",
+        "-V",
+        action="store_true",
+        help="print the version and exit",
     )
 
     return parser.parse_args()
@@ -137,17 +137,17 @@ def handle_markdown_source(
             options,
             snippet_by_name=params.snippet_by_name,
         )
-        print(f'{sys.argv[0]}: generated {params.file_name}', file=sys.stderr)
+        print(f"{sys.argv[0]}: generated {params.file_name}", file=sys.stderr)
 
 
 def handle_dfd_source(
     options: model.Options, provenance: str, input_fp: TextIO, output_path: str
 ) -> None:
     root = model.SourceLine("", provenance, None, None)
-    if output_path == '-':
+    if output_path == "-":
         # output to stdout
         with tempfile.TemporaryDirectory() as d:
-            path = os.path.join(d, 'file.svg')
+            path = os.path.join(d, "file.svg")
             dfd.build(root, input_fp.read(), path, options)
             with open(path) as f:
                 print(f.read())
@@ -160,10 +160,10 @@ def run(args: argparse.Namespace) -> None:
     # adjust input
     if args.INPUT_FILE is None:
         input_fp = sys.stdin
-        provenance = '<stdin>'
+        provenance = "<stdin>"
     else:
         input_fp = open(args.INPUT_FILE)
-        provenance = f'<file:{args.INPUT_FILE}>'
+        provenance = f"<file:{args.INPUT_FILE}>"
 
     options = model.Options(
         args.format,
@@ -183,9 +183,9 @@ def run(args: argparse.Namespace) -> None:
     if args.output_file is None:
         if args.INPUT_FILE is not None:
             basename = os.path.splitext(args.INPUT_FILE)[0]
-            output_path = basename + '.' + args.format
+            output_path = basename + "." + args.format
         else:
-            output_path = '-'
+            output_path = "-"
     else:
         output_path = args.output_file
 
@@ -200,12 +200,12 @@ def main() -> None:
 
     args = parse_args()
     if args.version:
-        print('data-flow-diagram', VERSION)
+        print("data-flow-diagram", VERSION)
         sys.exit(0)
 
     try:
         run(args)
     except model.DfdException as e:
-        text = f'ERROR: {e}'
+        text = f"ERROR: {e}"
         print_error(text)
         sys.exit(1)

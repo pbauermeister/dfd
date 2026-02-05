@@ -12,8 +12,8 @@ from . import config
 
 def repr(o: Any) -> str:
     name: str = o.__class__.__name__
-    val: str = json.dumps(dataclasses.asdict(o), indent='  ')
-    return f'{name} {val}'
+    val: str = json.dumps(dataclasses.asdict(o), indent="  ")
+    return f"{name} {val}"
 
 
 @dataclass
@@ -21,8 +21,8 @@ class Base:
     def __repr__(self) -> str:
         return (
             self.__class__.__name__
-            + ' '
-            + json.dumps(dataclasses.asdict(self), indent='  ')
+            + " "
+            + json.dumps(dataclasses.asdict(self), indent="  ")
         )
 
 
@@ -89,24 +89,24 @@ class Attrib(Statement):
 Attribs = dict[str, Attrib]
 
 
-STYLE = 'style'
+STYLE = "style"
 
-PROCESS = 'process'
-CONTROL = 'control'
-ENTITY = 'entity'
-STORE = 'store'
-CHANNEL = 'channel'
-NONE = 'none'
+PROCESS = "process"
+CONTROL = "control"
+ENTITY = "entity"
+STORE = "store"
+CHANNEL = "channel"
+NONE = "none"
 
-FLOW = 'flow'
-BFLOW = 'bflow'
-CFLOW = 'cflow'
-UFLOW = 'uflow'
-SIGNAL = 'signal'
+FLOW = "flow"
+BFLOW = "bflow"
+CFLOW = "cflow"
+UFLOW = "uflow"
+SIGNAL = "signal"
 
-FRAME = 'frame'
+FRAME = "frame"
 
-ATTRIB = 'attrib'
+ATTRIB = "attrib"
 
 
 @dataclass
@@ -119,31 +119,31 @@ class GraphOptions:
 
 def pack(src_line: str | None) -> str:
     if src_line is None:
-        return '<none>'
-    return ' '.join(src_line.split())
+        return "<none>"
+    return " ".join(src_line.split())
 
 
 def mk_err_prefix_from(src: SourceLine) -> str:
 
     def _add_to_stack(stack: list[str], src: SourceLine) -> None:
         if src.line_nr is None:
-            stack += [f'  {pack(src.raw_text)}']
+            stack += [f"  {pack(src.raw_text)}"]
         else:
             if src.parent and src.parent.is_container:
                 nr = src.parent.line_nr + 1
                 delta = src.line_nr + 1
                 final = nr + delta
-                stack += [f'  line {final}: {pack(src.raw_text)}']
+                stack += [f"  line {final}: {pack(src.raw_text)}"]
             else:
                 nr = src.line_nr + 1
-                stack += [f'  line {nr}: {pack(src.raw_text)}']
+                stack += [f"  line {nr}: {pack(src.raw_text)}"]
         if src.parent:
             _add_to_stack(stack, src.parent)
 
-    stack: list[str] = ['(most recent first)']
+    stack: list[str] = ["(most recent first)"]
     _add_to_stack(stack, src)
-    stack += ['']
-    return '\n'.join(stack) + 'Error: '
+    stack += [""]
+    return "\n".join(stack) + "Error: "
 
 
 class DfdException(Exception):
