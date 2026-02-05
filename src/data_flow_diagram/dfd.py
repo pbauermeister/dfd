@@ -27,6 +27,8 @@ def build(
     statements = filter_statements(statements)
     statements, graph_options = handle_options(statements)
 
+    statements = handle_only(statements, options.debug)
+
     if options.no_graph_title:
         title = ""
     else:
@@ -361,3 +363,60 @@ def handle_options(
         new_statements.append(statement)
 
     return new_statements, options
+
+
+def handle_only(
+    statements: model.Statements, debug: bool = False
+) -> model.Statements:
+    """Filter statements based on "only" statements.
+    If there are no "only" statements, return the original list."""
+
+    # collect only statements
+    only_statements = [s for s in statements if isinstance(s, model.Only)]
+    if not only_statements:
+        return statements
+
+    only_names = set()
+    for s in only_statements:
+        only_names.update(s.names)
+    if debug:
+        print(f"'Only' list: {only_names}")
+
+    # filter statements
+    new_statements = []
+
+    for statement in statements:
+        if debug:
+            print(f"\nHandling statement: {statement}")
+        match statement:
+            case model.Item() as item:
+                # skip nodes that are not in the only list
+                if item.name not in only_names:
+                    if debug:
+                        print("=> Skipping: its name is not in the 'only' list")
+                    continue
+            case model.Connection() as conn:
+                # skip connections if either src or dst is not in the only list
+                if conn.src not in only_names or conn.dst not in only_names:
+                    if debug:
+                        print("=> Skipping: some end is not in the 'only' list")
+                    continue
+            case model.Frame() as frame:
+                names = set(frame.items)
+                # skip frames if any of the items is in the only list
+                if not names.issubset(only_names):
+                    if debug:
+                        print(
+                            "=> Skipping: some items are not in the 'only' list"
+                        )
+                    continue
+            case model.Only() as only:
+                # skip only statements, as we don't need them anymore
+                continue
+
+        # keep statement
+        if debug:
+            print("=> Keeping statement")
+        new_statements.append(statement)
+
+    return new_statements

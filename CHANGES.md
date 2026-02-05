@@ -1,3 +1,8 @@
+## Version 1.14.1:
+
+- Supports the "only" prefix: !NODE.
+- TODO: update doc.
+
 ## Version 1.13.1:
 
 - Supports style rotated (and unrotated).

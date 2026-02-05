@@ -64,7 +64,8 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
 
         if nb_stars == 2:
             raise model.DfdException(
-                f'{error_prefix}Connection "{conn.type}" may not link to two ' f"stars"
+                f'{error_prefix}Connection "{conn.type}" may not link to two '
+                f"stars"
             )
 
     # check references of frames
@@ -81,7 +82,8 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
         for name in frame.items:
             if name not in items_by_name:
                 raise model.DfdException(
-                    f'{error_prefix}Frame includes "{name}", ' f"which is not defined"
+                    f'{error_prefix}Frame includes "{name}", '
+                    f"which is not defined"
                 )
             if name in framed_items:
                 raise model.DfdException(
@@ -142,10 +144,13 @@ def parse(
             "signal.r?": parse_signal_r_q,
             model.FRAME: parse_frame,
             model.ATTRIB: parse_attrib,
+            model.ONLY: parse_only,
         }.get(word)
 
         if f is None:
-            raise model.DfdException(f"{error_prefix}Unrecognized keyword " f'"{word}"')
+            raise model.DfdException(
+                f"{error_prefix}Unrecognized keyword " f'"{word}"'
+            )
 
         try:
             statement = f(source)
@@ -173,7 +178,9 @@ def parse(
     return statements, dependencies, attribs
 
 
-def split_args(dfd_line: str, n: int, last_is_optional: bool = False) -> list[str]:
+def split_args(
+    dfd_line: str, n: int, last_is_optional: bool = False
+) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
 
     terms: list[str] = dfd_line.split(maxsplit=n)
@@ -207,6 +214,15 @@ def parse_attrib(source: model.SourceLine) -> model.Statement:
     """Parse attrib name text"""
     alias, text = split_args(source.text, 2, True)
     return model.Attrib(source, alias, text)
+
+
+def parse_only(source: model.SourceLine) -> model.Statement:
+    """Parse attrib name text"""
+    terms: list[str] = source.text.split()
+    if len(terms) < 2:
+        raise model.DfdException(f"One or more arguments are expected")
+    names = terms[1:]
+    return model.Only(source, names)
 
 
 def parse_process(source: model.SourceLine) -> model.Statement:
@@ -302,43 +318,57 @@ def parse_signal_r(source: model.SourceLine) -> model.Statement:
 def parse_flow_q(source: model.SourceLine) -> model.Statement:
     """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, text, "", src, dst, relaxed=True)
+    return model.Connection(
+        source, model.FLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, text, "", src, dst, True, relaxed=True)
+    return model.Connection(
+        source, model.FLOW, text, "", src, dst, True, relaxed=True
+    )
 
 
 def parse_cflow_q(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CFLOW, text, "", src, dst, relaxed=True)
+    return model.Connection(
+        source, model.CFLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_cflow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CFLOW, text, "", src, dst, True, relaxed=True)
+    return model.Connection(
+        source, model.CFLOW, text, "", src, dst, True, relaxed=True
+    )
 
 
 def parse_bflow_q(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.BFLOW, text, "", src, dst, relaxed=True)
+    return model.Connection(
+        source, model.BFLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_uflow_q(source: model.SourceLine) -> model.Statement:
     """Parse undirected flow flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.UFLOW, text, "", src, dst, relaxed=True)
+    return model.Connection(
+        source, model.UFLOW, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_signal_q(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, text, "", src, dst, relaxed=True)
+    return model.Connection(
+        source, model.SIGNAL, text, "", src, dst, relaxed=True
+    )
 
 
 def parse_signal_r_q(source: model.SourceLine) -> model.Statement:

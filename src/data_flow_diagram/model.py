@@ -86,6 +86,11 @@ class Attrib(Statement):
     text: str
 
 
+@dataclass
+class Only(Statement):
+    names: list[str]
+
+
 Attribs = dict[str, Attrib]
 
 
@@ -107,6 +112,8 @@ SIGNAL = "signal"
 FRAME = "frame"
 
 ATTRIB = "attrib"
+
+ONLY = "!"
 
 
 @dataclass
