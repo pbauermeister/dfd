@@ -95,7 +95,8 @@ class Generator:
                 )
             case model.ENTITY:
                 line = (
-                    f'"{copy.name}" [shape=rectangle label="{copy.text}" ' f"{attrs}]"
+                    f'"{copy.name}" [shape=rectangle label="{copy.text}" '
+                    f"{attrs}]"
                 )
             case model.STORE:
                 d = self._attrib_to_dict(copy, attrs)
@@ -118,7 +119,9 @@ class Generator:
     def _attrib_to_dict(self, item: model.Item, attrs: str) -> dict[str, str]:
         d = self._item_to_html_dict(item)
         d.update({"fontcolor": "black", "color": "black"})
-        attrs_d = {k: v for k, v in [each.split("=", 1) for each in attrs.split()]}
+        attrs_d = {
+            k: v for k, v in [each.split("=", 1) for each in attrs.split()]
+        }
         d.update(attrs_d)
         return d
 
@@ -127,7 +130,9 @@ class Generator:
         d["text"] = d["text"].replace("\\n", "<br/>")
         return d
 
-    def _compile_attribs_names(self, attribs: model.Attribs) -> re.Pattern[str] | None:
+    def _compile_attribs_names(
+        self, attribs: model.Attribs
+    ) -> re.Pattern[str] | None:
         if not attribs:
             return None
         names = ["\\b" + re.escape(k) + "\\b" for k in attribs.keys()]
@@ -147,7 +152,9 @@ class Generator:
 
             return self.attribs[alias].text
 
-        return self.attribs_rx.sub(replacer, attrs) if self.attribs_rx else attrs
+        return (
+            self.attribs_rx.sub(replacer, attrs) if self.attribs_rx else attrs
+        )
 
     def generate_star(self, text: str) -> str:
         text = wrap(text, self.graph_options.item_text_width)
@@ -247,6 +254,9 @@ class Generator:
         else:
             graph_params.append("rankdir=LR")
 
+        if self.graph_options.is_rotated:
+            graph_params.append(f"rotate=90")
+
         block = "\n".join(self.lines).replace("\n", "\n  ")
         text = TMPL.DOT.format(
             title=title,
@@ -327,6 +337,10 @@ def handle_options(
                         options.is_context = True
                     case "horizontal":
                         options.is_vertical = False
+                    case "rotated":
+                        options.is_rotated = True
+                    case "unrotated":
+                        options.is_rotated = False
                     case "item-text-width":
                         try:
                             options.item_text_width = int(style.value)

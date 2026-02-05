@@ -1,3 +1,7 @@
+## Version 1.13.1:
+
+- Supports style rotated (and unrotated).
+
 ## Version 1.12.1.post3:
 
 - CHANGES.md is read by setup.py to deduce the version.

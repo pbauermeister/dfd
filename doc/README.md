@@ -230,6 +230,8 @@ diagram:
 | `style vertical`                | Layouts flows in the vertical direction.                     |
 | `style item-text-width N`       | Sets the items labels wrapping to use N chars columns.       |
 | `style connection-text-width N` | Sets the connections labels wrapping to use N chars columns. |
+| `style rotated`                 | Rotates the diagram by 90°.                                  |
+| `style unrotated`               | Reverts the diagram rotation, if any.                        |
 
 A style apply to the whole diagram, whatever where it is declared in
 the source. If a style is re-defined, the last declaration applies.

@@ -113,6 +113,7 @@ ATTRIB = "attrib"
 class GraphOptions:
     is_vertical: bool = False
     is_context: bool = False
+    is_rotated: bool = False
     item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
     connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
 
