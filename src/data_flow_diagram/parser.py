@@ -217,21 +217,24 @@ def parse_attrib(source: model.SourceLine) -> model.Statement:
     return model.Attrib(source, alias, text)
 
 
-def parse_only(source: model.SourceLine) -> model.Statement:
-    """Parse ! NAME"""
+def parse_filter(source: model.SourceLine) -> list[str]:
+    """Parse !/~ NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
         raise model.DfdException(f"One or more arguments are expected")
     names = terms[1:]
+    return names
+
+
+def parse_only(source: model.SourceLine) -> model.Statement:
+    """Parse ! NAME[S]"""
+    names = parse_filter(source)
     return model.Only(source, names)
 
 
 def parse_without(source: model.SourceLine) -> model.Statement:
-    """Parse ~ NAME"""
-    terms: list[str] = source.text.split()
-    if len(terms) < 2:
-        raise model.DfdException(f"One or more arguments are expected")
-    names = terms[1:]
+    """Parse ~ NAME[S]"""
+    names = parse_filter(source)
     return model.Without(source, names)
 
 

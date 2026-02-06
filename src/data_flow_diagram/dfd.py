@@ -367,6 +367,17 @@ def handle_options(
     return new_statements, options
 
 
+def collect_filter_names(
+    statements: model.Statements, filter_type: type[model.Filter]
+) -> set[str]:
+    """Collect names from filter statements of the given type."""
+    names = set()
+    for s in statements:
+        if isinstance(s, filter_type):
+            names.update(s.names)
+    return names
+
+
 def handle_only(
     statements: model.Statements, debug: bool = False
 ) -> model.Statements:
@@ -374,22 +385,17 @@ def handle_only(
     If there are no "only" statements, return the original list."""
 
     # collect only statements
-    only_statements = [s for s in statements if isinstance(s, model.Only)]
-    if not only_statements:
+    only_names = collect_filter_names(statements, model.Only)
+    if not only_names:
         return statements
-
-    only_names = set()
-    for s in only_statements:
-        only_names.update(s.names)
     if debug:
         print(f"'Only' list: {only_names}")
 
     # filter statements
     new_statements = []
-
     for statement in statements:
         if debug:
-            print(f"\nHandling statement: {statement}")
+            print(f"\nOnly: handling statement: {statement}")
         match statement:
             case model.Item() as item:
                 # skip nodes that are not in the only list
@@ -429,23 +435,19 @@ def handle_without(
 ) -> model.Statements:
     """Filter statements based on "without" statements.
     If there are no "without" statements, return the original list."""
-    # collect without statements
-    without_statements = [s for s in statements if isinstance(s, model.Without)]
-    if not without_statements:
-        return statements
 
-    without_names = set()
-    for s in without_statements:
-        without_names.update(s.names)
+    # collect without statements
+    without_names = collect_filter_names(statements, model.Without)
+    if not without_names:
+        return statements
     if debug:
         print(f"'Without' list: {without_names}")
 
     # filter statements
     new_statements = []
-
     for statement in statements:
         if debug:
-            print(f"\nHandling statement: {statement}")
+            print(f"\nWithout: handling statement: {statement}")
         match statement:
             case model.Item() as item:
                 # skip nodes that are not in the without list

@@ -87,13 +87,18 @@ class Attrib(Statement):
 
 
 @dataclass
-class Only(Statement):
+class Filter(Statement):
     names: list[str]
 
 
 @dataclass
-class Without(Statement):
-    names: list[str]
+class Only(Filter):
+    pass
+
+
+@dataclass
+class Without(Filter):
+    pass
 
 
 Attribs = dict[str, Attrib]
