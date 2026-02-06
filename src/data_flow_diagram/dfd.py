@@ -412,15 +412,22 @@ def handle_only(
                     continue
             case model.Frame() as frame:
                 names = set(frame.items)
-                # skip frames if any of the items is in the only list
-                if not names.issubset(only_names):
+                # skip frames if none of the items are in the only list
+                if not names.intersection(only_names):
+                    if debug:
+                        print("=> Skipping: no items are in the 'only' list")
+                    continue
+                else:
+                    # adjust frame items by removing those not in the only list
+                    new_items = [n for n in frame.items if n in only_names]
                     if debug:
                         print(
-                            "=> Skipping: some items are not in the 'only' list"
+                            f"=> Adjusting items : {frame.items} -> {new_items}"
                         )
-                    continue
+                    frame.items = new_items
+
             case model.Only() as only:
-                # skip only statements, as we don't need them anymore
+                # skip the Only statements, as we don't need them anymore
                 continue
 
         # keep statement
@@ -464,15 +471,25 @@ def handle_without(
                     continue
             case model.Frame() as frame:
                 names = set(frame.items)
-                # skip frames if any of the items is in the without list
-                if names.intersection(without_names):
+                # skip frames if all of the items is in the without list
+                if names.issubset(without_names):
                     if debug:
                         print(
-                            "=> Skipping: some items are in the 'without' list"
+                            "=> Skipping: all items are in the 'without' list"
                         )
                     continue
+                else:
+                    # adjust frame items by removing those in the without list
+                    new_items = [
+                        n for n in frame.items if n not in without_names
+                    ]
+                    if debug:
+                        print(
+                            f"=> Adjusting items: {frame.items} -> {new_items}"
+                        )
+                    frame.items = new_items
             case model.Without() as without:
-                # skip without statements, as we don't need them anymore
+                # skip the Without statements, as we don't need them anymore
                 continue
 
         # keep statement

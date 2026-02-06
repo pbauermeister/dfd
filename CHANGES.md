@@ -1,3 +1,7 @@
+## Version 1.14.4:
+
+- Fix bug affecting frames and only/without filters.
+
 ## Version 1.14.3:
 
 - Slight factoring
