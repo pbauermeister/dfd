@@ -23,13 +23,14 @@ def build(
     statements, dependencies, attribs = parser.parse(lines, options.debug)
     if dependencies and not options.no_check_dependencies:
         dependency_checker.check(dependencies, snippet_by_name, options)
+
+    # keep/remove statements based on only/without statements
+    statements = handle_only(statements, options.debug)
+    statements = handle_without(statements, options.debug)
+
     items_by_name = parser.check(statements)
     statements = filter_statements(statements)
     statements, graph_options = handle_options(statements)
-
-    # filter statements based on only/without statements
-    statements = handle_only(statements, options.debug)
-    statements = handle_without(statements, options.debug)
 
     if options.no_graph_title:
         title = ""
