@@ -27,7 +27,9 @@ def build(
     statements = filter_statements(statements)
     statements, graph_options = handle_options(statements)
 
+    # filter statements based on only/without statements
     statements = handle_only(statements, options.debug)
+    statements = handle_without(statements, options.debug)
 
     if options.no_graph_title:
         title = ""
@@ -412,6 +414,62 @@ def handle_only(
                     continue
             case model.Only() as only:
                 # skip only statements, as we don't need them anymore
+                continue
+
+        # keep statement
+        if debug:
+            print("=> Keeping statement")
+        new_statements.append(statement)
+
+    return new_statements
+
+
+def handle_without(
+    statements: model.Statements, debug: bool = False
+) -> model.Statements:
+    """Filter statements based on "without" statements.
+    If there are no "without" statements, return the original list."""
+    # collect without statements
+    without_statements = [s for s in statements if isinstance(s, model.Without)]
+    if not without_statements:
+        return statements
+
+    without_names = set()
+    for s in without_statements:
+        without_names.update(s.names)
+    if debug:
+        print(f"'Without' list: {without_names}")
+
+    # filter statements
+    new_statements = []
+
+    for statement in statements:
+        if debug:
+            print(f"\nHandling statement: {statement}")
+        match statement:
+            case model.Item() as item:
+                # skip nodes that are not in the without list
+                if item.name in without_names:
+                    if debug:
+                        print("=> Skipping: its name is in the 'without' list")
+                    continue
+            case model.Connection() as conn:
+                # skip connections if either src or dst is in the without list
+                if conn.src in without_names or conn.dst in without_names:
+                    if debug:
+                        print("=> Skipping: some end is in the 'without' list")
+                    continue
+            case model.Frame() as frame:
+                names = set(frame.items)
+                # skip frames if any of the items is in the without list
+                if names.intersection(without_names):
+                    if debug:
+                        print(
+                            "=> Skipping: some items are in the 'without' list"
+                        )
+                    continue
+            case model.Without() as without:
+                # skip without statements, as we don't need them anymore
                 continue
 
         # keep statement

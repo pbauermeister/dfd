@@ -91,6 +91,11 @@ class Only(Statement):
     names: list[str]
 
 
+@dataclass
+class Without(Statement):
+    names: list[str]
+
+
 Attribs = dict[str, Attrib]
 
 
@@ -114,6 +119,7 @@ FRAME = "frame"
 ATTRIB = "attrib"
 
 ONLY = "!"
+WITHOUT = "~"
 
 
 @dataclass

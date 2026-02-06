@@ -145,6 +145,7 @@ def parse(
             model.FRAME: parse_frame,
             model.ATTRIB: parse_attrib,
             model.ONLY: parse_only,
+            model.WITHOUT: parse_without,
         }.get(word)
 
         if f is None:
@@ -217,12 +218,21 @@ def parse_attrib(source: model.SourceLine) -> model.Statement:
 
 
 def parse_only(source: model.SourceLine) -> model.Statement:
-    """Parse attrib name text"""
+    """Parse ! NAME"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
         raise model.DfdException(f"One or more arguments are expected")
     names = terms[1:]
     return model.Only(source, names)
+
+
+def parse_without(source: model.SourceLine) -> model.Statement:
+    """Parse ~ NAME"""
+    terms: list[str] = source.text.split()
+    if len(terms) < 2:
+        raise model.DfdException(f"One or more arguments are expected")
+    names = terms[1:]
+    return model.Without(source, names)
 
 
 def parse_process(source: model.SourceLine) -> model.Statement:
