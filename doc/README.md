@@ -74,7 +74,7 @@ Synopsis:
 
 Example:
 
-```data-flow-diagram items.svg
+```data-flow-diagram img/items.svg
 # create a process bubble:
 process	P	A process
 
@@ -95,7 +95,7 @@ none	N	A point
 
 ```
 
-![Creating items](./items.svg)
+![Creating items](./img/items.svg)
 
 - A process is a functional unit that processes inputs and generates outputs.
 
@@ -118,7 +118,7 @@ Synopsis:
 
 Example:
 
-```data-flow-diagram connections.svg
+```data-flow-diagram img/connections.svg
 process	A1
 process	A2
 process	B1
@@ -152,7 +152,7 @@ flow	*	X	an unsourced flow
 signal	Y	*	an untargetted signal
 ```
 
-![Creating connections](./connections.svg)
+![Creating connections](./img/connections.svg)
 
 That's it! With items and connections, you can create any DFD diagram of
 arbitrary complexity.
@@ -172,7 +172,7 @@ Syntactic sugars make source easier on the eye:
 The shaft of the arrow can be of arbitrary lengh, so `->` , `-->` and `------->`
 are equivalent.
 
-```data-flow-diagram connections-sugar.svg
+```data-flow-diagram img/connections-sugar.svg
 process	P1
 process	P2
 
@@ -185,7 +185,7 @@ P1 <<- P2       a continuous back flow
 P1 ::> *	an untargetted signal
 ```
 
-![Creating connections](./connections-sugar.svg)
+![Connection sugars](./img/connections-sugar.svg)
 
 ### 4. Optional label
 
@@ -194,7 +194,7 @@ The LABEL can be ommitted, in which case:
 - for items, the NAME is used as LABEL,
 - for connections, no LABEL is rendered:
 
-```data-flow-diagram items-unlabelled.svg
+```data-flow-diagram img/items-unlabelled.svg
 # create a process bubble:
 process	Process
 
@@ -214,7 +214,7 @@ none	Point
 Process --> Channel
 ```
 
-![Creating items](./items-unlabelled.svg)
+![Unlabelled items](./img/items-unlabelled.svg)
 
 ### 5. Styling
 
@@ -259,7 +259,7 @@ Synopsis:
 
 Basic frame:
 
-```data-flow-diagram frame.svg
+```data-flow-diagram img/frame.svg
 process	P1
 process	P2
 process P3
@@ -270,11 +270,11 @@ P1 --> P3
 P3 --> P2
 ```
 
-![Frames](./frame.svg)
+![Frames](./img/frame.svg)
 
 Frame without label:
 
-```data-flow-diagram frame-without-label.svg
+```data-flow-diagram img/frame-without-label.svg
 process	P1
 process	P2
 process P3
@@ -285,11 +285,11 @@ P1 --> P3
 P3 --> P2
 ```
 
-![Frames](./frame-without-label.svg)
+![Frames without label](./img/frame-without-label.svg)
 
 Frame with styling:
 
-```data-flow-diagram frame-blue.svg
+```data-flow-diagram img/frame-blue.svg
 process	P1
 process	P2
 process P3
@@ -300,13 +300,13 @@ P1 --> P3
 P3 --> P2
 ```
 
-![Frames](./frame-blue.svg)
+![Blue frame](./img/frame-blue.svg)
 
 ## C. Details with examples
 
 ### 1. A simple complete example
 
-```data-flow-diagram complete-example.svg
+```data-flow-diagram img/complete-example.svg
 process	Acquire	Acquire data
 process	Compute
 control Control
@@ -326,13 +326,13 @@ Config	<->  Compute	parameters
 Compute --> API  	records
 ```
 
-![Creating items](./complete-example.svg)
+![Complete example](./img/complete-example.svg)
 
 ### 2. Items rendered only if used (hidable)
 
 By default, all items are rendered, even if not connected to anything:
 
-```data-flow-diagram show-all-items.svg
+```data-flow-diagram img/show-all-items.svg
 process	P1	Process 1
 process	P2	Process 2
 process	P3	Process 3
@@ -340,14 +340,14 @@ process	P3	Process 3
 P1 --> P2	connection
 ```
 
-![Show all items](./show-all-items.svg)
+![Show all items](./img/show-all-items.svg)
 
 A `?` postfix to an item name indicates that, if unused (i.e. not connected to
 anything), the item shall be hidden.
 
 Here, _Process 3_ is not rendered:
 
-```data-flow-diagram hide-if-unused.svg
+```data-flow-diagram img/hide-if-unused.svg
 process	P1	Process 1
 process	P2?	Process 2
 process	P3?	Process 3
@@ -355,13 +355,13 @@ process	P3?	Process 3
 P1 --> P2	connection
 ```
 
-![Hide if unused](./hide-if-unused.svg)
+![Hide if unused](./img/hide-if-unused.svg)
 
 ### 3. Context diagrams
 
 A top-level, so-called "Context Diagram" can be created by specifying `style context`:
 
-```data-flow-diagram context.svg
+```data-flow-diagram img/context.svg
 style context
 
 process	P	The System
@@ -376,7 +376,7 @@ E3  <-> P   flow
 E4  ::> P   signal
 ```
 
-![Context diagram](./context.svg)
+![Context diagram](./img/context.svg)
 
 Note that there should be exactly one process.
 
@@ -384,7 +384,7 @@ Note that there should be exactly one process.
 
 By default, the graph direction is horizontal, so `style horizontal` is implied:
 
-```data-flow-diagram horizontal.svg
+```data-flow-diagram img/horizontal.svg
 style horizontal
 
 process	P1
@@ -393,11 +393,11 @@ process P2
 P1 --> P2
 ```
 
-![Horizontal](./horizontal.svg)
+![Horizontal](./img/horizontal.svg)
 
 For a top-down direction, use `style vertical`:
 
-```data-flow-diagram vertical.svg
+```data-flow-diagram img/vertical.svg
 style vertical
 
 process	P1
@@ -406,7 +406,7 @@ process P2
 P1 --> P2
 ```
 
-![Vertical](./vertical.svg)
+![Vertical](./img/vertical.svg)
 
 ### 5. Relaxed constraints
 
@@ -414,7 +414,7 @@ By default, the placement of items is constrained by both their
 declaration order, and also attempt to minimize connection lengths. In
 the following diagram, P2 is slightly shifted to shorten `P1 --> P3`:
 
-```data-flow-diagram constraint.svg
+```data-flow-diagram img/constraint.svg
 style vertical
 
 process	P1
@@ -426,13 +426,13 @@ P2 -->  P3
 P1 -->  P3
 ```
 
-![Constraint](./constraint.svg)
+![Constraint](./img/constraint.svg)
 
 Sometimes, especially in complex diagrams, adding a connection can bring
 a constraint that is not desired. It is possible turn off the constraint posed
 by any given connection, by appending a `?` to the connection:
 
-```data-flow-diagram constraint-relaxed.svg
+```data-flow-diagram img/constraint-relaxed.svg
 style vertical
 
 process	P1
@@ -445,7 +445,7 @@ P1 -->? P3
 # equivalent to: flow? P1 P3
 ```
 
-![Relaxed](./constraint-relaxed.svg)
+![Relaxed constraint](./img/constraint-relaxed.svg)
 
 - You can see that `P1 --> P3` did not lead `P2` to be shifted. This
   way, the P1 -> P2 -> P3 alignment reflects a more natural flow.
@@ -457,7 +457,7 @@ P1 -->? P3
 Rendering attributes can be added by prefixing the label by
 `[NAME=VALUE ...]` using Graphviz attributes syntax:
 
-```data-flow-diagram attributes.svg
+```data-flow-diagram img/attributes.svg
 style vertical
 
 process	P1  [fillcolor=red] Red bg
@@ -469,7 +469,7 @@ P2 -->  P3  [color=blue] blue arrow
 P1 -->  P3  [penwidth=2] thick
 ```
 
-![Attributes](./attributes.svg)
+![Attributes](./img/attributes.svg)
 
 For possible attributes, see:
 
@@ -492,7 +492,7 @@ source text.
 Multiple aliases can be used for an item. Aliases can be
 mixed with inline attributes.
 
-```data-flow-diagram attributes-alias.svg
+```data-flow-diagram img/attributes-alias.svg
 style vertical
 
 # stylistic aliases
@@ -528,7 +528,7 @@ P2 -->  P1  [FIXUP] issue fixed
 P1 -->  P3  [OK penwidth=2] all OK
 ```
 
-![Attributes](./attributes-alias.svg)
+![Attributes alias](./img/attributes-alias.svg)
 
 ### 7. Text wrapping and line breaks
 
@@ -540,7 +540,7 @@ Lines are wrapped by default by:
 - 14 columns for connections:
 
 ```
-data-flow-diagram wrapping-1.svg
+data-flow-diagram img/wrapping-1.svg
 style vertical
 
 process	P1  Do this and this and also this
@@ -550,7 +550,7 @@ P1 -->  P2  result of doing all this
 P2 -->  P1  result\nof doing all that
 ```
 
-![Wrapping-1](./wrapping-1.svg)
+![Wrapping-1](./img/wrapping-1.svg)
 
 The column widths can be changed by
 
@@ -559,23 +559,23 @@ The column widths can be changed by
 
 Bigger number of columns:
 
-```data-flow-diagram wrapping-2.svg
-#include #wrapping-1
+```data-flow-diagram img/wrapping-2.svg
+#include #img/wrapping-1
 style item-text-width 40
 style connection-text-width 40
 ```
 
-![Wrapping-2](./wrapping-2.svg)
+![Wrapping-2](./img/wrapping-2.svg)
 
 Smaller number of columns:
 
-```data-flow-diagram wrapping-3.svg
-#include #wrapping-1
+```data-flow-diagram img/wrapping-3.svg
+#include #img/wrapping-1
 style item-text-width 8
 style connection-text-width 6
 ```
 
-![Wrapping-2](./wrapping-3.svg)
+![Wrapping-2](./img/wrapping-3.svg)
 
 ### 8. Real-time aspects (SA/RT)
 
@@ -598,7 +598,7 @@ events.
 The following example models a lamp that can be switched on by a
 push-button, and will automatically turn off after a timeout:
 
-```data-flow-diagram realtime.svg
+```data-flow-diagram img/realtime.svg
 entity	Clock
 entity	Button
 entity	Lamp
@@ -616,7 +616,7 @@ Driver	--> Lamp	voltage
 Power	->> Driver	voltage
 ```
 
-![Real-time](./realtime.svg)
+![Real-time](./img/realtime.svg)
 
 - The timer has an internal hidden state, e.g. a counter.
 - While the lamp is on, one can re-trigger the timeout by a push.
@@ -631,13 +631,13 @@ For each snippet, an image file is generated.
 
 A snippet can be defined by such a code block:
 
-    ```data-flow-diagram FILENAME.svg
+    ```data-flow-diagram img/FILENAME.svg
 
     DFD_STATEMENTS
 
     ```
 
-The opening fence ` ```data-flow-diagram FILENAME.svg ` must specify
+The opening fence ` ```data-flow-diagram img/FILENAME.svg ` must specify
 `data-flow-diagram` as formatter, followed by an output file name with
 extension.
 
@@ -646,7 +646,7 @@ fence, so an arbitrary number of whitespaces can be inserted between the
 opening ` ``` ` and the `data-flow-diagram` formatter, like:
 
     ```
-    data-flow-diagram FILENAME.svg
+    data-flow-diagram img/FILENAME.svg
 
     DFD_STATEMENTS
 
@@ -655,13 +655,13 @@ opening ` ``` ` and the `data-flow-diagram` formatter, like:
 Note that only code blocks delimited by triple-backticks fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored:
 
-        data-flow-diagram FILENAME.svg
+        data-flow-diagram img/FILENAME.svg
 
         DFD_STATEMENTS
 
         indented code blocks are not captured.
 
-A generated image file can be used by e.g. `![Label](FILENAME.svg)`.
+A generated image file can be used by e.g. `![Label](img/FILENAME.svg)`.
 
 The source file of the present page is using the markdown feature.
 
@@ -694,18 +694,18 @@ Read on for more details.
 
 You can include a file as includee.
 
-Say you have a file named `includee.part` containing:
+Say you have a file named `dfd/includee.part` containing:
 
 ```
 process	P1	Process 1
 process	P2	Process 2
 ```
 
-In any other DFD, you can include the file `includee.part` by
-`#include includee.part`:
+In any other DFD, you can include the file `dfd/includee.part` by
+`#include dfd/includee.part`:
 
-```data-flow-diagram includer.svg
-#include includee.part
+```data-flow-diagram dfd/includer.svg
+#include dfd/includee.part
 
 P1 --> P2	connection
 ```
@@ -719,7 +719,7 @@ process	P2	Process 2
 P1 --> P2	connection
 ```
 
-![Includer 1](./includer.svg)
+![Includer](./dfd/includer.svg)
 
 ### 2. Including snippet
 
@@ -727,33 +727,33 @@ When using `--markdown`, you can include another snippet of the same document.
 
 #### a. Includee
 
-Here, you first define and generate the snippet `includee-snippet-1.svg`.
+Here, you first define and generate the snippet `dfd/includee-snippet-1.svg`.
 
-    ```data-flow-diagram includee-snippet-1.svg
+    ```data-flow-diagram dfd/includee-snippet-1.svg
     process	P3	Process 3
     process	P4	Process 4
     ```
 
-The includee generated image can be used: `![Included snippet](./includee-snippet-1.svg)`
+The includee generated image can be used: `![Includee snippet](./dfd/includee-snippet-1.svg)`
 
-![Included snippet](./includee-snippet-1.svg)
+![Includee snippet](./dfd/includee-snippet-1.svg)
 
 #### b. Includer
 
-Then, we use the snippet `includee-snippet-1.svg` (defined above) by
-`#include <includee-snippet-1`. The leading `#` mandates to include a
+Then, we use the snippet `dfd/includee-snippet-1.svg` (defined above) by
+`#include #dfd/includee-snippet-1`. The leading `#` mandates to include a
 snippet and not a file. Think of it like an anchor to the markdown snippet.
 The output format extension (here `.svg` for
-`includee-snippet-1`) must be ommitted.
+`dfd/includee-snippet-1`) must be ommitted.
 
-    ```data-flow-diagram includer-1.svg
+    ```data-flow-diagram dfd/includer-1.svg
 
-    #include #includee-snippet-1
+    #include #dfd/includee-snippet-1
 
     P3 --> P4	connection
     ```
 
-![Includer 1](./includer-1.svg)
+![Includer 1](./img/includer-1.svg)
 
 ### 3. Including snippet without generating an image for the includee
 
@@ -761,10 +761,10 @@ Like above, but without generating an image for the includee snippet.
 
 #### a. Includee
 
-Here we first define the snippet `includee-snippet-2`. A leading `#`
+Here we first define the snippet `dfd/includee-snippet-2`. A leading `#`
 mandates to not generate an image for it. Hence it needs no format extension.
 
-    ```data-flow-diagram #includee-snippet-2
+    ```data-flow-diagram #dfd/includee-snippet-2
     process	P5	Process 5
     process	P6	Process 6
     ```
@@ -773,14 +773,14 @@ mandates to not generate an image for it. Hence it needs no format extension.
 
 The includer works exactly like in the previous section.
 
-    ```data-flow-diagram includer-2.svg
+    ```data-flow-diagram dfd/includer-2.svg
 
-    #include #includee-snippet-2
+    #include #dfd/includee-snippet-2
 
     P5 --> P6	connection
     ```
 
-![Includer 2](./includer-2.svg)
+![Includer 2](./dfd/includer-2.svg)
 
 ### 4. Nested includes
 
@@ -796,18 +796,18 @@ The following markdown defines nested snippets:
     process	P3
     ```
 
-    ```data-flow-diagram nested-include.svg
+    ```data-flow-diagram dfd/nested-include.svg
     #include #snippet-2
     P1 --> P3	connection
     P2 --> P3	connection
     ```
 
 This yields the image: <br/>
-![Nested](./nested-include.svg)
+![Nested include](./img/nested-include.svg)
 
 Such a snippet (which includes itself) involves an infinite recursion:
 
-    ```data-flow-diagram snippet-recursive.svg
+    ```data-flow-diagram img/snippet-recursive.svg
     process	P1
     #include #snippet-recursive
     ```
@@ -819,7 +819,7 @@ ERROR: (most recent first)
   line 2: #include #snippet-recursive
   line 1: <snippet #snippet-recursive>
   line 2: #include #snippet-recursive
-  line 329: <file:README.md><snippet:snippet-recursive.svg>
+  line 329: <file:README.md><snippet:img/snippet-recursive.svg>
 Error: Recursive include of "#snippet-recursive"
 ```
 
@@ -858,37 +858,37 @@ Examples:
 Supposing you have this (referred) snippet:
 
 ```
-data-flow-diagram Feature-1.svg
+data-flow-diagram dfd/Feature-1.svg
 process	This    Do this
 ```
 
-![Feature-1](./Feature-1.svg)
+![Feature-1](./dfd/Feature-1.svg)
 
 In another graph (the referrer), you can refer to the **whole referred graph** by a `none` item:
 
-```data-flow-diagram Referrer-1.svg
+```data-flow-diagram img/Referrer-1.svg
 # Externals:
-none #Feature-1:
+none #dfd/Feature-1:
 
 # Internals:
 process	That    Do that
 
-Feature-1 --> That
+dfd/Feature-1 --> That
 ```
 
-![Referrer](./Referrer-1.svg)
+![Referrer 1](./img/Referrer-1.svg)
 
-- `#Feature-1` refers to the `Feature-1` snippet,
+- `#dfd/Feature-1` refers to the `dfd/Feature-1` snippet,
 - `:` without an item name, refers to the whole referred graph.
 - The referred graph must be used by its graph name, without the
-  `#` snippet prefix; here `Feature-1`.
+  `#` snippet prefix; here `dfd/Feature-1`.
 
 You can also refer to **items inside the referred graph**, by declaring a referrer of
 the same type, and specifying the referred item name:
 
-```data-flow-diagram Referrer-2.svg
+```data-flow-diagram img/Referrer-2.svg
 # Externals:
-process #Feature-1:This
+process #dfd/Feature-1:This
 
 # Internals:
 process	That    Do that
@@ -896,9 +896,9 @@ process	That    Do that
 This --> That
 ```
 
-![Referrer](./Referrer-2.svg)
+![Referrer 2](./img/Referrer-2.svg)
 
-- `#Feature-1` refers to the `Feature-1` snippet.
+- `#dfd/Feature-1` refers to the `dfd/Feature-1` snippet.
 - `:This` refers to the item named `This` in the referred snippet.
 - `process` must be used, in order to be of the same type as the referred item.
 - The referred item must be used by its item name; here `This`.
@@ -907,9 +907,9 @@ This --> That
 If the referred item has a label that the referrer wants to use, the referrer
 must re-declare the label:
 
-```data-flow-diagram Referrer-3.svg
+```data-flow-diagram img/Referrer-3.svg
 # Externals:
-process #Feature-1:This Do this
+process #dfd/Feature-1:This Do this
 
 # Internals:
 process	That    Do that
@@ -917,7 +917,7 @@ process	That    Do that
 This --> That
 ```
 
-![Referrer](./Referrer-3.svg)
+![Referrer 3](./img/Referrer-3.svg)
 
 #### b. Referring to another DFD file
 
@@ -925,7 +925,7 @@ All the latter can be done with referred graph as separate **file**, instead of 
 
 In such case, the file name of the referred graph shall be used.
 
-Supposing you have a file named `Feature-2.dfd`, and containing:
+Supposing you have a file named `dfd/Feature-2.dfd`, and containing:
 
 ```
 process These	Do these
@@ -933,22 +933,22 @@ process These	Do these
 
 You can refer to the above graph as follows:
 
-```data-flow-diagram dependant-4.svg
+```data-flow-diagram img/dependant-4.svg
 # Externals:
-none    Feature-2.dfd:
-process Feature-2.dfd:These
+none    dfd/Feature-2.dfd:
+process dfd/Feature-2.dfd:These
 
 # Internals:
 process	That    Do that
 
-Feature-2   --> That
+dfd/Feature-2   --> That
 That        --> These
 ```
 
-![Dependant](./dependant-4.svg)
+![Dependant 4](./img/dependant-4.svg)
 
-- `Feature-2.dfd` refers to the `Feature-2.dfd` file.
-- The `Feature-2` name (without `.dfd` extension) must be further used.
+- `dfd/Feature-2.dfd` refers to the `dfd/Feature-2.dfd` file.
+- The `dfd/Feature-2` name (without `.dfd` extension) must be further used.
 - The same other rules (e.g. accessing items of the referred graph) apply as
   with snippets.
 
