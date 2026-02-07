@@ -1,3 +1,7 @@
+## Version 1.14.5:
+
+- The "only" filter now accepts up/down propagation of inclusion.
+
 ## Version 1.14.4:
 
 - Fix bug affecting frames and only/without filters.

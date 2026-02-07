@@ -26,11 +26,8 @@ def build(
 
     items_by_name = parser.check(statements)
 
-    # keep/remove statements based on only/without statements
-    statements = handle_only(statements, options.debug)
-    statements = handle_without(statements, options.debug)
-
-    statements = filter_statements(statements)
+    statements = handle_only_without_filters(statements, options.debug)
+    statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
 
     if options.no_graph_title:
@@ -303,7 +300,7 @@ def generate_dot(
     return gen.generate_dot_text(title)
 
 
-def filter_statements(statements: model.Statements) -> model.Statements:
+def remove_unused_hidables(statements: model.Statements) -> model.Statements:
     # collect used items
     connected_items = set()
     for statement in statements:
@@ -369,16 +366,15 @@ def handle_options(
     return new_statements, options
 
 
-def collect_only_names(statements: model.Statements) -> set[str]:
+def find_neighbors(only: model.Only, statements: model.Statements) -> set[str]:
     """Collect names from filter statements of the given type."""
-    names: set[str] = set()
 
     def find_down_neighbors(names: set[str]) -> set[str]:
         neighbor_names: set[str] = set()
         for statement in statements:
             match statement:
                 case model.Connection() as conn:
-                    if conn.dst in names and conn.src not in names:
+                    if conn.dst in names:
                         neighbor_names.add(conn.src)
                 case _:
                     continue
@@ -389,169 +385,120 @@ def collect_only_names(statements: model.Statements) -> set[str]:
         for statement in statements:
             match statement:
                 case model.Connection() as conn:
-                    if conn.src in names and conn.dst not in names:
+                    if conn.src in names:
                         neighbor_names.add(conn.dst)
                 case _:
                     continue
         return neighbor_names
 
-    for s in statements:
-        if isinstance(s, model.Only):
-            # add names from this Only statement
-            names.update(s.names)
+    neighbor_names: set[str] = set()
 
-            # propagate to up-neighbors if needed
-            neighbor_names = set(s.names)
-            for i in range(s.up_neighbors):
-                neighbor_names = find_up_neighbors(neighbor_names)
-                names.update(neighbor_names)
+    down_neighbor_names = set(only.names)
+    for i in range(only.down_neighbors):
+        down_neighbor_names = find_down_neighbors(down_neighbor_names)
+        neighbor_names.update(down_neighbor_names)
 
-            # propagate to down-neighbors if needed
-            neighbor_names = set(s.names)
-            for i in range(s.down_neighbors):
-                neighbor_names = find_down_neighbors(neighbor_names)
-                names.update(neighbor_names)
-    return names
+    up_neighbor_names = set(only.names)
+    for i in range(only.up_neighbors):
+        up_neighbor_names = find_up_neighbors(up_neighbor_names)
+        neighbor_names.update(up_neighbor_names)
+
+    return neighbor_names
 
 
-def collect_without_names(statements: model.Statements) -> set[str]:
-    """Collect names from filter statements of the given type."""
-    names: set[str] = set()
-    for s in statements:
-        if isinstance(s, model.Without):
-            names.update(s.names)
-    return names
-
-
-def handle_only(
+def handle_only_without_filters(
     statements: model.Statements, debug: bool = False
 ) -> model.Statements:
-    """Filter statements based on "only" statements.
-    If there are no "only" statements, return the original list."""
+    initial_names = set(
+        [s.name for s in statements if isinstance(s, model.Item)]
+    )
+    all_names = initial_names.copy()
+    kept_names: set[str] | None = None
 
-    # collect only statements
-    only_names = collect_only_names(statements)
-    if not only_names:
-        return statements
-    if debug:
-        print(f"'Only' list: {only_names}")
+    def check_names(names: set[str], in_names: set[str], prefix: str) -> None:
+        if not names.issubset(initial_names):
+            diff = ", ".join(names - initial_names)
+            raise model.DfdException(f'{prefix} Name(s) unknown: {diff}')
 
-    # filter statements
+        if not names.issubset(in_names):
+            diff = ", ".join(names - in_names)
+            raise model.DfdException(
+                f'{prefix} Name(s) no longer available due to previous filters: {diff}'
+            )
+
+    # collect filtered names
+    for statement in statements:
+        prefix = model.mk_err_prefix_from(statement.source)
+
+        match statement:
+            case model.Only() as only:
+                if kept_names is None:
+                    kept_names = set()
+
+                # all Only names must be valid
+                names = set(only.names)
+                check_names(names, all_names, prefix)
+
+                # add names from this Only statement
+                kept_names.update(only.names)
+
+                # add neighbors
+                kept_names.update(find_neighbors(only, statements))
+
+            case model.Without() as without:
+                if kept_names is None:
+                    kept_names = all_names.copy()
+
+                # all Without names must be valid
+                names = set(without.names)
+                check_names(names, kept_names, prefix)
+
+                # remove names from this Without statement
+                kept_names.difference_update(names)
+
+                # reset the state to the currently kept items
+                all_names = kept_names
+                kept_names = None
+
+    kept_names = kept_names if kept_names is not None else all_names
+
+    # apply filters
     new_statements = []
-    found: set[str] = set()
     for statement in statements:
         if debug:
             print(f"\nOnly: handling statement: {statement}")
         match statement:
             case model.Item() as item:
-                if item.name in only_names:
-                    found.add(item.name)
-
                 # skip nodes that are not in the only list
-                if item.name not in only_names:
+                if item.name not in kept_names:
                     if debug:
-                        print("=> Skipping: its name is not in the 'only' list")
+                        print("=> Skipping: its name is not in the kept list")
                     continue
+
             case model.Connection() as conn:
-                # skip connections if either src or dst is not in the only list
-                if conn.src not in only_names or conn.dst not in only_names:
+                # skip connections if either src or dst is not in the kept list
+                if conn.src not in kept_names or conn.dst not in kept_names:
                     if debug:
-                        print("=> Skipping: some end is not in the 'only' list")
+                        print("=> Skipping: some end is not in the kept list")
                     continue
+
             case model.Frame() as frame:
                 names = set(frame.items)
-                # skip frames if none of the items are in the only list
-                if not names.intersection(only_names):
+                # skip frames if none of the items are in the kept list
+                if not names.intersection(kept_names):
                     if debug:
-                        print("=> Skipping: no items are in the 'only' list")
+                        print("=> Skipping: no items are in the kept list")
                     continue
                 else:
-                    # adjust frame items by removing those not in the only list
-                    new_items = [n for n in frame.items if n in only_names]
+                    # adjust frame items by removing those not in the kept list
+                    new_items = [n for n in frame.items if n in kept_names]
                     if debug:
-                        print(
-                            f"=> Adjusting items : {frame.items} -> {new_items}"
-                        )
+                        print(f"=> Adjusting: {frame.items} -> {new_items}")
                     frame.items = new_items
 
         # keep statement
         if debug:
             print("=> Keeping statement")
         new_statements.append(statement)
-
-    if found != only_names:
-        diff = ", ".join(only_names - found)
-        raise model.DfdException(
-            f"Warning: some names in the 'only' list were not found: " f"{diff}"
-        )
-
-    return new_statements
-
-
-def handle_without(
-    statements: model.Statements, debug: bool = False
-) -> model.Statements:
-    """Filter statements based on "without" statements.
-    If there are no "without" statements, return the original list."""
-
-    # collect without statements
-    without_names = collect_without_names(statements)
-    if not without_names:
-        return statements
-    if debug:
-        print(f"'Without' list: {without_names}")
-
-    # filter statements
-    new_statements = []
-    found: set[str] = set()
-    for statement in statements:
-        if debug:
-            print(f"\nWithout: handling statement: {statement}")
-        match statement:
-            case model.Item() as item:
-                if item.name in without_names:
-                    found.add(item.name)
-                # skip nodes that are not in the without list
-                if item.name in without_names:
-                    if debug:
-                        print("=> Skipping: its name is in the 'without' list")
-                    continue
-            case model.Connection() as conn:
-                # skip connections if either src or dst is in the without list
-                if conn.src in without_names or conn.dst in without_names:
-                    if debug:
-                        print("=> Skipping: some end is in the 'without' list")
-                    continue
-            case model.Frame() as frame:
-                names = set(frame.items)
-                # skip frames if all of the items is in the without list
-                if names.issubset(without_names):
-                    if debug:
-                        print(
-                            "=> Skipping: all items are in the 'without' list"
-                        )
-                    continue
-                else:
-                    # adjust frame items by removing those in the without list
-                    new_items = [
-                        n for n in frame.items if n not in without_names
-                    ]
-                    if debug:
-                        print(
-                            f"=> Adjusting items: {frame.items} -> {new_items}"
-                        )
-                    frame.items = new_items
-
-        # keep statement
-        if debug:
-            print("=> Keeping statement")
-        new_statements.append(statement)
-
-    if found != without_names:
-        diff = ", ".join(without_names - found)
-        raise model.DfdException(
-            f"Warning: some names in the 'without' list were not found: "
-            f"{diff}"
-        )
 
     return new_statements
