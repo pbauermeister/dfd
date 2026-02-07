@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 122)">
 <title>D</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-122 204,-122 204,4 -4,4"/>
-<text text-anchor="middle" x="100" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; nested&#45;include &#45;</text>
+<text text-anchor="middle" x="100" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; img/nested&#45;include &#45;</text>
 <!-- P1 -->
 <g id="node1" class="node">
 <title>P1</title>

@@ -8,10 +8,10 @@ process	P2
 process	P3
 ```
 
-```data-flow-diagram nested-include.svg
+```data-flow-diagram img/nested-include.svg
 #include #snippet-2
 
 P1 --> P3	connection
 P2 --> P3	connection
 ```
-![Nested](./nested-include.svg)
+![Nested](./img/nested-include.svg)

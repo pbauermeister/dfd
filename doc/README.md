@@ -185,7 +185,7 @@ P1 <<- P2       a continuous back flow
 P1 ::> *	an untargetted signal
 ```
 
-![Creating connections](./img/connections-sugar.svg)
+![Connection sugars](./img/connections-sugar.svg)
 
 ### 4. Optional label
 
@@ -214,7 +214,7 @@ none	Point
 Process --> Channel
 ```
 
-![Creating items](./img/items-unlabelled.svg)
+![Unlabelled items](./img/items-unlabelled.svg)
 
 ### 5. Styling
 
@@ -285,7 +285,7 @@ P1 --> P3
 P3 --> P2
 ```
 
-![Frames](./img/frame-without-label.svg)
+![Frames without label](./img/frame-without-label.svg)
 
 Frame with styling:
 
@@ -300,7 +300,7 @@ P1 --> P3
 P3 --> P2
 ```
 
-![Frames](./img/frame-blue.svg)
+![Blue frame](./img/frame-blue.svg)
 
 ## C. Details with examples
 
@@ -326,7 +326,7 @@ Config	<->  Compute	parameters
 Compute --> API  	records
 ```
 
-![Creating items](./img/complete-example.svg)
+![Complete example](./img/complete-example.svg)
 
 ### 2. Items rendered only if used (hidable)
 
@@ -445,7 +445,7 @@ P1 -->? P3
 # equivalent to: flow? P1 P3
 ```
 
-![Relaxed](./img/constraint-relaxed.svg)
+![Relaxed constraint](./img/constraint-relaxed.svg)
 
 - You can see that `P1 --> P3` did not lead `P2` to be shifted. This
   way, the P1 -> P2 -> P3 alignment reflects a more natural flow.
@@ -528,7 +528,7 @@ P2 -->  P1  [FIXUP] issue fixed
 P1 -->  P3  [OK penwidth=2] all OK
 ```
 
-![Attributes](./img/attributes-alias.svg)
+![Attributes alias](./img/attributes-alias.svg)
 
 ### 7. Text wrapping and line breaks
 
@@ -694,18 +694,18 @@ Read on for more details.
 
 You can include a file as includee.
 
-Say you have a file named `includee.part` containing:
+Say you have a file named `dfd/includee.part` containing:
 
 ```
 process	P1	Process 1
 process	P2	Process 2
 ```
 
-In any other DFD, you can include the file `includee.part` by
-`#include includee.part`:
+In any other DFD, you can include the file `dfd/includee.part` by
+`#include dfd/includee.part`:
 
-```data-flow-diagram includer.svg
-#include includee.part
+```data-flow-diagram dfd/includer.svg
+#include dfd/includee.part
 
 P1 --> P2	connection
 ```
@@ -719,7 +719,7 @@ process	P2	Process 2
 P1 --> P2	connection
 ```
 
-![Includer 1](./includer.svg)
+![Includer](./dfd/includer.svg)
 
 ### 2. Including snippet
 
@@ -727,33 +727,33 @@ When using `--markdown`, you can include another snippet of the same document.
 
 #### a. Includee
 
-Here, you first define and generate the snippet `includee-snippet-1.svg`.
+Here, you first define and generate the snippet `dfd/includee-snippet-1.svg`.
 
-    ```data-flow-diagram includee-snippet-1.svg
+    ```data-flow-diagram dfd/includee-snippet-1.svg
     process	P3	Process 3
     process	P4	Process 4
     ```
 
-The includee generated image can be used: `![Included snippet](./includee-snippet-1.svg)`
+The includee generated image can be used: `![Includee snippet](./dfd/includee-snippet-1.svg)`
 
-![Included snippet](./includee-snippet-1.svg)
+![Includee snippet](./dfd/includee-snippet-1.svg)
 
 #### b. Includer
 
-Then, we use the snippet `includee-snippet-1.svg` (defined above) by
-`#include <includee-snippet-1`. The leading `#` mandates to include a
+Then, we use the snippet `dfd/includee-snippet-1.svg` (defined above) by
+`#include #dfd/includee-snippet-1`. The leading `#` mandates to include a
 snippet and not a file. Think of it like an anchor to the markdown snippet.
 The output format extension (here `.svg` for
-`includee-snippet-1`) must be ommitted.
+`dfd/includee-snippet-1`) must be ommitted.
 
-    ```data-flow-diagram includer-1.svg
+    ```data-flow-diagram dfd/includer-1.svg
 
-    #include #includee-snippet-1
+    #include #dfd/includee-snippet-1
 
     P3 --> P4	connection
     ```
 
-![Includer 1](./includer-1.svg)
+![Includer 1](./img/includer-1.svg)
 
 ### 3. Including snippet without generating an image for the includee
 
@@ -761,10 +761,10 @@ Like above, but without generating an image for the includee snippet.
 
 #### a. Includee
 
-Here we first define the snippet `includee-snippet-2`. A leading `#`
+Here we first define the snippet `dfd/includee-snippet-2`. A leading `#`
 mandates to not generate an image for it. Hence it needs no format extension.
 
-    ```data-flow-diagram #includee-snippet-2
+    ```data-flow-diagram #dfd/includee-snippet-2
     process	P5	Process 5
     process	P6	Process 6
     ```
@@ -773,14 +773,14 @@ mandates to not generate an image for it. Hence it needs no format extension.
 
 The includer works exactly like in the previous section.
 
-    ```data-flow-diagram includer-2.svg
+    ```data-flow-diagram dfd/includer-2.svg
 
-    #include #includee-snippet-2
+    #include #dfd/includee-snippet-2
 
     P5 --> P6	connection
     ```
 
-![Includer 2](./includer-2.svg)
+![Includer 2](./dfd/includer-2.svg)
 
 ### 4. Nested includes
 
@@ -796,14 +796,14 @@ The following markdown defines nested snippets:
     process	P3
     ```
 
-    ```data-flow-diagram img/nested-include.svg
+    ```data-flow-diagram dfd/nested-include.svg
     #include #snippet-2
     P1 --> P3	connection
     P2 --> P3	connection
     ```
 
 This yields the image: <br/>
-![Nested](./nested-include.svg)
+![Nested include](./img/nested-include.svg)
 
 Such a snippet (which includes itself) involves an infinite recursion:
 
@@ -858,37 +858,37 @@ Examples:
 Supposing you have this (referred) snippet:
 
 ```
-data-flow-diagram Feature-1.svg
+data-flow-diagram dfd/Feature-1.svg
 process	This    Do this
 ```
 
-![Feature-1](./Feature-1.svg)
+![Feature-1](./dfd/Feature-1.svg)
 
 In another graph (the referrer), you can refer to the **whole referred graph** by a `none` item:
 
 ```data-flow-diagram img/Referrer-1.svg
 # Externals:
-none #Feature-1:
+none #dfd/Feature-1:
 
 # Internals:
 process	That    Do that
 
-Feature-1 --> That
+dfd/Feature-1 --> That
 ```
 
-![Referrer](./img/Referrer-1.svg)
+![Referrer 1](./img/Referrer-1.svg)
 
-- `#Feature-1` refers to the `Feature-1` snippet,
+- `#dfd/Feature-1` refers to the `dfd/Feature-1` snippet,
 - `:` without an item name, refers to the whole referred graph.
 - The referred graph must be used by its graph name, without the
-  `#` snippet prefix; here `Feature-1`.
+  `#` snippet prefix; here `dfd/Feature-1`.
 
 You can also refer to **items inside the referred graph**, by declaring a referrer of
 the same type, and specifying the referred item name:
 
 ```data-flow-diagram img/Referrer-2.svg
 # Externals:
-process #Feature-1:This
+process #dfd/Feature-1:This
 
 # Internals:
 process	That    Do that
@@ -896,9 +896,9 @@ process	That    Do that
 This --> That
 ```
 
-![Referrer](./img/Referrer-2.svg)
+![Referrer 2](./img/Referrer-2.svg)
 
-- `#Feature-1` refers to the `Feature-1` snippet.
+- `#dfd/Feature-1` refers to the `dfd/Feature-1` snippet.
 - `:This` refers to the item named `This` in the referred snippet.
 - `process` must be used, in order to be of the same type as the referred item.
 - The referred item must be used by its item name; here `This`.
@@ -909,7 +909,7 @@ must re-declare the label:
 
 ```data-flow-diagram img/Referrer-3.svg
 # Externals:
-process #Feature-1:This Do this
+process #dfd/Feature-1:This Do this
 
 # Internals:
 process	That    Do that
@@ -917,7 +917,7 @@ process	That    Do that
 This --> That
 ```
 
-![Referrer](./img/Referrer-3.svg)
+![Referrer 3](./img/Referrer-3.svg)
 
 #### b. Referring to another DFD file
 
@@ -925,7 +925,7 @@ All the latter can be done with referred graph as separate **file**, instead of 
 
 In such case, the file name of the referred graph shall be used.
 
-Supposing you have a file named `Feature-2.dfd`, and containing:
+Supposing you have a file named `dfd/Feature-2.dfd`, and containing:
 
 ```
 process These	Do these
@@ -935,20 +935,20 @@ You can refer to the above graph as follows:
 
 ```data-flow-diagram img/dependant-4.svg
 # Externals:
-none    Feature-2.dfd:
-process Feature-2.dfd:These
+none    dfd/Feature-2.dfd:
+process dfd/Feature-2.dfd:These
 
 # Internals:
 process	That    Do that
 
-Feature-2   --> That
+dfd/Feature-2   --> That
 That        --> These
 ```
 
-![Dependant](./img/dependant-4.svg)
+![Dependant 4](./img/dependant-4.svg)
 
-- `Feature-2.dfd` refers to the `Feature-2.dfd` file.
-- The `Feature-2` name (without `.dfd` extension) must be further used.
+- `dfd/Feature-2.dfd` refers to the `dfd/Feature-2.dfd` file.
+- The `dfd/Feature-2` name (without `.dfd` extension) must be further used.
 - The same other rules (e.g. accessing items of the referred graph) apply as
   with snippets.
 

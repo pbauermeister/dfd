@@ -8,13 +8,13 @@ OPTS=
 (
     cd doc
 
-    rm -f img/*.svg
+    rm -f */*.svg
 
     for doc in *.md; do
 	../data-flow-diagram $OPTS $doc --markdown
     done
 
-    for dfd in *.dfd; do
+    for dfd in dfd/*.dfd; do
 	../data-flow-diagram $OPTS $dfd
     done
 )
