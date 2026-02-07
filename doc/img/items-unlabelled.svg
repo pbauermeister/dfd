@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 252.5)">
 <title>D</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-252.5 227.58,-252.5 227.58,4 -4,4"/>
-<text text-anchor="middle" x="111.79" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; items&#45;unlabelled &#45;</text>
+<text text-anchor="middle" x="111.79" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; img/items&#45;unlabelled &#45;</text>
 <!-- Process -->
 <g id="node1" class="node">
 <title>Process</title>

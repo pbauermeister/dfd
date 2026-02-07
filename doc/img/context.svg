@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 367.28)">
 <title>D</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-367.28 357.04,-367.28 357.04,4 -4,4"/>
-<text text-anchor="middle" x="176.52" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; context &#45;</text>
+<text text-anchor="middle" x="176.52" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; img/context &#45;</text>
 <!-- P -->
 <g id="node1" class="node">
 <title>P</title>

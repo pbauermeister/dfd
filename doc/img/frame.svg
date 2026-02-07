@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 172)">
 <title>D</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-172 164,-172 164,4 -4,4"/>
-<text text-anchor="middle" x="80" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; frame &#45;</text>
+<text text-anchor="middle" x="80" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; img/frame &#45;</text>
 <g id="clust1" class="cluster">
 <title>cluster_0</title>
 <polygon fill="none" stroke="black" stroke-dasharray="5,2" points="8,-36 8,-160 78,-160 78,-36 8,-36"/>

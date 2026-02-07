@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 125.5)">
 <title>D</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-125.5 639.87,-125.5 639.87,4 -4,4"/>
-<text text-anchor="middle" x="317.93" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; complete&#45;example &#45;</text>
+<text text-anchor="middle" x="317.93" y="-6.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000060">&#45; img/complete&#45;example &#45;</text>
 <!-- Acquire -->
 <g id="node1" class="node">
 <title>Acquire</title>
