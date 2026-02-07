@@ -93,7 +93,8 @@ class Filter(Statement):
 
 @dataclass
 class Only(Filter):
-    pass
+    up_neighbors: int
+    down_neighbors: int
 
 
 @dataclass

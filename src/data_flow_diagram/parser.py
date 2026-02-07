@@ -217,24 +217,39 @@ def parse_attrib(source: model.SourceLine) -> model.Statement:
     return model.Attrib(source, alias, text)
 
 
-def parse_filter(source: model.SourceLine) -> list[str]:
-    """Parse !/~ NAME[S]"""
+def parse_only(source: model.SourceLine) -> model.Statement:
+    """Parse ! NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
         raise model.DfdException(f"One or more arguments are expected")
-    names = terms[1:]
-    return names
 
+    up = 0
+    down = 0
 
-def parse_only(source: model.SourceLine) -> model.Statement:
-    """Parse ! NAME[S]"""
-    names = parse_filter(source)
-    return model.Only(source, names)
+    args = terms[1:]
+    while args:
+        arg = args[0]
+        if arg.isdecimal():
+            up = down = int(arg)
+            args = args[1:]
+        elif len(arg) > 1 and arg[0] in "+-" and arg[1:].isdecimal():
+            if arg[0] == "+":
+                up = int(arg[1:])
+            else:
+                down = int(arg[1:])
+            args = args[1:]
+        else:
+            break
+
+    if len(args) == 0:
+        raise model.DfdException(f"One or more names are expected")
+
+    return model.Only(source, args, up, down)
 
 
 def parse_without(source: model.SourceLine) -> model.Statement:
     """Parse ~ NAME[S]"""
-    names = parse_filter(source)
+    names = source.text.split()[1:]
     return model.Without(source, names)
 
 
@@ -393,6 +408,15 @@ def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
 
 
 def apply_syntactic_sugars(src_line: str) -> str:
+
+    # allow arguments to be sticked to the filter mnemonics
+    if src_line and src_line[0] in ("!~"):
+        if len(src_line) > 1 and src_line[1] != " ":
+            # insert a space after the filter, so that it is recognized as a filter
+            new_line = src_line[0] + " " + src_line[1:]
+            return new_line
+
+    # others syntactic sugars apply on 3 or more terms
     terms = src_line.split()
     if len(terms) < 3:
         return src_line
