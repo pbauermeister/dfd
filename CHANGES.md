@@ -1,3 +1,38 @@
+## Version 1.14.6:
+
+- Both "only" and "without" filters accept up/down propagation.
+
+- They also can be told to filter only neighbors, by e.g. "~+>3 NODE"
+  meaning: "remove 3 downstream neighbors, but not the NODE itself".
+
+- Filters summary:
+
+  ```
+  # Only-filter
+  # -----------
+
+  ! NODES          # keep NODES
+
+  # Neighbors: + / - / +-
+  !+NUM NODES      # keep NODES and also NUM downstream neighbors
+  !-NUM NODES      # keep NODES and also NUM upstream neighbors
+  !+-NUM NODES     # keep NODES and also NUM neighbors
+
+  # Only neigbors: >
+  !+>NUM NODES     # keep NUM downstream neighbors (but not NODES themselves)
+                   # ditto for upstream
+
+  # Without-filter
+  # --------------
+
+  ~ NODES          # remove NODES
+
+  # Etc. similarly as for the only-filter.
+  ```
+
+- They also can be told to filter only neighbors, by e.g. "~+>3 NODE"
+  meaning: "remove 3 downstream neighbors, but not the NODE itself".
+
 ## Version 1.14.5:
 
 - The "only" filter now accepts up/down propagation of inclusion.
