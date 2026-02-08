@@ -367,11 +367,11 @@ def handle_options(
 
 
 def find_neighbors(
-    filter: model.Filter, statements: model.Statements
+    filter: model.Filter, statements: model.Statements, max_neighbors: int
 ) -> set[str]:
     """Collect names from filter statements of the given type."""
 
-    def find_neighbors(names: set[str], find_down: bool) -> set[str]:
+    def _find_neighbors(names: set[str], find_down: bool) -> set[str]:
         neighbor_names: set[str] = set()
         for statement in statements:
             match statement:
@@ -398,18 +398,23 @@ def find_neighbors(
 
     neighbor_names: set[str] = set()
 
+    def _nb(nb: int) -> int:
+        if nb < 0:
+            return max_neighbors
+        return nb
+
     # find down neighbors by successive waves of connections
     names = set(filter.names)
-    for i in range(filter.neighbors_down):
-        names = find_neighbors(names, find_down=True)
+    for i in range(_nb(filter.neighbors_down)):
+        names = _find_neighbors(names, find_down=True)
         if not names:
             break
         neighbor_names.update(names)
 
     # find up neighbors by successive waves of connections
     names = set(filter.names)
-    for i in range(filter.neighbors_up):
-        names = find_neighbors(names, find_down=False)
+    for i in range(_nb(filter.neighbors_up)):
+        names = _find_neighbors(names, find_down=False)
         if not names:
             break
         neighbor_names.update(names)
@@ -424,7 +429,7 @@ def handle_filters(
     all_names = set([s.name for s in statements if isinstance(s, model.Item)])
     kept_names: set[str] | None = None
 
-    def check_names(names: set[str], in_names: set[str], prefix: str) -> None:
+    def _check_names(names: set[str], in_names: set[str], prefix: str) -> None:
         if not names.issubset(all_names):
             diff = ", ".join(names - all_names)
             raise model.DfdException(f'{prefix} Name(s) unknown: {diff}')
@@ -446,14 +451,16 @@ def handle_filters(
 
                 # all Only names must be valid
                 names = set(only.names)
-                check_names(names, all_names, prefix)
+                _check_names(names, all_names, prefix)
 
                 # add names from this Only statement
                 if not only.neighbors_only:
                     kept_names.update(only.names)
 
                 # add neighbors
-                kept_names.update(find_neighbors(only, statements))
+                kept_names.update(
+                    find_neighbors(only, statements, len(all_names))
+                )
 
             case model.Without() as without:
                 if kept_names is None:
@@ -461,7 +468,7 @@ def handle_filters(
 
                 # all Without names must be valid
                 names = set(without.names)
-                check_names(names, kept_names, prefix)
+                _check_names(names, kept_names, prefix)
 
                 # remove names from this Without statement
                 if not without.neighbors_only:
@@ -469,7 +476,7 @@ def handle_filters(
 
                 # remove neighbors
                 kept_names.difference_update(
-                    find_neighbors(without, statements)
+                    find_neighbors(without, statements, len(all_names))
                 )
 
     kept_names = kept_names if kept_names is not None else all_names

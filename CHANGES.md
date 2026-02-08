@@ -1,4 +1,4 @@
-## Version 1.14.6:
+## Version 1.14.6.post1:
 
 - Both "only" and "without" filters accept up/down propagation.
 
@@ -14,6 +14,7 @@
   ! NODES          # keep NODES
 
   # Neighbors: + / - / +-
+  # where NUM is an integer or * for all:
   !+NUM NODES      # keep NODES and also NUM downstream neighbors
   !-NUM NODES      # keep NODES and also NUM upstream neighbors
   !+-NUM NODES     # keep NODES and also NUM neighbors
@@ -32,6 +33,8 @@
 
 - They also can be told to filter only neighbors, by e.g. "~+>3 NODE"
   meaning: "remove 3 downstream neighbors, but not the NODE itself".
+
+- TODO: update doc.
 
 ## Version 1.14.5:
 

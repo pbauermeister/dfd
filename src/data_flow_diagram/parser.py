@@ -156,7 +156,7 @@ def parse(
         try:
             statement = f(source)
         except model.DfdException as e:
-            raise model.DfdException(f'{error_prefix}{e}"')
+            raise model.DfdException(f'{error_prefix}{e}')
 
         match statement:
             case model.Item() as item:
@@ -250,12 +250,15 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
             is_only = True
             arg = arg[1:]
 
-        if not arg.isdigit():
+        if arg == "*":
+            val = -1  # special value for "all neighbors"
+        elif arg.isdigit():
+            val = int(arg)
+        else:
             raise model.DfdException(
-                f"Neighborhood size must be an integer: {arg}"
+                f"Neighborhood size must be an integer or '*', not: {arg}"
             )
 
-        val = int(arg)
         if is_up:
             up = val
         if is_down:
