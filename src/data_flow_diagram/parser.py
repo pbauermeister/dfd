@@ -144,8 +144,8 @@ def parse(
             "signal.r?": parse_signal_r_q,
             model.FRAME: parse_frame,
             model.ATTRIB: parse_attrib,
-            model.ONLY: parse_only,
-            model.WITHOUT: parse_without,
+            model.ONLY: parse_filter,
+            model.WITHOUT: parse_filter,
         }.get(word)
 
         if f is None:
@@ -217,40 +217,60 @@ def parse_attrib(source: model.SourceLine) -> model.Statement:
     return model.Attrib(source, alias, text)
 
 
-def parse_only(source: model.SourceLine) -> model.Statement:
-    """Parse ! NAME[S]"""
+def parse_filter(source: model.SourceLine) -> model.Statement:
+    """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
         raise model.DfdException(f"One or more arguments are expected")
 
-    up = 0
-    down = 0
+    up = down = 0
+    is_only = False
 
     args = terms[1:]
+
+    # first arguments may be +N or -N, which specify the number of down/up neighbors to include in the filter
     while args:
         arg = args[0]
-        if arg.isdecimal():
-            up = down = int(arg)
-            args = args[1:]
-        elif len(arg) > 1 and arg[0] in "+-" and arg[1:].isdecimal():
-            if arg[0] == "+":
-                up = int(arg[1:])
-            else:
-                down = int(arg[1:])
-            args = args[1:]
-        else:
-            break
+        if arg[0] not in "+-":
+            break  # no neighbor specification
+
+        is_up = is_down = False
+
+        if arg.startswith("+-") or arg.startswith("-+"):
+            is_up = is_down = True
+            arg = arg[2:]
+        elif arg.startswith("+"):
+            is_up = True
+            arg = arg[1:]
+        elif arg.startswith("-"):
+            is_down = True
+            arg = arg[1:]
+
+        if arg.startswith(">"):
+            is_only = True
+            arg = arg[1:]
+
+        if not arg.isdigit():
+            raise model.DfdException(
+                f"Neighborhood size must be an integer: {arg}"
+            )
+
+        val = int(arg)
+        if is_up:
+            up = val
+        if is_down:
+            down = val
+
+        args = args[1:]
 
     if len(args) == 0:
         raise model.DfdException(f"One or more names are expected")
 
-    return model.Only(source, args, up, down)
-
-
-def parse_without(source: model.SourceLine) -> model.Statement:
-    """Parse ~ NAME[S]"""
-    names = source.text.split()[1:]
-    return model.Without(source, names)
+    cmd = terms[0]
+    if cmd == model.ONLY:
+        return model.Only(source, args, up, down, is_only)
+    else:  # cmd == model.WITHOUT:
+        return model.Without(source, args, up, down, is_only)
 
 
 def parse_process(source: model.SourceLine) -> model.Statement:

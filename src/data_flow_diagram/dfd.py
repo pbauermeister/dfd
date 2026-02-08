@@ -26,7 +26,7 @@ def build(
 
     items_by_name = parser.check(statements)
 
-    statements = handle_only_without_filters(statements, options.debug)
+    statements = handle_filters(statements, options.debug)
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
 
@@ -366,58 +366,67 @@ def handle_options(
     return new_statements, options
 
 
-def find_neighbors(only: model.Only, statements: model.Statements) -> set[str]:
+def find_neighbors(
+    filter: model.Filter, statements: model.Statements
+) -> set[str]:
     """Collect names from filter statements of the given type."""
 
-    def find_down_neighbors(names: set[str]) -> set[str]:
+    def find_neighbors(names: set[str], find_down: bool) -> set[str]:
         neighbor_names: set[str] = set()
         for statement in statements:
             match statement:
                 case model.Connection() as conn:
-                    if conn.dst in names:
-                        neighbor_names.add(conn.src)
-                case _:
-                    continue
-        return neighbor_names
+                    src, dst = conn.src, conn.dst
+                    if conn.reversed:
+                        src, dst = dst, src
 
-    def find_up_neighbors(names: set[str]) -> set[str]:
-        neighbor_names: set[str] = set()
-        for statement in statements:
-            match statement:
-                case model.Connection() as conn:
-                    if conn.src in names:
-                        neighbor_names.add(conn.dst)
+                    if conn.type in (model.BFLOW, model.UFLOW):
+                        if dst in names:
+                            neighbor_names.add(src)
+                        if src in names:
+                            neighbor_names.add(dst)
+                    else:
+                        if find_down:
+                            if dst in names:
+                                neighbor_names.add(src)
+                        else:
+                            if src in names:
+                                neighbor_names.add(dst)
                 case _:
                     continue
         return neighbor_names
 
     neighbor_names: set[str] = set()
 
-    down_neighbor_names = set(only.names)
-    for i in range(only.down_neighbors):
-        down_neighbor_names = find_down_neighbors(down_neighbor_names)
-        neighbor_names.update(down_neighbor_names)
+    # find down neighbors by successive waves of connections
+    names = set(filter.names)
+    for i in range(filter.neighbors_down):
+        names = find_neighbors(names, find_down=True)
+        if not names:
+            break
+        neighbor_names.update(names)
 
-    up_neighbor_names = set(only.names)
-    for i in range(only.up_neighbors):
-        up_neighbor_names = find_up_neighbors(up_neighbor_names)
-        neighbor_names.update(up_neighbor_names)
+    # find up neighbors by successive waves of connections
+    names = set(filter.names)
+    for i in range(filter.neighbors_up):
+        names = find_neighbors(names, find_down=False)
+        if not names:
+            break
+        neighbor_names.update(names)
 
+    # done
     return neighbor_names
 
 
-def handle_only_without_filters(
+def handle_filters(
     statements: model.Statements, debug: bool = False
 ) -> model.Statements:
-    initial_names = set(
-        [s.name for s in statements if isinstance(s, model.Item)]
-    )
-    all_names = initial_names.copy()
+    all_names = set([s.name for s in statements if isinstance(s, model.Item)])
     kept_names: set[str] | None = None
 
     def check_names(names: set[str], in_names: set[str], prefix: str) -> None:
-        if not names.issubset(initial_names):
-            diff = ", ".join(names - initial_names)
+        if not names.issubset(all_names):
+            diff = ", ".join(names - all_names)
             raise model.DfdException(f'{prefix} Name(s) unknown: {diff}')
 
         if not names.issubset(in_names):
@@ -440,7 +449,8 @@ def handle_only_without_filters(
                 check_names(names, all_names, prefix)
 
                 # add names from this Only statement
-                kept_names.update(only.names)
+                if not only.neighbors_only:
+                    kept_names.update(only.names)
 
                 # add neighbors
                 kept_names.update(find_neighbors(only, statements))
@@ -454,11 +464,13 @@ def handle_only_without_filters(
                 check_names(names, kept_names, prefix)
 
                 # remove names from this Without statement
-                kept_names.difference_update(names)
+                if not without.neighbors_only:
+                    kept_names.difference_update(names)
 
-                # reset the state to the currently kept items
-                all_names = kept_names
-                kept_names = None
+                # remove neighbors
+                kept_names.difference_update(
+                    find_neighbors(without, statements)
+                )
 
     kept_names = kept_names if kept_names is not None else all_names
 

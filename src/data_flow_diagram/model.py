@@ -89,12 +89,14 @@ class Attrib(Statement):
 @dataclass
 class Filter(Statement):
     names: list[str]
+    neighbors_up: int
+    neighbors_down: int
+    neighbors_only: bool
 
 
 @dataclass
 class Only(Filter):
-    up_neighbors: int
-    down_neighbors: int
+    pass
 
 
 @dataclass
