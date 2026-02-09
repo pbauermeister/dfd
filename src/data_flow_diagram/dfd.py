@@ -367,57 +367,60 @@ def handle_options(
 
 
 def find_neighbors(
-    filter: model.Filter, statements: model.Statements, max_neighbors: int
+    filter: model.Filter,
+    statements: model.Statements,
+    max_neighbors: int,
+    debug: bool,
 ) -> set[str]:
     """Collect names from filter statements of the given type."""
 
-    def _find_neighbors(names: set[str], find_down: bool) -> set[str]:
-        neighbor_names: set[str] = set()
+    def _find_neighbors(
+        names: set[str], find_down: bool, nreverse: bool
+    ) -> set[str]:
+        found_names: set[str] = set()
         for statement in statements:
             match statement:
                 case model.Connection() as conn:
                     src, dst = conn.src, conn.dst
-                    if conn.reversed:
+                    if conn.reversed and not nreverse:
                         src, dst = dst, src
 
                     if conn.type in (model.BFLOW, model.UFLOW):
                         if dst in names:
-                            neighbor_names.add(src)
+                            found_names.add(src)
                         if src in names:
-                            neighbor_names.add(dst)
+                            found_names.add(dst)
                     else:
                         if find_down:
-                            if dst in names:
-                                neighbor_names.add(src)
-                        else:
                             if src in names:
-                                neighbor_names.add(dst)
+                                found_names.add(dst)
+                        else:
+                            if dst in names:
+                                found_names.add(src)
                 case _:
                     continue
-        return neighbor_names
-
-    neighbor_names: set[str] = set()
+        return found_names
 
     def _nb(nb: int) -> int:
         if nb < 0:
             return max_neighbors
         return nb
 
-    # find down neighbors by successive waves of connections
-    names = set(filter.names)
-    for i in range(_nb(filter.neighbors_down)):
-        names = _find_neighbors(names, find_down=True)
-        if not names:
-            break
-        neighbor_names.update(names)
-
-    # find up neighbors by successive waves of connections
-    names = set(filter.names)
-    for i in range(_nb(filter.neighbors_up)):
-        names = _find_neighbors(names, find_down=False)
-        if not names:
-            break
-        neighbor_names.update(names)
+    # find down and up neighbors by successive waves of connections
+    neighbor_names: set[str] = set()
+    for fn, down in (filter.neighbors_down, True), (filter.neighbors_up, False):
+        names = set(filter.names)
+        for i in range(_nb(fn.n)):
+            names = _find_neighbors(names, find_down=down, nreverse=fn.nreverse)
+            if not names:
+                break
+            if debug:
+                print(f"  - {i} {down} {fn}")
+                print(f"     :", neighbor_names)
+                print(f"   + :", names)
+            neighbor_names.update(names)
+            if debug:
+                print(f"   = :", neighbor_names)
 
     # done
     return neighbor_names
@@ -444,40 +447,55 @@ def handle_filters(
     for statement in statements:
         prefix = model.mk_err_prefix_from(statement.source)
 
+        if debug:
+            if isinstance(statement, model.Filter):
+                print("*** Filter:", statement)
+                print("    before:", kept_names)
+
         match statement:
-            case model.Only() as only:
+            case model.Only() as f:
                 if kept_names is None:
                     kept_names = set()
 
                 # all Only names must be valid
-                names = set(only.names)
+                names = set(f.names)
                 _check_names(names, all_names, prefix)
 
                 # add names from this Only statement
-                if not only.neighbors_only:
-                    kept_names.update(only.names)
+                if not f.neighbors_up.only and not f.neighbors_down.only:
+                    if debug:
+                        print("ONLY: adding nodes:", names)
+                    kept_names.update(f.names)
 
                 # add neighbors
-                kept_names.update(
-                    find_neighbors(only, statements, len(all_names))
-                )
+                neighbors = find_neighbors(f, statements, len(all_names), debug)
+                if debug:
+                    print("ONLY: adding neighbors:", neighbors)
+                kept_names.update(neighbors)
 
-            case model.Without() as without:
+            case model.Without() as f:
                 if kept_names is None:
                     kept_names = all_names.copy()
 
                 # all Without names must be valid
-                names = set(without.names)
+                names = set(f.names)
                 _check_names(names, kept_names, prefix)
 
                 # remove names from this Without statement
-                if not without.neighbors_only:
+                if not f.neighbors_up.only and not f.neighbors_down.only:
+                    if debug:
+                        print("WITHOUT: removing nodes:", names)
                     kept_names.difference_update(names)
 
                 # remove neighbors
-                kept_names.difference_update(
-                    find_neighbors(without, statements, len(all_names))
-                )
+                neighbors = find_neighbors(f, statements, len(all_names), debug)
+                if debug:
+                    print("WITHOUT: removing neighbors:", neighbors)
+                kept_names.difference_update(neighbors)
+
+        if debug:
+            if isinstance(statement, model.Filter):
+                print("    after:", kept_names)
 
     kept_names = kept_names if kept_names is not None else all_names
 

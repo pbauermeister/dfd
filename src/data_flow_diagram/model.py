@@ -87,11 +87,17 @@ class Attrib(Statement):
 
 
 @dataclass
+class FilterNeighbors:
+    n: int
+    only: bool
+    nreverse: bool
+
+
+@dataclass
 class Filter(Statement):
     names: list[str]
-    neighbors_up: int
-    neighbors_down: int
-    neighbors_only: bool
+    neighbors_up: FilterNeighbors
+    neighbors_down: FilterNeighbors
 
 
 @dataclass

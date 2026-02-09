@@ -223,57 +223,74 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
     if len(terms) < 2:
         raise model.DfdException(f"One or more arguments are expected")
 
-    up = down = 0
-    is_only = False
+    f = model.Filter(
+        source,
+        names=[],
+        neighbors_up=model.FilterNeighbors(0, False, False),
+        neighbors_down=model.FilterNeighbors(0, False, False),
+    )
 
     args = terms[1:]
 
     # first arguments may be +N or -N, which specify the number of down/up neighbors to include in the filter
     while args:
         arg = args[0]
-        if arg[0] not in "+-":
+        if arg[0] not in "<>[]":
             break  # no neighbor specification
 
+        fn = model.FilterNeighbors(0, False, False)
         is_up = is_down = False
 
-        if arg.startswith("+-") or arg.startswith("-+"):
+        if arg.startswith("<>"):
             is_up = is_down = True
             arg = arg[2:]
-        elif arg.startswith("+"):
+        elif arg.startswith("<"):
             is_up = True
             arg = arg[1:]
-        elif arg.startswith("-"):
+        elif arg.startswith(">"):
             is_down = True
             arg = arg[1:]
+        elif arg.startswith("["):
+            is_up = True
+            fn.nreverse = True
+            arg = arg[1:]
+        elif arg.startswith("]"):
+            is_down = True
+            fn.nreverse = True
+            arg = arg[1:]
 
-        if arg.startswith(">"):
-            is_only = True
+        if arg.startswith("x"):
+            fn.only = True
             arg = arg[1:]
 
         if arg == "*":
-            val = -1  # special value for "all neighbors"
+            fn.n = -1  # special value for "all neighbors"
         elif arg.isdigit():
-            val = int(arg)
+            fn.n = int(arg)
         else:
             raise model.DfdException(
                 f"Neighborhood size must be an integer or '*', not: {arg}"
             )
 
         if is_up:
-            up = val
+            f.neighbors_up = fn
         if is_down:
-            down = val
+            f.neighbors_down = fn
 
+        # ready for next argument
         args = args[1:]
 
     if len(args) == 0:
         raise model.DfdException(f"One or more names are expected")
+    f.names = args
 
     cmd = terms[0]
+    res: model.Statement
     if cmd == model.ONLY:
-        return model.Only(source, args, up, down, is_only)
+        res = model.Only(**f.__dict__)
     else:  # cmd == model.WITHOUT:
-        return model.Without(source, args, up, down, is_only)
+        res = model.Without(**f.__dict__)
+    return res
 
 
 def parse_process(source: model.SourceLine) -> model.Statement:

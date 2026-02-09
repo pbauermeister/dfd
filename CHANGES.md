@@ -1,4 +1,4 @@
-## Version 1.14.6.post1:
+## Version 1.14.6.post2:
 
 - Both "only" and "without" filters accept up/down propagation.
 
@@ -11,22 +11,33 @@
   # Only-filter
   # -----------
 
-  ! NODES          # keep NODES
+  ! NODE...          # keep NODE(s)
 
-  # Neighbors: + / - / +-
-  # where NUM is an integer or * for all:
-  !+NUM NODES      # keep NODES and also NUM downstream neighbors
-  !-NUM NODES      # keep NODES and also NUM upstream neighbors
-  !+-NUM NODES     # keep NODES and also NUM neighbors
+  # With filters:
+  !FILTER... NODE...
 
-  # Only neigbors: >
-  !+>NUM NODES     # keep NUM downstream neighbors (but not NODES themselves)
-                   # ditto for upstream
+  # Filter:
+  DIRECTION[ONLY]NUM
+
+  # DIRECTION:
+  #   >       downstream neighbors
+  #   <       upstream neighbors
+  #   <>      all directions
+  #   [       left neighbors
+  #   ]       right neighbors
+  #
+  # ONLY (optional):
+  #   x       take neighbors but not nodes themselves
+  #
+  # NUM:
+  #   DECIMAL number of neighbors
+  #   *       all neighbors in given direction
+  #
 
   # Without-filter
   # --------------
 
-  ~ NODES          # remove NODES
+  ~ NODE...          # remove NODE(s)
 
   # Etc. similarly as for the only-filter.
   ```
