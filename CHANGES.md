@@ -1,4 +1,8 @@
-## Version 1.14.6.post2:
+## Version 1.15.2:
+
+- The "without" filter can act as a replacer.
+
+## Version 1.15.1:
 
 - Both "only" and "without" filters accept up/down propagation.
 
@@ -47,7 +51,7 @@
 
 - TODO: update doc.
 
-## Version 1.14.5:
+## Version 1.15.0:
 
 - The "only" filter now accepts up/down propagation of inclusion.
 

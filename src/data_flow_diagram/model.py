@@ -68,6 +68,11 @@ class Connection(Drawable):
     reversed: bool = False
     relaxed: bool = False
 
+    def signature(self) -> str:
+        d = dataclasses.asdict(self).copy()
+        del d["source"]
+        return json.dumps(d, sort_keys=True)
+
 
 @dataclass
 class Frame(Drawable):
@@ -107,7 +112,7 @@ class Only(Filter):
 
 @dataclass
 class Without(Filter):
-    pass
+    replaced_by: str
 
 
 Attribs = dict[str, Attrib]

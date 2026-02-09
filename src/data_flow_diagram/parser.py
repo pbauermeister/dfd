@@ -230,66 +230,75 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
         neighbors_down=model.FilterNeighbors(0, False, False),
     )
 
+    cmd = terms[0]
     args = terms[1:]
+    replacer = ""
 
     # first arguments may be +N or -N, which specify the number of down/up neighbors to include in the filter
     while args:
         arg = args[0]
-        if arg[0] not in "<>[]":
-            break  # no neighbor specification
+        if arg[0] not in "=<>[]":
+            break  # no neighbor/replacer specification
 
-        fn = model.FilterNeighbors(0, False, False)
-        is_up = is_down = False
+        if cmd == model.WITHOUT and arg.startswith("="):
+            replacer = arg[1:]
+            args = args[1:]
 
-        if arg.startswith("<>"):
-            is_up = is_down = True
-            arg = arg[2:]
-        elif arg.startswith("<"):
-            is_up = True
-            arg = arg[1:]
-        elif arg.startswith(">"):
-            is_down = True
-            arg = arg[1:]
-        elif arg.startswith("["):
-            is_up = True
-            fn.nreverse = True
-            arg = arg[1:]
-        elif arg.startswith("]"):
-            is_down = True
-            fn.nreverse = True
-            arg = arg[1:]
-
-        if arg.startswith("x"):
-            fn.only = True
-            arg = arg[1:]
-
-        if arg == "*":
-            fn.n = -1  # special value for "all neighbors"
-        elif arg.isdigit():
-            fn.n = int(arg)
         else:
-            raise model.DfdException(
-                f"Neighborhood size must be an integer or '*', not: {arg}"
-            )
+            fn = model.FilterNeighbors(0, False, False)
+            is_up = is_down = False
 
-        if is_up:
-            f.neighbors_up = fn
-        if is_down:
-            f.neighbors_down = fn
+            if arg.startswith("<>"):
+                is_up = is_down = True
+                arg = arg[2:]
+            elif arg.startswith("<"):
+                is_up = True
+                arg = arg[1:]
+            elif arg.startswith(">"):
+                is_down = True
+                arg = arg[1:]
+            elif arg.startswith("["):
+                is_up = True
+                fn.nreverse = True
+                arg = arg[1:]
+            elif arg.startswith("]"):
+                is_down = True
+                fn.nreverse = True
+                arg = arg[1:]
 
-        # ready for next argument
-        args = args[1:]
+            if arg.startswith("x"):
+                fn.only = True
+                arg = arg[1:]
+
+            if arg == "*":
+                fn.n = -1  # special value for "all neighbors"
+            elif arg.isdigit():
+                fn.n = int(arg)
+            else:
+                raise model.DfdException(
+                    f"Neighborhood size must be an integer or '*', not: {arg}"
+                )
+
+            if is_up:
+                f.neighbors_up = fn
+            if is_down:
+                f.neighbors_down = fn
+
+            # ready for next argument
+            args = args[1:]
 
     if len(args) == 0:
         raise model.DfdException(f"One or more names are expected")
+
     f.names = args
 
-    cmd = terms[0]
     res: model.Statement
     if cmd == model.ONLY:
         res = model.Only(**f.__dict__)
     else:  # cmd == model.WITHOUT:
-        res = model.Without(**f.__dict__)
+        res = model.Without(
+            **f.__dict__, replaced_by=replacer
+        )  # replaced_by is set later by the caller
     return res
 
 

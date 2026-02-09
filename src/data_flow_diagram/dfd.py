@@ -443,6 +443,8 @@ def handle_filters(
                 f'{prefix} Name(s) no longer available due to previous filters: {diff}'
             )
 
+    replacement: dict[str, str] = {}
+
     # collect filtered names
     for statement in statements:
         prefix = model.mk_err_prefix_from(statement.source)
@@ -479,7 +481,12 @@ def handle_filters(
 
                 # all Without names must be valid
                 names = set(f.names)
-                _check_names(names, kept_names, prefix)
+                names_to_check = names.copy()
+                if f.replaced_by:
+                    names_to_check.add(f.replaced_by)
+                    for name in names:
+                        replacement[name] = f.replaced_by
+                _check_names(names_to_check, kept_names, prefix)
 
                 # remove names from this Without statement
                 if not f.neighbors_up.only and not f.neighbors_down.only:
@@ -500,7 +507,8 @@ def handle_filters(
     kept_names = kept_names if kept_names is not None else all_names
 
     # apply filters
-    new_statements = []
+    new_statements: list[model.Statement] = []
+    replaced_connections: dict[str, model.Connection] = {}
     for statement in statements:
         if debug:
             print(f"\nOnly: handling statement: {statement}")
@@ -513,15 +521,33 @@ def handle_filters(
                     continue
 
             case model.Connection() as conn:
-                # skip connections if either src or dst is not in the kept list
-                if conn.src not in kept_names or conn.dst not in kept_names:
-                    if debug:
-                        print("=> Skipping: some end is not in the kept list")
-                    continue
+                if conn.src in replacement or conn.dst in replacement:
+                    if conn.src in replacement and conn.dst in replacement:
+                        continue  # skip connections if both ends are replaced by the same name
+                    # replace any end
+                    if conn.src in replacement:
+                        conn.src = replacement[conn.src]
+                    if conn.dst in replacement:
+                        conn.dst = replacement[conn.dst]
+                    replaced_connections[conn.signature()] = conn
+                else:
+                    # skip connections if either src or dst is not in the kept list
+                    if conn.src not in kept_names or conn.dst not in kept_names:
+                        if debug:
+                            print(
+                                "=> Skipping: some end is not in the kept list"
+                            )
+                        continue
 
             case model.Frame() as frame:
-                names = set(frame.items)
+                # apply replacements
+                for name in frame.items:
+                    if name in replacement:
+                        frame.items.remove(name)
+                        frame.items.append(replacement[name])
+
                 # skip frames if none of the items are in the kept list
+                names = set(frame.items)
                 if not names.intersection(kept_names):
                     if debug:
                         print("=> Skipping: no items are in the kept list")
@@ -538,4 +564,17 @@ def handle_filters(
             print("=> Keeping statement")
         new_statements.append(statement)
 
-    return new_statements
+    # remove duplicate connections due to replacements
+    kept_new_statements = []
+    skiped_statements = set()
+    for statement in new_statements:
+        match statement:
+            case model.Connection() as conn:
+                sig = conn.signature()
+                if sig in skiped_statements:
+                    continue
+                if sig in replaced_connections:
+                    skiped_statements.add(sig)
+        kept_new_statements.append(statement)
+
+    return kept_new_statements
