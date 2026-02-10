@@ -371,7 +371,7 @@ def find_neighbors(
     statements: model.Statements,
     max_neighbors: int,
     debug: bool,
-) -> set[str]:
+) -> tuple[set[str], set[str]]:
     """Collect names from filter statements of the given type."""
 
     def _find_neighbors(
@@ -407,9 +407,11 @@ def find_neighbors(
         return nb
 
     # find down and up neighbors by successive waves of connections
-    neighbor_names: set[str] = set()
-    for fn, down in (filter.neighbors_down, True), (filter.neighbors_up, False):
+    def _find_neighbors_in_dir(
+        fn: model.FilterNeighbors, down: bool
+    ) -> set[str]:
         names = set(filter.names)
+        neighbor_names: set[str] = set()
         for i in range(_nb(fn.n)):
             names = _find_neighbors(names, find_down=down, nreverse=fn.nreverse)
             if not names:
@@ -421,9 +423,11 @@ def find_neighbors(
             neighbor_names.update(names)
             if debug:
                 print(f"   = :", neighbor_names)
+        return neighbor_names
 
-    # done
-    return neighbor_names
+    return _find_neighbors_in_dir(
+        filter.neighbors_down, down=True
+    ), _find_neighbors_in_dir(filter.neighbors_up, down=False)
 
 
 def handle_filters(
@@ -444,6 +448,9 @@ def handle_filters(
             )
 
     replacement: dict[str, str] = {}
+    skip_frames_for_names: set[str] = (
+        set()
+    )  # names for which frames should be skipped due to neighbors_only
 
     # collect filtered names
     for statement in statements:
@@ -470,10 +477,22 @@ def handle_filters(
                     kept_names.update(f.names)
 
                 # add neighbors
-                neighbors = find_neighbors(f, statements, len(all_names), debug)
+                downs, ups = find_neighbors(
+                    f, statements, len(all_names), debug
+                )
                 if debug:
-                    print("ONLY: adding neighbors:", neighbors)
-                kept_names.update(neighbors)
+                    print("ONLY: adding neighbors:", downs, ups)
+                kept_names.update(downs)
+                kept_names.update(ups)
+
+                if f.neighbors_up.nframes:
+                    skip_frames_for_names.update(ups)
+                    if not f.neighbors_up.only:
+                        skip_frames_for_names.update(names)
+                if f.neighbors_down.nframes:
+                    skip_frames_for_names.update(downs)
+                    if not f.neighbors_down.only:
+                        skip_frames_for_names.update(names)
 
             case model.Without() as f:
                 if kept_names is None:
@@ -495,10 +514,22 @@ def handle_filters(
                     kept_names.difference_update(names)
 
                 # remove neighbors
-                neighbors = find_neighbors(f, statements, len(all_names), debug)
+                downs, ups = find_neighbors(
+                    f, statements, len(all_names), debug
+                )
                 if debug:
-                    print("WITHOUT: removing neighbors:", neighbors)
-                kept_names.difference_update(neighbors)
+                    print("WITHOUT: removing neighbors:", downs, ups)
+                kept_names.difference_update(downs)
+                kept_names.difference_update(ups)
+
+                if f.neighbors_up.nframes:
+                    skip_frames_for_names.update(ups)
+                    if not f.neighbors_up.only:
+                        skip_frames_for_names.update(names)
+                if f.neighbors_down.nframes:
+                    skip_frames_for_names.update(downs)
+                    if not f.neighbors_down.only:
+                        skip_frames_for_names.update(names)
 
         if debug:
             if isinstance(statement, model.Filter):
@@ -506,18 +537,23 @@ def handle_filters(
 
     kept_names = kept_names if kept_names is not None else all_names
 
+    if debug:
+        print("\nItems to keep", kept_names)
+
     # apply filters
     new_statements: list[model.Statement] = []
     replaced_connections: dict[str, model.Connection] = {}
     for statement in statements:
         if debug:
-            print(f"\nOnly: handling statement: {statement}")
+            print(f"\nHandling statement: {statement}")
         match statement:
             case model.Item() as item:
                 # skip nodes that are not in the only list
                 if item.name not in kept_names:
                     if debug:
-                        print("=> Skipping: its name is not in the kept list")
+                        print(
+                            "=> Skipping item: its name is not in the kept list"
+                        )
                     continue
 
             case model.Connection() as conn:
@@ -535,7 +571,7 @@ def handle_filters(
                     if conn.src not in kept_names or conn.dst not in kept_names:
                         if debug:
                             print(
-                                "=> Skipping: some end is not in the kept list"
+                                "=> Skipping connection: some end is not in the kept list"
                             )
                         continue
 
@@ -550,14 +586,26 @@ def handle_filters(
                 names = set(frame.items)
                 if not names.intersection(kept_names):
                     if debug:
-                        print("=> Skipping: no items are in the kept list")
+                        print(
+                            "=> Skipping frame: no items are in the kept list"
+                        )
                     continue
                 else:
                     # adjust frame items by removing those not in the kept list
                     new_items = [n for n in frame.items if n in kept_names]
                     if debug:
-                        print(f"=> Adjusting: {frame.items} -> {new_items}")
+                        print(
+                            f"=> Adjusting frame items: {frame.items} -> {new_items}"
+                        )
                     frame.items = new_items
+
+                    # skip frames if they contain items for which frames should be skipped
+                    if set(new_items).intersection(skip_frames_for_names):
+                        if debug:
+                            print(
+                                "=> Skipping frame: some items are in the skip-frames list"
+                            )
+                        continue
 
         # keep statement
         if debug:

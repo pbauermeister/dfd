@@ -217,6 +217,21 @@ def parse_attrib(source: model.SourceLine) -> model.Statement:
     return model.Attrib(source, alias, text)
 
 
+RX_FILTER_ARG = re.compile(
+    r"""(
+      # either a neighbor specification
+      (?P<neighbors><>|<|>|\[|])    # direction
+      (?P<flags>[a-zA-Z]*)              # flags
+      (?: (?P<all>[*]) | (?P<num>[0-9]+) )  # "*" for all, or decimal number
+      |
+      # or a replacer specification
+      =                             # indicates replacer
+      (?P<replacer>.*)              # name if item replacing the others
+    )""",
+    re.X,
+)
+
+
 def parse_filter(source: model.SourceLine) -> model.Statement:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
@@ -226,8 +241,8 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
     f = model.Filter(
         source,
         names=[],
-        neighbors_up=model.FilterNeighbors(0, False, False),
-        neighbors_down=model.FilterNeighbors(0, False, False),
+        neighbors_up=model.FilterNeighbors(0, False, False, False),
+        neighbors_down=model.FilterNeighbors(0, False, False, False),
     )
 
     cmd = terms[0]
@@ -237,43 +252,50 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
     # first arguments may be +N or -N, which specify the number of down/up neighbors to include in the filter
     while args:
         arg = args[0]
-        if arg[0] not in "=<>[]":
+
+        match = RX_FILTER_ARG.fullmatch(arg)
+        if not match:
             break  # no neighbor/replacer specification
 
-        if cmd == model.WITHOUT and arg.startswith("="):
+        if match.group("replacer"):
+            if cmd != model.WITHOUT:
+                raise model.DfdException(
+                    f"Replacer specification is only allowed for {model.WITHOUT} filter"
+                )
             replacer = arg[1:]
             args = args[1:]
-
-        else:
-            fn = model.FilterNeighbors(0, False, False)
+        elif match.group("neighbors"):
+            fn = model.FilterNeighbors(0, False, False, False)
             is_up = is_down = False
 
-            if arg.startswith("<>"):
-                is_up = is_down = True
-                arg = arg[2:]
-            elif arg.startswith("<"):
-                is_up = True
-                arg = arg[1:]
-            elif arg.startswith(">"):
-                is_down = True
-                arg = arg[1:]
-            elif arg.startswith("["):
-                is_up = True
-                fn.nreverse = True
-                arg = arg[1:]
-            elif arg.startswith("]"):
-                is_down = True
-                fn.nreverse = True
-                arg = arg[1:]
+            match match.group("neighbors"):
+                case "<>":
+                    is_up = is_down = True
+                case "<":
+                    is_up = True
+                case ">":
+                    is_down = True
+                case "[":
+                    is_up = True
+                    fn.nreverse = True
+                case "]":
+                    is_down = True
+                    fn.nreverse = True
 
-            if arg.startswith("x"):
-                fn.only = True
-                arg = arg[1:]
-
-            if arg == "*":
+            for flag in match.group("flags"):
+                match flag:
+                    case "x":
+                        fn.only = True
+                    case "f":
+                        fn.nframes = True
+                    case _:
+                        raise model.DfdException(
+                            f"Unrecognized filter flag: {flag}"
+                        )
+            if match.group("all"):
                 fn.n = -1  # special value for "all neighbors"
-            elif arg.isdigit():
-                fn.n = int(arg)
+            elif match.group("num"):
+                fn.n = int(match.group("num"))
             else:
                 raise model.DfdException(
                     f"Neighborhood size must be an integer or '*', not: {arg}"
