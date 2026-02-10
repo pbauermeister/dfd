@@ -1,3 +1,7 @@
+## Version 1.15.3:
+
+- The filters can mandate to remove impacted frames.
+
 ## Version 1.15.2:
 
 - The "without" filter can act as a replacer.
