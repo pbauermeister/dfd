@@ -277,25 +277,25 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
                     is_down = True
                 case "[":
                     is_up = True
-                    fn.nreverse = True
+                    fn.layout_dir = True
                 case "]":
                     is_down = True
-                    fn.nreverse = True
+                    fn.layout_dir = True
 
             for flag in match.group("flags"):
                 match flag:
                     case "x":
-                        fn.only = True
+                        fn.no_anchors = True
                     case "f":
-                        fn.nframes = True
+                        fn.no_frames = True
                     case _:
                         raise model.DfdException(
                             f"Unrecognized filter flag: {flag}"
                         )
             if match.group("all"):
-                fn.n = -1  # special value for "all neighbors"
+                fn.distance = -1  # special value for "all neighbors"
             elif match.group("num"):
-                fn.n = int(match.group("num"))
+                fn.distance = int(match.group("num"))
             else:
                 raise model.DfdException(
                     f"Neighborhood size must be an integer or '*', not: {arg}"

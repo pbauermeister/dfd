@@ -412,8 +412,10 @@ def find_neighbors(
     ) -> set[str]:
         names = set(filter.names)
         neighbor_names: set[str] = set()
-        for i in range(_nb(fn.n)):
-            names = _find_neighbors(names, find_down=down, nreverse=fn.nreverse)
+        for i in range(_nb(fn.distance)):
+            names = _find_neighbors(
+                names, find_down=down, nreverse=fn.layout_dir
+            )
             if not names:
                 break
             if debug:
@@ -471,7 +473,10 @@ def handle_filters(
                 _check_names(names, all_names, prefix)
 
                 # add names from this Only statement
-                if not f.neighbors_up.only and not f.neighbors_down.only:
+                if (
+                    not f.neighbors_up.no_anchors
+                    and not f.neighbors_down.no_anchors
+                ):
                     if debug:
                         print("ONLY: adding nodes:", names)
                     kept_names.update(f.names)
@@ -485,13 +490,13 @@ def handle_filters(
                 kept_names.update(downs)
                 kept_names.update(ups)
 
-                if f.neighbors_up.nframes:
+                if f.neighbors_up.no_frames:
                     skip_frames_for_names.update(ups)
-                    if not f.neighbors_up.only:
+                    if not f.neighbors_up.no_anchors:
                         skip_frames_for_names.update(names)
-                if f.neighbors_down.nframes:
+                if f.neighbors_down.no_frames:
                     skip_frames_for_names.update(downs)
-                    if not f.neighbors_down.only:
+                    if not f.neighbors_down.no_anchors:
                         skip_frames_for_names.update(names)
 
             case model.Without() as f:
@@ -508,7 +513,10 @@ def handle_filters(
                 _check_names(names_to_check, kept_names, prefix)
 
                 # remove names from this Without statement
-                if not f.neighbors_up.only and not f.neighbors_down.only:
+                if (
+                    not f.neighbors_up.no_anchors
+                    and not f.neighbors_down.no_anchors
+                ):
                     if debug:
                         print("WITHOUT: removing nodes:", names)
                     kept_names.difference_update(names)
@@ -522,13 +530,13 @@ def handle_filters(
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
 
-                if f.neighbors_up.nframes:
+                if f.neighbors_up.no_frames:
                     skip_frames_for_names.update(ups)
-                    if not f.neighbors_up.only:
+                    if not f.neighbors_up.no_anchors:
                         skip_frames_for_names.update(names)
-                if f.neighbors_down.nframes:
+                if f.neighbors_down.no_frames:
                     skip_frames_for_names.update(downs)
-                    if not f.neighbors_down.only:
+                    if not f.neighbors_down.no_anchors:
                         skip_frames_for_names.update(names)
 
         if debug:

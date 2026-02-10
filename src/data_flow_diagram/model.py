@@ -93,10 +93,10 @@ class Attrib(Statement):
 
 @dataclass
 class FilterNeighbors:
-    n: int  # neighborhood distance to keep, or -1 for all
-    only: bool  # consider only neighbors, not listed nodes themselves
-    nreverse: bool  # consider layout direction, not flow direction
-    nframes: bool  # suppress impacted frames
+    distance: int  # neighborhood distance to keep, or -1 for all
+    no_anchors: bool  # consider only neighbors, not listed nodes themselves
+    layout_dir: bool  # consider layout direction, not flow direction
+    no_frames: bool  # suppress impacted frames
 
 
 @dataclass
