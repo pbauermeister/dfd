@@ -1,3 +1,7 @@
+## Version 1.16.0:
+
+- Fix: With --no-graph-title, frame titles have wrong font.
+
 ## Version 1.15.3:
 
 - The filters can mandate to remove impacted frames.
