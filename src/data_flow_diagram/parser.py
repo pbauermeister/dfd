@@ -4,6 +4,8 @@ import os.path
 import re
 from typing import Callable, Tuple
 
+from data_flow_diagram.console import dprint
+
 from . import dfd_dot_templates as TMPL
 from . import model
 
@@ -175,7 +177,7 @@ def parse(
 
     if debug:
         for s in statements:
-            print(model.repr(s))
+            dprint(model.repr(s))
     return statements, dependencies, attribs
 
 
