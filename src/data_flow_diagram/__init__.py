@@ -12,9 +12,7 @@ This module parses the commandline args, prepares the I/Os and calls the stuff.
 """
 
 import argparse
-import io
 import os
-import re
 import sys
 import tempfile
 from typing import TextIO
@@ -31,6 +29,7 @@ except pkg_resources.DistributionNotFound:
 
 
 def parse_args() -> argparse.Namespace:
+    assert __doc__ is not None
     description, epilog = [each.strip() for each in __doc__.split("-----")[:2]]
 
     parser = argparse.ArgumentParser(description=description, epilog=epilog)
@@ -143,7 +142,7 @@ def handle_markdown_source(
 def handle_dfd_source(
     options: model.Options, provenance: str, input_fp: TextIO, output_path: str
 ) -> None:
-    root = model.SourceLine("", provenance, None, None)
+    root = model.SourceLine("", provenance, None, 0)
     if output_path == "-":
         # output to stdout
         with tempfile.TemporaryDirectory() as d:

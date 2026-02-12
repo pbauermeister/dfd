@@ -6,7 +6,7 @@ import re
 import textwrap
 from typing import Any, Optional
 
-from . import config, dependency_checker
+from . import dependency_checker
 from . import dfd_dot_templates as TMPL
 from . import dot, model, parser, scanner
 
