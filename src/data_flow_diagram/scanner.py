@@ -1,9 +1,8 @@
 import os
 import re
 
-from data_flow_diagram.console import dprint
-
 from . import model
+from .console import dprint
 
 # Regex to transform lines like:
 #   abc\

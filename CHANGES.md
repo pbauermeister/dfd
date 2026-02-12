@@ -1,4 +1,4 @@
-## Version 1.16.0:
+## Version 1.16.0.post1:
 
 - Fix: With --no-graph-title, frame titles have wrong font.
 

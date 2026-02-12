@@ -6,11 +6,10 @@ import re
 import textwrap
 from typing import Any, Optional
 
-from data_flow_diagram.console import dprint
-
 from . import dependency_checker
 from . import dfd_dot_templates as TMPL
 from . import dot, model, parser, scanner
+from .console import dprint
 
 
 def build(
