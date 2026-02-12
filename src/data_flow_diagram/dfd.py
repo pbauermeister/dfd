@@ -6,11 +6,10 @@ import re
 import textwrap
 from typing import Any, Optional
 
-from data_flow_diagram.console import dprint
-
 from . import dependency_checker
 from . import dfd_dot_templates as TMPL
 from . import dot, model, parser, scanner
+from .console import dprint
 
 
 def build(
@@ -123,8 +122,27 @@ class Generator:
     def _attrib_to_dict(self, item: model.Item, attrs: str) -> dict[str, str]:
         d = self._item_to_html_dict(item)
         d.update({"fontcolor": "black", "color": "black"})
+
+        def strip_quotes(s: str) -> str:
+            if s.startswith('"'):
+                return s.strip('"')
+            elif s.startswith("'"):
+                return s.strip("'")
+            return s
+
+        def split_attr(s: str) -> tuple[str, str]:
+            pair = s.split("=", 1)
+            if len(pair) != 2:
+                prefix = model.mk_err_prefix_from(item.source)
+                raise model.DfdException(
+                    f'{prefix}Invalid attribute "{s}" in item "{item.name}"'
+                    "; maybe referring to an inexistent attrib alias?"
+                )
+            return pair[0], pair[1]
+
         attrs_d = {
-            k: v for k, v in [each.split("=", 1) for each in attrs.split()]
+            k: strip_quotes(v)
+            for k, v in [split_attr(each) for each in attrs.split()]
         }
         d.update(attrs_d)
         return d

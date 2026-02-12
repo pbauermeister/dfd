@@ -1,4 +1,8 @@
-## Version 1.16.0:
+## Version 1.16.1.post1:
+
+- Fix: When using attribs alias for stores or channel, unquote attribs
+
+## Version 1.16.0.post1:
 
 - Fix: With --no-graph-title, frame titles have wrong font.
 

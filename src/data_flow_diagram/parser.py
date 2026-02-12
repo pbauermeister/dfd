@@ -4,10 +4,9 @@ import os.path
 import re
 from typing import Callable, Tuple
 
-from data_flow_diagram.console import dprint
-
 from . import dfd_dot_templates as TMPL
 from . import model
+from .console import dprint
 
 
 def check(statements: model.Statements) -> dict[str, model.Item]:
