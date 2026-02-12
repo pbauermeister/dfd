@@ -6,7 +6,7 @@ import re
 import textwrap
 from typing import Any, Optional
 
-from . import config, dependency_checker
+from . import dependency_checker
 from . import dfd_dot_templates as TMPL
 from . import dot, model, parser, scanner
 
@@ -246,11 +246,14 @@ class Generator:
 
     def generate_dot_text(self, title: str) -> str:
         graph_params = []
+
         if self.graph_options.is_context:
             graph_params.append(TMPL.GRAPH_PARAMS_CONTEXT_DIAGRAM)
 
         if title:
             graph_params.append(TMPL.DOT_GRAPH_TITLE.format(title=title))
+        else:
+            graph_params.append(TMPL.DOT_GRAPH_NOTITLE)
 
         if self.graph_options.is_vertical:
             graph_params.append("rankdir=TB")
