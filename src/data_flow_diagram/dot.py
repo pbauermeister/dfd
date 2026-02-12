@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 from . import model
-from .error import print_error
+from .console import print_error
 
 
 def generate_image(

@@ -1,6 +1,8 @@
 import os
 import re
 
+from data_flow_diagram.console import dprint
+
 from . import model
 
 # Regex to transform lines like:
@@ -28,14 +30,14 @@ def scan(
     _scan(input, provenance, output, snippet_by_name, includes)
 
     if debug:
-        print("=" * 40)
-        print(provenance)
-        print("----------")
-        print(input)
-        print("----------")
+        dprint("=" * 40)
+        dprint(provenance)
+        dprint("----------")
+        dprint(input)
+        dprint("----------")
         for l in output:
-            print(model.repr(l))
-        print("=" * 40)
+            dprint(model.repr(l))
+        dprint("=" * 40)
 
     return output
 
@@ -78,20 +80,25 @@ def include(
         # include from MD snippet
         if not snippet_by_name:
             raise model.DfdException(
-                f"{prefix}source is not markdown, " f'cannot include snippet "{name}".'
+                f"{prefix}source is not markdown, "
+                f'cannot include snippet "{name}".'
             )
         name0 = name
         name = name[1:]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
-            raise model.DfdException(f'{prefix}included snippet "{name}" not found.')
+            raise model.DfdException(
+                f'{prefix}included snippet "{name}" not found.'
+            )
 
         _scan(snippet.text, caller, output, snippet_by_name, includes)
 
     else:
         # include from file
         if not os.path.exists(name):
-            raise model.DfdException(f'{prefix}included file "{name}" not found.')
+            raise model.DfdException(
+                f'{prefix}included file "{name}" not found.'
+            )
         with open(name, encoding="utf-8") as f:
             text = f.read()
         _scan(text, caller, output, snippet_by_name, includes)

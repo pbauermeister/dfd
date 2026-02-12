@@ -20,7 +20,7 @@ from typing import TextIO
 import pkg_resources
 
 from . import dfd, dot, markdown, model
-from .error import print_error
+from .console import print_error, dprint, set_debug
 
 try:
     VERSION = pkg_resources.require("data-flow-diagram")[0].version
@@ -136,7 +136,7 @@ def handle_markdown_source(
             options,
             snippet_by_name=params.snippet_by_name,
         )
-        print(f"{sys.argv[0]}: generated {params.file_name}", file=sys.stderr)
+        dprint(f"{sys.argv[0]}: generated {params.file_name}")
 
 
 def handle_dfd_source(
@@ -172,6 +172,8 @@ def run(args: argparse.Namespace) -> None:
         args.no_check_dependencies,
         args.debug,
     )
+
+    set_debug(args.debug)
 
     # markdown source
     if args.markdown:
