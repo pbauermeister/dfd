@@ -215,6 +215,16 @@ class Generator:
 
         attrs = f'label="{text}"'
 
+        match conn.type:
+            # make the edge invisible before other attributes
+            case model.CONSTRAINT:
+                if text and not conn.attrs:
+                    # transparent edge, to reveal the label
+                    attrs += " style=solid color=invis"
+                else:
+                    # invisible edge and label
+                    attrs += " style=invis dir=none"
+
         if conn.attrs:
             attrs += " " + self._expand_attribs(conn.attrs)
 
@@ -236,6 +246,8 @@ class Generator:
                 if conn.reversed:
                     attrs += " dir=back"
                 attrs += " style=dashed"
+            case model.CONSTRAINT:
+                pass
             case _:
                 prefix = model.mk_err_prefix_from(conn.source)
                 raise model.DfdException(
@@ -313,6 +325,13 @@ def generate_dot(
                 dst_item = get_item(connection.dst)
                 gen.generate_connection(connection, src_item, dst_item)
 
+            case model.Constraint() as constraint:
+                src_item = get_item(constraint.src)
+                dst_item = get_item(constraint.dst)
+                d = constraint.__dict__.copy()
+                conn = model.Connection(**d, relaxed=False)
+                gen.generate_connection(conn, src_item, dst_item)
+
             case model.Style() as style:
                 gen.generate_style(style)
 
@@ -327,7 +346,7 @@ def remove_unused_hidables(statements: model.Statements) -> model.Statements:
     connected_items = set()
     for statement in statements:
         match statement:
-            case model.Connection() as conn:
+            case model.Edge() as conn:
                 pass
             case _:
                 continue
