@@ -133,6 +133,7 @@ BFLOW = "bflow"
 CFLOW = "cflow"
 UFLOW = "uflow"
 SIGNAL = "signal"
+CONSTRAINT = "constraint"
 
 FRAME = "frame"
 

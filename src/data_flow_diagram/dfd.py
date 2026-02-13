@@ -215,6 +215,16 @@ class Generator:
 
         attrs = f'label="{text}"'
 
+        match conn.type:
+            # make the edge invisible before other attributes
+            case model.CONSTRAINT:
+                if text and not conn.attrs:
+                    # transparent edge, to reveal the label
+                    attrs += " style=solid color=invis"
+                else:
+                    # invisible edge and label
+                    attrs += " style=invis dir=none"
+
         if conn.attrs:
             attrs += " " + self._expand_attribs(conn.attrs)
 
@@ -236,6 +246,8 @@ class Generator:
                 if conn.reversed:
                     attrs += " dir=back"
                 attrs += " style=dashed"
+            case model.CONSTRAINT:
+                pass
             case _:
                 prefix = model.mk_err_prefix_from(conn.source)
                 raise model.DfdException(
@@ -403,6 +415,11 @@ def find_neighbors(
         for statement in statements:
             match statement:
                 case model.Connection() as conn:
+
+                    # constraints do not define neighborhood
+                    if conn.type == model.CONSTRAINT:
+                        continue
+
                     src, dst = conn.src, conn.dst
                     if conn.reversed and not nreverse:
                         src, dst = dst, src
