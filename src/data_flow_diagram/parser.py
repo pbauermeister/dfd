@@ -35,6 +35,21 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             f"at line {other.source.line_nr+1}: {other_text}"
         )
 
+    # check references and values of constraints
+    for statement in statements:
+        match statement:
+            case model.Constraint() as conn:
+                pass
+            case _:
+                continue
+        for point in conn.src, conn.dst:
+            if point not in items_by_name:
+                error_prefix = model.mk_err_prefix_from(statement.source)
+                raise model.DfdException(
+                    f'{error_prefix}Constraint links to "{point}", '
+                    f"which is not defined"
+                )
+
     # check references and values of connections
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
@@ -143,6 +158,8 @@ def parse(
             "flow.r?": parse_flow_r_q,
             "cflow.r?": parse_cflow_r_q,
             "signal.r?": parse_signal_r_q,
+            model.CONSTRAINT: parse_constraint,
+            model.CONSTRAINT + ".r": parse_constraint_r,
             model.FRAME: parse_frame,
             model.ATTRIB: parse_attrib,
             model.ONLY: parse_filter,
@@ -479,6 +496,18 @@ def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
     )
 
 
+def parse_constraint(source: model.SourceLine) -> model.Statement:
+    """Parse constraint statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Constraint(source, model.CONSTRAINT, text, "", src, dst)
+
+
+def parse_constraint_r(source: model.SourceLine) -> model.Statement:
+    """Parse reversed constraint statement"""
+    src, dst, text = split_args(source.text, 3, True)
+    return model.Constraint(source, model.CONSTRAINT, text, "", dst, src)
+
+
 def apply_syntactic_sugars(src_line: str) -> str:
 
     # allow arguments to be sticked to the filter mnemonics
@@ -503,10 +532,14 @@ def apply_syntactic_sugars(src_line: str) -> str:
         return "\t".join(array)
 
     new_line = ""
+
+    # FIXME: use moded.FLOW etc. instead of hardcoded strings, but that would require importing model in this module, which creates a circular dependency. Refactor to avoid that.
+
     if re.fullmatch(r"-+>[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
         new_line = fmt("flow" + q, parts)
+
     elif re.fullmatch(r"<-+[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
@@ -539,6 +572,13 @@ def apply_syntactic_sugars(src_line: str) -> str:
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
         new_line = fmt("signal.r" + q, parts)  # , swap=True)
+
+    elif re.fullmatch(r">+", op):
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt("constraint", parts)
+    elif re.fullmatch(r"<+", op):
+        parts = src_line.split(maxsplit=3)
+        new_line = fmt("constraint.r", parts)
 
     if new_line:
         return new_line
