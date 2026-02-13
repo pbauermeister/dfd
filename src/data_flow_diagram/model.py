@@ -62,25 +62,16 @@ class Item(Drawable):
 
 
 @dataclass
-class Edge(Drawable):
+class Connection(Drawable):
     src: str
     dst: str
     reversed: bool = False
-
-
-@dataclass
-class Connection(Edge):
     relaxed: bool = False
 
     def signature(self) -> str:
         d = dataclasses.asdict(self).copy()
         del d["source"]
         return json.dumps(d, sort_keys=True)
-
-
-@dataclass
-class Constraint(Edge):
-    pass
 
 
 @dataclass
@@ -143,6 +134,7 @@ CFLOW = "cflow"
 UFLOW = "uflow"
 SIGNAL = "signal"
 CONSTRAINT = "constraint"
+
 FRAME = "frame"
 
 ATTRIB = "attrib"

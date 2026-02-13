@@ -325,13 +325,6 @@ def generate_dot(
                 dst_item = get_item(connection.dst)
                 gen.generate_connection(connection, src_item, dst_item)
 
-            case model.Constraint() as constraint:
-                src_item = get_item(constraint.src)
-                dst_item = get_item(constraint.dst)
-                d = constraint.__dict__.copy()
-                conn = model.Connection(**d, relaxed=False)
-                gen.generate_connection(conn, src_item, dst_item)
-
             case model.Style() as style:
                 gen.generate_style(style)
 
@@ -346,7 +339,7 @@ def remove_unused_hidables(statements: model.Statements) -> model.Statements:
     connected_items = set()
     for statement in statements:
         match statement:
-            case model.Edge() as conn:
+            case model.Connection() as conn:
                 pass
             case _:
                 continue
@@ -422,6 +415,11 @@ def find_neighbors(
         for statement in statements:
             match statement:
                 case model.Connection() as conn:
+
+                    # constraints do not define neighborhood
+                    if conn.type == model.CONSTRAINT:
+                        continue
+
                     src, dst = conn.src, conn.dst
                     if conn.reversed and not nreverse:
                         src, dst = dst, src

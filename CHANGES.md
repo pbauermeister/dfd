@@ -1,6 +1,6 @@
 ## Version 1.16.2:
 
-- `A > B` adds a layout constraint, but not a connection.
+- `A > B` adds a layout constraint, but not a real connection.
 
 ## Version 1.16.1.post1:
 

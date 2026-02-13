@@ -35,21 +35,6 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             f"at line {other.source.line_nr+1}: {other_text}"
         )
 
-    # check references and values of constraints
-    for statement in statements:
-        match statement:
-            case model.Constraint() as conn:
-                pass
-            case _:
-                continue
-        for point in conn.src, conn.dst:
-            if point not in items_by_name:
-                error_prefix = model.mk_err_prefix_from(statement.source)
-                raise model.DfdException(
-                    f'{error_prefix}Constraint links to "{point}", '
-                    f"which is not defined"
-                )
-
     # check references and values of connections
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
@@ -499,13 +484,13 @@ def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
 def parse_constraint(source: model.SourceLine) -> model.Statement:
     """Parse constraint statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Constraint(source, model.CONSTRAINT, text, "", src, dst)
+    return model.Connection(source, model.CONSTRAINT, text, "", src, dst)
 
 
 def parse_constraint_r(source: model.SourceLine) -> model.Statement:
     """Parse reversed constraint statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Constraint(source, model.CONSTRAINT, text, "", dst, src)
+    return model.Connection(source, model.CONSTRAINT, text, "", dst, src)
 
 
 def apply_syntactic_sugars(src_line: str) -> str:
