@@ -137,12 +137,12 @@ def parse(
             model.BFLOW + "?": parse_bflow_q,
             model.UFLOW + "?": parse_uflow_q,
             model.SIGNAL + "?": parse_signal_q,
-            "flow.r": parse_flow_r,
-            "cflow.r": parse_cflow_r,
-            "signal.r": parse_signal_r,
-            "flow.r?": parse_flow_r_q,
-            "cflow.r?": parse_cflow_r_q,
-            "signal.r?": parse_signal_r_q,
+            model.FLOW + ".r": parse_flow_r,
+            model.CFLOW + ".r": parse_cflow_r,
+            model.SIGNAL + ".r": parse_signal_r,
+            model.FLOW + ".r?": parse_flow_r_q,
+            model.CFLOW + ".r?": parse_cflow_r_q,
+            model.SIGNAL + ".r?": parse_signal_r_q,
             model.CONSTRAINT: parse_constraint,
             model.CONSTRAINT + ".r": parse_constraint_r,
             model.FRAME: parse_frame,
@@ -496,7 +496,7 @@ def parse_constraint_r(source: model.SourceLine) -> model.Statement:
 def apply_syntactic_sugars(src_line: str) -> str:
 
     # allow arguments to be sticked to the filter mnemonics
-    if src_line and src_line[0] in ("!~"):
+    if src_line and src_line[0] in (model.ONLY, model.WITHOUT):
         if len(src_line) > 1 and src_line[1] != " ":
             # insert a space after the filter, so that it is recognized as a filter
             new_line = src_line[0] + " " + src_line[1:]
@@ -518,52 +518,50 @@ def apply_syntactic_sugars(src_line: str) -> str:
 
     new_line = ""
 
-    # FIXME: use moded.FLOW etc. instead of hardcoded strings, but that would require importing model in this module, which creates a circular dependency. Refactor to avoid that.
-
     if re.fullmatch(r"-+>[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("flow" + q, parts)
+        new_line = fmt(model.FLOW + q, parts)
 
     elif re.fullmatch(r"<-+[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("flow.r" + q, parts)  # , swap=True)
+        new_line = fmt(model.FLOW + ".r" + q, parts)
 
     if re.fullmatch(r"-+>>[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("cflow" + q, parts)
+        new_line = fmt(model.CFLOW + q, parts)
     elif re.fullmatch(r"<<-+[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("cflow.r" + q, parts)  # , swap=True)
+        new_line = fmt(model.CFLOW + ".r" + q, parts)
 
     elif re.fullmatch(r"<-+>[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("bflow" + q, parts)
+        new_line = fmt(model.BFLOW + q, parts)
 
     elif re.fullmatch(r"--+[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("uflow" + q, parts)
+        new_line = fmt(model.UFLOW + q, parts)
 
     elif re.fullmatch(r":+>[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("signal" + q, parts)
+        new_line = fmt(model.SIGNAL + q, parts)
     elif re.fullmatch(r"<:+[?]?", op):
         q = "?" if op.endswith("?") else ""
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("signal.r" + q, parts)  # , swap=True)
+        new_line = fmt(model.SIGNAL + ".r" + q, parts)
 
     elif re.fullmatch(r">+", op):
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("constraint", parts)
+        new_line = fmt(model.CONSTRAINT, parts)
     elif re.fullmatch(r"<+", op):
         parts = src_line.split(maxsplit=3)
-        new_line = fmt("constraint.r", parts)
+        new_line = fmt(model.CONSTRAINT + ".r", parts)
 
     if new_line:
         return new_line
