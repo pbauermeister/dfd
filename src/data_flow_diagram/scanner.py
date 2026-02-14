@@ -53,7 +53,7 @@ def _scan(
             continue
         source_line = model.SourceLine(line, line, parent, nr)
         pair = line.split(maxsplit=1)
-        if len(pair) == 2 and pair[0] == "#include":
+        if len(pair) == 2 and pair[0] == model.INCLUDE_DIRECTIVE:
             include(line, source_line, output, snippet_by_name, includes)
         else:
             output.append(source_line)
@@ -75,7 +75,7 @@ def include(
     includes.add(name)
 
     caller = model.SourceLine("", f"<snippet {name}>", parent, 0)
-    if name.startswith("#"):
+    if name.startswith(model.SNIPPET_PREFIX):
         # include from MD snippet
         if not snippet_by_name:
             raise model.DfdException(
@@ -83,7 +83,7 @@ def include(
                 f'cannot include snippet "{name}".'
             )
         name0 = name
-        name = name[1:]
+        name = name[len(model.SNIPPET_PREFIX):]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
             raise model.DfdException(

@@ -14,9 +14,9 @@ def check(
         prefix = model.mk_err_prefix_from(dep.source)
 
         # load source text
-        if dep.to_graph.startswith("#"):
+        if dep.to_graph.startswith(model.SNIPPET_PREFIX):
             # from snippet
-            name = dep.to_graph[1:]
+            name = dep.to_graph[len(model.SNIPPET_PREFIX):]
             if name not in snippet_by_name:
                 errors.append(f'{prefix}Referring to unknown snippet "{name}"')
                 continue
@@ -30,7 +30,7 @@ def check(
                     text = f.read()
             except FileNotFoundError as e:
                 if name in snippet_by_name:
-                    errors.append(f'{prefix}{e}. Did you mean "#{name}" ?')
+                    errors.append(f'{prefix}{e}. Did you mean "{model.SNIPPET_PREFIX}{name}" ?')
                 else:
                     errors.append(f"{prefix}{e}")
                 continue

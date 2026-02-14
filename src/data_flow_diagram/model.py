@@ -72,7 +72,7 @@ class GraphOptions:
 @dataclass
 class Style(Statement):
     style: str
-    value: Any = None
+    value: str = ""
 
 
 @dataclass
@@ -202,6 +202,8 @@ class Keyword(StrEnum):
 
 NODE_STAR = "*"  # star as src/dst in connections will declare and generate a distinct "none" node
 ALL_NEIGHBORS = "*"  # "all" distance in filter neighbor spec
+SNIPPET_PREFIX = "#"  # prefix distinguishing snippet references from file paths
+INCLUDE_DIRECTIVE = "#include"  # DSL directive for including external sources
 
 
 ##############################################################################

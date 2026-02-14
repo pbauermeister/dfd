@@ -4,7 +4,7 @@ import os.path
 import pprint
 import re
 import textwrap
-from typing import Any, Optional
+from typing import Any
 
 from . import dependency_checker
 from . import dfd_dot_templates as TMPL
@@ -312,7 +312,7 @@ def generate_dot(
 ) -> str:
     """Iterate over statements and generate a dot source file"""
 
-    def get_item(name: str) -> Optional[model.Item]:
+    def get_item(name: str) -> model.Item | None:
         return None if name == model.NODE_STAR else items_by_name[name]
 
     for statement in statements:
@@ -639,15 +639,15 @@ def handle_filters(
 
     # remove duplicate connections due to replacements
     kept_new_statements = []
-    skiped_statements = set()
+    skipped_statements = set()
     for statement in new_statements:
         match statement:
             case model.Connection() as conn:
                 sig = conn.signature()
-                if sig in skiped_statements:
+                if sig in skipped_statements:
                     continue
                 if sig in replaced_connections:
-                    skiped_statements.add(sig)
+                    skipped_statements.add(sig)
         kept_new_statements.append(statement)
 
     return kept_new_statements
