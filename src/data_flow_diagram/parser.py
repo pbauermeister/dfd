@@ -2,7 +2,7 @@
 
 import os.path
 import re
-from typing import Tuple
+from typing import Callable, Tuple
 
 from . import dfd_dot_templates as TMPL
 from . import model
@@ -115,42 +115,12 @@ def parse(
         error_prefix = model.mk_err_prefix_from(source)
 
         # syntactic sugars may rewrite the line
-        line = apply_syntactic_sugars(src_line)
+        line = _apply_syntactic_sugars(src_line)
         source.text = line  # fixup text
 
         word = source.text.split()[0]
 
-        f = {
-            Keyword.STYLE: parse_style,
-            Keyword.PROCESS: parse_process,
-            Keyword.CONTROL: parse_control,
-            Keyword.ENTITY: parse_entity,
-            Keyword.STORE: parse_store,
-            Keyword.NONE: parse_none,
-            Keyword.CHANNEL: parse_channel,
-            Keyword.FLOW: parse_flow,
-            Keyword.CFLOW: parse_cflow,
-            Keyword.BFLOW: parse_bflow,
-            Keyword.UFLOW: parse_uflow,
-            Keyword.SIGNAL: parse_signal,
-            Keyword.FLOW_RELAXED: parse_flow_q,
-            Keyword.CFLOW_RELAXED: parse_cflow_q,
-            Keyword.BFLOW_RELAXED: parse_bflow_q,
-            Keyword.UFLOW_RELAXED: parse_uflow_q,
-            Keyword.SIGNAL_RELAXED: parse_signal_q,
-            Keyword.FLOW_REVERSED: parse_flow_r,
-            Keyword.CFLOW_REVERSED: parse_cflow_r,
-            Keyword.SIGNAL_REVERSED: parse_signal_r,
-            Keyword.FLOW_REVERSED_RELAXED: parse_flow_r_q,
-            Keyword.CFLOW_REVERSED_RELAXED: parse_cflow_r_q,
-            Keyword.SIGNAL_REVERSED_RELAXED: parse_signal_r_q,
-            Keyword.CONSTRAINT: parse_constraint,
-            Keyword.CONSTRAINT_REVERSED: parse_constraint_r,
-            Keyword.FRAME: parse_frame,
-            Keyword.ATTRIB: parse_attrib,
-            Keyword.ONLY: parse_filter,
-            Keyword.WITHOUT: parse_filter,
-        }.get(Keyword(word))
+        f = _PARSERS.get(word)
 
         if f is None:
             raise model.DfdException(
@@ -164,7 +134,7 @@ def parse(
 
         match statement:
             case model.Item() as item:
-                parse_item_external(item, dependencies)
+                _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
 
         match statement:
@@ -183,7 +153,7 @@ def parse(
     return statements, dependencies, attribs
 
 
-def split_args(
+def _split_args(
     dfd_line: str, n: int, last_is_optional: bool = False
 ) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
@@ -201,7 +171,7 @@ def split_args(
     return terms[1:]
 
 
-def parse_item_name(name: str) -> Tuple[str, bool]:
+def _parse_item_name(name: str) -> Tuple[str, bool]:
     """If name ends with ?, make it hidable"""
     if name.endswith("?"):
         return name[:-1], True
@@ -209,15 +179,15 @@ def parse_item_name(name: str) -> Tuple[str, bool]:
         return name, False
 
 
-def parse_style(source: model.SourceLine) -> model.Statement:
+def _parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
-    style, value = split_args(source.text, 2, True)
+    style, value = _split_args(source.text, 2, True)
     return model.Style(source, style, value)
 
 
-def parse_attrib(source: model.SourceLine) -> model.Statement:
+def _parse_attrib(source: model.SourceLine) -> model.Statement:
     """Parse attrib name text"""
-    alias, text = split_args(source.text, 2, True)
+    alias, text = _split_args(source.text, 2, True)
     return model.Attrib(source, alias, text)
 
 
@@ -236,7 +206,7 @@ RX_FILTER_ARG = re.compile(
 )
 
 
-def parse_filter(source: model.SourceLine) -> model.Statement:
+def _parse_filter(source: model.SourceLine) -> model.Statement:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
@@ -328,173 +298,39 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
     return res
 
 
-def parse_process(source: model.SourceLine) -> model.Statement:
-    """Parse process statement"""
-    name, text = split_args(source.text, 2, True)
-    name, hidable = parse_item_name(name)
-    return model.Item(source, Keyword.PROCESS, text, "", name, hidable)
+def _make_item_parser(
+    keyword: Keyword,
+) -> Callable[[model.SourceLine], model.Statement]:
+    """Create a parser for an item statement of the given type."""
+
+    def parse(source: model.SourceLine) -> model.Statement:
+        name, text = _split_args(source.text, 2, True)
+        name, hidable = _parse_item_name(name)
+        return model.Item(source, keyword, text, "", name, hidable)
+
+    return parse
 
 
-def parse_control(source: model.SourceLine) -> model.Statement:
-    """Parse control statement"""
-    name, text = split_args(source.text, 2, True)
-    name, hidable = parse_item_name(name)
-    return model.Item(source, Keyword.CONTROL, text, "", name, hidable)
+def _make_connection_parser(
+    keyword: Keyword,
+    reversed: bool = False,
+    relaxed: bool = False,
+    swap: bool = False,
+) -> Callable[[model.SourceLine], model.Statement]:
+    """Create a parser for a connection statement."""
+
+    def parse(source: model.SourceLine) -> model.Statement:
+        src, dst, text = _split_args(source.text, 3, True)
+        if swap:
+            src, dst = dst, src
+        return model.Connection(
+            source, keyword, text, "", src, dst, reversed, relaxed
+        )
+
+    return parse
 
 
-def parse_entity(source: model.SourceLine) -> model.Statement:
-    """Parse entity statement"""
-    name, text = split_args(source.text, 2, True)
-    name, hidable = parse_item_name(name)
-    return model.Item(source, Keyword.ENTITY, text, "", name, hidable)
-
-
-def parse_store(source: model.SourceLine) -> model.Statement:
-    """Parse store statement"""
-    name, text = split_args(source.text, 2, True)
-    name, hidable = parse_item_name(name)
-    return model.Item(source, Keyword.STORE, text, "", name, hidable)
-
-
-def parse_none(source: model.SourceLine) -> model.Statement:
-    """Parse none statement"""
-    name, text = split_args(source.text, 2, True)
-    name, hidable = parse_item_name(name)
-    return model.Item(source, Keyword.NONE, text, "", name, hidable)
-
-
-def parse_channel(source: model.SourceLine) -> model.Statement:
-    """Parse channel statement"""
-    name, text = split_args(source.text, 2, True)
-    name, hidable = parse_item_name(name)
-    return model.Item(source, Keyword.CHANNEL, text, "", name, hidable)
-
-
-def parse_flow(source: model.SourceLine) -> model.Statement:
-    """Parse directional flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.FLOW, text, "", src, dst)
-
-
-def parse_flow_r(source: model.SourceLine) -> model.Statement:
-    """Parse directional reversed flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.FLOW, text, "", src, dst, True)
-
-
-def parse_cflow(source: model.SourceLine) -> model.Statement:
-    """Parse continuous flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.CFLOW, text, "", src, dst)
-
-
-def parse_cflow_r(source: model.SourceLine) -> model.Statement:
-    """Parse continuous flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.CFLOW, text, "", src, dst, True)
-
-
-def parse_bflow(source: model.SourceLine) -> model.Statement:
-    """Parse bidirectional flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.BFLOW, text, "", src, dst)
-
-
-def parse_uflow(source: model.SourceLine) -> model.Statement:
-    """Parse undirected flow flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.UFLOW, text, "", src, dst)
-
-
-def parse_signal(source: model.SourceLine) -> model.Statement:
-    """Parse signal statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.SIGNAL, text, "", src, dst)
-
-
-def parse_signal_r(source: model.SourceLine) -> model.Statement:
-    """Parse reversed signal statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.SIGNAL, text, "", src, dst, True)
-
-
-def parse_flow_q(source: model.SourceLine) -> model.Statement:
-    """Parse directional flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.FLOW, text, "", src, dst, relaxed=True
-    )
-
-
-def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
-    """Parse directional reversed flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.FLOW, text, "", src, dst, True, relaxed=True
-    )
-
-
-def parse_cflow_q(source: model.SourceLine) -> model.Statement:
-    """Parse continuous flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.CFLOW, text, "", src, dst, relaxed=True
-    )
-
-
-def parse_cflow_r_q(source: model.SourceLine) -> model.Statement:
-    """Parse continuous flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.CFLOW, text, "", src, dst, True, relaxed=True
-    )
-
-
-def parse_bflow_q(source: model.SourceLine) -> model.Statement:
-    """Parse bidirectional flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.BFLOW, text, "", src, dst, relaxed=True
-    )
-
-
-def parse_uflow_q(source: model.SourceLine) -> model.Statement:
-    """Parse undirected flow flow statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.UFLOW, text, "", src, dst, relaxed=True
-    )
-
-
-def parse_signal_q(source: model.SourceLine) -> model.Statement:
-    """Parse signal statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.SIGNAL, text, "", src, dst, relaxed=True
-    )
-
-
-def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
-    """Parse reversed signal statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(
-        source, Keyword.SIGNAL, text, "", src, dst, True, relaxed=True
-    )
-
-
-def parse_constraint(source: model.SourceLine) -> model.Statement:
-    """Parse constraint statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.CONSTRAINT, text, "", src, dst)
-
-
-def parse_constraint_r(source: model.SourceLine) -> model.Statement:
-    """Parse reversed constraint statement"""
-    src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, Keyword.CONSTRAINT, text, "", dst, src)
-
-
-def apply_syntactic_sugars(src_line: str) -> str:
+def _apply_syntactic_sugars(src_line: str) -> str:
 
     # allow arguments to be sticked to the filter mnemonics
     if src_line and src_line[0] in (Keyword.ONLY, Keyword.WITHOUT):
@@ -573,7 +409,7 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
                 item.text = item.text or item.name
 
 
-def parse_item_external(
+def _parse_item_external(
     item: model.Item, dependencies: model.GraphDependencies
 ) -> None:
     parts = item.name.split(":", 1)
@@ -598,7 +434,7 @@ def parse_item_external(
         dependencies.append(dependency)
 
 
-def parse_frame(source: model.SourceLine) -> model.Statement:
+def _parse_frame(source: model.SourceLine) -> model.Statement:
     """Parse frame statement"""
     parts = source.text.split("=", maxsplit=1)
     if len(parts) == 1:
@@ -609,3 +445,61 @@ def parse_frame(source: model.SourceLine) -> model.Statement:
     items = parts[0].split()[1:]
     attrs = "style=dashed"
     return model.Frame(source, Keyword.FRAME, text, attrs, items)
+
+
+##############################################################################
+# Keyword-to-parser dispatch table (module-level, built once)
+
+_PARSERS: dict[str, Callable[[model.SourceLine], model.Statement]] = {
+    # Options
+    Keyword.STYLE: _parse_style,
+    Keyword.ATTRIB: _parse_attrib,
+    # Items
+    Keyword.PROCESS: _make_item_parser(Keyword.PROCESS),
+    Keyword.CONTROL: _make_item_parser(Keyword.CONTROL),
+    Keyword.ENTITY: _make_item_parser(Keyword.ENTITY),
+    Keyword.STORE: _make_item_parser(Keyword.STORE),
+    Keyword.NONE: _make_item_parser(Keyword.NONE),
+    Keyword.CHANNEL: _make_item_parser(Keyword.CHANNEL),
+    # Connections
+    Keyword.FLOW: _make_connection_parser(Keyword.FLOW),
+    Keyword.CFLOW: _make_connection_parser(Keyword.CFLOW),
+    Keyword.BFLOW: _make_connection_parser(Keyword.BFLOW),
+    Keyword.UFLOW: _make_connection_parser(Keyword.UFLOW),
+    Keyword.SIGNAL: _make_connection_parser(Keyword.SIGNAL),
+    Keyword.CONSTRAINT: _make_connection_parser(Keyword.CONSTRAINT),
+    # Connections: reversed
+    Keyword.FLOW_REVERSED: _make_connection_parser(Keyword.FLOW, reversed=True),
+    Keyword.CFLOW_REVERSED: _make_connection_parser(
+        Keyword.CFLOW, reversed=True
+    ),
+    Keyword.SIGNAL_REVERSED: _make_connection_parser(
+        Keyword.SIGNAL, reversed=True
+    ),
+    Keyword.CONSTRAINT_REVERSED: _make_connection_parser(
+        Keyword.CONSTRAINT, swap=True
+    ),
+    # Connections: relaxed
+    Keyword.FLOW_RELAXED: _make_connection_parser(Keyword.FLOW, relaxed=True),
+    Keyword.CFLOW_RELAXED: _make_connection_parser(Keyword.CFLOW, relaxed=True),
+    Keyword.BFLOW_RELAXED: _make_connection_parser(Keyword.BFLOW, relaxed=True),
+    Keyword.UFLOW_RELAXED: _make_connection_parser(Keyword.UFLOW, relaxed=True),
+    Keyword.SIGNAL_RELAXED: _make_connection_parser(
+        Keyword.SIGNAL, relaxed=True
+    ),
+    # Connections: reversed + relaxed
+    Keyword.FLOW_REVERSED_RELAXED: _make_connection_parser(
+        Keyword.FLOW, reversed=True, relaxed=True
+    ),
+    Keyword.CFLOW_REVERSED_RELAXED: _make_connection_parser(
+        Keyword.CFLOW, reversed=True, relaxed=True
+    ),
+    Keyword.SIGNAL_REVERSED_RELAXED: _make_connection_parser(
+        Keyword.SIGNAL, reversed=True, relaxed=True
+    ),
+    # Frame
+    Keyword.FRAME: _parse_frame,
+    # Filters
+    Keyword.ONLY: _parse_filter,
+    Keyword.WITHOUT: _parse_filter,
+}
