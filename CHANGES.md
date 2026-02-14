@@ -1,3 +1,7 @@
+## Version 1.16.2.post2:
+
+- Refactoring of style options.
+
 ## Version 1.16.2.post1:
 
 - Refactoring of keywords.

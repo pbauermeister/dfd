@@ -142,6 +142,20 @@ class Without(Filter):
 
 
 ##############################################################################
+# Style options
+
+
+class StyleOption(StrEnum):
+    VERTICAL = "vertical"
+    HORIZONTAL = "horizontal"
+    CONTEXT = "context"
+    ROTATED = "rotated"
+    UNROTATED = "unrotated"
+    ITEM_TEXT_WIDTH = "item-text-width"
+    CONNECTION_TEXT_WIDTH = "connection-text-width"
+
+
+##############################################################################
 # Statement keywords
 
 
