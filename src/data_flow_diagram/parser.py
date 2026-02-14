@@ -46,9 +46,9 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 continue
         nb_stars = 0
         for point in conn.src, conn.dst:
-            if point == "*":
+            if point == model.NODE_STAR:
                 nb_stars += 1
-            if point != "*":
+            if point != model.NODE_STAR:
                 if point not in items_by_name:
                     raise model.DfdException(
                         f'{error_prefix}Connection "{conn.type}" links to "{point}", '
@@ -136,12 +136,12 @@ def parse(
             case model.Item() as item:
                 _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
+                # Items are also Drawables, so parse drawable attributes here
+                parse_drawable_attrs(item)
 
-        match statement:
             case model.Drawable() as drawable:
                 parse_drawable_attrs(drawable)
 
-        match statement:
             case model.Attrib() as attrib:
                 attribs[attrib.alias] = attrib
 
@@ -196,12 +196,13 @@ RX_FILTER_ARG = re.compile(
       # either a neighbor specification
       (?P<neighbors><>|<|>|\[|])    # direction
       (?P<flags>[a-zA-Z]*)              # flags
-      (?: (?P<all>[*]) | (?P<num>[0-9]+) )  # "*" for all, or decimal number
+      (?: (?P<all>[%s]) | (?P<num>[0-9]+) )  # "all" distance, or decimal number
       |
       # or a replacer specification
       =                             # indicates replacer
       (?P<replacer>.*)              # name if item replacing the others
-    )""",
+    )"""
+    % re.escape(model.ALL_NEIGHBORS),
     re.X,
 )
 
@@ -420,8 +421,8 @@ def _parse_item_external(
         else:
             item.name = parts[-2]
 
-        if item.name.startswith("#"):
-            item.name = item.name[1:]
+        if item.name.startswith(model.SNIPPET_PREFIX):
+            item.name = item.name[len(model.SNIPPET_PREFIX):]
         else:
             item.name = os.path.splitext(item.name)[0]
 

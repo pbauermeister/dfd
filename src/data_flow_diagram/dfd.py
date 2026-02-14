@@ -4,7 +4,7 @@ import os.path
 import pprint
 import re
 import textwrap
-from typing import Any, Optional
+from typing import Any
 
 from . import dependency_checker
 from . import dfd_dot_templates as TMPL
@@ -312,8 +312,8 @@ def generate_dot(
 ) -> str:
     """Iterate over statements and generate a dot source file"""
 
-    def get_item(name: str) -> Optional[model.Item]:
-        return None if name == "*" else items_by_name[name]
+    def get_item(name: str) -> model.Item | None:
+        return None if name == model.NODE_STAR else items_by_name[name]
 
     for statement in statements:
         match statement:
@@ -499,6 +499,18 @@ def handle_filters(
             dprint("*** Filter:", statement)
             dprint("    before:", kept_names)
 
+        def _collect_frame_skips(
+            f: model.Filter, names: set[str], downs: set[str], ups: set[str],
+        ) -> None:
+            if f.neighbors_up.no_frames:
+                skip_frames_for_names.update(ups)
+                if not f.neighbors_up.no_anchors:
+                    skip_frames_for_names.update(names)
+            if f.neighbors_down.no_frames:
+                skip_frames_for_names.update(downs)
+                if not f.neighbors_down.no_anchors:
+                    skip_frames_for_names.update(names)
+
         match statement:
             case model.Only() as f:
                 if kept_names is None:
@@ -524,14 +536,7 @@ def handle_filters(
                 kept_names.update(downs)
                 kept_names.update(ups)
 
-                if f.neighbors_up.no_frames:
-                    skip_frames_for_names.update(ups)
-                    if not f.neighbors_up.no_anchors:
-                        skip_frames_for_names.update(names)
-                if f.neighbors_down.no_frames:
-                    skip_frames_for_names.update(downs)
-                    if not f.neighbors_down.no_anchors:
-                        skip_frames_for_names.update(names)
+                _collect_frame_skips(f, names, downs, ups)
 
             case model.Without() as f:
                 if kept_names is None:
@@ -562,14 +567,7 @@ def handle_filters(
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
 
-                if f.neighbors_up.no_frames:
-                    skip_frames_for_names.update(ups)
-                    if not f.neighbors_up.no_anchors:
-                        skip_frames_for_names.update(names)
-                if f.neighbors_down.no_frames:
-                    skip_frames_for_names.update(downs)
-                    if not f.neighbors_down.no_anchors:
-                        skip_frames_for_names.update(names)
+                _collect_frame_skips(f, names, downs, ups)
 
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
@@ -641,15 +639,15 @@ def handle_filters(
 
     # remove duplicate connections due to replacements
     kept_new_statements = []
-    skiped_statements = set()
+    skipped_statements = set()
     for statement in new_statements:
         match statement:
             case model.Connection() as conn:
                 sig = conn.signature()
-                if sig in skiped_statements:
+                if sig in skipped_statements:
                     continue
                 if sig in replaced_connections:
-                    skiped_statements.add(sig)
+                    skipped_statements.add(sig)
         kept_new_statements.append(statement)
 
     return kept_new_statements
