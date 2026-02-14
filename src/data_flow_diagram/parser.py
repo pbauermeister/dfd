@@ -2,10 +2,11 @@
 
 import os.path
 import re
-from typing import Callable, Tuple
+from typing import Tuple
 
 from . import dfd_dot_templates as TMPL
 from . import model
+from .model import Keyword
 from .console import dprint
 
 
@@ -54,13 +55,13 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                         f"which is not defined"
                     )
                 if (
-                    items_by_name[point].type == model.CONTROL
-                    and conn.type != model.SIGNAL
+                    items_by_name[point].type == Keyword.CONTROL
+                    and conn.type != Keyword.SIGNAL
                 ):
                     raise model.DfdException(
-                        f'{error_prefix}Connection to {model.CONTROL} "{point}" is '
+                        f'{error_prefix}Connection to {Keyword.CONTROL} "{point}" is '
                         f'of type "{conn.type}", however only connections of type '
-                        f'"{model.SIGNAL}" are allowed'
+                        f'"{Keyword.SIGNAL}" are allowed'
                     )
 
         if nb_stars == 2:
@@ -120,36 +121,36 @@ def parse(
         word = source.text.split()[0]
 
         f = {
-            model.STYLE: parse_style,
-            model.PROCESS: parse_process,
-            model.CONTROL: parse_control,
-            model.ENTITY: parse_entity,
-            model.STORE: parse_store,
-            model.NONE: parse_none,
-            model.CHANNEL: parse_channel,
-            model.FLOW: parse_flow,
-            model.CFLOW: parse_cflow,
-            model.BFLOW: parse_bflow,
-            model.UFLOW: parse_uflow,
-            model.SIGNAL: parse_signal,
-            model.FLOW_RELAXED: parse_flow_q,
-            model.CFLOW_RELAXED: parse_cflow_q,
-            model.BFLOW_RELAXED: parse_bflow_q,
-            model.UFLOW_RELAXED: parse_uflow_q,
-            model.SIGNAL_RELAXED: parse_signal_q,
-            model.FLOW_REVERSED: parse_flow_r,
-            model.CFLOW_REVERSED: parse_cflow_r,
-            model.SIGNAL_REVERSED: parse_signal_r,
-            model.FLOW_REVERSED_RELAXED: parse_flow_r_q,
-            model.CFLOW_REVERSED_RELAXED: parse_cflow_r_q,
-            model.SIGNAL_REVERSED_RELAXED: parse_signal_r_q,
-            model.CONSTRAINT: parse_constraint,
-            model.CONSTRAINT_REVERSED: parse_constraint_r,
-            model.FRAME: parse_frame,
-            model.ATTRIB: parse_attrib,
-            model.ONLY: parse_filter,
-            model.WITHOUT: parse_filter,
-        }.get(word)
+            Keyword.STYLE: parse_style,
+            Keyword.PROCESS: parse_process,
+            Keyword.CONTROL: parse_control,
+            Keyword.ENTITY: parse_entity,
+            Keyword.STORE: parse_store,
+            Keyword.NONE: parse_none,
+            Keyword.CHANNEL: parse_channel,
+            Keyword.FLOW: parse_flow,
+            Keyword.CFLOW: parse_cflow,
+            Keyword.BFLOW: parse_bflow,
+            Keyword.UFLOW: parse_uflow,
+            Keyword.SIGNAL: parse_signal,
+            Keyword.FLOW_RELAXED: parse_flow_q,
+            Keyword.CFLOW_RELAXED: parse_cflow_q,
+            Keyword.BFLOW_RELAXED: parse_bflow_q,
+            Keyword.UFLOW_RELAXED: parse_uflow_q,
+            Keyword.SIGNAL_RELAXED: parse_signal_q,
+            Keyword.FLOW_REVERSED: parse_flow_r,
+            Keyword.CFLOW_REVERSED: parse_cflow_r,
+            Keyword.SIGNAL_REVERSED: parse_signal_r,
+            Keyword.FLOW_REVERSED_RELAXED: parse_flow_r_q,
+            Keyword.CFLOW_REVERSED_RELAXED: parse_cflow_r_q,
+            Keyword.SIGNAL_REVERSED_RELAXED: parse_signal_r_q,
+            Keyword.CONSTRAINT: parse_constraint,
+            Keyword.CONSTRAINT_REVERSED: parse_constraint_r,
+            Keyword.FRAME: parse_frame,
+            Keyword.ATTRIB: parse_attrib,
+            Keyword.ONLY: parse_filter,
+            Keyword.WITHOUT: parse_filter,
+        }.get(Keyword(word))
 
         if f is None:
             raise model.DfdException(
@@ -261,9 +262,9 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
             break  # no neighbor/replacer specification
 
         if match.group("replacer"):
-            if cmd != model.WITHOUT:
+            if cmd != Keyword.WITHOUT:
                 raise model.DfdException(
-                    f"Replacer specification is only allowed for {model.WITHOUT} filter"
+                    f"Replacer specification is only allowed for {Keyword.WITHOUT} filter"
                 )
             replacer = arg[1:]
             args = args[1:]
@@ -318,9 +319,9 @@ def parse_filter(source: model.SourceLine) -> model.Statement:
     f.names = args
 
     res: model.Statement
-    if cmd == model.ONLY:
+    if cmd == Keyword.ONLY:
         res = model.Only(**f.__dict__)
-    else:  # cmd == model.WITHOUT:
+    else:  # cmd == Keyword.WITHOUT:
         res = model.Without(
             **f.__dict__, replaced_by=replacer
         )  # replaced_by is set later by the caller
@@ -331,97 +332,97 @@ def parse_process(source: model.SourceLine) -> model.Statement:
     """Parse process statement"""
     name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.PROCESS, text, "", name, hidable)
+    return model.Item(source, Keyword.PROCESS, text, "", name, hidable)
 
 
 def parse_control(source: model.SourceLine) -> model.Statement:
     """Parse control statement"""
     name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.CONTROL, text, "", name, hidable)
+    return model.Item(source, Keyword.CONTROL, text, "", name, hidable)
 
 
 def parse_entity(source: model.SourceLine) -> model.Statement:
     """Parse entity statement"""
     name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.ENTITY, text, "", name, hidable)
+    return model.Item(source, Keyword.ENTITY, text, "", name, hidable)
 
 
 def parse_store(source: model.SourceLine) -> model.Statement:
     """Parse store statement"""
     name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.STORE, text, "", name, hidable)
+    return model.Item(source, Keyword.STORE, text, "", name, hidable)
 
 
 def parse_none(source: model.SourceLine) -> model.Statement:
     """Parse none statement"""
     name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.NONE, text, "", name, hidable)
+    return model.Item(source, Keyword.NONE, text, "", name, hidable)
 
 
 def parse_channel(source: model.SourceLine) -> model.Statement:
     """Parse channel statement"""
     name, text = split_args(source.text, 2, True)
     name, hidable = parse_item_name(name)
-    return model.Item(source, model.CHANNEL, text, "", name, hidable)
+    return model.Item(source, Keyword.CHANNEL, text, "", name, hidable)
 
 
 def parse_flow(source: model.SourceLine) -> model.Statement:
     """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, text, "", src, dst)
+    return model.Connection(source, Keyword.FLOW, text, "", src, dst)
 
 
 def parse_flow_r(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.FLOW, text, "", src, dst, True)
+    return model.Connection(source, Keyword.FLOW, text, "", src, dst, True)
 
 
 def parse_cflow(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CFLOW, text, "", src, dst)
+    return model.Connection(source, Keyword.CFLOW, text, "", src, dst)
 
 
 def parse_cflow_r(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CFLOW, text, "", src, dst, True)
+    return model.Connection(source, Keyword.CFLOW, text, "", src, dst, True)
 
 
 def parse_bflow(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.BFLOW, text, "", src, dst)
+    return model.Connection(source, Keyword.BFLOW, text, "", src, dst)
 
 
 def parse_uflow(source: model.SourceLine) -> model.Statement:
     """Parse undirected flow flow statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.UFLOW, text, "", src, dst)
+    return model.Connection(source, Keyword.UFLOW, text, "", src, dst)
 
 
 def parse_signal(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, text, "", src, dst)
+    return model.Connection(source, Keyword.SIGNAL, text, "", src, dst)
 
 
 def parse_signal_r(source: model.SourceLine) -> model.Statement:
     """Parse reversed signal statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.SIGNAL, text, "", src, dst, True)
+    return model.Connection(source, Keyword.SIGNAL, text, "", src, dst, True)
 
 
 def parse_flow_q(source: model.SourceLine) -> model.Statement:
     """Parse directional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.FLOW, text, "", src, dst, relaxed=True
+        source, Keyword.FLOW, text, "", src, dst, relaxed=True
     )
 
 
@@ -429,7 +430,7 @@ def parse_flow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse directional reversed flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.FLOW, text, "", src, dst, True, relaxed=True
+        source, Keyword.FLOW, text, "", src, dst, True, relaxed=True
     )
 
 
@@ -437,7 +438,7 @@ def parse_cflow_q(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.CFLOW, text, "", src, dst, relaxed=True
+        source, Keyword.CFLOW, text, "", src, dst, relaxed=True
     )
 
 
@@ -445,7 +446,7 @@ def parse_cflow_r_q(source: model.SourceLine) -> model.Statement:
     """Parse continuous flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.CFLOW, text, "", src, dst, True, relaxed=True
+        source, Keyword.CFLOW, text, "", src, dst, True, relaxed=True
     )
 
 
@@ -453,7 +454,7 @@ def parse_bflow_q(source: model.SourceLine) -> model.Statement:
     """Parse bidirectional flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.BFLOW, text, "", src, dst, relaxed=True
+        source, Keyword.BFLOW, text, "", src, dst, relaxed=True
     )
 
 
@@ -461,7 +462,7 @@ def parse_uflow_q(source: model.SourceLine) -> model.Statement:
     """Parse undirected flow flow statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.UFLOW, text, "", src, dst, relaxed=True
+        source, Keyword.UFLOW, text, "", src, dst, relaxed=True
     )
 
 
@@ -469,7 +470,7 @@ def parse_signal_q(source: model.SourceLine) -> model.Statement:
     """Parse signal statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.SIGNAL, text, "", src, dst, relaxed=True
+        source, Keyword.SIGNAL, text, "", src, dst, relaxed=True
     )
 
 
@@ -477,26 +478,26 @@ def parse_signal_r_q(source: model.SourceLine) -> model.Statement:
     """Parse reversed signal statement"""
     src, dst, text = split_args(source.text, 3, True)
     return model.Connection(
-        source, model.SIGNAL, text, "", src, dst, True, relaxed=True
+        source, Keyword.SIGNAL, text, "", src, dst, True, relaxed=True
     )
 
 
 def parse_constraint(source: model.SourceLine) -> model.Statement:
     """Parse constraint statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CONSTRAINT, text, "", src, dst)
+    return model.Connection(source, Keyword.CONSTRAINT, text, "", src, dst)
 
 
 def parse_constraint_r(source: model.SourceLine) -> model.Statement:
     """Parse reversed constraint statement"""
     src, dst, text = split_args(source.text, 3, True)
-    return model.Connection(source, model.CONSTRAINT, text, "", dst, src)
+    return model.Connection(source, Keyword.CONSTRAINT, text, "", dst, src)
 
 
 def apply_syntactic_sugars(src_line: str) -> str:
 
     # allow arguments to be sticked to the filter mnemonics
-    if src_line and src_line[0] in (model.ONLY, model.WITHOUT):
+    if src_line and src_line[0] in (Keyword.ONLY, Keyword.WITHOUT):
         if len(src_line) > 1 and src_line[1] != " ":
             # insert a space after the filter, so that it is recognized as a filter
             new_line = src_line[0] + " " + src_line[1:]
@@ -523,33 +524,37 @@ def apply_syntactic_sugars(src_line: str) -> str:
         return _fmt(keyword, parts)
 
     if re.fullmatch(r"-+>[?]?", op):
-        new_line = _resolve(model.FLOW, model.FLOW_RELAXED)
+        new_line = _resolve(Keyword.FLOW, Keyword.FLOW_RELAXED)
 
     elif re.fullmatch(r"<-+[?]?", op):
-        new_line = _resolve(model.FLOW_REVERSED, model.FLOW_REVERSED_RELAXED)
+        new_line = _resolve(
+            Keyword.FLOW_REVERSED, Keyword.FLOW_REVERSED_RELAXED
+        )
 
     if re.fullmatch(r"-+>>[?]?", op):
-        new_line = _resolve(model.CFLOW, model.CFLOW_RELAXED)
+        new_line = _resolve(Keyword.CFLOW, Keyword.CFLOW_RELAXED)
     elif re.fullmatch(r"<<-+[?]?", op):
-        new_line = _resolve(model.CFLOW_REVERSED, model.CFLOW_REVERSED_RELAXED)
+        new_line = _resolve(
+            Keyword.CFLOW_REVERSED, Keyword.CFLOW_REVERSED_RELAXED
+        )
 
     elif re.fullmatch(r"<-+>[?]?", op):
-        new_line = _resolve(model.BFLOW, model.BFLOW_RELAXED)
+        new_line = _resolve(Keyword.BFLOW, Keyword.BFLOW_RELAXED)
 
     elif re.fullmatch(r"--+[?]?", op):
-        new_line = _resolve(model.UFLOW, model.UFLOW_RELAXED)
+        new_line = _resolve(Keyword.UFLOW, Keyword.UFLOW_RELAXED)
 
     elif re.fullmatch(r":+>[?]?", op):
-        new_line = _resolve(model.SIGNAL, model.SIGNAL_RELAXED)
+        new_line = _resolve(Keyword.SIGNAL, Keyword.SIGNAL_RELAXED)
     elif re.fullmatch(r"<:+[?]?", op):
         new_line = _resolve(
-            model.SIGNAL_REVERSED, model.SIGNAL_REVERSED_RELAXED
+            Keyword.SIGNAL_REVERSED, Keyword.SIGNAL_REVERSED_RELAXED
         )
 
     elif re.fullmatch(r">+", op):
-        new_line = _resolve(model.CONSTRAINT)
+        new_line = _resolve(Keyword.CONSTRAINT)
     elif re.fullmatch(r"<+", op):
-        new_line = _resolve(model.CONSTRAINT_REVERSED)
+        new_line = _resolve(Keyword.CONSTRAINT_REVERSED)
 
     if new_line:
         return new_line

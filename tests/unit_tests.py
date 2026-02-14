@@ -91,9 +91,7 @@ class UnitTest(unittest.TestCase):
 
     def test_parse_syntax_error(self) -> None:
         l = scanner.scan(None, inputs.SYNTAX_ERROR)
-        with self.assertRaises(
-            model.DfdException, msg='Undetected syntax error'
-        ):
+        with self.assertRaises(ValueError, msg='Undetected syntax error'):
             parser.parse(l)
 
     def test_parse_duplicate_item_error(self) -> None:

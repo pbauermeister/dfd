@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import json
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any
 
 from . import config
@@ -141,53 +142,45 @@ class Without(Filter):
 
 
 ##############################################################################
-# Statement keyword litterals
+# Statement keywords
 
-STYLE = "style"
 
-PROCESS = "process"
-CONTROL = "control"
-ENTITY = "entity"
-STORE = "store"
-CHANNEL = "channel"
-NONE = "none"
+class Keyword(StrEnum):
+    STYLE = "style"
+    ATTRIB = "attrib"
 
-FLOW = "flow"
-BFLOW = "bflow"
-CFLOW = "cflow"
-UFLOW = "uflow"
-SIGNAL = "signal"
-CONSTRAINT = "constraint"
+    PROCESS = "process"
+    CONTROL = "control"
+    ENTITY = "entity"
+    STORE = "store"
+    CHANNEL = "channel"
+    NONE = "none"
 
-FRAME = "frame"
+    FLOW = "flow"
+    BFLOW = "bflow"
+    CFLOW = "cflow"
+    UFLOW = "uflow"
+    SIGNAL = "signal"
+    CONSTRAINT = "constraint"
 
-ATTRIB = "attrib"
+    FRAME = "frame"
 
-ONLY = "!"
-WITHOUT = "~"
+    ONLY = "!"
+    WITHOUT = "~"
 
-# Connection variants
-
-_REVERSED = ".r"
-_RELAXED = "?"
-
-FLOW_REVERSED = FLOW + _REVERSED
-FLOW_RELAXED = FLOW + _RELAXED
-FLOW_REVERSED_RELAXED = FLOW + _REVERSED + _RELAXED
-
-CFLOW_REVERSED = CFLOW + _REVERSED
-CFLOW_RELAXED = CFLOW + _RELAXED
-CFLOW_REVERSED_RELAXED = CFLOW + _REVERSED + _RELAXED
-
-BFLOW_RELAXED = BFLOW + _RELAXED
-
-UFLOW_RELAXED = UFLOW + _RELAXED
-
-SIGNAL_REVERSED = SIGNAL + _REVERSED
-SIGNAL_RELAXED = SIGNAL + _RELAXED
-SIGNAL_REVERSED_RELAXED = SIGNAL + _REVERSED + _RELAXED
-
-CONSTRAINT_REVERSED = CONSTRAINT + _REVERSED
+    # Connection variants
+    FLOW_REVERSED = "flow.r"
+    FLOW_RELAXED = "flow?"
+    FLOW_REVERSED_RELAXED = "flow.r?"
+    CFLOW_REVERSED = "cflow.r"
+    CFLOW_RELAXED = "cflow?"
+    CFLOW_REVERSED_RELAXED = "cflow.r?"
+    BFLOW_RELAXED = "bflow?"
+    UFLOW_RELAXED = "uflow?"
+    SIGNAL_REVERSED = "signal.r"
+    SIGNAL_RELAXED = "signal?"
+    SIGNAL_REVERSED_RELAXED = "signal.r?"
+    CONSTRAINT_REVERSED = "constraint.r"
 
 
 ##############################################################################
