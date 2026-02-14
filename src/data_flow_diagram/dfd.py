@@ -499,6 +499,18 @@ def handle_filters(
             dprint("*** Filter:", statement)
             dprint("    before:", kept_names)
 
+        def _collect_frame_skips(
+            f: model.Filter, names: set[str], downs: set[str], ups: set[str],
+        ) -> None:
+            if f.neighbors_up.no_frames:
+                skip_frames_for_names.update(ups)
+                if not f.neighbors_up.no_anchors:
+                    skip_frames_for_names.update(names)
+            if f.neighbors_down.no_frames:
+                skip_frames_for_names.update(downs)
+                if not f.neighbors_down.no_anchors:
+                    skip_frames_for_names.update(names)
+
         match statement:
             case model.Only() as f:
                 if kept_names is None:
@@ -524,14 +536,7 @@ def handle_filters(
                 kept_names.update(downs)
                 kept_names.update(ups)
 
-                if f.neighbors_up.no_frames:
-                    skip_frames_for_names.update(ups)
-                    if not f.neighbors_up.no_anchors:
-                        skip_frames_for_names.update(names)
-                if f.neighbors_down.no_frames:
-                    skip_frames_for_names.update(downs)
-                    if not f.neighbors_down.no_anchors:
-                        skip_frames_for_names.update(names)
+                _collect_frame_skips(f, names, downs, ups)
 
             case model.Without() as f:
                 if kept_names is None:
@@ -562,14 +567,7 @@ def handle_filters(
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
 
-                if f.neighbors_up.no_frames:
-                    skip_frames_for_names.update(ups)
-                    if not f.neighbors_up.no_anchors:
-                        skip_frames_for_names.update(names)
-                if f.neighbors_down.no_frames:
-                    skip_frames_for_names.update(downs)
-                    if not f.neighbors_down.no_anchors:
-                        skip_frames_for_names.update(names)
+                _collect_frame_skips(f, names, downs, ups)
 
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
