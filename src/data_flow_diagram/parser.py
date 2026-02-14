@@ -132,19 +132,19 @@ def parse(
             model.BFLOW: parse_bflow,
             model.UFLOW: parse_uflow,
             model.SIGNAL: parse_signal,
-            model.FLOW + "?": parse_flow_q,
-            model.CFLOW + "?": parse_cflow_q,
-            model.BFLOW + "?": parse_bflow_q,
-            model.UFLOW + "?": parse_uflow_q,
-            model.SIGNAL + "?": parse_signal_q,
-            model.FLOW + ".r": parse_flow_r,
-            model.CFLOW + ".r": parse_cflow_r,
-            model.SIGNAL + ".r": parse_signal_r,
-            model.FLOW + ".r?": parse_flow_r_q,
-            model.CFLOW + ".r?": parse_cflow_r_q,
-            model.SIGNAL + ".r?": parse_signal_r_q,
+            model.FLOW_RELAXED: parse_flow_q,
+            model.CFLOW_RELAXED: parse_cflow_q,
+            model.BFLOW_RELAXED: parse_bflow_q,
+            model.UFLOW_RELAXED: parse_uflow_q,
+            model.SIGNAL_RELAXED: parse_signal_q,
+            model.FLOW_REVERSED: parse_flow_r,
+            model.CFLOW_REVERSED: parse_cflow_r,
+            model.SIGNAL_REVERSED: parse_signal_r,
+            model.FLOW_REVERSED_RELAXED: parse_flow_r_q,
+            model.CFLOW_REVERSED_RELAXED: parse_cflow_r_q,
+            model.SIGNAL_REVERSED_RELAXED: parse_signal_r_q,
             model.CONSTRAINT: parse_constraint,
-            model.CONSTRAINT + ".r": parse_constraint_r,
+            model.CONSTRAINT_REVERSED: parse_constraint_r,
             model.FRAME: parse_frame,
             model.ATTRIB: parse_attrib,
             model.ONLY: parse_filter,
@@ -509,59 +509,47 @@ def apply_syntactic_sugars(src_line: str) -> str:
 
     op = terms[1]
 
-    def fmt(verb: str, args: list[str], swap: bool = False) -> str:
+    def _fmt(verb: str, args: list[str]) -> str:
         array = [verb] + args
         del array[2]  # remove arrow
-        if swap:
-            array[1], array[2] = array[2], array[1]
         return "\t".join(array)
 
     new_line = ""
 
-    if re.fullmatch(r"-+>[?]?", op):
-        q = "?" if op.endswith("?") else ""
+    def _resolve(keyword: str, relaxed_keyword: str | None = None) -> str:
         parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.FLOW + q, parts)
+        if relaxed_keyword is not None and op.endswith("?"):
+            return _fmt(relaxed_keyword, parts)
+        return _fmt(keyword, parts)
+
+    if re.fullmatch(r"-+>[?]?", op):
+        new_line = _resolve(model.FLOW, model.FLOW_RELAXED)
 
     elif re.fullmatch(r"<-+[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.FLOW + ".r" + q, parts)
+        new_line = _resolve(model.FLOW_REVERSED, model.FLOW_REVERSED_RELAXED)
 
     if re.fullmatch(r"-+>>[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.CFLOW + q, parts)
+        new_line = _resolve(model.CFLOW, model.CFLOW_RELAXED)
     elif re.fullmatch(r"<<-+[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.CFLOW + ".r" + q, parts)
+        new_line = _resolve(model.CFLOW_REVERSED, model.CFLOW_REVERSED_RELAXED)
 
     elif re.fullmatch(r"<-+>[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.BFLOW + q, parts)
+        new_line = _resolve(model.BFLOW, model.BFLOW_RELAXED)
 
     elif re.fullmatch(r"--+[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.UFLOW + q, parts)
+        new_line = _resolve(model.UFLOW, model.UFLOW_RELAXED)
 
     elif re.fullmatch(r":+>[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.SIGNAL + q, parts)
+        new_line = _resolve(model.SIGNAL, model.SIGNAL_RELAXED)
     elif re.fullmatch(r"<:+[?]?", op):
-        q = "?" if op.endswith("?") else ""
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.SIGNAL + ".r" + q, parts)
+        new_line = _resolve(
+            model.SIGNAL_REVERSED, model.SIGNAL_REVERSED_RELAXED
+        )
 
     elif re.fullmatch(r">+", op):
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.CONSTRAINT, parts)
+        new_line = _resolve(model.CONSTRAINT)
     elif re.fullmatch(r"<+", op):
-        parts = src_line.split(maxsplit=3)
-        new_line = fmt(model.CONSTRAINT + ".r", parts)
+        new_line = _resolve(model.CONSTRAINT_REVERSED)
 
     if new_line:
         return new_line
