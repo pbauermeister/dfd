@@ -136,12 +136,12 @@ def parse(
             case model.Item() as item:
                 _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
+                # Items are also Drawables, so parse drawable attributes here
+                parse_drawable_attrs(item)
 
-        match statement:
             case model.Drawable() as drawable:
                 parse_drawable_attrs(drawable)
 
-        match statement:
             case model.Attrib() as attrib:
                 attribs[attrib.alias] = attrib
 
