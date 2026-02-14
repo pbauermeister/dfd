@@ -368,22 +368,22 @@ def handle_options(
         match statement:
             case model.Style() as style:
                 match style.style:
-                    case "vertical":
+                    case model.StyleOption.VERTICAL:
                         options.is_vertical = True
-                    case "context":
+                    case model.StyleOption.CONTEXT:
                         options.is_context = True
-                    case "horizontal":
+                    case model.StyleOption.HORIZONTAL:
                         options.is_vertical = False
-                    case "rotated":
+                    case model.StyleOption.ROTATED:
                         options.is_rotated = True
-                    case "unrotated":
+                    case model.StyleOption.UNROTATED:
                         options.is_rotated = False
-                    case "item-text-width":
+                    case model.StyleOption.ITEM_TEXT_WIDTH:
                         try:
                             options.item_text_width = int(style.value)
                         except ValueError as e:
                             raise model.DfdException(f'{prefix}{e}"')
-                    case "connection-text-width":
+                    case model.StyleOption.CONNECTION_TEXT_WIDTH:
                         try:
                             options.connection_text_width = int(style.value)
                         except ValueError as e:
