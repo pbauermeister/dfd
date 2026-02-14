@@ -16,6 +16,10 @@ def repr(o: Any) -> str:
     return f"{name} {val}"
 
 
+##############################################################################
+# Classes representing elementsstatements and internal data structures
+
+
 @dataclass
 class Base:
     def __repr__(self) -> str:
@@ -24,6 +28,9 @@ class Base:
             + " "
             + json.dumps(dataclasses.asdict(self), indent="  ")
         )
+
+
+# Source text
 
 
 @dataclass
@@ -43,11 +50,40 @@ class SourceLine(Base):
     is_container: bool = False
 
 
+# Statements
 @dataclass
 class Statement(Base):
     source: SourceLine
 
 
+# Statements: options
+
+
+@dataclass
+class GraphOptions:
+    is_vertical: bool = False
+    is_context: bool = False
+    is_rotated: bool = False
+    item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
+    connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
+
+
+@dataclass
+class Style(Statement):
+    style: str
+    value: Any = None
+
+
+@dataclass
+class Attrib(Statement):
+    alias: str
+    text: str
+
+
+Attribs = dict[str, Attrib]
+
+
+# Statements: elements
 @dataclass
 class Drawable(Statement):
     type: str
@@ -80,18 +116,6 @@ class Frame(Drawable):
 
 
 @dataclass
-class Style(Statement):
-    style: str
-    value: Any = None
-
-
-@dataclass
-class Attrib(Statement):
-    alias: str
-    text: str
-
-
-@dataclass
 class FilterNeighbors:
     distance: int  # neighborhood distance to keep, or -1 for all
     no_anchors: bool  # consider only neighbors, not listed nodes themselves
@@ -116,8 +140,8 @@ class Without(Filter):
     replaced_by: str
 
 
-Attribs = dict[str, Attrib]
-
+##############################################################################
+# Statement keyword litterals
 
 STYLE = "style"
 
@@ -143,13 +167,8 @@ ONLY = "!"
 WITHOUT = "~"
 
 
-@dataclass
-class GraphOptions:
-    is_vertical: bool = False
-    is_context: bool = False
-    is_rotated: bool = False
-    item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
-    connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
+##############################################################################
+# Helpers
 
 
 def pack(src_line: str | None) -> str:
