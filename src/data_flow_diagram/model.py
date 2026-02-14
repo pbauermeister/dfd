@@ -65,8 +65,8 @@ class GraphOptions:
     is_vertical: bool = False
     is_context: bool = False
     is_rotated: bool = False
-    item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
-    connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
+    item_text_width: int = config.DEFAULT_ITEM_TEXT_WIDTH
+    connection_text_width: int = config.DEFAULT_CONNECTION_TEXT_WIDTH
 
 
 @dataclass
@@ -195,6 +195,13 @@ class Keyword(StrEnum):
     SIGNAL_RELAXED = "signal?"
     SIGNAL_REVERSED_RELAXED = "signal.r?"
     CONSTRAINT_REVERSED = "constraint.r"
+
+
+##############################################################################
+# DSL syntax literals
+
+NODE_STAR = "*"  # star as src/dst in connections will declare and generate a distinct "none" node
+ALL_NEIGHBORS = "*"  # "all" distance in filter neighbor spec
 
 
 ##############################################################################

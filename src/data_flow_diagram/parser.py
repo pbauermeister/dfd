@@ -46,9 +46,9 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 continue
         nb_stars = 0
         for point in conn.src, conn.dst:
-            if point == "*":
+            if point == model.NODE_STAR:
                 nb_stars += 1
-            if point != "*":
+            if point != model.NODE_STAR:
                 if point not in items_by_name:
                     raise model.DfdException(
                         f'{error_prefix}Connection "{conn.type}" links to "{point}", '
@@ -196,12 +196,13 @@ RX_FILTER_ARG = re.compile(
       # either a neighbor specification
       (?P<neighbors><>|<|>|\[|])    # direction
       (?P<flags>[a-zA-Z]*)              # flags
-      (?: (?P<all>[*]) | (?P<num>[0-9]+) )  # "*" for all, or decimal number
+      (?: (?P<all>[%s]) | (?P<num>[0-9]+) )  # "all" distance, or decimal number
       |
       # or a replacer specification
       =                             # indicates replacer
       (?P<replacer>.*)              # name if item replacing the others
-    )""",
+    )"""
+    % re.escape(model.ALL_NEIGHBORS),
     re.X,
 )
 

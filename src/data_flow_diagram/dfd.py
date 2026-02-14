@@ -313,7 +313,7 @@ def generate_dot(
     """Iterate over statements and generate a dot source file"""
 
     def get_item(name: str) -> Optional[model.Item]:
-        return None if name == "*" else items_by_name[name]
+        return None if name == model.NODE_STAR else items_by_name[name]
 
     for statement in statements:
         match statement:
