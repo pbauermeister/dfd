@@ -607,6 +607,5 @@ def parse_frame(source: model.SourceLine) -> model.Statement:
         text = parts[1].strip()
 
     items = parts[0].split()[1:]
-    type = ""  # so far there is only one type of frame
     attrs = "style=dashed"
-    return model.Frame(source, type, text, attrs, items)
+    return model.Frame(source, Keyword.FRAME, text, attrs, items)

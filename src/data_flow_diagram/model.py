@@ -87,7 +87,7 @@ Attribs = dict[str, Attrib]
 # Statements: elements
 @dataclass
 class Drawable(Statement):
-    type: str
+    type: Keyword
     text: str
     attrs: str
 
@@ -241,7 +241,7 @@ class Options:
 class GraphDependency:
     to_graph: str
     to_item: str | None
-    to_type: str
+    to_type: Keyword
     source: SourceLine
 
 
