@@ -1,6 +1,5 @@
-import sys
-
 from . import model, scanner, parser
+from .model import Keyword
 
 
 def check(
@@ -39,10 +38,10 @@ def check(
 
         # if only graph is targetted, we're done
         if dep.to_item is None:
-            if dep.to_type != model.NONE:
+            if dep.to_type != Keyword.NONE:
                 errors.append(
                     f"{prefix}A whole graph may only be referred to "
-                    f'by an item of type "{model.NONE}", and not '
+                    f'by an item of type "{Keyword.NONE}", and not '
                     f'"{dep.to_type}"'
                 )
             continue

@@ -79,7 +79,7 @@ class Generator:
         attrs = self._expand_attribs(attrs)
 
         match copy.type:
-            case model.PROCESS:
+            case model.Keyword.PROCESS:
                 if self.graph_options.is_context:
                     shape = "circle"
                     fc = "white"
@@ -90,23 +90,23 @@ class Generator:
                     f'"{copy.name}" [shape={shape} label="{copy.text}" '
                     f"fillcolor={fc} style=filled {attrs}]"
                 )
-            case model.CONTROL:
+            case model.Keyword.CONTROL:
                 fc = '"#eeeeee"'
                 line = (
                     f'"{copy.name}" [shape=ellipse label="{copy.text}" '
                     f'fillcolor={fc} style="filled,dashed" {attrs}]'
                 )
-            case model.ENTITY:
+            case model.Keyword.ENTITY:
                 line = (
                     f'"{copy.name}" [shape=rectangle label="{copy.text}" '
                     f"{attrs}]"
                 )
-            case model.STORE:
+            case model.Keyword.STORE:
                 d = self._attrib_to_dict(copy, attrs)
                 line = TMPL.STORE.format(**d)
-            case model.NONE:
+            case model.Keyword.NONE:
                 line = f'"{copy.name}" [shape=none label="{copy.text}" {attrs}]'
-            case model.CHANNEL:
+            case model.Keyword.CHANNEL:
                 d = self._attrib_to_dict(copy, attrs)
                 if self.graph_options.is_vertical:
                     line = TMPL.CHANNEL_HORIZONTAL.format(**d)
@@ -202,7 +202,7 @@ class Generator:
             text = ""
         else:
             src_name = src_item.name
-            if src_item.type == model.CHANNEL:
+            if src_item.type == model.Keyword.CHANNEL:
                 src_port = ":x:c"
 
         if not dst_item:
@@ -210,14 +210,14 @@ class Generator:
             text = ""
         else:
             dst_name = dst_item.name
-            if dst_item.type == model.CHANNEL:
+            if dst_item.type == model.Keyword.CHANNEL:
                 dst_port = ":x:c"
 
         attrs = f'label="{text}"'
 
         match conn.type:
             # make the edge invisible before other attributes
-            case model.CONSTRAINT:
+            case model.Keyword.CONSTRAINT:
                 if text and not conn.attrs:
                     # transparent edge, to reveal the label
                     attrs += " style=solid color=invis"
@@ -229,24 +229,24 @@ class Generator:
             attrs += " " + self._expand_attribs(conn.attrs)
 
         match conn.type:
-            case model.FLOW:
+            case model.Keyword.FLOW:
                 if conn.reversed:
                     attrs += " dir=back"
-            case model.BFLOW:
+            case model.Keyword.BFLOW:
                 attrs += " dir=both"
-            case model.CFLOW:
+            case model.Keyword.CFLOW:
                 if conn.reversed:
                     attrs += " dir=back"
                     attrs += " arrowtail=normalnormal"
                 else:
                     attrs += " arrowhead=normalnormal"
-            case model.UFLOW:
+            case model.Keyword.UFLOW:
                 attrs += " dir=none"
-            case model.SIGNAL:
+            case model.Keyword.SIGNAL:
                 if conn.reversed:
                     attrs += " dir=back"
                 attrs += " style=dashed"
-            case model.CONSTRAINT:
+            case model.Keyword.CONSTRAINT:
                 pass
             case _:
                 prefix = model.mk_err_prefix_from(conn.source)
@@ -417,14 +417,14 @@ def find_neighbors(
                 case model.Connection() as conn:
 
                     # constraints do not define neighborhood
-                    if conn.type == model.CONSTRAINT:
+                    if conn.type == model.Keyword.CONSTRAINT:
                         continue
 
                     src, dst = conn.src, conn.dst
                     if conn.reversed and not nreverse:
                         src, dst = dst, src
 
-                    if conn.type in (model.BFLOW, model.UFLOW):
+                    if conn.type in (model.Keyword.BFLOW, model.Keyword.UFLOW):
                         if dst in names:
                             found_names.add(src)
                         if src in names:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import json
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any
 
 from . import config
@@ -16,6 +17,10 @@ def repr(o: Any) -> str:
     return f"{name} {val}"
 
 
+##############################################################################
+# Classes representing elementsstatements and internal data structures
+
+
 @dataclass
 class Base:
     def __repr__(self) -> str:
@@ -24,6 +29,9 @@ class Base:
             + " "
             + json.dumps(dataclasses.asdict(self), indent="  ")
         )
+
+
+# Source text
 
 
 @dataclass
@@ -43,14 +51,43 @@ class SourceLine(Base):
     is_container: bool = False
 
 
+# Statements
 @dataclass
 class Statement(Base):
     source: SourceLine
 
 
+# Statements: options
+
+
+@dataclass
+class GraphOptions:
+    is_vertical: bool = False
+    is_context: bool = False
+    is_rotated: bool = False
+    item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
+    connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
+
+
+@dataclass
+class Style(Statement):
+    style: str
+    value: Any = None
+
+
+@dataclass
+class Attrib(Statement):
+    alias: str
+    text: str
+
+
+Attribs = dict[str, Attrib]
+
+
+# Statements: elements
 @dataclass
 class Drawable(Statement):
-    type: str
+    type: Keyword
     text: str
     attrs: str
 
@@ -80,18 +117,6 @@ class Frame(Drawable):
 
 
 @dataclass
-class Style(Statement):
-    style: str
-    value: Any = None
-
-
-@dataclass
-class Attrib(Statement):
-    alias: str
-    text: str
-
-
-@dataclass
 class FilterNeighbors:
     distance: int  # neighborhood distance to keep, or -1 for all
     no_anchors: bool  # consider only neighbors, not listed nodes themselves
@@ -116,40 +141,50 @@ class Without(Filter):
     replaced_by: str
 
 
-Attribs = dict[str, Attrib]
+##############################################################################
+# Statement keywords
 
 
-STYLE = "style"
+class Keyword(StrEnum):
+    STYLE = "style"
+    ATTRIB = "attrib"
 
-PROCESS = "process"
-CONTROL = "control"
-ENTITY = "entity"
-STORE = "store"
-CHANNEL = "channel"
-NONE = "none"
+    PROCESS = "process"
+    CONTROL = "control"
+    ENTITY = "entity"
+    STORE = "store"
+    CHANNEL = "channel"
+    NONE = "none"
 
-FLOW = "flow"
-BFLOW = "bflow"
-CFLOW = "cflow"
-UFLOW = "uflow"
-SIGNAL = "signal"
-CONSTRAINT = "constraint"
+    FLOW = "flow"
+    BFLOW = "bflow"
+    CFLOW = "cflow"
+    UFLOW = "uflow"
+    SIGNAL = "signal"
+    CONSTRAINT = "constraint"
 
-FRAME = "frame"
+    FRAME = "frame"
 
-ATTRIB = "attrib"
+    ONLY = "!"
+    WITHOUT = "~"
 
-ONLY = "!"
-WITHOUT = "~"
+    # Connection variants
+    FLOW_REVERSED = "flow.r"
+    FLOW_RELAXED = "flow?"
+    FLOW_REVERSED_RELAXED = "flow.r?"
+    CFLOW_REVERSED = "cflow.r"
+    CFLOW_RELAXED = "cflow?"
+    CFLOW_REVERSED_RELAXED = "cflow.r?"
+    BFLOW_RELAXED = "bflow?"
+    UFLOW_RELAXED = "uflow?"
+    SIGNAL_REVERSED = "signal.r"
+    SIGNAL_RELAXED = "signal?"
+    SIGNAL_REVERSED_RELAXED = "signal.r?"
+    CONSTRAINT_REVERSED = "constraint.r"
 
 
-@dataclass
-class GraphOptions:
-    is_vertical: bool = False
-    is_context: bool = False
-    is_rotated: bool = False
-    item_text_width = config.DEFAULT_ITEM_TEXT_WIDTH
-    connection_text_width = config.DEFAULT_CONNECTION_TEXT_WIDTH
+##############################################################################
+# Helpers
 
 
 def pack(src_line: str | None) -> str:
@@ -206,7 +241,7 @@ class Options:
 class GraphDependency:
     to_graph: str
     to_item: str | None
-    to_type: str
+    to_type: Keyword
     source: SourceLine
 
 
