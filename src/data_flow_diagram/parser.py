@@ -1,5 +1,6 @@
 """Parse DFD source text in our DSL"""
 
+import dataclasses
 import os.path
 import re
 from typing import Callable, Tuple
@@ -136,17 +137,29 @@ def parse(
         match statement:
             case model.ExportedStyle() as style:
                 if shared_options is not None:
-                    match style.style:
-                        case "percent-zoom":
-                            shared_options.percent_zoom = int(style.value)
-                        case "background-color":
-                            shared_options.background_color = style.value
-                        case "no-graph-title":
-                            shared_options.no_graph_title = True
-                        case _:
-                            raise model.DfdException(
-                                f'{error_prefix}Unrecognized style option "{style.style}"'
-                            )
+                    # convert name to snake_case
+                    field_name = style.style.replace("-", "_")
+
+                    # check that the style belongs to shared options
+                    if field_name not in model.SHARED_OPTION_NAMES:
+                        raise model.DfdException(
+                            f'{error_prefix}Unrecognized style option "{style.style}"'
+                        )
+
+                    # locate the field in the dataclass by its name
+                    field = next(
+                        f
+                        for f in dataclasses.fields(model.SharedOptions)
+                        if f.name == field_name
+                    )
+
+                    # convert value and set it in shared options
+                    if field.type == "int":
+                        setattr(shared_options, field_name, int(style.value))
+                    elif field.type == "bool":
+                        setattr(shared_options, field_name, True)
+                    else:
+                        setattr(shared_options, field_name, style.value)
                     continue
 
             case model.Item() as item:
