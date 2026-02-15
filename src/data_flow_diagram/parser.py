@@ -2,12 +2,12 @@
 
 import os.path
 import re
-from typing import Callable, Tuple
+from typing import Callable, Tuple, get_type_hints
 
 from . import dfd_dot_templates as TMPL
 from . import model
-from .model import Keyword
 from .console import dprint
+from .model import Keyword
 
 
 def check(statements: model.Statements) -> dict[str, model.Item]:
@@ -98,7 +98,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
 
 def parse(
     source_lines: model.SourceLines,
-    debug: bool = False,
+    shared_options: model.Options | None = None,
 ) -> tuple[model.Statements, model.GraphDependencies, model.Attribs]:
     """Parse the DFD source text as list of statements"""
 
@@ -120,6 +120,7 @@ def parse(
 
         word = source.text.split()[0]
 
+        # get parser from dispatch table
         f = _PARSERS.get(word)
 
         if f is None:
@@ -133,6 +134,27 @@ def parse(
             raise model.DfdException(f'{error_prefix}{e}')
 
         match statement:
+            case model.ExportedStyle() as style:
+                if shared_options is not None:
+                    # convert name to snake_case
+                    field_name = style.style.replace("-", "_")
+
+                    # check that the style belongs to shared options
+                    if field_name not in model.SHARED_OPTION_NAMES:
+                        raise model.DfdException(
+                            f'{error_prefix}Unrecognized style option "{style.style}"'
+                        )
+
+                    # convert value and set it in shared options
+                    field_type = get_type_hints(model.SharedOptions)[field_name]
+                    if field_type is int:
+                        setattr(shared_options, field_name, int(style.value))
+                    elif field_type is bool:
+                        setattr(shared_options, field_name, True)
+                    else:
+                        setattr(shared_options, field_name, style.value)
+                    continue
+
             case model.Item() as item:
                 _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
@@ -147,7 +169,7 @@ def parse(
 
         statements.append(statement)
 
-    if debug:
+    if shared_options and shared_options.debug:
         for s in statements:
             dprint(model.repr(s))
     return statements, dependencies, attribs
@@ -182,6 +204,10 @@ def _parse_item_name(name: str) -> Tuple[str, bool]:
 def _parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
     style, value = _split_args(source.text, 2, True)
+    style_snake = style.replace("-", "_")
+    if style_snake in model.SHARED_OPTION_NAMES:
+        return model.ExportedStyle(source, style, value)
+
     return model.Style(source, style, value)
 
 

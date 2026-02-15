@@ -21,7 +21,7 @@ def build(
 ) -> None:
     """Take a DFD source and build the final image or document"""
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
-    statements, dependencies, attribs = parser.parse(lines, options.debug)
+    statements, dependencies, attribs = parser.parse(lines, options)
     if dependencies and not options.no_check_dependencies:
         dependency_checker.check(dependencies, snippet_by_name, options)
 
