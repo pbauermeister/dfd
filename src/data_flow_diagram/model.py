@@ -76,6 +76,11 @@ class Style(Statement):
 
 
 @dataclass
+class ExportedStyle(Style):
+    pass
+
+
+@dataclass
 class Attrib(Statement):
     alias: str
     text: str
@@ -251,11 +256,25 @@ SnippetByName = dict[str, Snippet]
 
 
 @dataclass
-class Options:
-    format: str
+class SharedOptions:
+    """These options can be specified as `style NAME [VALUE]` in the DFD itself,
+    and are also available as commandline args."""
+
     percent_zoom: int
     background_color: str
     no_graph_title: bool
+
+
+SHARED_OPTION_NAMES = [
+    field.name for field in dataclasses.fields(SharedOptions)
+]
+
+
+@dataclass
+class Options(SharedOptions):
+    """These options can be specified as commandline args."""
+
+    format: str
     no_check_dependencies: bool
     debug: bool
 

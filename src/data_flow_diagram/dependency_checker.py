@@ -16,7 +16,7 @@ def check(
         # load source text
         if dep.to_graph.startswith(model.SNIPPET_PREFIX):
             # from snippet
-            name = dep.to_graph[len(model.SNIPPET_PREFIX):]
+            name = dep.to_graph[len(model.SNIPPET_PREFIX) :]
             if name not in snippet_by_name:
                 errors.append(f'{prefix}Referring to unknown snippet "{name}"')
                 continue
@@ -30,7 +30,9 @@ def check(
                     text = f.read()
             except FileNotFoundError as e:
                 if name in snippet_by_name:
-                    errors.append(f'{prefix}{e}. Did you mean "{model.SNIPPET_PREFIX}{name}" ?')
+                    errors.append(
+                        f'{prefix}{e}. Did you mean "{model.SNIPPET_PREFIX}{name}" ?'
+                    )
                 else:
                     errors.append(f"{prefix}{e}")
                 continue
@@ -48,7 +50,7 @@ def check(
 
         # scan and parse
         lines = scanner.scan(dep.source, text, snippet_by_name, options.debug)
-        statements, _, _ = parser.parse(lines, options.debug)
+        statements, _, _ = parser.parse(lines, options)
 
         # find name
         item = find_item(dep.to_item, statements)

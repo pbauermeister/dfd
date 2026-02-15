@@ -6,8 +6,8 @@ from typing import Callable, Tuple
 
 from . import dfd_dot_templates as TMPL
 from . import model
-from .model import Keyword
 from .console import dprint
+from .model import Keyword
 
 
 def check(statements: model.Statements) -> dict[str, model.Item]:
@@ -98,7 +98,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
 
 def parse(
     source_lines: model.SourceLines,
-    debug: bool = False,
+    shared_options: model.Options | None = None,
 ) -> tuple[model.Statements, model.GraphDependencies, model.Attribs]:
     """Parse the DFD source text as list of statements"""
 
@@ -120,6 +120,7 @@ def parse(
 
         word = source.text.split()[0]
 
+        # get parser from dispatch table
         f = _PARSERS.get(word)
 
         if f is None:
@@ -133,6 +134,21 @@ def parse(
             raise model.DfdException(f'{error_prefix}{e}')
 
         match statement:
+            case model.ExportedStyle() as style:
+                if shared_options is not None:
+                    match style.style:
+                        case "percent-zoom":
+                            shared_options.percent_zoom = int(style.value)
+                        case "background-color":
+                            shared_options.background_color = style.value
+                        case "no-graph-title":
+                            shared_options.no_graph_title = True
+                        case _:
+                            raise model.DfdException(
+                                f'{error_prefix}Unrecognized style option "{style.style}"'
+                            )
+                    continue
+
             case model.Item() as item:
                 _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
@@ -147,7 +163,7 @@ def parse(
 
         statements.append(statement)
 
-    if debug:
+    if shared_options and shared_options.debug:
         for s in statements:
             dprint(model.repr(s))
     return statements, dependencies, attribs
@@ -182,6 +198,10 @@ def _parse_item_name(name: str) -> Tuple[str, bool]:
 def _parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
     style, value = _split_args(source.text, 2, True)
+    style_snake = style.replace("-", "_")
+    if style_snake in model.SHARED_OPTION_NAMES:
+        return model.ExportedStyle(source, style, value)
+
     return model.Style(source, style, value)
 
 
@@ -422,7 +442,7 @@ def _parse_item_external(
             item.name = parts[-2]
 
         if item.name.startswith(model.SNIPPET_PREFIX):
-            item.name = item.name[len(model.SNIPPET_PREFIX):]
+            item.name = item.name[len(model.SNIPPET_PREFIX) :]
         else:
             item.name = os.path.splitext(item.name)[0]
 

@@ -165,12 +165,12 @@ def run(args: argparse.Namespace) -> None:
         provenance = f"<file:{args.INPUT_FILE}>"
 
     options = model.Options(
-        args.format,
-        args.percent_zoom,
-        args.background_color,
-        args.no_graph_title,
-        args.no_check_dependencies,
-        args.debug,
+        format=args.format,
+        percent_zoom=args.percent_zoom,
+        background_color=args.background_color,
+        no_graph_title=args.no_graph_title,
+        no_check_dependencies=args.no_check_dependencies,
+        debug=args.debug,
     )
 
     set_debug(args.debug)

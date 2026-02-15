@@ -21,7 +21,7 @@ def build(
 ) -> None:
     """Take a DFD source and build the final image or document"""
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
-    statements, dependencies, attribs = parser.parse(lines, options.debug)
+    statements, dependencies, attribs = parser.parse(lines, options)
     if dependencies and not options.no_check_dependencies:
         dependency_checker.check(dependencies, snippet_by_name, options)
 
@@ -500,7 +500,10 @@ def handle_filters(
             dprint("    before:", kept_names)
 
         def _collect_frame_skips(
-            f: model.Filter, names: set[str], downs: set[str], ups: set[str],
+            f: model.Filter,
+            names: set[str],
+            downs: set[str],
+            ups: set[str],
         ) -> None:
             if f.neighbors_up.no_frames:
                 skip_frames_for_names.update(ups)
