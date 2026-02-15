@@ -76,7 +76,9 @@ def parse_args() -> argparse.Namespace:
         required=False,
         default=100,
         type=int,
-        help="magnification percentage; default is 100",
+        help="(not yet available)"
+        " magnification percentage; default is 100;"
+        " deprecated: use 'style percent-zoom VALUE' in the DFD itself",
     )
 
     parser.add_argument(
@@ -84,17 +86,20 @@ def parse_args() -> argparse.Namespace:
         "-b",
         required=False,
         default="white",
-        help="background color name (including 'none' for"
+        help="(not yet available)"
+        " background color name (including 'none' for"
         " transparent) in web color notation; see"
         " https://developer.mozilla.org/en-US/docs/Web/CSS/color_value"
-        " for a list of valid names; default is white",
+        " for a list of valid names; default is white;"
+        " deprecated: use 'style background-color VALUE' in the DFD itself",
     )
 
     parser.add_argument(
         "--no-graph-title",
         action="store_true",
         default=False,
-        help="suppress graph title",
+        help="suppress graph title;"
+        " deprecated: use 'style no-graph-title' in the DFD itself",
     )
 
     parser.add_argument(

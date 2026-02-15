@@ -1,9 +1,8 @@
 """Parse DFD source text in our DSL"""
 
-import dataclasses
 import os.path
 import re
-from typing import Callable, Tuple
+from typing import Callable, Tuple, get_type_hints
 
 from . import dfd_dot_templates as TMPL
 from . import model
@@ -146,17 +145,11 @@ def parse(
                             f'{error_prefix}Unrecognized style option "{style.style}"'
                         )
 
-                    # locate the field in the dataclass by its name
-                    field = next(
-                        f
-                        for f in dataclasses.fields(model.SharedOptions)
-                        if f.name == field_name
-                    )
-
                     # convert value and set it in shared options
-                    if field.type == "int":
+                    field_type = get_type_hints(model.SharedOptions)[field_name]
+                    if field_type is int:
                         setattr(shared_options, field_name, int(style.value))
-                    elif field.type == "bool":
+                    elif field_type is bool:
                         setattr(shared_options, field_name, True)
                     else:
                         setattr(shared_options, field_name, style.value)
