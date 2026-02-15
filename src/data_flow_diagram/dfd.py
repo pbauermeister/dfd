@@ -474,6 +474,7 @@ def handle_filters(
 ) -> model.Statements:
     all_names = set([s.name for s in statements if isinstance(s, model.Item)])
     kept_names: set[str] | None = None
+    only_names: set[str] = set()
 
     def _check_names(names: set[str], in_names: set[str], prefix: str) -> None:
         if not names.issubset(all_names):
@@ -530,6 +531,7 @@ def handle_filters(
                 ):
                     dprint("ONLY: adding nodes:", names)
                     kept_names.update(f.names)
+                    only_names.update(f.names)
 
                 # add neighbors
                 downs, ups = find_neighbors(
@@ -574,6 +576,15 @@ def handle_filters(
 
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
+
+    # A node in the only_names set may lose its connections and, if it is
+    # hidable, vanish (or, if in a frame, reappear as a basic node).
+    # To keep it, we make it non-hidable.
+    for statement in statements:
+        match statement:
+            case model.Item() as item:
+                if item.name in only_names:
+                    item.hidable = False  # make non-hidable
 
     kept_names = kept_names if kept_names is not None else all_names
 
