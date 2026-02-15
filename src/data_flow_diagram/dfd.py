@@ -500,7 +500,10 @@ def handle_filters(
             dprint("    before:", kept_names)
 
         def _collect_frame_skips(
-            f: model.Filter, names: set[str], downs: set[str], ups: set[str],
+            f: model.Filter,
+            names: set[str],
+            downs: set[str],
+            ups: set[str],
         ) -> None:
             if f.neighbors_up.no_frames:
                 skip_frames_for_names.update(ups)

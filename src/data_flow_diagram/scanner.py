@@ -83,7 +83,7 @@ def include(
                 f'cannot include snippet "{name}".'
             )
         name0 = name
-        name = name[len(model.SNIPPET_PREFIX):]
+        name = name[len(model.SNIPPET_PREFIX) :]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
             raise model.DfdException(

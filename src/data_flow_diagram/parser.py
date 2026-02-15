@@ -422,7 +422,7 @@ def _parse_item_external(
             item.name = parts[-2]
 
         if item.name.startswith(model.SNIPPET_PREFIX):
-            item.name = item.name[len(model.SNIPPET_PREFIX):]
+            item.name = item.name[len(model.SNIPPET_PREFIX) :]
         else:
             item.name = os.path.splitext(item.name)[0]
 
