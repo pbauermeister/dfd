@@ -2,13 +2,13 @@
 . ./set-ex.sh
 
 banner2 "Cleaning up"
-./clean.sh
+./tools/clean.sh
 
 banner2 "Linting"
-./lint.sh
+./tools/lint.sh
 
 banner2 "Testing"
 ./test.sh
 
 banner2 "Making doc"
-./make-doc.sh
+./tools/make-doc.sh

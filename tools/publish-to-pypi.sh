@@ -15,7 +15,7 @@
 
 . ./set-ex.sh
 
-./build.sh
+./tools/build.sh
 
 
 banner2 "Publishing to Pypi"

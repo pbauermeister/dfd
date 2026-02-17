@@ -41,7 +41,7 @@ black: ## run black (changes shall be committed)
 
 lint: ## lint source files
 	. .venv/bin/activate && \
-	./lint.sh
+	./tools/lint.sh
 
 test: ## run unit tests and non-regression tests
 	. .venv/bin/activate && \
@@ -68,13 +68,13 @@ install: ## install locally
 
 doc: ## remake doc
 	. .venv/bin/activate && \
-	./make-doc.sh
+	./tools/make-doc.sh
 
 publish-to-pypi: venv ## publish to Pypi
 	. .venv/bin/activate && \
-	./publish-to-pypi.sh
+	./tools/publish-to-pypi.sh
 
 ################################################################################
 # Cleanup:: ##
 clean: ## clean
-	./clean.sh
+	./tools/clean.sh

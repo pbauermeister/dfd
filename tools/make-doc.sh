@@ -4,6 +4,8 @@
 OPTS=--debug
 OPTS=
 
+tools/doc-renumber-md-titles.py doc/README.md
+
 # rebuild in doc/
 (
     cd doc
