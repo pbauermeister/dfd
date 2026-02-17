@@ -10,3 +10,14 @@ for dfd in "$NR_DIR"/*.dfd; do
     echo "  $dfd -> $svg"
     ./data-flow-diagram "$dfd" -f svg -o "$svg"
 done
+
+for md in "$NR_DIR"/*.md; do
+    [ -f "$md" ] || continue
+    tmp_md="${md%.md}.tmp.md"
+    # Flatten subdir/file -> subdir--file and .dot -> .svg
+    sed -e 's|\(tests/non-regression/[^/]*\)/|\1--|g' \
+        -e 's/\.dot$/.svg/g' "$md" > "$tmp_md"
+    echo "  $md (markdown)"
+    ./data-flow-diagram --markdown -f svg "$tmp_md"
+    rm -f "$tmp_md"
+done

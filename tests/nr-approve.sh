@@ -11,6 +11,14 @@ for dfd in "$NR_DIR"/*.dfd; do
     ./data-flow-diagram "$dfd" -f dot -o "$dot"
 done
 
+for md in "$NR_DIR"/*.md; do
+    [ -f "$md" ] || continue
+    subdir="${md%.md}"
+    mkdir -p "$subdir"
+    echo "  $md (markdown)"
+    ./data-flow-diagram --markdown -f dot "$md"
+done
+
 echo
 echo "WARNING: Any git change to $NR_DIR/*.dot files must be"
 echo "carefully examined. Changed golden files are either deliberate"
