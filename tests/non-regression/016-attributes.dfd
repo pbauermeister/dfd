@@ -1,0 +1,9 @@
+style vertical
+
+process	P1  [fillcolor=red] Red bg
+process P2  [color=red fontcolor=blue] Red border, blue text
+process P3  [fontcolor=white fillcolor=blue color=blue] Inverted blue
+
+P1 -->  P2  [color=red fontcolor=red] red
+P2 -->  P3  [color=blue] blue arrow
+P1 -->  P3  [penwidth=2] thick

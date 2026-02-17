@@ -1,0 +1,8 @@
+process	P1
+process	P2
+process P3
+
+frame P1 P2 = [style=solid color=blue fontcolor=blue] A blue\nsolid frame
+
+P1 --> P3
+P3 --> P2

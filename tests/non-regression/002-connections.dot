@@ -1,0 +1,59 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/002-connections -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 0: process A1 */
+  "A1" [shape=ellipse label="A1" fillcolor="#eeeeee" style=filled ]
+
+  /* 1: process A2 */
+  "A2" [shape=ellipse label="A2" fillcolor="#eeeeee" style=filled ]
+
+  /* 2: process B1 */
+  "B1" [shape=ellipse label="B1" fillcolor="#eeeeee" style=filled ]
+
+  /* 3: process B2 */
+  "B2" [shape=ellipse label="B2" fillcolor="#eeeeee" style=filled ]
+
+  /* 4: process C1 */
+  "C1" [shape=ellipse label="C1" fillcolor="#eeeeee" style=filled ]
+
+  /* 5: process C2 */
+  "C2" [shape=ellipse label="C2" fillcolor="#eeeeee" style=filled ]
+
+  /* 6: process D1 */
+  "D1" [shape=ellipse label="D1" fillcolor="#eeeeee" style=filled ]
+
+  /* 7: process D2 */
+  "D2" [shape=ellipse label="D2" fillcolor="#eeeeee" style=filled ]
+
+  /* 8: process E1 */
+  "E1" [shape=ellipse label="E1" fillcolor="#eeeeee" style=filled ]
+
+  /* 9: process E2 */
+  "E2" [shape=ellipse label="E2" fillcolor="#eeeeee" style=filled ]
+
+  /* 10: process X */
+  "X" [shape=ellipse label="X" fillcolor="#eeeeee" style=filled ]
+
+  /* 11: process Y */
+  "Y" [shape=ellipse label="Y" fillcolor="#eeeeee" style=filled ]
+
+  /* 14: flow A1 A2 a flow */
+  "A1" -> "A2" [label="a flow"]
+
+  /* 17: cflow B1 B2 a continuous flow */
+  "B1" -> "B2" [label="a continuous\nflow" arrowhead=normalnormal]
+
+  /* 20: bflow C1 C2 a bi-directional flow */
+  "C1" -> "C2" [label="a bi-\ndirectional\nflow" dir=both]
+
+  /* 23: signal D1 D2 a signal */
+  "D1" -> "D2" [label="a signal" style=dashed]
+
+  /* 26: uflow E1 E2 an undirected flow */
+  "E1" -> "E2" [label="an undirected\nflow" dir=none]
+}

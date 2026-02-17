@@ -1,0 +1,36 @@
+
+digraph D {
+  edge [len=2.25]
+  graph[label="
+- tests/non-regression/011-context -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 2: process P The System */
+  "P" [shape=circle label="The System" fillcolor=white style=filled ]
+
+  /* 3: entity E1 Entity 1 */
+  "E1" [shape=rectangle label="Entity 1" ]
+
+  /* 4: entity E2 Entity 2 */
+  "E2" [shape=rectangle label="Entity 2" ]
+
+  /* 5: entity E3 Entity 3 */
+  "E3" [shape=rectangle label="Entity 3" ]
+
+  /* 6: entity E4 Entity 4 */
+  "E4" [shape=rectangle label="Entity 4" ]
+
+  /* 8: flow E1 P flow */
+  "E1" -> "P" [label="flow"]
+
+  /* 9: flow.r E2 P flow */
+  "E2" -> "P" [label="flow" dir=back]
+
+  /* 10: bflow E3 P flow */
+  "E3" -> "P" [label="flow" dir=both]
+
+  /* 11: signal E4 P signal */
+  "E4" -> "P" [label="signal" style=dashed]
+}

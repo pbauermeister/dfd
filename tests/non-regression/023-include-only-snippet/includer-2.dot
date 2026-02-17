@@ -1,0 +1,17 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/023-include-only-snippet/includer-2 -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 0: process P5 Process 5 */
+  "P5" [shape=ellipse label="Process 5" fillcolor="#eeeeee" style=filled ]
+
+  /* 1: process P6 Process 6 */
+  "P6" [shape=ellipse label="Process 6" fillcolor="#eeeeee" style=filled ]
+
+  /* 2: flow P5 P6 connection */
+  "P5" -> "P6" [label="connection"]
+}

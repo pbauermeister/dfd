@@ -17,6 +17,14 @@
 - Include a **Requirement** section describing what was asked for, and a **Design** section describing the agreed-upon approach, before implementation begins.
 - Update the status in-place as work progresses.
 
+## Non-regression tests
+
+- **Fixtures** (test inputs) live in `tests/non-regression/`: `.dfd`, `.part`, `.md` files.
+- **Golden files** (expected outputs): `.dot` files. Standalone tests use `NNN-name.dot`; markdown tests use `NNN-name/output.dot` subdirectories.
+- **Workflow:** `make nr-preview` → inspect SVGs → `make nr-approve` → commit fixtures and golden files together.
+- `make nr-test` runs as part of `make test`. It compares regenerated DOT against golden `.dot` files.
+- Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 027+).
+
 ## Formatting
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).

@@ -1,0 +1,31 @@
+process	A1
+process	A2
+process	B1
+process	B2
+process	C1
+process	C2
+process	D1
+process	D2
+process	E1
+process	E2
+process X
+process Y
+
+# create a directed flow:
+flow	A1	A2	a flow
+
+# create a continuous flow:
+cflow	B1	B2	a continuous flow
+
+# create a bi-directional flow:
+bflow	C1	C2	a bi-directional flow
+
+# create a directed signal:
+signal	D1	D2	a signal
+
+# create an undirected flow:
+uflow	E1	E2	an undirected flow
+
+# create untargetted connections
+flow	*	X	an unsourced flow
+signal	Y	*	an untargetted signal

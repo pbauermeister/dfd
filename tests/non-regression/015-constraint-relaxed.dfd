@@ -1,0 +1,10 @@
+style vertical
+
+process	P1
+process P2
+process P3
+
+P1 -->  P2
+P2 -->  P3
+P1 -->? P3
+# equivalent to: flow? P1 P3

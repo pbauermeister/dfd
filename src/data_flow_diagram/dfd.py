@@ -39,7 +39,11 @@ def build(
     gen = Generator(graph_options, attribs)
     text = generate_dot(gen, title, statements, items_by_name)
     dprint(text)
-    dot.generate_image(graph_options, text, output_path, options.format)
+    if options.format == "dot":
+        with open(output_path, "w") as f:
+            f.write(text)
+    else:
+        dot.generate_image(graph_options, text, output_path, options.format)
 
 
 def wrap(text: str, cols: int) -> str:

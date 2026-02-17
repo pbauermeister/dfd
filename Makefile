@@ -43,9 +43,19 @@ lint: ## lint source files
 	. .venv/bin/activate && \
 	./lint.sh
 
-test: ## run tests
+test: ## run unit tests and non-regression tests
 	. .venv/bin/activate && \
 	./test.sh
+	$(MAKE) nr-test
+
+nr-preview: ## generate SVGs from NR test DFDs for visual inspection
+	./tests/nr-preview.sh
+
+nr-approve: ## (re)generate golden .dot files from NR test DFDs
+	./tests/nr-approve.sh
+
+nr-test: ## compare generated DOT against golden .dot files
+	./tests/nr-test.sh
 
 ################################################################################
 # Local:: ##

@@ -1,0 +1,26 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/015-constraint-relaxed -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=TB
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 2: process P1 */
+  "P1" [shape=ellipse label="P1" fillcolor="#eeeeee" style=filled ]
+
+  /* 3: process P2 */
+  "P2" [shape=ellipse label="P2" fillcolor="#eeeeee" style=filled ]
+
+  /* 4: process P3 */
+  "P3" [shape=ellipse label="P3" fillcolor="#eeeeee" style=filled ]
+
+  /* 6: flow P1 P2 */
+  "P1" -> "P2" [label=""]
+
+  /* 7: flow P2 P3 */
+  "P2" -> "P3" [label=""]
+
+  /* 8: flow? P1 P3 */
+  "P1" -> "P3" [label="" constraint=false]
+}

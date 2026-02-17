@@ -1,0 +1,12 @@
+style context
+
+process	P	The System
+entity  E1  Entity 1
+entity  E2  Entity 2
+entity  E3  Entity 3
+entity  E4  Entity 4
+
+E1  --> P   flow
+E2  <-- P   flow
+E3  <-> P   flow
+E4  ::> P   signal

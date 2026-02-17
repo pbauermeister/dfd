@@ -1,0 +1,7 @@
+style vertical
+
+process	P1  Do this and this and also this
+process P2  Do\n that and that and also that
+
+P1 -->  P2  result of doing all this
+P2 -->  P1  result\nof doing all that
