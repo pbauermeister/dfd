@@ -499,7 +499,7 @@ style vertical
 
 attrib GREEN    color=green fontcolor=green
 
-# functional aliases for nodes
+# functional aliases for items
 
 attrib START    penwidth=2 fillcolor=lightgrey
 attrib ABNORMAL fillcolor=red fontcolor=white color=invis
@@ -964,3 +964,311 @@ Dependencies checking lead to error, if any of the following is found:
 
 To turn off the checking, specify the `--no-check-dependencies` flag to the
 command line.
+
+## 7. Filters
+
+Filtering (keeping/removing items) can be used to generate diagram subsets.
+
+You can work on a complete master diagram, and create subset diagrams by including the master and using filters.
+
+First, let us create a master diagram:
+
+```data-flow-diagram img/data-pipeline.svg
+attrib  UPSTREAM        penwidth=2 color="#5050e0"
+attrib  PARAM           color="#60b06060" fontcolor="#60b060"
+attrib  ALERT           color="#ff4040" fontcolor="#ff4040"
+attrib  FCAST           penwidth=2 color="maroon"
+attrib  CONSUME         penwidth=2 color="#303030"
+
+####### ############### ###############################
+# Items
+
+entity  ds              Data source
+process etl             ETL
+
+entity  user            User
+process proc_flow       process data flow
+entity  ext             External system
+
+store   db_aggr         Aggregated data
+store   db_fcast        Forecasts
+
+store   db_raw          Raw data
+store   db_params       Parameters
+
+process optim           optimize params
+process forecast        compute forecasts
+process interact        handle interactions
+
+frame db_aggr db_fcast db_params =  Computation results
+frame optim forecast =  Batch processing
+
+############### ####### ############### ###############
+# Connections
+
+# Ingestion
+ds              ->>     etl             [UPSTREAM]
+etl             ->>     db_raw          [UPSTREAM]
+db_raw          ->>     proc_flow       [UPSTREAM]
+
+# processing
+proc_flow       ->>     db_aggr         [UPSTREAM]
+proc_flow       <--     db_params       [PARAM] alert thresh
+proc_flow       ::>     user            [ALERT] alert
+
+# optimization
+db_params       <--     optim           [PARAM] new params
+
+# forecast
+db_aggr         -->     forecast        [UPSTREAM]
+db_params       -->     forecast        [PARAM] horizon
+db_fcast        <--     forecast        [FCAST]
+
+# interact w/ user
+db_aggr         -->     interact        [UPSTREAM]
+db_fcast        -->     interact        [FCAST]
+interact        -->     user            [CONSUME]
+interact        -->     ext             [CONSUME]
+db_params       <--     interact        [PARAM] alert thresh
+```
+
+![Filtering](./img/data-pipeline.svg)
+
+### 7.1. The "Only" filters
+
+#### 7.1.1. Keep some items
+
+You can keep a list of items:
+
+```data-flow-diagram img/filter-some.svg
+#include #img/data-pipeline
+
+# Here is a list of items to keep
+! ds etl db_raw
+
+# Here is another list
+! proc_flow
+
+# Note the "!" filter, with several item names
+```
+
+![Filtering](./img/filter-some.svg)
+
+#### 7.1.2. Neighbours
+
+Two kinds of neigborhood exist:
+
+- Upstream/downstream
+- Left/right
+
+```data-flow-diagram img/neighborhood.svg
+process A
+process B
+process C
+
+A --> B
+C <-- B
+```
+
+![Filtering](./img/neighborhood.svg)
+
+Here:
+
+- Seen from B, A is upstream, and C is downstream
+- Seen from B, A is on the left
+- Seen from C, B is on the right
+
+#### 7.1.3. Keep an item and the neighours before
+
+```data-flow-diagram img/filter-only-before.svg
+#include #img/data-pipeline
+
+# We keep db_raw, and upstream neighbours
+!<* db_raw
+
+# Note the "<" span meaning "upstream", and "*" for "all in given direction"
+```
+
+![Filtering](./img/filter-only-before.svg)
+
+#### 7.1.4. Keep an item and the neighours after
+
+```data-flow-diagram img/filter-only-after.svg
+#include #img/data-pipeline
+
+# We keep db_raw, and all downstream neighbours
+!>* db_raw
+
+# Note the ">" span meaning "downstream"
+```
+
+![Filtering](./img/filter-only-after.svg)
+
+#### 7.1.5. Keep an item and only two levels of neighbours after
+
+```data-flow-diagram img/filter-only-after-two.svg
+#include #img/data-pipeline
+
+# We keep proc_flow, and two levels of downstream neighbours
+!>2 proc_flow
+
+# Note the ">" for "downstream", and "2" for "two levels"
+```
+
+![Filtering](./img/filter-only-after-two.svg)
+
+#### 7.1.6. Keep an item and only two levels of neighbours in all directions
+
+```data-flow-diagram img/filter-only-two.svg
+#include #img/data-pipeline
+
+# We keep proc_flow, and two levels of neighbours in all directions
+!<>2 proc_flow
+
+# Note the "<>" meaning "all directions"
+```
+
+![Filtering](./img/filter-only-two.svg)
+
+#### 7.1.7. Same, but not the item itself
+
+```data-flow-diagram img/filter-only-after-two-not-me.svg
+#include #img/data-pipeline
+
+# We keep two levels of downstream neighbours, but not proc_flow itself
+!<>x2 proc_flow
+
+# Note the 'x' flag, meaning "not the item themselves, but the neighbours"
+```
+
+![Filtering](./img/filter-only-after-two-not-me.svg)
+
+#### 7.1.8. Same, and remove the frames
+
+```data-flow-diagram img/filter-only-no-frames.svg
+#include #img/data-pipeline
+
+# Like in the previous example, and without frames
+!<>xf2 proc_flow
+
+# Note the 'f' flag, meaning "remove involved frames"
+```
+
+![Filtering](./img/filter-only-no-frames.svg)
+
+#### 7.1.9. Keep an item and those on its left
+
+```data-flow-diagram img/filter-only-left.svg
+#include #img/data-pipeline
+
+# Keep proc_flow, and all neighbours on its left
+![* proc_flow
+
+# Note the "[*" span, with "[" meaning "on the left"
+```
+
+![Filtering](./img/filter-only-left.svg)
+
+#### 7.1.10. Keep an item and one level on its right
+
+```data-flow-diagram img/filter-only-right.svg
+#include #img/data-pipeline
+
+# Keep proc_flow, and one levels of neighbours on its left
+!]1 proc_flow
+
+# Note the "]1" span, with "]" meaning "on the right"
+```
+
+![Filtering](./img/filter-only-right.svg)
+
+### 7.2. The "Without" filters
+
+#### 7.2.1. etc
+
+#### 7.2.2. Replace a group of items by another item
+
+First, lets put our focus around the computation results:
+
+```data-flow-diagram img/filter-dbs-context.svg
+#include #img/data-pipeline
+
+# Keep some databases and immediate neighbours
+!<>1 db_aggr db_fcast db_params
+
+# (This is optional, just for clarity)
+```
+
+![Filtering](./img/filter-dbs-context.svg)
+
+Then, let's collapse the DBs as a new one:
+
+```data-flow-diagram img/filter-replace.svg
+#include #img/data-pipeline
+
+# Declare a new super DB to later represent the other DBs
+store db_all All DBs
+
+# Keep the databases and immediate neighbours (as before), and also the super DB
+!<>1 db_aggr db_fcast db_params db_all
+
+# Replace the DBs by the super DB
+~=db_all db_aggr db_fcast db_params
+
+# Note the "=" operator, to define a replacer, then the removed nodes
+```
+
+![Filtering](./img/filter-replace.svg)
+
+## 8. Influencing the layout
+
+Let us consider this diagram:
+
+```data-flow-diagram img/layout-constraint-0.svg
+style horizontal
+process A
+process B
+process C
+
+A --> B
+```
+
+![Filtering](./img/layout-constraint-0.svg)
+
+Now, say you want C to be at the same layout level as B. Add a constraint:
+
+```data-flow-diagram img/layout-constraint-1.svg
+style horizontal
+process A
+process B
+process C
+
+A --> B
+
+# Force C to be on the right of A
+A >>  C
+
+```
+
+![Filtering](./img/layout-constraint-1.svg)
+
+OK, but this has added some "tension" between A and C, so `A --> B` is now skewed.
+
+If this is an issue, you can rebalance them horizontally by adding some tension between A and B:
+
+```data-flow-diagram img/layout-constraint-2.svg
+style horizontal
+process A
+process B
+process C
+
+A --> B
+
+# Force C to be on the right of A
+A >>  C
+
+# Add tension between A and B
+A >>  B
+```
+
+![Filtering](./img/layout-constraint-2.svg)
