@@ -1,0 +1,32 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/017-attributes-alias -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=TB
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 20: control P0 [START] Start */
+  "P0" [shape=ellipse label="Start" fillcolor="#eeeeee" style="filled,dashed" penwidth=2 fillcolor=lightgrey]
+
+  /* 21: process P1 System check */
+  "P1" [shape=ellipse label="System check" fillcolor="#eeeeee" style=filled ]
+
+  /* 22: process P2 [ABNORMAL] Malfunction state */
+  "P2" [shape=ellipse label="Malfunction state" fillcolor="#eeeeee" style=filled fillcolor=red fontcolor=white color=invis]
+
+  /* 25: process P3 [END GREEN] Done */
+  "P3" [shape=ellipse label="Done" fillcolor="#eeeeee" style=filled penwidth=2 fillcolor=lightgrey color=grey color=green fontcolor=green]
+
+  /* 27: signal P0 P1 trigger */
+  "P0" -> "P1" [label="trigger" style=dashed]
+
+  /* 28: flow P1 P2 [ALERT] issue found */
+  "P1" -> "P2" [label="issue found" color=red fontcolor=red]
+
+  /* 29: flow P2 P1 [FIXUP] issue fixed */
+  "P2" -> "P1" [label="issue fixed" color=blue fontcolor=blue]
+
+  /* 32: flow P1 P3 [OK penwidth=2] all OK */
+  "P1" -> "P3" [label="all OK" color=green fontcolor=green penwidth=2]
+}

@@ -1,0 +1,17 @@
+# create a process bubble:
+process	Process
+
+# create a terminal rectangle:
+entity	Entity
+
+# create a store:
+store	Store
+
+# create a channel
+channel	Channel
+
+# create a point
+none	Point
+
+# connection
+Process --> Channel

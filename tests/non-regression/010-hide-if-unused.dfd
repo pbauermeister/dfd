@@ -1,0 +1,5 @@
+process	P1	Process 1
+process	P2?	Process 2
+process	P3?	Process 3
+
+P1 --> P2	connection

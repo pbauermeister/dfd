@@ -1,0 +1,17 @@
+process	Acquire	Acquire data
+process	Compute
+control Control
+entity	Device
+store	Config	Configuration
+channel	API
+
+*	::>  Control	clock
+Control <::  *		enable
+Control <::  *		disable
+Control ::>? Acquire	sampling
+
+Device	->>  Acquire 	continuous raw data
+Acquire	-->  Compute	raw records
+Config	<->  Compute	parameters
+
+Compute --> API  	records

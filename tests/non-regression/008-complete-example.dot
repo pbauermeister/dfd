@@ -1,0 +1,56 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/008-complete-example -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 0: process Acquire Acquire data */
+  "Acquire" [shape=ellipse label="Acquire data" fillcolor="#eeeeee" style=filled ]
+
+  /* 1: process Compute */
+  "Compute" [shape=ellipse label="Compute" fillcolor="#eeeeee" style=filled ]
+
+  /* 2: control Control */
+  "Control" [shape=ellipse label="Control" fillcolor="#eeeeee" style="filled,dashed" ]
+
+  /* 3: entity Device */
+  "Device" [shape=rectangle label="Device" ]
+
+  /* 4: store Config Configuration */
+  "Config" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Configuration</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 5: channel API */
+  "API" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">API</FONT></TD>
+      </TR>
+    </TABLE>>]
+
+  /* 10: signal? Control Acquire sampling */
+  "Control" -> "Acquire" [label="sampling" style=dashed constraint=false]
+
+  /* 12: cflow Device Acquire continuous raw data */
+  "Device" -> "Acquire" [label="continuous raw\ndata" arrowhead=normalnormal]
+
+  /* 13: flow Acquire Compute raw records */
+  "Acquire" -> "Compute" [label="raw records"]
+
+  /* 14: bflow Config Compute parameters */
+  "Config" -> "Compute" [label="parameters" dir=both]
+
+  /* 16: flow Compute API records */
+  "Compute" -> "API":x:c [label="records"]
+}

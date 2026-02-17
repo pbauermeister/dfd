@@ -1,0 +1,10 @@
+process	P1
+process	P2
+
+P1 --> P2	a flow
+P1 <-> P2	a bi-directional flow
+P1 ::> P2	a signal
+P1 <<- P2       a continuous back flow
+
+*  --> P2	an unsourced flow
+P1 ::> *	an untargetted signal

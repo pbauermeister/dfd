@@ -1,0 +1,15 @@
+entity	Clock
+entity	Button
+entity	Lamp
+entity	Power Power supply
+control	Timer
+process	Driver
+
+Driver  <:: Button	switch on
+Timer   <:: Button	reset
+
+Timer	::> Driver	switch off
+Clock	::> Timer	tick
+
+Driver	--> Lamp	voltage
+Power	->> Driver	voltage

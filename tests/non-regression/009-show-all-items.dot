@@ -1,0 +1,20 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/009-show-all-items -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 0: process P1 Process 1 */
+  "P1" [shape=ellipse label="Process 1" fillcolor="#eeeeee" style=filled ]
+
+  /* 1: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
+
+  /* 2: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
+
+  /* 4: flow P1 P2 connection */
+  "P1" -> "P2" [label="connection"]
+}

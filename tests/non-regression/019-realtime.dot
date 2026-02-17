@@ -1,0 +1,44 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/019-realtime -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 0: entity Clock */
+  "Clock" [shape=rectangle label="Clock" ]
+
+  /* 1: entity Button */
+  "Button" [shape=rectangle label="Button" ]
+
+  /* 2: entity Lamp */
+  "Lamp" [shape=rectangle label="Lamp" ]
+
+  /* 3: entity Power Power supply */
+  "Power" [shape=rectangle label="Power supply" ]
+
+  /* 4: control Timer */
+  "Timer" [shape=ellipse label="Timer" fillcolor="#eeeeee" style="filled,dashed" ]
+
+  /* 5: process Driver */
+  "Driver" [shape=ellipse label="Driver" fillcolor="#eeeeee" style=filled ]
+
+  /* 7: signal.r Driver Button switch on */
+  "Driver" -> "Button" [label="switch on" dir=back style=dashed]
+
+  /* 8: signal.r Timer Button reset */
+  "Timer" -> "Button" [label="reset" dir=back style=dashed]
+
+  /* 10: signal Timer Driver switch off */
+  "Timer" -> "Driver" [label="switch off" style=dashed]
+
+  /* 11: signal Clock Timer tick */
+  "Clock" -> "Timer" [label="tick" style=dashed]
+
+  /* 13: flow Driver Lamp voltage */
+  "Driver" -> "Lamp" [label="voltage"]
+
+  /* 14: cflow Power Driver voltage */
+  "Power" -> "Driver" [label="voltage" arrowhead=normalnormal]
+}

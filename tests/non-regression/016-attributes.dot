@@ -1,0 +1,26 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/016-attributes -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=TB
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 2: process P1 [fillcolor=red] Red bg */
+  "P1" [shape=ellipse label="Red bg" fillcolor="#eeeeee" style=filled fillcolor=red]
+
+  /* 3: process P2 [color=red fontcolor=blue] Red border, blue text */
+  "P2" [shape=ellipse label="Red border, blue\ntext" fillcolor="#eeeeee" style=filled color=red fontcolor=blue]
+
+  /* 4: process P3 [fontcolor=white fillcolor=blue color=blue] Inverted blue */
+  "P3" [shape=ellipse label="Inverted blue" fillcolor="#eeeeee" style=filled fontcolor=white fillcolor=blue color=blue]
+
+  /* 6: flow P1 P2 [color=red fontcolor=red] red */
+  "P1" -> "P2" [label="red" color=red fontcolor=red]
+
+  /* 7: flow P2 P3 [color=blue] blue arrow */
+  "P2" -> "P3" [label="blue arrow" color=blue]
+
+  /* 8: flow P1 P3 [penwidth=2] thick */
+  "P1" -> "P3" [label="thick" penwidth=2]
+}

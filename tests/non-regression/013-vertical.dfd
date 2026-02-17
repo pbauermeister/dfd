@@ -1,0 +1,6 @@
+style vertical
+
+process	P1
+process P2
+
+P1 --> P2
