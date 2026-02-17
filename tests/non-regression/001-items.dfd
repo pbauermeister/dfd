@@ -1,0 +1,17 @@
+# create a process bubble:
+process	P	A process
+
+# create a control bubble:
+control K  	A control
+
+# create a terminal rectangle:
+entity	T	An entity
+
+# create a store:
+store	S	A store
+
+# create a channel
+channel	C	A channel
+
+# create a point
+none	N	A point
