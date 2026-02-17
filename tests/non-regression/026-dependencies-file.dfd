@@ -1,0 +1,9 @@
+# Externals:
+none    tests/non-regression/026-dependencies-file-dep.dfd:
+process tests/non-regression/026-dependencies-file-dep.dfd:These
+
+# Internals:
+process	That    Do that
+
+tests/non-regression/026-dependencies-file-dep   --> That
+That        --> These

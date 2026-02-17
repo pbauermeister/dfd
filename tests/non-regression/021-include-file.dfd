@@ -1,0 +1,3 @@
+#include tests/non-regression/021-include-file.part
+
+P1 --> P2	connection

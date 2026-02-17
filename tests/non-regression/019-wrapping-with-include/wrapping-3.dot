@@ -1,0 +1,20 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/019-wrapping-with-include/wrapping-3 -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=TB
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 2: process P1 Do this and this and also this */
+  "P1" [shape=ellipse label="Do this\nand this\nand also\nthis" fillcolor="#eeeeee" style=filled ]
+
+  /* 3: process P2 Do\n that and that and also that */
+  "P2" [shape=ellipse label="Do\n that\nand that\nand also\nthat" fillcolor="#eeeeee" style=filled ]
+
+  /* 5: flow P1 P2 result of doing all this */
+  "P1" -> "P2" [label="result\nof\ndoing\nall\nthis"]
+
+  /* 6: flow P2 P1 result\nof doing all that */
+  "P2" -> "P1" [label="result\nof\ndoing\nall\nthat"]
+}
