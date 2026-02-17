@@ -70,3 +70,63 @@ Three incremental steps were applied:
 3. **Consolidate into `class Keyword(StrEnum)`** (model.py): all 27 keyword constants (17 base + 10 variants) gathered into a single enum. Consumer files (parser.py, dfd.py, dependency_checker.py) updated to use `Keyword.MEMBER` access. `StrEnum` membership means values remain usable as plain strings for parsing, comparison, hashing, and serialization.
 
 Files changed: `model.py`, `parser.py`, `dfd.py`, `dependency_checker.py`. Output verified identical (smoke test).
+
+## 2026-02-17 — Debrief: Non-regression test framework (#023) [DONE]
+
+**Prompt:** Rate our collaborative work on the NR test framework task.
+
+### User feedback
+
+Good interactive analysis and design teamwork. Claude handled the tedious
+bulk work (26 test cases, 33 golden files, script logic, renaming cycles)
+that would not have been done with patience by hand. Under user guidance,
+we also improved the documentation process (task-specific devlog and
+CLAUDE.md conventions). This took involvement but would likely have been
+postponed indefinitely without AI help. Very pleased by the outcomes.
+
+### Claude feedback
+
+**What went well:**
+- The iterative rhythm worked: user sets direction, Claude proposes a
+  plan, user spots gaps (missing sections E.3, F.1; preview not showing
+  .md SVGs; flat SVG naming; doc-order numbering), Claude executes the
+  fix quickly. Each correction round was one exchange, not a prolonged
+  back-and-forth.
+- Devlog discipline paid off. Having a written design before coding meant
+  no wasted implementation — the sed temp-copy approach, the subdirectory
+  convention, and the snippet-name stability argument were all validated
+  on paper first.
+- The tedium-to-value ratio was high: creating 26 fixtures, verifying
+  path substitutions, and renaming with cycle-breaking are exactly the
+  kind of error-prone mechanical work where AI assistance shines.
+
+**What could have gone better:**
+- I initially skipped sections E.3 and F.1 from the doc — the user had
+  to point this out. A more systematic checklist (enumerate all doc
+  sections, tick off coverage) would have caught this in the planning
+  phase.
+- The `.md` preview was initially omitted ("not needed"), then needed
+  a follow-up fix, then a second fix for flat naming. Thinking through
+  the full developer workflow upfront would have avoided two extra rounds.
+
+### Comparative rating
+
+| Dimension               | Rating   | Notes                                      |
+| ----------------------- | -------- | ------------------------------------------ |
+| Human–AI interaction    | Strong   | Short feedback loops, clear delegation of design (human) vs execution (AI). Above average compared to typical AI-assisted coding where prompts are one-shot. |
+| Task difficulty          | Moderate | No algorithmic complexity, but many moving parts (path conventions, sed safety, snippet-name invariants, cycle-breaking renames). |
+| Tediousness             | High     | 26 fixtures, 33 golden files, 6 scripts, content-aware renames — ideal AI territory. |
+| Outcome quality          | High     | Full doc coverage, regression detection verified, clean devlog, reusable conventions in CLAUDE.md. |
+
+### How to make future teamwork stronger
+
+1. **Checklist-driven coverage.** Before implementing test suites or
+   feature sets, have Claude enumerate all source items (doc sections,
+   API endpoints, CLI flags) and present a coverage matrix for user
+   sign-off. This prevents the "you missed section E.3" pattern.
+2. **Workflow walkthrough.** Before finalizing scripts, mentally
+   simulate the full developer workflow (create → preview → inspect →
+   approve → commit → test → clean) and verify each step produces
+   usable output. This catches UX gaps like the missing preview.
+3. **Terminology early.** Agreeing on terms (fixtures, golden files)
+   at the start avoids documentation inconsistency and rework later.
