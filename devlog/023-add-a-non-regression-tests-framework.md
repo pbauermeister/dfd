@@ -8,21 +8,39 @@
 Add a non-regression (NR) test framework that verifies the Graphviz DOT
 text generated from DFD sources against committed golden references.
 
-### Workflow
+### Scope
 
-1. The developer creates a DFD source file in `tests/non-regression/`,
-   named with a numeric prefix (e.g. `001-items.dfd`).
-2. A **preview step** generates the corresponding `.svg` file for visual
-   inspection.
-3. The developer inspects the SVG. If satisfied, a **confirmation step**
-   generates the `.dot` golden file (the Graphviz DOT source text that
-   the tool produces internally).
-4. Both `.dfd` and `.dot` are committed. The `.svg` is gitignored.
-5. When running NR tests, each `.dfd` is loaded, the DOT text is
-   regenerated, and compared against the committed `.dot`. Any mismatch
-   is a failure.
+All examples from `doc/README.md` sections B through F must be covered:
+items, connections, syntactic sugars, optional labels, frames, complete
+example, hidable items, context diagrams, layout direction, constraints,
+attributes, text wrapping (standalone and with includes), real-time
+aspects, file-based includes, snippet includes, include-only snippets,
+nested includes, and dependencies (snippet-based and file-based).
 
-Each step is triggered by a Makefile target.
+### Developer workflow
+
+1. Create a fixture (`.dfd` or `.md`) in `tests/non-regression/`, named
+   with a numeric prefix following `doc/README.md` section order.
+2. `make nr-preview` — generates SVGs for visual inspection.
+3. Inspect the SVGs. If satisfied, `make nr-approve` — generates golden
+   `.dot` files.
+4. Commit fixtures and golden files together. SVGs are gitignored.
+5. `make nr-test` (included in `make test`) — regenerates DOT, diffs
+   against golden files, fails on any mismatch.
+6. `make nr-clean` — removes generated SVGs.
+
+### Terminology
+
+- **Fixtures**: test input files (`.dfd`, `.part`, `.md`) — committed.
+- **Golden files**: expected DOT output (`.dot`) — committed after approval.
+- **Previews**: rendered SVGs (`.svg`) — gitignored, for visual inspection only.
+
+### Naming conventions
+
+- Standalone: `NNN-description.{dfd,dot}` (flat).
+- Markdown: `NNN-description.md` with golden files in `NNN-description/` subdirectory.
+- Preview SVGs for markdown tests are flattened: `NNN-description--output.svg`.
+- Numbering follows `doc/README.md` section order.
 
 ## 2. Design
 

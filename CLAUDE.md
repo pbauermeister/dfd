@@ -1,5 +1,17 @@
 # Project Instructions
 
+## Task kickoff checklist
+
+When starting a non-trivial task, provide as many of these as applicable:
+
+1. **GitHub issue number** — needed for the devlog file name (`devlog/NNN-*.md`).
+2. **Scope boundary** — which doc sections, files, or features are in scope. Explicit lists prevent missed items (e.g. "all examples in doc/README.md sections E and F").
+3. **Developer workflow** — how you intend to use the result (preview, approve, commit, clean). Helps Claude design scripts that fit your actual workflow, not an assumed one.
+4. **Naming/ordering conventions** — if output must follow a specific order or naming scheme, state it upfront (e.g. "number test cases to match doc section order").
+5. **Terminology** — if the domain has specific terms (fixtures, golden files, etc.), mention them early so documentation stays consistent.
+
+Claude: if the user starts a task without covering these points, briefly remind them of this checklist.
+
 ## DEVLOG.md
 
 - `DEVLOG.md` is owned by Claude for recording analysis outcomes.
