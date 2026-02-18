@@ -76,20 +76,17 @@ def parse_args() -> argparse.Namespace:
         "-b",
         required=False,
         default=None,
-        help="(not yet available)"
-        " background color name (including 'none' for"
+        help="background color name (including 'none' for"
         " transparent) in web color notation; see"
         " https://developer.mozilla.org/en-US/docs/Web/CSS/color_value"
-        " for a list of valid names; default is white;"
-        " deprecated: use 'style background-color VALUE' in the DFD itself",
+        " for a list of valid names; default is white",
     )
 
     parser.add_argument(
         "--no-graph-title",
         action="store_true",
         default=False,
-        help="suppress graph title;"
-        " deprecated: use 'style no-graph-title' in the DFD itself",
+        help="suppress graph title",
     )
 
     parser.add_argument(

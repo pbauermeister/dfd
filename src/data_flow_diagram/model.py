@@ -258,7 +258,7 @@ SnippetByName = dict[str, Snippet]
 class Options:
     """These options can be specified as commandline args."""
 
-    background_color: str
+    background_color: str | None
     no_graph_title: bool
     format: str
     no_check_dependencies: bool

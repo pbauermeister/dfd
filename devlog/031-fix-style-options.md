@@ -7,34 +7,34 @@
 
 ## Requirement
 
-Fix GitHib bug #31.
+Fix GitHub bug #31.
 
-The two styles `background-color` and `no-graph-title` options shall be able to be specified from the command line (as now) and also as `style` in the DFD source.
+The `background-color` and `no-graph-title` options shall be specifiable both from the command line (as now) and via `style` in the DFD source.
 
-If both are specified, the command line one shall take precedence.
+If both are specified, the command-line value takes precedence.
 
-Moreover, `background-color` had no effect (it was not implemented).
+Additionally, `background-color` had no effect (it was not implemented).
 
 ## Design
 
-1. Extend the enum `StyleOption` to accept the two new options from DFD source.
+1. Extend the `StyleOption` enum to accept the two new options from DFD source.
 
-2. Between the parsing and generation steps, merge the provenance of the option values, which can come from commandline or DFD source.
+2. Between parsing and generation, merge option values coming from the command line and DFD source, with command-line precedence.
 
 ## Implementation
 
-- Removed the commandline option `--percent-zoom`, which is not implemented.
+- Remove the unimplemented `--percent-zoom` command-line option.
 
-- Updated the main README.md to have an up-to-date output of the help.
+- Update `README.md` with the current help output.
 
-- Update the doc/README.md to list all `style ...` options (alpha sorted).
+- Update `doc/README.md` to list all `style` options (alphabetically sorted).
 
-- In the doc, added a DFD example with `background-color` and `no-graph-title`.
+- Add a DFD example in the doc demonstrating `background-color` and `no-graph-title`.
 
-- Merge the `background-color` and `no-graph-title` options coming from DFD or commandline, with precedence of commandline.
+- Merge `background-color` and `no-graph-title` values from DFD source and command line, with command-line precedence.
 
-- Remove no longer used models `ExportedStyle` and `SharedOptions` (which were not a good design) and related code.
+- Remove the now-unused `ExportedStyle` and `SharedOptions` models and related code.
 
 ## Testing
 
-TODO: add at least one NR case, that can be copied from the doc (img/bg-color-no-title)
+TODO: add at least one NR case, that can be copied from the doc (img/bg-color-no-title).

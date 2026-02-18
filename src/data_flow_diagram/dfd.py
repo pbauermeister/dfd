@@ -36,7 +36,11 @@ def build(
     else:
         title = os.path.splitext(output_path)[0]
 
-    bg_color = options.background_color or graph_options.background_color
+    bg_color = (
+        options.background_color
+        if options.background_color is not None
+        else graph_options.background_color
+    )
 
     gen = Generator(graph_options, attribs)
     text = generate_dot(gen, title, bg_color, statements, items_by_name)
@@ -301,7 +305,6 @@ class Generator:
             graph_params.append(f"rotate=90")
 
         if bg_color:
-            print(bg_color)
             graph_params.append(f"bgcolor={bg_color}")
 
         block = "\n".join(self.lines).replace("\n", "\n  ")
