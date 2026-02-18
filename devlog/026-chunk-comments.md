@@ -98,3 +98,21 @@ The function has three phases, already marked by phase-header comments:
 Extracted from the model function (`dfd.py:handle_filters`) and
 discussions during Phase 1. The full rules are published in
 **`doc/COMMENTING.md`**; CLAUDE.md references that file.
+
+## Phase 3: Apply to the whole project
+
+Applied chunk comments, docstrings, and terminology alignment to all
+10 source files in `src/data_flow_diagram/`:
+
+| File                   | Changes                                                           |
+| ---------------------- | ----------------------------------------------------------------- |
+| `__init__.py`          | Sharpened chunk comments in `run()`, fixed typo in docstring      |
+| `console.py`           | Fixed "debuhg" typo in docstring                                  |
+| `dependency_checker.py`| Condensed docstring, improved chunk comments, removed TODO        |
+| `dfd.py`               | Added docstrings + chunk comments to `build`, Generator methods, `remove_unused_hidables`, `handle_options`, `find_neighbors`; removed TODO lines |
+| `dfd_dot_templates.py` | Added section comment for font constants                          |
+| `dot.py`               | Added chunk comments, removed dead commented-out line             |
+| `markdown.py`          | Added docstring to `extract_snippets`                             |
+| `model.py`             | Fixed typo, aligned FilterNeighbors + constants to glossary terms |
+| `parser.py`            | Added docstrings to 4 functions, chunk comments throughout `_parse_filter` and `_apply_syntactic_sugars` |
+| `scanner.py`           | Improved chunk comments, added docstring to `_scan`               |
