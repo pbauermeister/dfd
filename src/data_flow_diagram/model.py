@@ -67,17 +67,14 @@ class GraphOptions:
     is_rotated: bool = False
     item_text_width: int = config.DEFAULT_ITEM_TEXT_WIDTH
     connection_text_width: int = config.DEFAULT_CONNECTION_TEXT_WIDTH
+    background_color: str | None = None
+    no_graph_title: bool = False
 
 
 @dataclass
 class Style(Statement):
     style: str
     value: str = ""
-
-
-@dataclass
-class ExportedStyle(Style):
-    pass
 
 
 @dataclass
@@ -158,6 +155,8 @@ class StyleOption(StrEnum):
     UNROTATED = "unrotated"
     ITEM_TEXT_WIDTH = "item-text-width"
     CONNECTION_TEXT_WIDTH = "connection-text-width"
+    BACKGROUND_COLOR = "background-color"
+    NO_GRAPH_TITLE = "no-graph-title"
 
 
 ##############################################################################
@@ -256,24 +255,11 @@ SnippetByName = dict[str, Snippet]
 
 
 @dataclass
-class SharedOptions:
-    """These options can be specified as `style NAME [VALUE]` in the DFD itself,
-    and are also available as commandline args."""
-
-    percent_zoom: int
-    background_color: str
-    no_graph_title: bool
-
-
-SHARED_OPTION_NAMES = [
-    field.name for field in dataclasses.fields(SharedOptions)
-]
-
-
-@dataclass
-class Options(SharedOptions):
+class Options:
     """These options can be specified as commandline args."""
 
+    background_color: str | None
+    no_graph_title: bool
     format: str
     no_check_dependencies: bool
     debug: bool

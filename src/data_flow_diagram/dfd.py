@@ -31,13 +31,19 @@ def build(
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
 
-    if options.no_graph_title:
+    if options.no_graph_title or graph_options.no_graph_title:
         title = ""
     else:
         title = os.path.splitext(output_path)[0]
 
+    bg_color = (
+        options.background_color
+        if options.background_color is not None
+        else graph_options.background_color
+    )
+
     gen = Generator(graph_options, attribs)
-    text = generate_dot(gen, title, statements, items_by_name)
+    text = generate_dot(gen, title, bg_color, statements, items_by_name)
     dprint(text)
     if options.format == "dot":
         with open(output_path, "w") as f:
@@ -279,7 +285,7 @@ class Generator:
             self.lines.append(f'  "{item}"')
         self.lines.append("}")
 
-    def generate_dot_text(self, title: str) -> str:
+    def generate_dot_text(self, title: str, bg_color: str | None) -> str:
         graph_params = []
 
         if self.graph_options.is_context:
@@ -298,6 +304,9 @@ class Generator:
         if self.graph_options.is_rotated:
             graph_params.append(f"rotate=90")
 
+        if bg_color:
+            graph_params.append(f"bgcolor={bg_color}")
+
         block = "\n".join(self.lines).replace("\n", "\n  ")
         text = TMPL.DOT.format(
             title=title,
@@ -311,6 +320,7 @@ class Generator:
 def generate_dot(
     gen: Generator,
     title: str,
+    bg_color: str | None,
     statements: model.Statements,
     items_by_name: dict[str, model.Item],
 ) -> str:
@@ -335,7 +345,7 @@ def generate_dot(
             case model.Frame() as frame:
                 gen.generate_frame(frame)
 
-    return gen.generate_dot_text(title)
+    return gen.generate_dot_text(title, bg_color)
 
 
 def remove_unused_hidables(statements: model.Statements) -> model.Statements:
@@ -392,7 +402,10 @@ def handle_options(
                             options.connection_text_width = int(style.value)
                         except ValueError as e:
                             raise model.DfdException(f'{prefix}{e}"')
-
+                    case model.StyleOption.BACKGROUND_COLOR:
+                        options.background_color = style.value
+                    case model.StyleOption.NO_GRAPH_TITLE:
+                        options.no_graph_title = True
                     case _:
                         raise model.DfdException(
                             f"{prefix}Unsupported style " f'"{style.style}"'

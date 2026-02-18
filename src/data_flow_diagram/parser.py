@@ -134,27 +134,6 @@ def parse(
             raise model.DfdException(f'{error_prefix}{e}')
 
         match statement:
-            case model.ExportedStyle() as style:
-                if shared_options is not None:
-                    # convert name to snake_case
-                    field_name = style.style.replace("-", "_")
-
-                    # check that the style belongs to shared options
-                    if field_name not in model.SHARED_OPTION_NAMES:
-                        raise model.DfdException(
-                            f'{error_prefix}Unrecognized style option "{style.style}"'
-                        )
-
-                    # convert value and set it in shared options
-                    field_type = get_type_hints(model.SharedOptions)[field_name]
-                    if field_type is int:
-                        setattr(shared_options, field_name, int(style.value))
-                    elif field_type is bool:
-                        setattr(shared_options, field_name, True)
-                    else:
-                        setattr(shared_options, field_name, style.value)
-                    continue
-
             case model.Item() as item:
                 _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
@@ -204,10 +183,6 @@ def _parse_item_name(name: str) -> Tuple[str, bool]:
 def _parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
     style, value = _split_args(source.text, 2, True)
-    style_snake = style.replace("-", "_")
-    if style_snake in model.SHARED_OPTION_NAMES:
-        return model.ExportedStyle(source, style, value)
-
     return model.Style(source, style, value)
 
 
