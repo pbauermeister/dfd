@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Graphviz is required by the integration test and the non-regression tests
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
+
+      - name: Install Python dependencies
+        run: pip install pytest setuptools typing_extensions .
+
+      - name: Run unit and integration tests
+        run: pytest
+
+      - name: Run non-regression tests
+        run: ./tests/nr-test.sh

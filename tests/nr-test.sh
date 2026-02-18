@@ -6,6 +6,7 @@ set -e
 NR_DIR=tests/non-regression
 fail=0
 
+# Test .dfd files
 for dfd in "$NR_DIR"/*.dfd; do
     dot="${dfd%.dfd}.dot"
     [ -f "$dot" ] || continue
@@ -21,10 +22,12 @@ for dfd in "$NR_DIR"/*.dfd; do
     rm -f "$tmp"
 done
 
+# Test .md files with fenced code blocks
 for md in "$NR_DIR"/*.md; do
     [ -f "$md" ] || continue
     subdir="${md%.md}"
     tmp_md="${md%.md}.tmp.md"
+
     # Rewrite fence output paths: .dot -> .tmp
     sed 's/\.dot$/.tmp/g' "$md" > "$tmp_md"
     ./data-flow-diagram --markdown -f dot "$tmp_md"
@@ -43,4 +46,5 @@ for md in "$NR_DIR"/*.md; do
     rm -f "$tmp_md"
 done
 
+# Final result
 [ $fail -eq 0 ] || { echo "Non-regression test(s) FAILED"; exit 1; }

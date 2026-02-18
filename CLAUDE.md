@@ -29,6 +29,10 @@ Claude: if the user starts a task without covering these points, briefly remind 
 - Include a **Requirement** section describing what was asked for, and a **Design** section describing the agreed-upon approach, before implementation begins.
 - Update the status in-place as work progresses.
 
+## Writing or modifying tests
+
+Before adding or changing any test, read `tests/README.md`. It defines: how to classify a test (unit / integration / non-regression; nominal / edge / robustness / regression), where to place it, how to run it in isolation, and how it gets picked up by the full suite (`make test`).
+
 ## Non-regression tests
 
 - **Fixtures** (test inputs) live in `tests/non-regression/`: `.dfd`, `.part`, `.md` files.
@@ -37,6 +41,33 @@ Claude: if the user starts a task without covering these points, briefly remind 
 - `make nr-test` runs as part of `make test`. It compares regenerated DOT against golden `.dot` files.
 - Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 027+).
 
+## Implementation workflow
+
+When implementing an approved plan:
+
+- Complete work in **logical units** and commit each one separately, so changes are traceable at medium granularity (not one giant commit, not one commit per file).
+- **Stop and ask** before continuing when: (a) the next step depends on validating the current result, (b) a decision is needed that was not resolved in the plan, or (c) something unexpected is discovered.
+- Otherwise, proceed autonomously through the remaining steps and commit as you go.
+- **At plan-approval time**, declare every permission category the implementation will need using `allowedPrompts` in `ExitPlanMode`, so the user can grant all permissions upfront and implementation can run unattended. Each entry should name the affected files or targets where known (e.g. `"delete tests/unit_tests.py, tests/inputs.py (irreversible)"`), and explicitly flag dangerous or irreversible actions.
+
+## Design philosophy
+
+**YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
+
+## Commenting style
+
+Comments are treated as *more important than code*: they represent the one-step-higher semantic level that makes code understandable to humans and AIs alike. Accurate comments are a prerequisite for safe refactoring. Stale or wrong comments are worse than none.
+
+Two comment types are used, with different purposes:
+
+- **Chunk comments** (primary): short `#` comments placed before a logical group of lines throughout a function or method body, stating *what* that group accomplishes — not *how*. They let the eye scan the file structure at a glance, then zoom into any block of interest. Target density: roughly one chunk comment per 5–10 lines of code. Avoid restating the code; avoid omitting them where the purpose isn't obvious from names alone.
+
+- **Intent comments** (occasional): a sentence in a docstring — or rarely an inline `#` — explaining *why* a design decision was made. Use these sparingly, only when the reasoning behind a choice would not be recoverable from the code or surrounding context.
+
 ## Formatting
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).
+
+## Markdown formatting
+
+- When writing Markdown, match the output of VSCode's table formatter exactly: **pad every table cell with spaces so all cells in a column are the same width**, and pad the separator row dashes (`---`) to the same width. This prevents meaningless diff noise when the user's editor auto-formats on save. Other Markdown elements (headings, lists, blank lines) follow standard CommonMark conventions.
