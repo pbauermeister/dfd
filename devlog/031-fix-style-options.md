@@ -1,7 +1,7 @@
 # 031 — Fix style options
 
 **Date:** 2026-02-18
-**Status:** ONGOING
+**Status:** DONE
 
 ---
 
