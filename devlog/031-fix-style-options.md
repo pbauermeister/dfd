@@ -37,4 +37,4 @@ Additionally, `background-color` had no effect (it was not implemented).
 
 ## Testing
 
-TODO: add at least one NR case, that can be copied from the doc (img/bg-color-no-title).
+NR case `027-bg-color-no-title`: exercises both `style background-color` and `style no-graph-title`.

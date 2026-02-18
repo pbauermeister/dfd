@@ -1,0 +1,6 @@
+style background-color yellow
+style no-graph-title
+
+process	P1
+process	P2
+P1 --> P2
