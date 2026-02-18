@@ -22,6 +22,7 @@ SnippetContexts = list[SnippetContext]
 
 
 def extract_snippets(text: str) -> model.Snippets:
+    """Find all ```data-flow-diagram ...``` code blocks in a markdown text."""
     rx = re.compile(
         r"^```(?P<head>\s*)"
         r"data-flow-diagram\s+"

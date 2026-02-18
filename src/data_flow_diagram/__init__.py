@@ -116,7 +116,7 @@ def parse_args() -> argparse.Namespace:
 def handle_markdown_source(
     options: model.Options, provenance: str, input_fp: TextIO
 ) -> None:
-    """Call build() for the markdouwn case: isolate snippets and call build() for each of them."""
+    """Call build() for the markdown case: isolate snippets and call build() for each."""
 
     # read MD file and extract snippets with their context (line number, provenance, etc.)
     text = input_fp.read()
@@ -157,7 +157,7 @@ def handle_dfd_source(
 def run(args: argparse.Namespace) -> None:
     """Run the application with the given commandline args."""
 
-    # adjust input
+    # resolve input source (file or stdin)
     if args.INPUT_FILE is None:
         input_fp = sys.stdin
         provenance = "<stdin>"
@@ -175,12 +175,12 @@ def run(args: argparse.Namespace) -> None:
 
     set_debug(args.debug)
 
-    # markdown source
+    # dispatch to markdown or single-source mode
     if args.markdown:
         handle_markdown_source(options, provenance, input_fp)
         return
 
-    # adjust output
+    # resolve output path (explicit, derived from input, or stdout)
     if args.output_file is None:
         if args.INPUT_FILE is not None:
             basename = os.path.splitext(args.INPUT_FILE)[0]
@@ -195,9 +195,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    """Entry point for the application script.
-
-    Can be called by data-flow-diagram (console script) or by tests."""
+    """Entry point for the application script."""
 
     dot.check_installed()
 

@@ -24,7 +24,7 @@ def dprint(
     end: str | None = "\n",
     flush: Literal[False] = False,
 ) -> None:
-    """Debug printing, to stderr, and only if debuhg mode is on."""
+    """Debug printing, to stderr, and only if debug mode is on."""
 
     if not debug:
         return

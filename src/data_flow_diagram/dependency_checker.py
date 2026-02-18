@@ -7,13 +7,7 @@ def check(
     snippet_by_name: model.SnippetByName | None,
     options: model.Options,
 ) -> None:
-    """Verify that all dependencies are valid:
-
-    - that they refer to existing items, and
-    - that the type of the referred item is compatible with the type of the dependency.
-
-    TODO: add more chunk comments.
-    """
+    """Verify that all dependencies refer to existing items of compatible type."""
 
     snippet_by_name = snippet_by_name or {}
     errors: list[str] = []
@@ -45,7 +39,7 @@ def check(
                 continue
             what = "file"
 
-        # if only graph is targetted, we're done
+        # whole-graph reference: only check that the item type is "none"
         if dep.to_item is None:
             if dep.to_type != Keyword.NONE:
                 errors.append(
@@ -55,11 +49,11 @@ def check(
                 )
             continue
 
-        # scan and parse
+        # scan and parse the referred graph to look up the item
         lines = scanner.scan(dep.source, text, snippet_by_name, options.debug)
         statements, _, _ = parser.parse(lines, options)
 
-        # find name
+        # verify the referred item exists and has the expected type
         item = find_item(dep.to_item, statements)
         if item:
             if dep.to_type != item.type:
@@ -76,6 +70,7 @@ def check(
             f' of {what} "{name}"'
         )
 
+    # raise all accumulated errors at once
     if errors:
         errors.insert(0, "Dependency error(s) found:")
         raise model.DfdException("\n\n".join(errors))

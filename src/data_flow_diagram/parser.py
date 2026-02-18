@@ -11,9 +11,9 @@ from .model import Keyword
 
 
 def check(statements: model.Statements) -> dict[str, model.Item]:
-    """Check that all statement make sense"""
+    """Validate all statements: no duplicate items, valid connection endpoints, valid frames."""
 
-    # collect items
+    # collect items and reject duplicates
     items_by_name: dict[str, model.Item] = {}
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
@@ -36,7 +36,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             f"at line {other.source.line_nr+1}: {other_text}"
         )
 
-    # check references and values of connections
+    # validate connection endpoints and type constraints
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
@@ -70,7 +70,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 f"stars"
             )
 
-    # check references of frames
+    # validate frame membership: items must exist and not belong to multiple frames
     framed_items: set[str] = set()
     for statement in statements:
         error_prefix = model.mk_err_prefix_from(statement.source)
@@ -107,6 +107,7 @@ def parse(
     attribs: model.Attribs = {}
 
     for n, source in enumerate(source_lines):
+        # skip blank lines and comments
         src_line = source.text
 
         src_line = src_line.strip()
@@ -114,13 +115,12 @@ def parse(
             continue
         error_prefix = model.mk_err_prefix_from(source)
 
-        # syntactic sugars may rewrite the line
+        # rewrite arrow sugar to keyword form
         line = _apply_syntactic_sugars(src_line)
         source.text = line  # fixup text
 
+        # dispatch to the keyword-specific parser
         word = source.text.split()[0]
-
-        # get parser from dispatch table
         f = _PARSERS.get(word)
 
         if f is None:
@@ -133,11 +133,11 @@ def parse(
         except model.DfdException as e:
             raise model.DfdException(f'{error_prefix}{e}')
 
+        # post-parse: extract inline attributes and register dependencies
         match statement:
             case model.Item() as item:
                 _parse_item_external(item, dependencies)
                 item.text = item.text or item.name
-                # Items are also Drawables, so parse drawable attributes here
                 parse_drawable_attrs(item)
 
             case model.Drawable() as drawable:
@@ -214,6 +214,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     if len(terms) < 2:
         raise model.DfdException(f"One or more arguments are expected")
 
+    # initialize a base filter with no neighbours
     f = model.Filter(
         source,
         names=[],
@@ -225,7 +226,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     args = terms[1:]
     replacer = ""
 
-    # first arguments may be +N or -N, which specify the number of down/up neighbors to include in the filter
+    # consume leading neighbour/replacer specifications before the anchor names
     while args:
         arg = args[0]
 
@@ -244,6 +245,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
             fn = model.FilterNeighbors(0, False, False, False)
             is_up = is_down = False
 
+            # parse direction indicator
             match match.group("neighbors"):
                 case "<>":
                     is_up = is_down = True
@@ -258,6 +260,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                     is_down = True
                     fn.layout_dir = True
 
+            # parse optional modifier flags ("x", "f")
             for flag in match.group("flags"):
                 match flag:
                     case "x":
@@ -268,6 +271,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                         raise model.DfdException(
                             f"Unrecognized filter flag: {flag}"
                         )
+            # parse span (distance): "*" for unlimited, or a decimal number
             if match.group("all"):
                 fn.distance = -1  # special value for "all neighbors"
             elif match.group("num"):
@@ -277,6 +281,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                     f"Neighborhood size must be an integer or '*', not: {arg}"
                 )
 
+            # assign parsed spec to the matching direction(s)
             if is_up:
                 f.neighbors_up = fn
             if is_down:
@@ -288,8 +293,10 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     if len(args) == 0:
         raise model.DfdException(f"One or more names are expected")
 
+    # remaining args are anchor names
     f.names = args
 
+    # wrap into the concrete Only or Without subclass
     res: model.Statement
     if cmd == Keyword.ONLY:
         res = model.Only(**f.__dict__)
@@ -333,15 +340,16 @@ def _make_connection_parser(
 
 
 def _apply_syntactic_sugars(src_line: str) -> str:
+    """Rewrite arrow operators and filter shorthands to canonical keyword form."""
 
-    # allow arguments to be sticked to the filter mnemonics
+    # insert space after filter mnemonic (e.g. "!A B" → "! A B")
     if src_line and src_line[0] in (Keyword.ONLY, Keyword.WITHOUT):
         if len(src_line) > 1 and src_line[1] != " ":
             # insert a space after the filter, so that it is recognized as a filter
             new_line = src_line[0] + " " + src_line[1:]
             return new_line
 
-    # others syntactic sugars apply on 3 or more terms
+    # rewrite arrow operators (e.g. "A --> B label" → "flow A B label")
     terms = src_line.split()
     if len(terms) < 3:
         return src_line
@@ -361,6 +369,7 @@ def _apply_syntactic_sugars(src_line: str) -> str:
             return _fmt(relaxed_keyword, parts)
         return _fmt(keyword, parts)
 
+    # match arrow patterns against connection keywords
     if re.fullmatch(r"-+>[?]?", op):
         new_line = _resolve(Keyword.FLOW, Keyword.FLOW_RELAXED)
 
@@ -401,6 +410,7 @@ def _apply_syntactic_sugars(src_line: str) -> str:
 
 
 def parse_drawable_attrs(drawable: model.Drawable) -> None:
+    """Extract inline Graphviz attributes from a leading [...] bracket prefix."""
     if drawable.text and drawable.text.startswith("["):
         parts = drawable.text[1:].split("]", 1)
         drawable.attrs = parts[0]
@@ -414,14 +424,17 @@ def parse_drawable_attrs(drawable: model.Drawable) -> None:
 def _parse_item_external(
     item: model.Item, dependencies: model.GraphDependencies
 ) -> None:
+    """Detect and handle external references (graph:item syntax)."""
     parts = item.name.split(":", 1)
     if len(parts) > 1:
+        # mark as external (greyed-out style) and extract item name
         item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
         if parts[-1]:
             item.name = parts[-1]
         else:
             item.name = parts[-2]
 
+        # strip snippet prefix or file extension from the name
         if item.name.startswith(model.SNIPPET_PREFIX):
             item.name = item.name[len(model.SNIPPET_PREFIX) :]
         else:
@@ -430,6 +443,7 @@ def _parse_item_external(
         if not item.text:
             item.text = item.name
 
+        # register the dependency for later verification
         dependency = model.GraphDependency(
             parts[0], parts[1] or None, item.type, item.source
         )
