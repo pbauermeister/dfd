@@ -60,7 +60,7 @@ Rules:
 scanner.py          # what it is, not what it does
 parser.py
 filters.py
-codegen.py
+rendering.py
 templates.py
 ```
 
@@ -78,7 +78,7 @@ Rules:
 are ordered **generic to specific** (left to right):
 
 ```
-data_flow_diagram/pipeline/scanner.py
+data_flow_diagram/dsl/scanner.py
          ^            ^        ^
      package      domain    role
 ```
@@ -97,13 +97,13 @@ src/data_flow_diagram/
     model.py                # data types, exceptions, enums
     markdown.py             # markdown snippet extraction
     dfd.py                  # pipeline orchestrator (build)
-    pipeline/
+    dsl/
         __init__.py
         scanner.py          # preprocessing: includes, line continuations
         parser.py           # DSL parsing: keyword dispatch, syntactic sugar
         filters.py          # filter engine: only/without, neighbours
         checker.py          # cross-document dependency validation
-    codegen/
+    rendering/
         __init__.py
         dot.py              # DOT code generation (Generator class)
         templates.py        # DOT template strings and font constants
@@ -112,9 +112,9 @@ src/data_flow_diagram/
 
 Rationale:
 
-- **`pipeline/`** groups the DSL processing stages that transform
+- **`dsl/`** groups the DSL processing stages that transform
   source text into validated, filtered statements.
-- **`codegen/`** groups everything related to producing DOT output
+- **`rendering/`** groups everything related to producing DOT output
   and invoking Graphviz.
 - Top-level modules (`cli`, `config`, `console`, `model`, `markdown`,
   `dfd`) are either infrastructure shared across packages or entry
@@ -138,7 +138,7 @@ The package structure must work in all installation modes:
 - **Configuration values** (defaults, thresholds): define in
   `config.py` with `UPPER_SNAKE_CASE` names.
 - **Graphviz-specific constants** (templates, font specs, colours):
-  define in `codegen/templates.py`.
+  define in `rendering/templates.py`.
 - **DSL syntax literals** (sentinel values, directive keywords):
   define in `model.py` alongside the data types that use them.
 

@@ -169,17 +169,17 @@ target layout defined in `doc/CONVENTIONS.md`, reducing `dfd.py` from
 
 **Actions anticipated:**
 
-- Create `pipeline/` sub-package:
-  - Move `scanner.py` → `pipeline/scanner.py`
-  - Move `parser.py` → `pipeline/parser.py`
+- Create `dsl/` sub-package:
+  - Move `scanner.py` → `dsl/scanner.py`
+  - Move `parser.py` → `dsl/parser.py`
   - Extract `handle_filters()` + `find_neighbors()` from `dfd.py` →
-    `pipeline/filters.py` (~260 lines, self-contained filter engine)
-  - Move `dependency_checker.py` → `pipeline/checker.py`
-- Create `codegen/` sub-package:
+    `dsl/filters.py` (~260 lines, self-contained filter engine)
+  - Move `dependency_checker.py` → `dsl/checker.py`
+- Create `rendering/` sub-package:
   - Extract `Generator` class + `generate_dot()` + `wrap()` from
-    `dfd.py` → `codegen/dot.py` (~300 lines, DOT generation)
-  - Move `dfd_dot_templates.py` → `codegen/templates.py`
-  - Move `dot.py` → `codegen/graphviz.py` (Graphviz binary
+    `dfd.py` → `rendering/dot.py` (~300 lines, DOT generation)
+  - Move `dfd_dot_templates.py` → `rendering/templates.py`
+  - Move `dot.py` → `rendering/graphviz.py` (Graphviz binary
     invocation)
 - Decide where `handle_options()` and `remove_unused_hidables()` fit:
   orchestrator (`dfd.py`) or one of the sub-packages.
@@ -237,9 +237,9 @@ coupling and making data flow explicit.
   Graphviz). Refactor so the core pipeline returns DOT text, and I/O
   is handled by the caller. This makes it possible to unit-test the
   full pipeline without touching the filesystem.
-- Ensure each extracted module (filters, codegen) exposes a pure
+- Ensure each extracted module (filters, rendering) exposes a pure
   function: statements in → statements out (filters), statements in →
-  DOT text out (codegen).
+  DOT text out (rendering).
 - Add unit tests that exercise each stage in isolation with
   programmatically constructed `model.Statements` (not just
   end-to-end `.dfd` → `.dot` comparisons).

@@ -77,7 +77,7 @@ Full rules are in **`doc/CONVENTIONS.md`**. Key points:
 - **Functions**: action-first (`verb_object`), e.g. `handle_filters`, `generate_dot`.
 - **Classes**: PascalCase nouns, e.g. `Generator`, `FilterNeighbors`.
 - **Modules**: lowercase nouns (domain/role), e.g. `scanner`, `filters`.
-- **Packages**: generic → specific path order, e.g. `pipeline/scanner.py`.
+- **Packages**: generic → specific path order, e.g. `dsl/scanner.py`.
 - **Constants**: `UPPER_SNAKE_CASE` in their designated module.
 - Use official terminology from `doc/SYNTAX.md` in all identifiers.
 
