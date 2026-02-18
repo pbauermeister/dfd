@@ -1,3 +1,10 @@
+## Version 1.16.5:
+
+- Fix #31: allow `background-color` and `no-graph-title` to be specified as
+  `style` options in the DFD source, with command-line precedence.
+- Implement the `background-color` option (was previously a no-op).
+- Remove the unimplemented `--percent-zoom` command-line option.
+
 ## Version 1.16.4:
 
 - Fix #29: restore `make lint` by adding missing type annotations to all test
