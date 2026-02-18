@@ -68,6 +68,15 @@ Two comment types are used, with different purposes:
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).
 
+## Versioning convention
+
+Versions follow `MAJOR.MINOR.PATCH` with an optional `.postN` suffix:
+
+- Bump `PATCH` for user-facing changes: bug fixes, new features, doc additions.
+- Use `.postN` only for publishing/packaging fixes and trivial wording corrections
+  (e.g. fixing a typo in `README.md`, a broken PyPI upload, a CI script tweak)
+  that do not affect the tool's behaviour or documentation content.
+
 ## Markdown formatting
 
 - When writing Markdown, match the output of VSCode's table formatter exactly: **pad every table cell with spaces so all cells in a column are the same width**, and pad the separator row dashes (`---`) to the same width. This prevents meaningless diff noise when the user's editor auto-formats on save. Other Markdown elements (headings, lists, blank lines) follow standard CommonMark conventions.

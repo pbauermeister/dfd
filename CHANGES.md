@@ -1,3 +1,12 @@
+## Version 1.16.3:
+
+- Add non-regression test framework (`--format dot` support, golden-file comparison).
+- Add and improve unit and integration tests.
+- Fix: replace deprecated `pkg_resources` with `importlib.metadata` (stdlib),
+  resolving `ModuleNotFoundError` in CI environments.
+- Doc: document filtering (`only`/`without`) and layout constraints (`A > B`).
+- Doc: normalize section titles in `doc/README.md`.
+
 ## Version 1.16.2.post2:
 
 - Refactoring of style options.

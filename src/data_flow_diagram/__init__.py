@@ -17,14 +17,14 @@ import sys
 import tempfile
 from typing import TextIO
 
-import pkg_resources
+from importlib.metadata import PackageNotFoundError, version
 
 from . import dfd, dot, markdown, model
 from .console import print_error, dprint, set_debug
 
 try:
-    VERSION = pkg_resources.require("data-flow-diagram")[0].version
-except pkg_resources.DistributionNotFound:
+    VERSION = version("data-flow-diagram")
+except PackageNotFoundError:
     VERSION = "undefined"
 
 
