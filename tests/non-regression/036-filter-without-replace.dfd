@@ -2,6 +2,8 @@
 
 store db_all All DBs
 
+# keep the three DBs, their immediate neighbours, and the replacement item
 !<>1 db_aggr db_fcast db_params db_all
 
+# remove the three DBs and rewire their connections to db_all
 ~=db_all db_aggr db_fcast db_params

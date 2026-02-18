@@ -1,4 +1,5 @@
 #include tests/non-regression/028-filter-master.part
 
+# keep a subset of items, then remove etl from it
 ! ds etl db_raw proc_flow db_aggr db_params
 ~ etl

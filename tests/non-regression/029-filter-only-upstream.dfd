@@ -1,3 +1,4 @@
 #include tests/non-regression/028-filter-master.part
 
+# keep db_raw and all its upstream neighbours (unlimited span)
 !<* db_raw

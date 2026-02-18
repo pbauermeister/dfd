@@ -1,3 +1,4 @@
 #include tests/non-regression/028-filter-master.part
 
+# keep proc_flow and 1 level of neighbours to the right (layout direction)
 !]1 proc_flow

@@ -1,3 +1,4 @@
 #include tests/non-regression/028-filter-master.part
 
+# keep only neighbours (2 levels), suppress anchor and frames ("xf" flags)
 !<>xf2 proc_flow
