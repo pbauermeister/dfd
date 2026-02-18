@@ -601,8 +601,8 @@ def handle_filters(
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
 
-    # A node in the only_names set may lose its connections and, if it is
-    # hidable, vanish (or, if in a frame, reappear as a basic node).
+    # An item in the only_names set may lose its connections and, if it is
+    # hidable, vanish (or, if in a frame, reappear as a basic item).
     # To keep it, we make it non-hidable.
     for statement in statements:
         match statement:
