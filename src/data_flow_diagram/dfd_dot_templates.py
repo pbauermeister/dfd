@@ -1,3 +1,5 @@
+"""This module holds templates for DOT code generation."""
+
 STORE = """
 "{name}" [shape=none label=<
   <TABLE BORDER="0">

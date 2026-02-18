@@ -1,3 +1,5 @@
+"""This module provides functions to process snippets of DFD source in whole MD files."""
+
 import io
 import os
 import re
@@ -69,7 +71,7 @@ def check_snippets_unicity(provenance: str, snippets: model.Snippets) -> None:
     counts = Counter(snippet_names)
     multiples = {k: n for k, n in counts.items() if n > 1}
     if multiples:
-        root = model.SourceLine("", provenance, None, None)
+        root = model.SourceLine("", provenance, None, 0)
         error_prefix = model.mk_err_prefix_from(root)
         raise model.DfdException(
             f"{error_prefix}Snippets defined multiple " f"times: {multiples}"

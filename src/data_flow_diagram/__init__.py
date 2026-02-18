@@ -116,10 +116,15 @@ def parse_args() -> argparse.Namespace:
 def handle_markdown_source(
     options: model.Options, provenance: str, input_fp: TextIO
 ) -> None:
+    """Call build() for the markdouwn case: isolate snippets and call build() for each of them."""
+
+    # read MD file and extract snippets with their context (line number, provenance, etc.)
     text = input_fp.read()
     snippets = markdown.extract_snippets(text)
     markdown.check_snippets_unicity(provenance, snippets)
     snippets_params = markdown.make_snippets_params(provenance, snippets)
+
+    # call build() for each snippet
     for params in snippets_params:
         dfd.build(
             params.root,
@@ -134,6 +139,8 @@ def handle_markdown_source(
 def handle_dfd_source(
     options: model.Options, provenance: str, input_fp: TextIO, output_path: str
 ) -> None:
+    """Call build() for when the DFD is given by a path, and output to another path or stdout."""
+
     root = model.SourceLine("", provenance, None, 0)
     if output_path == "-":
         # output to stdout
@@ -148,6 +155,8 @@ def handle_dfd_source(
 
 
 def run(args: argparse.Namespace) -> None:
+    """Run the application with the given commandline args."""
+
     # adjust input
     if args.INPUT_FILE is None:
         input_fp = sys.stdin
@@ -186,7 +195,9 @@ def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    """Entry point for the application script"""
+    """Entry point for the application script.
+
+    Can be called by data-flow-diagram (console script) or by tests."""
 
     dot.check_installed()
 

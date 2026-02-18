@@ -1,3 +1,5 @@
+"""This module does the first steps of DFD scanning, principally handling the #include directives."""
+
 import os
 import re
 

@@ -7,6 +7,13 @@ def check(
     snippet_by_name: model.SnippetByName | None,
     options: model.Options,
 ) -> None:
+    """Verify that all dependencies are valid:
+
+    - that they refer to existing items, and
+    - that the type of the referred item is compatible with the type of the dependency.
+
+    TODO: add more chunk comments.
+    """
 
     snippet_by_name = snippet_by_name or {}
     errors: list[str] = []

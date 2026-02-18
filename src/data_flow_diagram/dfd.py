@@ -1,4 +1,7 @@
-"""Run the generation process"""
+"""Run the generation process.
+
+TODO: Add more chunk comments.
+TODO: Add more docstrings."""
 
 import os.path
 import pprint
