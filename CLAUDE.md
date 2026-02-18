@@ -72,33 +72,13 @@ When implementing an approved plan:
 
 ## Commenting style
 
-Comments represent the one-step-higher semantic level that makes code understandable to humans and AIs alike. They are a prerequisite for safe refactoring. Stale or wrong comments are worse than none.
+Full rules are in **`doc/COMMENTING.md`**. Key points:
 
-Three kinds of comments are used, at different granularities:
-
-- **Chunk comments** (primary): short `#` comments placed before a logical group of lines inside a function body, stating *what* that group accomplishes — not *how*. They partition the function into scannable blocks. Target density: roughly one chunk comment per 5–10 lines of code — denser for intricate logic, sparser for straightforward code. Avoid restating the code; avoid omitting them where the purpose isn't obvious from names alone.
-
-- **Phase headers**: a chunk comment that marks a major section of a long function (>~30 LOC). Prefixed with `# phase N:` to stand out when scanning. Use whenever a function has two or more distinct stages.
-
-- **Intent comments** (occasional): one or more `#` lines — or a docstring sentence — explaining *why* a design decision was made. Use sparingly, only when the reasoning would not be recoverable from the code or the surrounding chunk comments.
-
-**Casing convention:**
-
-- Chunk comments and phase headers: **lowercase** verb phrases (`# validate filter names`).
-- Intent comments: **capitalized** full sentences (`# An item in the only_names set may lose its connections…`).
-
-This visual distinction lets the eye tell *what* from *why* at a glance.
-
-**What NOT to comment:**
-
-- Well-named functions/methods — they already serve as signposts; a chunk comment above a call to `_collect_frame_skips(…)` would duplicate the name.
-- Debug/logging lines (`dprint(…)`).
-- Single obvious lines (e.g. `return result`).
-- Inline restatements of the code.
-
-**Terminology:** use official terms from the glossary in `doc/SYNTAX.md`. When a comment's terminology differs from the identifier it annotates, prefer the official term in the comment. Example: use "item" (not "node"), "anchor" (not "listed item"), "kept set".
-
-**Reference example:** `dfd.py:handle_filters` demonstrates the full range of comment types and density.
+- **Chunk comments** (lowercase verb phrases): state *what* a block does. Target ~1 per 5–10 lines.
+- **Phase headers** (`# phase N:`): mark major sections of long functions.
+- **Intent comments** (capitalized sentences): explain *why*, used sparingly.
+- Use official terminology from the glossary in `doc/SYNTAX.md`.
+- Do not comment well-named functions, debug lines, or obvious code.
 
 ## Formatting
 
