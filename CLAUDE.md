@@ -41,6 +41,16 @@ Claude: if the user starts a task without covering these points, briefly remind 
 
 **YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
 
+## Commenting style
+
+Comments are treated as *more important than code*: they represent the one-step-higher semantic level that makes code understandable to humans and AIs alike. Accurate comments are a prerequisite for safe refactoring. Stale or wrong comments are worse than none.
+
+Two comment types are used, with different purposes:
+
+- **Chunk comments** (primary): short `#` comments placed before a logical group of lines throughout a function or method body, stating *what* that group accomplishes — not *how*. They let the eye scan the file structure at a glance, then zoom into any block of interest. Target density: roughly one chunk comment per 5–10 lines of code. Avoid restating the code; avoid omitting them where the purpose isn't obvious from names alone.
+
+- **Intent comments** (occasional): a sentence in a docstring — or rarely an inline `#` — explaining *why* a design decision was made. Use these sparingly, only when the reasoning behind a choice would not be recoverable from the code or surrounding context.
+
 ## Formatting
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).

@@ -18,11 +18,13 @@ Analyze how it could be improved to achieve the same results, but be more Python
 
 Call internal features by direct Python access — no CLI subprocess calls in unit tests.
 
-Minimal instrumentation of application code is allowed if it avoids mocking.
+Instrumentation of application code is allowed.
+
+Modifications of application code is encouraged to avoid mocking.
 
 Running all tests must be fast enough not to hamper the install/publish process, and suitable for future CI on pull requests.
 
-The existing tests check successes and failures. They shall be extended to cover edge cases. They must not duplicate basic nominal cases, which are covered by the non-regression tests.
+The existing tests check successes and failures. They shall be easy to extended to cover edge cases. They must not duplicate basic nominal cases, which are covered by the non-regression tests.
 
 The framework must not anticipate future tests (no hooks, markers, or base classes for hypothetical needs), but must not create obstacles to adding them later.
 
@@ -41,7 +43,7 @@ Unit tests are called via a Makefile target (`make test`) that can be run standa
 
 | #   | Topic             | Decision                                                                                                                                                                                 |
 | --- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Test framework    | Switch to `pytest`                                                                                                                                                                       |
+| 1   | Test framework    | Switch to `pytest`; include sparse comments to guide pytest non-experts                                                                                                                  |
 | 2   | Path hack         | Remove `sys.path.insert(0, "src")` everywhere; configure `pythonpath = ["src"]` in `pyproject.toml [tool.pytest.ini_options]`                                                            |
 | 3   | Fixtures          | Move to `tests/conftest.py`; use module-level constants for DFD snippets (maximum readability); `pytest.fixture` only where setup/teardown genuinely adds value                          |
 | 4   | File organisation | Split by subsystem: `tests/unit/test_cli.py`, `tests/unit/test_parser.py`, `tests/unit/test_scanner.py`, `tests/unit/test_markdown.py`; one file per subsystem                           |
