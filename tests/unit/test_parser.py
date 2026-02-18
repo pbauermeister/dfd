@@ -53,7 +53,7 @@ CHECK_ERROR_CASES = [
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 
-def test_parse_valid_syntax():
+def test_parse_valid_syntax() -> None:
     # Full valid DFD must pass both parse() and check() without error
     tokens = scanner.scan(None, ALL_ITEMS_AND_CONNECTIONS)
     try:
@@ -62,15 +62,15 @@ def test_parse_valid_syntax():
         pytest.fail(f"Unexpected DfdException on valid syntax: {e}")
 
 
-def test_parse_unknown_keyword_raises():
+def test_parse_unknown_keyword_raises() -> None:
     # An unrecognised keyword must be caught by parse(), not silently ignored
     tokens = scanner.scan(None, "xyz")
     with pytest.raises(model.DfdException):
         parser.parse(tokens)
 
 
-@pytest.mark.parametrize("dfd_text", CHECK_ERROR_CASES)
-def test_check_raises(dfd_text):
+@pytest.mark.parametrize("dfd_text", CHECK_ERROR_CASES)  # type: ignore[misc]
+def test_check_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in check()
     tokens = scanner.scan(None, dfd_text)
     statements, _, _ = parser.parse(tokens)

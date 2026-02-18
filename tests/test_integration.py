@@ -7,10 +7,14 @@ pipeline including Graphviz.  They require the `dot` binary to be installed.
 import io
 import sys
 
+import pytest
+
 from data_flow_diagram import main
 
 
-def test_stdin_to_stdout_produces_svg(monkeypatch, capsys):
+def test_stdin_to_stdout_produces_svg(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     # Feed a minimal DFD on stdin; stdout must contain a well-formed SVG
     monkeypatch.setattr(sys, 'stdin', io.StringIO("process P Process"))
     monkeypatch.setattr(sys, 'argv', ['prog'])

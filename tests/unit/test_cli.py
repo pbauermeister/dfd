@@ -2,6 +2,8 @@
 
 import sys
 
+import pytest
+
 from data_flow_diagram import parse_args
 
 # The full set of argument names the CLI must expose; a mismatch here means
@@ -20,14 +22,18 @@ EXPECTED_ARG_KEYS = {
 }
 
 
-def test_parse_args_exposes_expected_keys(monkeypatch):
+def test_parse_args_exposes_expected_keys(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Simulate calling the CLI with a single positional argument
     monkeypatch.setattr(sys, 'argv', ['prog', 'my-file'])
     args = parse_args()
     assert set(args.__dict__.keys()) == EXPECTED_ARG_KEYS
 
 
-def test_parse_args_positional_input_file(monkeypatch):
+def test_parse_args_positional_input_file(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # The positional INPUT_FILE argument must be captured verbatim
     monkeypatch.setattr(sys, 'argv', ['prog', 'my-file'])
     args = parse_args()
