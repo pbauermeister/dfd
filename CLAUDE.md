@@ -37,6 +37,15 @@ Claude: if the user starts a task without covering these points, briefly remind 
 - `make nr-test` runs as part of `make test`. It compares regenerated DOT against golden `.dot` files.
 - Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 027+).
 
+## Implementation workflow
+
+When implementing an approved plan:
+
+- Complete work in **logical units** and commit each one separately, so changes are traceable at medium granularity (not one giant commit, not one commit per file).
+- **Stop and ask** before continuing when: (a) the next step depends on validating the current result, (b) a decision is needed that was not resolved in the plan, or (c) something unexpected is discovered.
+- Otherwise, proceed autonomously through the remaining steps and commit as you go.
+- **At plan-approval time**, declare every permission category the implementation will need using `allowedPrompts` in `ExitPlanMode`, so the user can grant all permissions upfront and implementation can run unattended. Each entry should name the affected files or targets where known (e.g. `"delete tests/unit_tests.py, tests/inputs.py (irreversible)"`), and explicitly flag dangerous or irreversible actions.
+
 ## Design philosophy
 
 **YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
@@ -54,3 +63,7 @@ Two comment types are used, with different purposes:
 ## Formatting
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).
+
+## Markdown formatting
+
+- When writing Markdown, match the output of VSCode's table formatter exactly: **pad every table cell with spaces so all cells in a column are the same width**, and pad the separator row dashes (`---`) to the same width. This prevents meaningless diff noise when the user's editor auto-formats on save. Other Markdown elements (headings, lists, blank lines) follow standard CommonMark conventions.
