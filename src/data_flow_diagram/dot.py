@@ -10,11 +10,13 @@ from .console import print_error
 def generate_image(
     graph_options: model.GraphOptions, text: str, output_path: str, format: str
 ) -> None:
+    # choose Graphviz engine based on diagram mode
     if graph_options.is_context:
         engine = "neato"  # circo is not as good
     else:
         engine = "dot"
 
+    # invoke Graphviz and handle errors
     cmd = [engine, f"-T{format}", f"-o{output_path}"]
     try:
         subprocess.run(cmd, input=text, encoding="utf-8", check=True)
@@ -23,7 +25,6 @@ def generate_image(
             print(f"{n+1:2}: {line}", file=sys.stderr)
         print_error(f"ERROR: {e}")
         sys.exit(1)
-    # print('Generated:', output_path, file=sys.stderr)
 
 
 def check_installed() -> None:

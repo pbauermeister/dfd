@@ -1,4 +1,4 @@
-"""Run the generation process"""
+"""Run the generation process."""
 
 import os.path
 import pprint
@@ -19,18 +19,21 @@ def build(
     options: model.Options,
     snippet_by_name: model.SnippetByName | None = None,
 ) -> None:
-    """Take a DFD source and build the final image or document"""
+    """Take a DFD source and build the final image or document."""
+
+    # scan (includes, line continuations) and parse the DSL into statements
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
     statements, dependencies, attribs = parser.parse(lines, options)
     if dependencies and not options.no_check_dependencies:
         dependency_checker.check(dependencies, snippet_by_name, options)
 
+    # validate statements and apply filters
     items_by_name = parser.check(statements)
-
     statements = handle_filters(statements, options.debug)
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
 
+    # resolve title and background color (CLI args override DFD style)
     if options.no_graph_title or graph_options.no_graph_title:
         title = ""
     else:
@@ -42,6 +45,7 @@ def build(
         else graph_options.background_color
     )
 
+    # generate DOT and produce the output file
     gen = Generator(graph_options, attribs)
     text = generate_dot(gen, title, bg_color, statements, items_by_name)
     dprint(text)
@@ -79,6 +83,9 @@ class Generator:
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
+        """Emit the DOT node declaration for a single item."""
+
+        # prepare a working copy with text wrapping and attrib expansion
         copy = model.Item(**item.__dict__)
         hits = self.RX_NUMBERED_NAME.findall(copy.text)
         if hits:
@@ -88,6 +95,7 @@ class Generator:
         attrs = copy.attrs or ""
         attrs = self._expand_attribs(attrs)
 
+        # emit shape-specific DOT declaration
         match copy.type:
             case model.Keyword.PROCESS:
                 if self.graph_options.is_context:
@@ -202,9 +210,11 @@ class Generator:
         src_item: model.Item | None,
         dst_item: model.Item | None,
     ) -> None:
+        """Emit the DOT edge declaration for a connection."""
         text = conn.text or ""
         text = wrap(text, self.graph_options.connection_text_width)
 
+        # resolve endpoints: anonymous ("*") items become star nodes
         src_port = dst_port = ""
 
         if not src_item:
@@ -223,10 +233,11 @@ class Generator:
             if dst_item.type == model.Keyword.CHANNEL:
                 dst_port = ":x:c"
 
+        # build edge attributes, starting with the label
         attrs = f'label="{text}"'
 
         match conn.type:
-            # make the edge invisible before other attributes
+            # Constraints are invisible layout-only edges
             case model.Keyword.CONSTRAINT:
                 if text and not conn.attrs:
                     # transparent edge, to reveal the label
@@ -238,6 +249,7 @@ class Generator:
         if conn.attrs:
             attrs += " " + self._expand_attribs(conn.attrs)
 
+        # apply connection-type-specific DOT attributes
         match conn.type:
             case model.Keyword.FLOW:
                 if conn.reversed:
@@ -286,6 +298,9 @@ class Generator:
         self.lines.append("}")
 
     def generate_dot_text(self, title: str, bg_color: str | None) -> str:
+        """Assemble all generated lines into the final DOT source text."""
+
+        # collect graph-level parameters from options
         graph_params = []
 
         if self.graph_options.is_context:
@@ -307,6 +322,7 @@ class Generator:
         if bg_color:
             graph_params.append(f"bgcolor={bg_color}")
 
+        # wrap generated lines into the DOT digraph template
         block = "\n".join(self.lines).replace("\n", "\n  ")
         text = TMPL.DOT.format(
             title=title,
@@ -349,6 +365,7 @@ def generate_dot(
 
 
 def remove_unused_hidables(statements: model.Statements) -> model.Statements:
+    """Drop hidable items that have no connections (conditional items marked with '?')."""
     # collect used items
     connected_items = set()
     for statement in statements:
@@ -375,6 +392,7 @@ def remove_unused_hidables(statements: model.Statements) -> model.Statements:
 def handle_options(
     statements: model.Statements,
 ) -> tuple[model.Statements, model.GraphOptions]:
+    """Extract style statements into GraphOptions and return the remaining statements."""
     new_statements = []
     options = model.GraphOptions()
     for statement in statements:
@@ -423,7 +441,7 @@ def find_neighbors(
     max_neighbors: int,
     debug: bool,
 ) -> tuple[set[str], set[str]]:
-    """Collect names from filter statements of the given type."""
+    """Collect neighbour names by following connections outward from filter anchors."""
 
     def _find_neighbors(
         names: set[str], find_down: bool, nreverse: bool
@@ -462,7 +480,7 @@ def find_neighbors(
             return max_neighbors
         return nb
 
-    # find down and up neighbors by successive waves of connections
+    # expand neighbours in one direction by successive waves of connections
     def _find_neighbors_in_dir(
         fn: model.FilterNeighbors, down: bool
     ) -> set[str]:
@@ -489,6 +507,7 @@ def find_neighbors(
 def handle_filters(
     statements: model.Statements, debug: bool = False
 ) -> model.Statements:
+    # collect all item names and initialize filter state
     all_names = set([s.name for s in statements if isinstance(s, model.Item)])
     kept_names: set[str] | None = None
     only_names: set[str] = set()
@@ -504,12 +523,13 @@ def handle_filters(
                 f'{prefix} Name(s) no longer available due to previous filters: {diff}'
             )
 
+    # state for name replacement (Without→replace) and frame suppression
     replacement: dict[str, str] = {}
     skip_frames_for_names: set[str] = (
         set()
-    )  # names for which frames should be skipped due to neighbors_only
+    )  # names whose frames should be suppressed (neighbor-only mode)
 
-    # collect filtered names
+    # phase 1: collect filtered names
     for statement in statements:
         prefix = model.mk_err_prefix_from(statement.source)
 
@@ -534,14 +554,15 @@ def handle_filters(
 
         match statement:
             case model.Only() as f:
+                # Only is additive: first Only starts with an empty kept set
                 if kept_names is None:
                     kept_names = set()
 
-                # all Only names must be valid
+                # validate filter names
                 names = set(f.names)
                 _check_names(names, all_names, prefix)
 
-                # add names from this Only statement
+                # add anchor names (suppressed by "x" flag: neighbours only)
                 if (
                     not f.neighbors_up.no_anchors
                     and not f.neighbors_down.no_anchors
@@ -550,7 +571,7 @@ def handle_filters(
                     kept_names.update(f.names)
                     only_names.update(f.names)
 
-                # add neighbors
+                # add upstream/downstream neighbour names
                 downs, ups = find_neighbors(
                     f, statements, len(all_names), debug
                 )
@@ -561,10 +582,11 @@ def handle_filters(
                 _collect_frame_skips(f, names, downs, ups)
 
             case model.Without() as f:
+                # Without is subtractive: first Without starts with all names
                 if kept_names is None:
                     kept_names = all_names.copy()
 
-                # all Without names must be valid
+                # validate filter names and register replacements
                 names = set(f.names)
                 names_to_check = names.copy()
                 if f.replaced_by:
@@ -573,7 +595,7 @@ def handle_filters(
                         replacement[name] = f.replaced_by
                 _check_names(names_to_check, kept_names, prefix)
 
-                # remove names from this Without statement
+                # remove anchor names (suppressed by "x" flag: neighbours only)
                 if (
                     not f.neighbors_up.no_anchors
                     and not f.neighbors_down.no_anchors
@@ -581,7 +603,7 @@ def handle_filters(
                     dprint("WITHOUT: removing nodes:", names)
                     kept_names.difference_update(names)
 
-                # remove neighbors
+                # remove upstream/downstream neighbour names
                 downs, ups = find_neighbors(
                     f, statements, len(all_names), debug
                 )
@@ -594,8 +616,8 @@ def handle_filters(
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
 
-    # A node in the only_names set may lose its connections and, if it is
-    # hidable, vanish (or, if in a frame, reappear as a basic node).
+    # An item in the only_names set may lose its connections and, if it is
+    # hidable, vanish (or, if in a frame, reappear as a basic item).
     # To keep it, we make it non-hidable.
     for statement in statements:
         match statement:
@@ -603,34 +625,36 @@ def handle_filters(
                 if item.name in only_names:
                     item.hidable = False  # make non-hidable
 
+    # default to keeping all names if no filter was encountered
     kept_names = kept_names if kept_names is not None else all_names
 
     dprint("\nItems to keep", kept_names)
 
-    # apply filters
+    # phase 2: apply filters to statements
     new_statements: list[model.Statement] = []
     replaced_connections: dict[str, model.Connection] = {}
     for statement in statements:
         dprint(f"\nHandling statement: {statement}")
         match statement:
             case model.Item() as item:
-                # skip nodes that are not in the only list
+                # skip items not in the kept set
                 if item.name not in kept_names:
                     dprint("=> Skipping item: its name is not in the kept list")
                     continue
 
             case model.Connection() as conn:
                 if conn.src in replacement or conn.dst in replacement:
+                    # skip if both ends are replaced (would collapse to self-loop)
                     if conn.src in replacement and conn.dst in replacement:
-                        continue  # skip connections if both ends are replaced by the same name
-                    # replace any end
+                        continue
+                    # rewrite replaced endpoint(s)
                     if conn.src in replacement:
                         conn.src = replacement[conn.src]
                     if conn.dst in replacement:
                         conn.dst = replacement[conn.dst]
                     replaced_connections[conn.signature()] = conn
                 else:
-                    # skip connections if either src or dst is not in the kept list
+                    # skip if either endpoint was filtered out
                     if conn.src not in kept_names or conn.dst not in kept_names:
                         dprint(
                             "=> Skipping connection: some end is not in the kept list"
@@ -638,26 +662,26 @@ def handle_filters(
                         continue
 
             case model.Frame() as frame:
-                # apply replacements
+                # rewrite replaced names in frame membership
                 for name in frame.items:
                     if name in replacement:
                         frame.items.remove(name)
                         frame.items.append(replacement[name])
 
-                # skip frames if none of the items are in the kept list
+                # skip frames with no remaining kept items
                 names = set(frame.items)
                 if not names.intersection(kept_names):
                     dprint("=> Skipping frame: no items are in the kept list")
                     continue
                 else:
-                    # adjust frame items by removing those not in the kept list
+                    # trim frame to kept items only
                     new_items = [n for n in frame.items if n in kept_names]
                     dprint(
                         f"=> Adjusting frame items: {frame.items} -> {new_items}"
                     )
                     frame.items = new_items
 
-                    # skip frames if they contain items for which frames should be skipped
+                    # skip frames containing items selected via "f" flag
                     if set(new_items).intersection(skip_frames_for_names):
                         dprint(
                             "=> Skipping frame: some items are in the skip-frames list"
@@ -668,7 +692,7 @@ def handle_filters(
         dprint("=> Keeping statement")
         new_statements.append(statement)
 
-    # remove duplicate connections due to replacements
+    # phase 3: deduplicate connections created by replacements
     kept_new_statements = []
     skipped_statements = set()
     for statement in new_statements:

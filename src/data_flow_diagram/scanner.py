@@ -1,3 +1,5 @@
+"""This module does the first steps of DFD scanning, principally handling the #include directives."""
+
 import os
 import re
 
@@ -21,9 +23,10 @@ def scan(
     output: model.SourceLines = []
     includes: set[str] = set()
 
-    # stitch continuated lines
+    # stitch continuation lines (trailing backslash)
     input = RX_LINE_CONT.sub("", input)
 
+    # default provenance for top-level sources
     if provenance is None:
         provenance = model.SourceLine("", provenance, None, 0)
     _scan(input, provenance, output, snippet_by_name, includes)
@@ -48,6 +51,7 @@ def _scan(
     snippet_by_name: model.SnippetByName | None,
     includes: set[str],
 ) -> None:
+    """Process each non-blank line: dispatch includes, collect the rest."""
     for nr, line in enumerate(input.splitlines()):
         if not line.strip():
             continue
@@ -66,6 +70,7 @@ def include(
     snippet_by_name: model.SnippetByName | None,
     includes: set[str],
 ) -> None:
+    # extract the include target and guard against recursion
     pair = line.split(maxsplit=1)
     name = pair[1]
     prefix = model.mk_err_prefix_from(parent)
@@ -74,6 +79,7 @@ def include(
         raise model.DfdException(f'{prefix}Recursive include of "{name}"')
     includes.add(name)
 
+    # resolve the includee: snippet (#-prefixed) or file
     caller = model.SourceLine("", f"<snippet {name}>", parent, 0)
     if name.startswith(model.SNIPPET_PREFIX):
         # include from MD snippet

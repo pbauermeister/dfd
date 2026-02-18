@@ -72,13 +72,13 @@ When implementing an approved plan:
 
 ## Commenting style
 
-Comments are treated as *more important than code*: they represent the one-step-higher semantic level that makes code understandable to humans and AIs alike. Accurate comments are a prerequisite for safe refactoring. Stale or wrong comments are worse than none.
+Full rules are in **`doc/COMMENTING.md`**. Key points:
 
-Two comment types are used, with different purposes:
-
-- **Chunk comments** (primary): short `#` comments placed before a logical group of lines throughout a function or method body, stating *what* that group accomplishes — not *how*. They let the eye scan the file structure at a glance, then zoom into any block of interest. Target density: roughly one chunk comment per 5–10 lines of code. Avoid restating the code; avoid omitting them where the purpose isn't obvious from names alone.
-
-- **Intent comments** (occasional): a sentence in a docstring — or rarely an inline `#` — explaining *why* a design decision was made. Use these sparingly, only when the reasoning behind a choice would not be recoverable from the code or surrounding context.
+- **Chunk comments** (lowercase verb phrases): state *what* a block does. Target ~1 per 5–10 lines.
+- **Phase headers** (`# phase N:`): mark major sections of long functions.
+- **Intent comments** (capitalized sentences): explain *why*, used sparingly.
+- Use official terminology from the glossary in `doc/SYNTAX.md`.
+- Do not comment well-named functions, debug lines, or obvious code.
 
 ## Formatting
 

@@ -18,7 +18,7 @@ def repr(o: Any) -> str:
 
 
 ##############################################################################
-# Classes representing elementsstatements and internal data structures
+# Classes representing elements, statements, and internal data structures
 
 
 @dataclass
@@ -120,10 +120,12 @@ class Frame(Drawable):
 
 @dataclass
 class FilterNeighbors:
-    distance: int  # neighborhood distance to keep, or -1 for all
-    no_anchors: bool  # consider only neighbors, not listed nodes themselves
-    layout_dir: bool  # consider layout direction, not flow direction
-    no_frames: bool  # suppress impacted frames
+    distance: int  # span: how many levels of neighbours (-1 = unlimited)
+    no_anchors: bool  # "x" flag: select only neighbours, not anchors
+    layout_dir: (
+        bool  # use layout direction (left/right) instead of flow direction
+    )
+    no_frames: bool  # "f" flag: suppress frames involving selected items
 
 
 @dataclass
@@ -204,8 +206,8 @@ class Keyword(StrEnum):
 ##############################################################################
 # DSL syntax literals
 
-NODE_STAR = "*"  # star as src/dst in connections will declare and generate a distinct "none" node
-ALL_NEIGHBORS = "*"  # "all" distance in filter neighbor spec
+NODE_STAR = "*"  # anonymous endpoint: generates a distinct "none" item
+ALL_NEIGHBORS = "*"  # unlimited span in filter neighbour spec
 SNIPPET_PREFIX = "#"  # prefix distinguishing snippet references from file paths
 INCLUDE_DIRECTIVE = "#include"  # DSL directive for including external sources
 
@@ -221,6 +223,7 @@ def pack(src_line: str | None) -> str:
 
 
 def mk_err_prefix_from(src: SourceLine) -> str:
+    """Build an error prefix showing the source location stack (most recent first)."""
 
     def _add_to_stack(stack: list[str], src: SourceLine) -> None:
         if src.line_nr is None:

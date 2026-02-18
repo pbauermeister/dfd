@@ -1,3 +1,5 @@
+"""This module holds templates for DOT code generation."""
+
 STORE = """
 "{name}" [shape=none label=<
   <TABLE BORDER="0">
@@ -32,6 +34,7 @@ CHANNEL_HORIZONTAL = """
 """.strip()
 
 
+# Graphviz font defaults for edges, items, and graph label
 DOT_FONT_EDGE = 'fontname="times-italic" fontsize=10'
 DOT_FONT_NODE = 'fontname="helvetica" fontsize=10'
 DOT_FONT_GRAPH = 'fontname="helvetica" fontsize=9 fontcolor="#000060"'

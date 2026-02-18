@@ -189,7 +189,7 @@ P1 ::> *	an untargetted signal
 
 ### 2.4. Optional label
 
-The LABEL can be ommitted, in which case:
+The LABEL can be omitted, in which case:
 
 - for items, the NAME is used as LABEL,
 - for connections, no LABEL is rendered:
@@ -757,7 +757,7 @@ Then, we use the snippet `dfd/includee-snippet-1.svg` (defined above) by
 `#include #dfd/includee-snippet-1`. The leading `#` mandates to include a
 snippet and not a file. Think of it like an anchor to the markdown snippet.
 The output format extension (here `.svg` for
-`dfd/includee-snippet-1`) must be ommitted.
+`dfd/includee-snippet-1`) must be omitted.
 
     ```data-flow-diagram dfd/includer-1.svg
 
@@ -842,7 +842,7 @@ It as a good practice to split a functional diagram in many sub-diagrams
 (nested or not), each one of low to medium complexity.
 
 The benefit of better readability comes with a drawback for the writer:
-maintaining consistancy. To ease this, the "dependencies" feature comes to help.
+maintaining consistency. To ease this, the "dependencies" feature comes to help.
 
 You can re-declare items already declared in other graphs. This has the following effects:
 
@@ -999,8 +999,8 @@ Filters statements are line beginning with `!` or `~`:
 
 You shall think of a set of kept items, manipulated sequentially:
 
-- If the first occurence of filters is `!`, the set is created empty
-- if the first occurence of filters is `~`, the set is created full,
+- If the first occurrence of filters is `!`, the set is created empty
+- if the first occurrence of filters is `~`, the set is created full,
 - multiple `!` statements are possible: each one adds items to the set;
 - `~` statements remove items from the set.
 - Example:
@@ -1062,11 +1062,11 @@ You can combine them by sequential statements:
 `DIRECTION[SPAN][FLAGS]`
 
 - DIRECTION:
-  - `>`: downstream neighbors
-  - `<`: upstream neighbors
+  - `>`: downstream neighbours
+  - `<`: upstream neighbours
   - `<>`: all directions
-  - `[`: left neighbors
-  - `]`: right neighbors
+  - `[`: left neighbours
+  - `]`: right neighbours
 - SPAN:
   - `*`: all neighbours in the given direction
   - _number_: this number of neighbours in the given direction
@@ -1183,7 +1183,7 @@ Here:
 - Seen from B, A is on the left
 - Seen from C, B is on the right
 
-##### 7.4.1.3. Keeping an item and the neighours before
+##### 7.4.1.3. Keeping an item and the neighbours before
 
 ```data-flow-diagram img/filter-only-before.svg
 #include #img/data-pipeline
@@ -1196,7 +1196,7 @@ Here:
 
 ![Filtering](./img/filter-only-before.svg)
 
-##### 7.4.1.4. Keeping an item and the neighours after
+##### 7.4.1.4. Keeping an item and the neighbours after
 
 ```data-flow-diagram img/filter-only-after.svg
 #include #img/data-pipeline
@@ -1279,7 +1279,7 @@ Here:
 ```data-flow-diagram img/filter-only-right.svg
 #include #img/data-pipeline
 
-# Keep proc_flow, and one levels of neighbours on its left
+# Keep proc_flow, and one level of neighbours on its left
 !]1 proc_flow
 
 # Note the "]1" span, with "]" meaning "on the right"
