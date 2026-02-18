@@ -10,11 +10,11 @@ Start by classifying your intent along two axes.
 
 ### Axis A — Test category
 
-| Category           | What it verifies                                                                 | Needs Graphviz? |
-| ------------------ | -------------------------------------------------------------------------------- | --------------- |
+| Category           | What it verifies                                                                  | Needs Graphviz? |
+| ------------------ | --------------------------------------------------------------------------------- | --------------- |
 | **Unit**           | A single internal Python function or a small cluster of tightly related functions | No              |
-| **Integration**    | The full pipeline end-to-end (stdin/file → SVG/DOT on stdout/disk)               | Yes             |
-| **Non-regression** | That a known-good DFD input still produces the expected DOT output               | Yes (nr-test)   |
+| **Integration**    | The full pipeline end-to-end (stdin/file → SVG/DOT on stdout/disk)                | Yes             |
+| **Non-regression** | That a known-good DFD input still produces the expected DOT output                | Yes (nr-test)   |
 
 Decision questions:
 
@@ -24,12 +24,12 @@ Decision questions:
 
 ### Axis B — Test nature
 
-| Nature          | Description                                                                              |
-| --------------- | ---------------------------------------------------------------------------------------- |
-| **Nominal**     | Valid input, expected happy-path output. Covered mainly by non-regression tests.         |
-| **Edge case**   | Valid but boundary input: empty labels, maximum widths, special characters, `*` nodes …  |
-| **Robustness**  | Invalid input that must be caught and produce a `DfdException` with a meaningful message |
-| **Regression**  | Reproduces a specific past bug to prevent it from reappearing                            |
+| Nature         | Description                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| **Nominal**    | Valid input, expected happy-path output. Covered mainly by non-regression tests.         |
+| **Edge case**  | Valid but boundary input: empty labels, maximum widths, special characters, `*` nodes …  |
+| **Robustness** | Invalid input that must be caught and produce a `DfdException` with a meaningful message |
+| **Regression** | Reproduces a specific past bug to prevent it from reappearing                            |
 
 > **Rule of thumb:** unit tests focus on edge cases and robustness; non-regression tests
 > cover nominal cases; integration tests verify the pipeline glue.
