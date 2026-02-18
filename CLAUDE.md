@@ -70,6 +70,17 @@ When implementing an approved plan:
 
 **YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
 
+## Naming and structure conventions
+
+Full rules are in **`doc/CONVENTIONS.md`**. Key points:
+
+- **Functions**: action-first (`verb_object`), e.g. `handle_filters`, `generate_dot`.
+- **Classes**: PascalCase nouns, e.g. `Generator`, `FilterNeighbors`.
+- **Modules**: lowercase nouns (domain/role), e.g. `scanner`, `filters`.
+- **Packages**: generic → specific path order, e.g. `dsl/scanner.py`.
+- **Constants**: `UPPER_SNAKE_CASE` in their designated module.
+- Use official terminology from `doc/SYNTAX.md` in all identifiers.
+
 ## Commenting style
 
 Full rules are in **`doc/COMMENTING.md`**. Key points:
