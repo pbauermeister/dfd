@@ -492,6 +492,7 @@ def find_neighbors(
 def handle_filters(
     statements: model.Statements, debug: bool = False
 ) -> model.Statements:
+    # collect all item names and initialize filter state
     all_names = set([s.name for s in statements if isinstance(s, model.Item)])
     kept_names: set[str] | None = None
     only_names: set[str] = set()
@@ -507,12 +508,13 @@ def handle_filters(
                 f'{prefix} Name(s) no longer available due to previous filters: {diff}'
             )
 
+    # state for name replacement (Without→replace) and frame suppression
     replacement: dict[str, str] = {}
     skip_frames_for_names: set[str] = (
         set()
-    )  # names for which frames should be skipped due to neighbors_only
+    )  # names whose frames should be suppressed (neighbor-only mode)
 
-    # collect filtered names
+    # phase 1: collect filtered names
     for statement in statements:
         prefix = model.mk_err_prefix_from(statement.source)
 
@@ -537,14 +539,15 @@ def handle_filters(
 
         match statement:
             case model.Only() as f:
+                # Only is additive: first Only starts with an empty kept set
                 if kept_names is None:
                     kept_names = set()
 
-                # all Only names must be valid
+                # validate filter names
                 names = set(f.names)
                 _check_names(names, all_names, prefix)
 
-                # add names from this Only statement
+                # add anchor names (suppressed by "x" flag: neighbours only)
                 if (
                     not f.neighbors_up.no_anchors
                     and not f.neighbors_down.no_anchors
@@ -553,7 +556,7 @@ def handle_filters(
                     kept_names.update(f.names)
                     only_names.update(f.names)
 
-                # add neighbors
+                # add upstream/downstream neighbour names
                 downs, ups = find_neighbors(
                     f, statements, len(all_names), debug
                 )
@@ -564,10 +567,11 @@ def handle_filters(
                 _collect_frame_skips(f, names, downs, ups)
 
             case model.Without() as f:
+                # Without is subtractive: first Without starts with all names
                 if kept_names is None:
                     kept_names = all_names.copy()
 
-                # all Without names must be valid
+                # validate filter names and register replacements
                 names = set(f.names)
                 names_to_check = names.copy()
                 if f.replaced_by:
@@ -576,7 +580,7 @@ def handle_filters(
                         replacement[name] = f.replaced_by
                 _check_names(names_to_check, kept_names, prefix)
 
-                # remove names from this Without statement
+                # remove anchor names (suppressed by "x" flag: neighbours only)
                 if (
                     not f.neighbors_up.no_anchors
                     and not f.neighbors_down.no_anchors
@@ -584,7 +588,7 @@ def handle_filters(
                     dprint("WITHOUT: removing nodes:", names)
                     kept_names.difference_update(names)
 
-                # remove neighbors
+                # remove upstream/downstream neighbour names
                 downs, ups = find_neighbors(
                     f, statements, len(all_names), debug
                 )
@@ -606,34 +610,36 @@ def handle_filters(
                 if item.name in only_names:
                     item.hidable = False  # make non-hidable
 
+    # default to keeping all names if no filter was encountered
     kept_names = kept_names if kept_names is not None else all_names
 
     dprint("\nItems to keep", kept_names)
 
-    # apply filters
+    # phase 2: apply filters to statements
     new_statements: list[model.Statement] = []
     replaced_connections: dict[str, model.Connection] = {}
     for statement in statements:
         dprint(f"\nHandling statement: {statement}")
         match statement:
             case model.Item() as item:
-                # skip nodes that are not in the only list
+                # skip items not in the kept set
                 if item.name not in kept_names:
                     dprint("=> Skipping item: its name is not in the kept list")
                     continue
 
             case model.Connection() as conn:
                 if conn.src in replacement or conn.dst in replacement:
+                    # skip if both ends are replaced (would collapse to self-loop)
                     if conn.src in replacement and conn.dst in replacement:
-                        continue  # skip connections if both ends are replaced by the same name
-                    # replace any end
+                        continue
+                    # rewrite replaced endpoint(s)
                     if conn.src in replacement:
                         conn.src = replacement[conn.src]
                     if conn.dst in replacement:
                         conn.dst = replacement[conn.dst]
                     replaced_connections[conn.signature()] = conn
                 else:
-                    # skip connections if either src or dst is not in the kept list
+                    # skip if either endpoint was filtered out
                     if conn.src not in kept_names or conn.dst not in kept_names:
                         dprint(
                             "=> Skipping connection: some end is not in the kept list"
@@ -641,26 +647,26 @@ def handle_filters(
                         continue
 
             case model.Frame() as frame:
-                # apply replacements
+                # rewrite replaced names in frame membership
                 for name in frame.items:
                     if name in replacement:
                         frame.items.remove(name)
                         frame.items.append(replacement[name])
 
-                # skip frames if none of the items are in the kept list
+                # skip frames with no remaining kept items
                 names = set(frame.items)
                 if not names.intersection(kept_names):
                     dprint("=> Skipping frame: no items are in the kept list")
                     continue
                 else:
-                    # adjust frame items by removing those not in the kept list
+                    # trim frame to kept items only
                     new_items = [n for n in frame.items if n in kept_names]
                     dprint(
                         f"=> Adjusting frame items: {frame.items} -> {new_items}"
                     )
                     frame.items = new_items
 
-                    # skip frames if they contain items for which frames should be skipped
+                    # skip frames containing items selected via "f" flag
                     if set(new_items).intersection(skip_frames_for_names):
                         dprint(
                             "=> Skipping frame: some items are in the skip-frames list"
@@ -671,7 +677,7 @@ def handle_filters(
         dprint("=> Keeping statement")
         new_statements.append(statement)
 
-    # remove duplicate connections due to replacements
+    # phase 3: deduplicate connections created by replacements
     kept_new_statements = []
     skipped_statements = set()
     for statement in new_statements:
