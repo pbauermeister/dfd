@@ -41,6 +41,20 @@ Before adding or changing any test, read `tests/README.md`. It defines: how to c
 - `make nr-test` runs as part of `make test`. It compares regenerated DOT against golden `.dot` files.
 - Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 027+).
 
+## Branching and PR workflow
+
+For every non-trivial fix or feature (i.e. anything with a `devlog/NNN-*.md`
+file), work on a dedicated branch and open a pull request:
+
+1. Create a branch named `NNN-short-description` before writing any code.
+2. Commit all implementation work — including the `devlog/NNN-*.md` file — on
+   that branch.
+3. Open a PR against `main` when the work is ready for review.
+4. Merge (or ask the user to merge) only after the PR is approved and CI passes.
+
+Direct commits to `main` are reserved for trivial changes (`.postN`-level) that
+do not warrant a PR.
+
 ## Implementation workflow
 
 When implementing an approved plan:
