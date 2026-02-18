@@ -1,0 +1,40 @@
+# Master diagram for filter tests.
+# Mirrors the data-pipeline example from doc/README.md section 7.
+
+entity  ds              Data source
+process etl             ETL
+process proc_flow       process data flow
+entity  user            User
+process ext             External system
+
+store   db_aggr         Aggregated data
+store   db_fcast        Forecasts
+store   db_raw          Raw data
+store   db_params       Parameters
+
+process optim           optimize params
+process forecast        compute forecasts
+process interact        handle interactions
+
+frame db_aggr db_fcast db_params = Computation results
+frame optim forecast = Batch processing
+
+ds              --> etl
+etl             --> db_raw
+db_raw          --> proc_flow
+
+proc_flow       --> db_aggr
+proc_flow       <-- db_params       alert thresh
+proc_flow       ::> user            alert
+
+db_params       <-- optim           new params
+
+db_aggr         --> forecast
+db_params       --> forecast        horizon
+db_fcast        <-- forecast
+
+db_aggr         --> interact
+db_fcast        --> interact
+interact        --> user
+interact        --> ext
+db_params       <-- interact        alert thresh

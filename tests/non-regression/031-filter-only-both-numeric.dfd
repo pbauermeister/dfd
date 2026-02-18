@@ -1,0 +1,3 @@
+#include tests/non-regression/028-filter-master.part
+
+!<>2 proc_flow

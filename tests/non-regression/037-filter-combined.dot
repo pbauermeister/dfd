@@ -1,0 +1,55 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/037-filter-combined -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 3: entity ds Data source */
+  "ds" [shape=rectangle label="Data source" ]
+
+  /* 5: process proc_flow process data flow */
+  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+
+  /* 9: store db_aggr Aggregated data */
+  "db_aggr" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 11: store db_raw Raw data */
+  "db_raw" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Raw data</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 12: store db_params Parameters */
+  "db_params" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Parameters</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  subgraph cluster_0 {
+    label="Computation results"
+    style=dashed
+    "db_aggr"
+    "db_params"
+  }
+
+  /* 23: flow db_raw proc_flow */
+  "db_raw" -> "proc_flow" [label=""]
+
+  /* 25: flow proc_flow db_aggr */
+  "proc_flow" -> "db_aggr" [label=""]
+
+  /* 26: flow.r proc_flow db_params alert thresh */
+  "proc_flow" -> "db_params" [label="alert thresh" dir=back]
+}

@@ -1,0 +1,7 @@
+#include tests/non-regression/028-filter-master.part
+
+store db_all All DBs
+
+!<>1 db_aggr db_fcast db_params db_all
+
+~=db_all db_aggr db_fcast db_params

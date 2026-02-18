@@ -1,0 +1,68 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/036-filter-without-replace -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 5: process proc_flow process data flow */
+  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+
+  /* 14: process optim optimize params */
+  "optim" [shape=ellipse label="optimize params" fillcolor="#eeeeee" style=filled ]
+
+  /* 15: process forecast compute forecasts */
+  "forecast" [shape=ellipse label="compute forecasts" fillcolor="#eeeeee" style=filled ]
+
+  /* 16: process interact handle interactions */
+  "interact" [shape=ellipse label="handle interactions" fillcolor="#eeeeee" style=filled ]
+
+  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  subgraph cluster_0 {
+    label="Computation results"
+    style=dashed
+    "db_all"
+    "db_all"
+  }
+
+  /* 19: frame optim forecast = Batch processing */
+  subgraph cluster_1 {
+    label="Batch processing"
+    style=dashed
+    "optim"
+    "forecast"
+  }
+
+  /* 25: flow proc_flow db_aggr */
+  "proc_flow" -> "db_all" [label=""]
+
+  /* 26: flow.r proc_flow db_params alert thresh */
+  "proc_flow" -> "db_all" [label="alert thresh" dir=back]
+
+  /* 29: flow.r db_params optim new params */
+  "db_all" -> "optim" [label="new params" dir=back]
+
+  /* 31: flow db_aggr forecast */
+  "db_all" -> "forecast" [label=""]
+
+  /* 32: flow db_params forecast horizon */
+  "db_all" -> "forecast" [label="horizon"]
+
+  /* 33: flow.r db_fcast forecast */
+  "db_all" -> "forecast" [label="" dir=back]
+
+  /* 35: flow db_aggr interact */
+  "db_all" -> "interact" [label=""]
+
+  /* 39: flow.r db_params interact alert thresh */
+  "db_all" -> "interact" [label="alert thresh" dir=back]
+
+  /* 2: store db_all All DBs */
+  "db_all" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">All DBs</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+}

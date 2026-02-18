@@ -1,0 +1,84 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/032-filter-only-x-flag -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 4: process etl ETL */
+  "etl" [shape=ellipse label="ETL" fillcolor="#eeeeee" style=filled ]
+
+  /* 6: entity user User */
+  "user" [shape=rectangle label="User" ]
+
+  /* 9: store db_aggr Aggregated data */
+  "db_aggr" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 11: store db_raw Raw data */
+  "db_raw" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Raw data</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 12: store db_params Parameters */
+  "db_params" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Parameters</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 14: process optim optimize params */
+  "optim" [shape=ellipse label="optimize params" fillcolor="#eeeeee" style=filled ]
+
+  /* 15: process forecast compute forecasts */
+  "forecast" [shape=ellipse label="compute forecasts" fillcolor="#eeeeee" style=filled ]
+
+  /* 16: process interact handle interactions */
+  "interact" [shape=ellipse label="handle interactions" fillcolor="#eeeeee" style=filled ]
+
+  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  subgraph cluster_0 {
+    label="Computation results"
+    style=dashed
+    "db_aggr"
+    "db_params"
+  }
+
+  /* 19: frame optim forecast = Batch processing */
+  subgraph cluster_1 {
+    label="Batch processing"
+    style=dashed
+    "optim"
+    "forecast"
+  }
+
+  /* 22: flow etl db_raw */
+  "etl" -> "db_raw" [label=""]
+
+  /* 29: flow.r db_params optim new params */
+  "db_params" -> "optim" [label="new params" dir=back]
+
+  /* 31: flow db_aggr forecast */
+  "db_aggr" -> "forecast" [label=""]
+
+  /* 32: flow db_params forecast horizon */
+  "db_params" -> "forecast" [label="horizon"]
+
+  /* 35: flow db_aggr interact */
+  "db_aggr" -> "interact" [label=""]
+
+  /* 37: flow interact user */
+  "interact" -> "user" [label=""]
+
+  /* 39: flow.r db_params interact alert thresh */
+  "db_params" -> "interact" [label="alert thresh" dir=back]
+}
