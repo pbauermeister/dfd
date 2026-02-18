@@ -43,13 +43,13 @@ MD_EXPECTED_SNIPPETS = [
 ]
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def md_with_two_snippets() -> str:
     """Markdown text containing two DFD snippets and one unrelated code block."""
     return MD_WITH_TWO_SNIPPETS
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def md_expected_snippets() -> list[model.Snippet]:
     """Expected Snippet objects for md_with_two_snippets."""
     return MD_EXPECTED_SNIPPETS
