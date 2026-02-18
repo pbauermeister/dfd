@@ -1,5 +1,8 @@
 # Just type 'make' to get help.
 
+PYTHON3 := python3
+SHELL := /bin/bash
+
 # Special targets:
 .PHONY:  * # In this makefile, targets are not built artifacts.
 
@@ -13,18 +16,24 @@ help: ## print this help
 
 	@# capture section headers and documented targets:
 	@grep -E '^#* *[ a-zA-Z_-]+:.*?##.*$$' Makefile \
-	| awk 'BEGIN {FS = ":[^:]*?##"}; {printf "  %-24s %s\n", $$1, $$2}' \
+	| awk 'BEGIN {FS = ":[^:]*?##"}; {printf "  %-20s %s\n", $$1, $$2}' \
 	| sed -E 's/^ *#+/\n/g' \
 	| sed -E 's/ +$$//g'
 
 	@# capture notes:
 	@grep -E '^##[^#]*$$' Makefile | sed -E 's/^## ?//g'
 
-venv: # setup a local .venv and tell how to activate it
-	python3 -m venv .venv || \
-	(apt install python3.12-venv && python3 -m venv .venv)
+venv: _venv ## setup a local .venv and tell how to activate it
 	@echo "Now please run:"
 	@echo ". .venv/bin/activate"
+
+venv-activate: ## activate .venv and start an interactive shell
+	@bash --rcfile <(echo "unset MAKELEVEL"; cat ~/.bashrc .venv/bin/activate)
+
+_venv:
+	python3 -m venv .venv || \
+	(apt install python3.12-venv && python3 -m venv .venv)
+	$(PYTHON3) -m venv .venv
 
 require: ## install needed dev+install tools, in venv
 	. .venv/bin/activate && \
