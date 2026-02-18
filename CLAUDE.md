@@ -46,7 +46,9 @@ Before adding or changing any test, read `tests/README.md`. It defines: how to c
 For every non-trivial fix or feature (i.e. anything with a `devlog/NNN-*.md`
 file), work on a dedicated branch and open a pull request:
 
-1. Create a branch named `NNN-short-description` before writing any code.
+1. Create a branch named `<prefix>/NNN-short-description` before writing any code,
+   where `<prefix>` reflects the kind of work: `fix`, `feature`, `refactor`,
+   `doc`, or `test`.
 2. Commit all implementation work — including the `devlog/NNN-*.md` file — on
    that branch.
 3. Open a PR against `main` when the work is ready for review.
@@ -81,6 +83,7 @@ Two comment types are used, with different purposes:
 ## Formatting
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).
+- After generating or modifying Python code, run `make lint` to catch type errors. Fix all mypy errors before committing.
 
 ## Versioning convention
 
