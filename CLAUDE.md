@@ -37,6 +37,10 @@ Claude: if the user starts a task without covering these points, briefly remind 
 - `make nr-test` runs as part of `make test`. It compares regenerated DOT against golden `.dot` files.
 - Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 027+).
 
+## Design philosophy
+
+**YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
+
 ## Formatting
 
 - After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).
