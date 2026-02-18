@@ -1,7 +1,7 @@
 # 025 — Improve Unit Tests Framework
 
 **Date:** 2026-02-18
-**Status:** IN-SPECS
+**Status:** DONE
 
 ## 1. Requirement
 
@@ -64,12 +64,91 @@ Unit tests are called via a Makefile target (`make test`) that can be run standa
 
 ## 2. Design
 
-_(to be filled in step 3)_
+### 2.1. Current situation (step 2 analysis)
+
+| Item | Current state | Problem |
+|------|---------------|---------|
+| Framework | `unittest.TestCase`, run via `python3 tests/unit_tests.py -v` | Not idiomatic; no parametrize, no fixtures, no monkeypatch |
+| Path setup | `sys.path.insert(0, "src")` in `unit_tests.py` and `inputs.py` | Fragile hack, non-Pythonic |
+| Fixture data | `tests/inputs.py` — plain module with string constants | Imported with a bare `import inputs` that only works when CWD is project root |
+| File layout | Single `tests/unit_tests.py` (8 tests across 4 subsystems) | No separation of concerns |
+| Parametrize | 3 near-identical `parser.check()` error tests written out separately | Adding a new error case requires copy-pasting a whole test method |
+| `sys.argv`/`sys.stdin` | Manually saved and restored in try/finally blocks | pytest's `monkeypatch` handles this more safely |
+| Makefile | `test:` calls `./test.sh` (which calls `python3 tests/unit_tests.py -v`) | `pytest` not used; `require:` doesn't install it |
+| GitHub Actions | No CI workflow | Tests never run automatically |
+
+**Subsystem-to-test mapping:**
+
+| Subsystem | File | Tests |
+|-----------|------|-------|
+| CLI entry point | `__init__.py` | `test_parse_args` |
+| Parser + Scanner | `parser.py`, `scanner.py` | 5 tests (1 success, 1 parse error, 3 check errors) |
+| Markdown | `markdown.py` | `test_input_md` |
+| Integration | full pipeline | `test_output_stdout` (stdin → stdout SVG) |
+
+### 2.2. Target layout
+
+```
+tests/
+  conftest.py              # shared pytest fixtures (markdown data)
+  test_integration.py      # end-to-end pipeline test
+  unit/
+    __init__.py
+    test_cli.py            # parse_args() tests
+    test_parser.py         # scanner + parser + check tests
+    test_markdown.py       # snippet extraction tests
+  non-regression/          # unchanged
+```
+
+### 2.3. Key design choices
+
+- **conftest.py**: only proper `@pytest.fixture` functions, for data too complex or
+  verbose to inline (currently: markdown fixtures). Small DFD strings stay inline as
+  `pytest.param` entries in the test file that uses them.
+- **Parametrize**: the 3 `parser.check()` error cases become one `@pytest.mark.parametrize`
+  test; each case is a `pytest.param(dfd_text, id="...")`.
+- **monkeypatch**: replaces manual `sys.argv`/`sys.stdin` save/restore in CLI and integration tests.
+- **capsys**: replaces `contextlib.redirect_stdout` in the integration test.
+- **No golden data** for unit tests.
+- **pyproject.toml**: gains `[tool.pytest.ini_options]` with `pythonpath = ["src"]`
+  and `testpaths = ["tests"]`.
+- **Makefile**: `require:` gains `pytest`; `test:` calls `pytest` directly, dropping `test.sh`.
+- **GitHub Actions**: installs Python 3.12 + Graphviz, installs `pytest` + project,
+  runs `pytest tests/` then `./tests/nr-test.sh`.
+
+### 2.4. Files deleted
+
+- `tests/unit_tests.py` — replaced by `tests/unit/test_*.py`
+- `tests/inputs.py` — replaced by `tests/conftest.py` and inline params
+- `test.sh` — superseded by direct `pytest` call in Makefile
 
 ## 3. Implementation decisions
 
-_(to be filled during implementation)_
+- `conftest.py` uses both module-level constants (for potential reuse in parametrize)
+  and `@pytest.fixture` functions that wrap them (for auto-injection by pytest).
+- Small DFD error strings stay inline in `test_parser.py` as `pytest.param` entries,
+  avoiding any need to import from conftest.
+- `tests/__init__.py` was deleted (empty, unneeded with pytest discovery).
+- `test.sh` was deleted; Makefile calls `pytest` directly.
+- The original 8 tests become 9 (the single `test_parse_args` was split into two
+  focused assertions: keys check and positional-arg check).
 
 ## 4. Implementation summary
 
-_(to be filled after implementation)_
+Files created:
+- `tests/conftest.py` — shared markdown fixtures
+- `tests/unit/__init__.py` — marks directory as package
+- `tests/unit/test_cli.py` — 2 tests for `parse_args()`
+- `tests/unit/test_parser.py` — 3 tests (1 success, 1 parse error, 1 parametrized check error × 3 cases)
+- `tests/unit/test_markdown.py` — 1 test for `extract_snippets()`
+- `tests/test_integration.py` — 1 end-to-end test
+- `.github/workflows/ci.yml` — CI workflow
+
+Files modified:
+- `pyproject.toml` — added `[tool.pytest.ini_options]`
+- `Makefile` — `require:` gains `pytest`; `test:` calls `pytest` directly
+
+Files deleted:
+- `tests/unit_tests.py`, `tests/inputs.py`, `test.sh`, `tests/__init__.py`
+
+Result: 9 tests, all passing in 0.11 s.

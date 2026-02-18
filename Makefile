@@ -28,7 +28,7 @@ venv: # setup a local .venv and tell how to activate it
 
 require: ## install needed dev+install tools, in venv
 	. .venv/bin/activate && \
-	pip install setuptools twine
+	pip install setuptools twine pytest
 
 all: venv require black lint test doc clean ## make all, except publish
 
@@ -45,7 +45,7 @@ lint: ## lint source files
 
 test: ## run unit tests and non-regression tests
 	. .venv/bin/activate && \
-	./test.sh
+	pytest
 	$(MAKE) nr-test
 
 nr-preview: ## generate SVGs from NR test DFDs for visual inspection
