@@ -969,7 +969,99 @@ command line.
 
 Filtering (keeping/removing items) can be used to generate diagram subsets.
 
-You can work on a complete master diagram, and create subset diagrams by including the master and using filters.
+### 7.1. Filters use case
+
+With a single DFD source file, filters do not make a lot of sense. But when combined with the `#include` capabilities, it allows you to reuse parts, and apply the DRY (do not repeat yourself) principle:
+
+- You work on a complete "master" diagram,
+- and create subset diagrams by including the master and using filters.
+- The subsets let you focus on desired aspects, and the master keeps the full and continuously maintained logic.
+
+### 7.2. Specifying filters
+
+Filters statements are line beginning with `!` or `~`:
+
+- `!` is the "only" filter, used to keep items,
+- `~` is the "without" filter, used to remove items.
+
+You shall think of a set of kept items, manipulated sequentially:
+
+- If the first occurence of filters is `!`, the set is created empty
+- if the first occurence of filters is `~`, the set is created full,
+- multiple `!` statements are possible: each one adds items to the set;
+- `~` statements remove items from the set.
+- Example:
+
+  ```
+  process A
+  process B
+  process C
+  process D
+
+  # Start with an empty set and keep A
+  !A
+
+  # Keep also B and C
+  !B C
+
+  ```
+
+You can combine them by sequential statements:
+
+- you can only remove items that are available at the given point,
+- you can re-add items that were previously removed.
+- Example:
+
+  ```
+  process A
+  process B
+  process C
+
+  # Start with a full set and remove A
+  ~A
+
+  # Remove B
+  ~B
+
+  # This would fail because A is already removed
+  ~A
+
+  # Re-add A
+  ! A
+
+  # This would now succeed
+  ~A
+
+  ```
+
+### 7.3. Filters syntax
+
+#### 7.3.1. The "Only" filter
+
+`![NEIGHBOURS ][ITEM_NAMES]`
+
+#### 7.3.2. The "Without" filter
+
+`~[NEIGHBOURS ][ITEM_NAMES]`
+
+#### 7.3.3. Neighbours syntax
+
+`DIRECTION[SPAN][FLAGS]`
+
+- DIRECTION:
+  - `>`: downstream neighbors
+  - `<`: upstream neighbors
+  - `<>`: all directions
+  - `[`: left neighbors
+  - `]`: right neighbors
+- SPAN:
+  - `*`: all neighbours in the given direction
+  - _number_: this number of neighbours in the given direction
+- FLAGS:
+  - `x`: select only the neighbours, not the listed items
+  - `f`: when selected items belong to a frame, remove the frame
+
+### 7.4. Filters example
 
 First, let us create a master diagram:
 
@@ -1034,9 +1126,9 @@ db_params       <--     interact        [PARAM] alert thresh
 
 ![Filtering](./img/data-pipeline.svg)
 
-### 7.1. The "Only" filters
+#### 7.4.1. Using the "Only" filters
 
-#### 7.1.1. Keep some items
+##### 7.4.1.1. Keeping some items
 
 You can keep a list of items:
 
@@ -1054,7 +1146,7 @@ You can keep a list of items:
 
 ![Filtering](./img/filter-some.svg)
 
-#### 7.1.2. Neighbours
+##### 7.4.1.2. Keeping neighbours
 
 Two kinds of neigborhood exist:
 
@@ -1078,7 +1170,7 @@ Here:
 - Seen from B, A is on the left
 - Seen from C, B is on the right
 
-#### 7.1.3. Keep an item and the neighours before
+##### 7.4.1.3. Keeping an item and the neighours before
 
 ```data-flow-diagram img/filter-only-before.svg
 #include #img/data-pipeline
@@ -1091,7 +1183,7 @@ Here:
 
 ![Filtering](./img/filter-only-before.svg)
 
-#### 7.1.4. Keep an item and the neighours after
+##### 7.4.1.4. Keeping an item and the neighours after
 
 ```data-flow-diagram img/filter-only-after.svg
 #include #img/data-pipeline
@@ -1104,7 +1196,7 @@ Here:
 
 ![Filtering](./img/filter-only-after.svg)
 
-#### 7.1.5. Keep an item and only two levels of neighbours after
+##### 7.4.1.5. Keeping an item and only two levels of neighbours after
 
 ```data-flow-diagram img/filter-only-after-two.svg
 #include #img/data-pipeline
@@ -1117,7 +1209,7 @@ Here:
 
 ![Filtering](./img/filter-only-after-two.svg)
 
-#### 7.1.6. Keep an item and only two levels of neighbours in all directions
+##### 7.4.1.6. Keeping an item and only two levels of neighbours in all directions
 
 ```data-flow-diagram img/filter-only-two.svg
 #include #img/data-pipeline
@@ -1130,7 +1222,7 @@ Here:
 
 ![Filtering](./img/filter-only-two.svg)
 
-#### 7.1.7. Same, but not the item itself
+##### 7.4.1.7. Same, but not the item itself
 
 ```data-flow-diagram img/filter-only-after-two-not-me.svg
 #include #img/data-pipeline
@@ -1143,7 +1235,7 @@ Here:
 
 ![Filtering](./img/filter-only-after-two-not-me.svg)
 
-#### 7.1.8. Same, and remove the frames
+##### 7.4.1.8. Same, and remove the frames
 
 ```data-flow-diagram img/filter-only-no-frames.svg
 #include #img/data-pipeline
@@ -1156,7 +1248,7 @@ Here:
 
 ![Filtering](./img/filter-only-no-frames.svg)
 
-#### 7.1.9. Keep an item and those on its left
+##### 7.4.1.9. Keeping an item and those on its left
 
 ```data-flow-diagram img/filter-only-left.svg
 #include #img/data-pipeline
@@ -1169,7 +1261,7 @@ Here:
 
 ![Filtering](./img/filter-only-left.svg)
 
-#### 7.1.10. Keep an item and one level on its right
+##### 7.4.1.10. Keeping an item and one level on its right
 
 ```data-flow-diagram img/filter-only-right.svg
 #include #img/data-pipeline
@@ -1182,11 +1274,11 @@ Here:
 
 ![Filtering](./img/filter-only-right.svg)
 
-### 7.2. The "Without" filters
+#### 7.4.2. Using the "Without" filters
 
-#### 7.2.1. etc
+##### 7.4.2.1. etc
 
-#### 7.2.2. Replace a group of items by another item
+##### 7.4.2.2. Replacing a group of items by another item
 
 First, lets put our focus around the computation results:
 
