@@ -13,7 +13,6 @@ EXPECTED_ARG_KEYS = {
     'output_file',
     'markdown',
     'format',
-    'percent_zoom',
     'background_color',
     'no_graph_title',
     'no_check_dependencies',

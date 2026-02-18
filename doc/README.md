@@ -223,15 +223,17 @@ Process --> Channel
 The keyword `style` defines rendering parameters for the whole
 diagram:
 
-| Style statement                 | Effect                                                       |
-| ------------------------------- | ------------------------------------------------------------ |
-| `style context`                 | Makes the diagram a context diagram.                         |
-| `style horizontal`              | Layouts flows in the horizontal direction (the default).     |
-| `style vertical`                | Layouts flows in the vertical direction.                     |
-| `style item-text-width N`       | Sets the items labels wrapping to use N chars columns.       |
-| `style connection-text-width N` | Sets the connections labels wrapping to use N chars columns. |
-| `style rotated`                 | Rotates the diagram by 90°.                                  |
-| `style unrotated`               | Reverts the diagram rotation, if any.                        |
+| Style statement                 | Effect                                                                            |
+| ------------------------------- | --------------------------------------------------------------------------------- |
+| `style background-color COLOR`  | Sets a graph background color as per https://graphviz.org/docs/attr-types/color/. |
+| `style connection-text-width N` | Sets the connections labels wrapping to use N chars columns.                      |
+| `style context`                 | Makes the diagram a context diagram.                                              |
+| `style horizontal`              | Layouts flows in the horizontal direction (the default).                          |
+| `style item-text-width N`       | Sets the items labels wrapping to use N chars columns.                            |
+| `style no-graph-title`          | Suppress graph title containing the image file path (without extension).          |
+| `style rotated`                 | Rotates the diagram by 90°.                                                       |
+| `style unrotated`               | Reverts the diagram rotation, if any.                                             |
+| `style vertical`                | Layouts flows in the vertical direction.                                          |
 
 A style apply to the whole diagram, whatever where it is declared in
 the source. If a style is re-defined, the last declaration applies.
@@ -249,7 +251,18 @@ ITEM1 --> ITEM2 [ATTRIBUTES ...] LABEL
 
 #### 2.5.3. Examples
 
-See examples below.
+```data-flow-diagram img/bg-color-no-title.svg
+style background-color yellow
+style no-graph-title
+
+process	P1
+process	P2
+P1 --> P2
+```
+
+![Background color and no title](./img/bg-color-no-title.svg)
+
+See other examples below.
 
 ### 2.6. Frames
 

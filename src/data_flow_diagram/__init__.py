@@ -72,21 +72,10 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--percent-zoom",
-        "-p",
-        required=False,
-        default=100,
-        type=int,
-        help="(not yet available)"
-        " magnification percentage; default is 100;"
-        " deprecated: use 'style percent-zoom VALUE' in the DFD itself",
-    )
-
-    parser.add_argument(
         "--background-color",
         "-b",
         required=False,
-        default="white",
+        default=None,
         help="(not yet available)"
         " background color name (including 'none' for"
         " transparent) in web color notation; see"
@@ -172,7 +161,6 @@ def run(args: argparse.Namespace) -> None:
 
     options = model.Options(
         format=args.format,
-        percent_zoom=args.percent_zoom,
         background_color=args.background_color,
         no_graph_title=args.no_graph_title,
         no_check_dependencies=args.no_check_dependencies,
