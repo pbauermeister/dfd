@@ -1,3 +1,9 @@
+## Version 1.16.4:
+
+- Fix #29: restore `make lint` by adding missing type annotations to all test
+  files; document `make lint` requirement and branch prefix convention in
+  `CLAUDE.md`.
+
 ## Version 1.16.3:
 
 - Add non-regression test framework (`--format dot` support, golden-file comparison).
