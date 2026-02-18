@@ -29,6 +29,10 @@ Claude: if the user starts a task without covering these points, briefly remind 
 - Include a **Requirement** section describing what was asked for, and a **Design** section describing the agreed-upon approach, before implementation begins.
 - Update the status in-place as work progresses.
 
+## Writing or modifying tests
+
+Before adding or changing any test, read `tests/README.md`. It defines: how to classify a test (unit / integration / non-regression; nominal / edge / robustness / regression), where to place it, how to run it in isolation, and how it gets picked up by the full suite (`make test`).
+
 ## Non-regression tests
 
 - **Fixtures** (test inputs) live in `tests/non-regression/`: `.dfd`, `.part`, `.md` files.

@@ -28,18 +28,34 @@ The existing tests check successes and failures. They shall be easy to extended 
 
 The framework must not anticipate future tests (no hooks, markers, or base classes for hypothetical needs), but must not create obstacles to adding them later.
 
+A documentation shall be provided to guide developers when creating new tests (or updating existing ones).
+
 ### 1.2. Developer workflow
 
 Unit tests are called via a Makefile target (`make test`) that can be run standalone or combined with other targets (`make all`). The underlying command switches from `python3 tests/unit_tests.py -v` to `pytest`.
 
-### 1.3. Terminology
+### 1.3. Documentation for tests development
+
+When a developer wants to add new test cases, a dedicated README.md will guide them:
+
+1. According to what I have in mind to test, to what category does it belong (unit, integration, non-regression), is it nominal/edge case? is it testing robustness (invalid inputs are detected a generate proper errors)? etc. (Please list any other criteria).
+
+2. The category being identify, what do I do next? where do I write my test (the logic, the artifacts/inputs/golden)? What example can I follow?
+
+3. How do I run my new test individually, in order to develop it?
+
+4. Where do I need to hook the test to the proper suite, so that it is called together with the others.
+
+Primarily written for humans, this README.md shall also be used by AI (Claude) when tasked to work on tests. An entry shall be added to CLAUDE.md for such a process.
+
+### 1.4. Terminology
 
 - **Fixtures**: DFD text snippets and other input data used as test inputs, defined in `tests/conftest.py`.
 - **Golden data**: Not used for unit tests (only relevant for non-regression tests).
 - **Unit tests**: Tests that call internal Python APIs directly and assert structural or exception properties.
 - **Integration tests**: Tests that exercise the full pipeline end-to-end (e.g. stdin → stdout SVG), kept in a flat `tests/test_integration.py`.
 
-### 1.4. Decisions (from spec chat, 2026-02-18)
+### 1.5. Decisions (from spec chat, 2026-02-18)
 
 | #   | Topic             | Decision                                                                                                                                                                                 |
 | --- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -55,7 +71,7 @@ Unit tests are called via a Makefile target (`make test`) that can be run standa
 | 10  | Engaging          | Error-case tests use `parametrize`; adding a new case means adding one tuple to a list                                                                                                   |
 | 11  | GitHub Actions    | Add `.github/workflows/ci.yml` running `make test` (covers both unit and non-regression tests)                                                                                           |
 
-### 1.5. Naming conventions
+### 1.6. Naming conventions
 
 - Test files: `test_<subsystem>.py` (e.g. `test_parser.py`)
 - Test functions: `test_<what>_<condition>` (e.g. `test_parse_duplicate_item_raises`)
@@ -66,25 +82,25 @@ Unit tests are called via a Makefile target (`make test`) that can be run standa
 
 ### 2.1. Current situation (step 2 analysis)
 
-| Item | Current state | Problem |
-|------|---------------|---------|
-| Framework | `unittest.TestCase`, run via `python3 tests/unit_tests.py -v` | Not idiomatic; no parametrize, no fixtures, no monkeypatch |
-| Path setup | `sys.path.insert(0, "src")` in `unit_tests.py` and `inputs.py` | Fragile hack, non-Pythonic |
-| Fixture data | `tests/inputs.py` — plain module with string constants | Imported with a bare `import inputs` that only works when CWD is project root |
-| File layout | Single `tests/unit_tests.py` (8 tests across 4 subsystems) | No separation of concerns |
-| Parametrize | 3 near-identical `parser.check()` error tests written out separately | Adding a new error case requires copy-pasting a whole test method |
-| `sys.argv`/`sys.stdin` | Manually saved and restored in try/finally blocks | pytest's `monkeypatch` handles this more safely |
-| Makefile | `test:` calls `./test.sh` (which calls `python3 tests/unit_tests.py -v`) | `pytest` not used; `require:` doesn't install it |
-| GitHub Actions | No CI workflow | Tests never run automatically |
+| Item                   | Current state                                                            | Problem                                                                       |
+| ---------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Framework              | `unittest.TestCase`, run via `python3 tests/unit_tests.py -v`            | Not idiomatic; no parametrize, no fixtures, no monkeypatch                    |
+| Path setup             | `sys.path.insert(0, "src")` in `unit_tests.py` and `inputs.py`           | Fragile hack, non-Pythonic                                                    |
+| Fixture data           | `tests/inputs.py` — plain module with string constants                   | Imported with a bare `import inputs` that only works when CWD is project root |
+| File layout            | Single `tests/unit_tests.py` (8 tests across 4 subsystems)               | No separation of concerns                                                     |
+| Parametrize            | 3 near-identical `parser.check()` error tests written out separately     | Adding a new error case requires copy-pasting a whole test method             |
+| `sys.argv`/`sys.stdin` | Manually saved and restored in try/finally blocks                        | pytest's `monkeypatch` handles this more safely                               |
+| Makefile               | `test:` calls `./test.sh` (which calls `python3 tests/unit_tests.py -v`) | `pytest` not used; `require:` doesn't install it                              |
+| GitHub Actions         | No CI workflow                                                           | Tests never run automatically                                                 |
 
 **Subsystem-to-test mapping:**
 
-| Subsystem | File | Tests |
-|-----------|------|-------|
-| CLI entry point | `__init__.py` | `test_parse_args` |
+| Subsystem        | File                      | Tests                                              |
+| ---------------- | ------------------------- | -------------------------------------------------- |
+| CLI entry point  | `__init__.py`             | `test_parse_args`                                  |
 | Parser + Scanner | `parser.py`, `scanner.py` | 5 tests (1 success, 1 parse error, 3 check errors) |
-| Markdown | `markdown.py` | `test_input_md` |
-| Integration | full pipeline | `test_output_stdout` (stdin → stdout SVG) |
+| Markdown         | `markdown.py`             | `test_input_md`                                    |
+| Integration      | full pipeline             | `test_output_stdout` (stdin → stdout SVG)          |
 
 ### 2.2. Target layout
 
@@ -136,6 +152,7 @@ tests/
 ## 4. Implementation summary
 
 Files created:
+
 - `tests/conftest.py` — shared markdown fixtures
 - `tests/unit/__init__.py` — marks directory as package
 - `tests/unit/test_cli.py` — 2 tests for `parse_args()`
@@ -145,10 +162,12 @@ Files created:
 - `.github/workflows/ci.yml` — CI workflow
 
 Files modified:
+
 - `pyproject.toml` — added `[tool.pytest.ini_options]`
 - `Makefile` — `require:` gains `pytest`; `test:` calls `pytest` directly
 
 Files deleted:
+
 - `tests/unit_tests.py`, `tests/inputs.py`, `test.sh`, `tests/__init__.py`
 
 Result: 9 tests, all passing in 0.11 s.
