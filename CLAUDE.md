@@ -12,16 +12,16 @@ When starting a non-trivial task, provide as many of these as applicable:
 
 Claude: if the user starts a task without covering these points, briefly remind them of this checklist.
 
-## DEVLOG.md
+## devlog/DEVLOG.md general file
 
-- `DEVLOG.md` is owned by Claude for recording analysis outcomes.
+- `devlog/DEVLOG.md` is owned by Claude for recording analysis outcomes that are still under discussion, before they become a task tracked by specific `NNN-short-description.md` files.
 - Each new entry must begin with a heading consisting of a human-readable timestamp, title text, and a status tag: `[PENDING]`, `[ONGOING]`, `[DONE]`, or `[REJECTED]` (e.g., `## 2026-02-12 15:30 — Topic [PENDING]`).
 - Status may be updated in-place on existing headings as work progresses.
 - Immediately after the heading, include a one-line **prompt summary** in bold describing what was asked (e.g., `**Prompt:** Analyze the README for first-glance readability and suggest improvements.`).
 - New entries are appended; existing entries must not be modified or removed.
 - Only append to `CLAUDE.md` itself when explicitly requested by the user.
 
-## Devlog
+## devlog/NNN-short-description.md files
 
 - For each feature or bug fix of non-trivial scope, create a file in `devlog/` named `NNN-short-description.md`.
 - **NNN** is the GitHub issue number. The user must provide it. If the user also provides a short description, use it directly; otherwise, fetch the issue title from GitHub (`gh issue view NNN`) and derive a slug from it.
