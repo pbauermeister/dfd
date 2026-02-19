@@ -50,11 +50,12 @@ file), work on a dedicated branch and open a pull request:
 1. Create a branch named `<prefix>/NNN-short-description` before writing any code,
    where `<prefix>` reflects the kind of work: `fix`, `feature`, `refactor`,
    `doc`, or `test`.
-2. Commit all implementation work — including the `devlog/NNN-*.md` file — on
-   that branch.
-3. Open a PR against `main` when the work is ready for review. Include
-   `Closes #NNN` in the PR body so the issue auto-closes on merge.
-4. Follow the **Task conclusion** process below once implementation is complete.
+2. Open a **draft PR** early (after the first commit) so the user can
+   follow progress. Include `Closes #NNN` in the PR body.
+3. Commit all implementation work — including the `devlog/NNN-*.md` file — on
+   that branch, pushing regularly.
+4. When implementation is complete, mark the PR as ready for review and
+   follow the **Task conclusion** process below.
 
 Direct commits to `main` are reserved for trivial changes (`.postN`-level) that
 do not warrant a PR.
