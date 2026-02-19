@@ -4,7 +4,7 @@ import os.path
 
 from . import exception, model
 from .console import dprint
-from .dsl import dependency_checker, filters, parser, scanner
+from .dsl import checker, dependency_checker, filters, parser, scanner
 from .rendering import graphviz
 from .rendering.dot import Generator, generate_dot
 
@@ -25,7 +25,7 @@ def build(
         dependency_checker.check(dependencies, snippet_by_name, options)
 
     # validate statements and apply filters
-    items_by_name = parser.check(statements)
+    items_by_name = checker.check(statements)
     statements = filters.handle_filters(statements, options.debug)
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)

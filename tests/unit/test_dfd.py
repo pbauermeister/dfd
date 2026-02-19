@@ -7,14 +7,14 @@ names, already-removed names, unknown style options, and bad style values.
 import pytest
 
 from data_flow_diagram import dfd, exception, model
-from data_flow_diagram.dsl import filters, parser, scanner
+from data_flow_diagram.dsl import checker, filters, parser, scanner
 
 
 def _parse(dfd_text: str) -> model.Statements:
     """Scan, parse, and check a DFD snippet, returning its statements."""
     tokens = scanner.scan(None, dfd_text)
     statements, _, _ = parser.parse(tokens)
-    parser.check(statements)
+    checker.check(statements)
     return statements
 
 
