@@ -147,8 +147,9 @@ mechanism.
     prefix in `__str__`. This is cleaner but requires updating every
     `except DfdException` site that reads `str(e)`.
 - Whichever approach is chosen, apply it across all modules:
-  `parser.py` (~8 sites), `dependency_checker.py` (~5 sites),
-  `dfd.py` (~4 sites), `scanner.py` (~3 sites).
+  - `parser.py` (~8 sites), `dependency_checker.py` (~5 sites),
+  - `dfd.py` (~4 sites), `scanner.py` (~3 sites).
+  - adapt the tests if needed.
 
 **Inter-aspect dependencies:** The non-regression tests (A) should
 include error-message tests before this task changes how messages are
