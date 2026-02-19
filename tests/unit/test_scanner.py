@@ -27,11 +27,15 @@ def test_include_snippet_not_markdown() -> None:
 
 def test_include_snippet_not_found() -> None:
     # Including a snippet that doesn't exist in the snippet map must raise
-    dfd_text = "#include #nosuchsnippet"
-    # snippet_by_name must be non-empty (truthy) to reach the "not found" path
     dummy_snippet = model.Snippet(text="x", name="other", output="o", line_nr=0)
+    snippets = {"other": dummy_snippet}
+
+    # Sanity check: a valid snippet name must succeed
+    scanner.scan(None, "#include #other", snippet_by_name=snippets)
+
+    # Now verify that an unknown name raises
     with pytest.raises(model.DfdException, match="not found"):
-        scanner.scan(None, dfd_text, snippet_by_name={"other": dummy_snippet})
+        scanner.scan(None, "#include #nosuchsnippet", snippet_by_name=snippets)
 
 
 def test_include_recursive(tmp_path: Path) -> None:

@@ -24,13 +24,13 @@ ALL_ITEMS_AND_CONNECTIONS = """
     channel  C2    Channel 2b
     control  Ctrl  Controller
 
-    flow     P     C     data
-    bflow    P     S     config
-    signal   P     P2    event
-    signal   Ctrl  P     control event
-    flow     P2    C2    more data
-    flow     *     P2    ext data
-    flow     P     T
+    P     -->  C     data
+    P     <->  S     config
+    P     ::>  P2    event
+    Ctrl  ::>  P     control event
+    P2    -->  C2    more data
+    *     -->  P2    ext data
+    P     -->  T
 
     frame P P2 = Processes
 """
@@ -49,18 +49,18 @@ CHECK_ERROR_CASES = [
     pytest.param(
         """
         process  P  text
-        flow     P  Q  text
+        P  -->  Q  text
         """,
         id="missing-ref",  # connection references undefined item Q
     ),
     pytest.param(
-        "flow  *  *  text",
+        "*  -->  *  text",
         id="double-star",  # both endpoints of a connection are wildcards
     ),
     pytest.param(
         """
         control  C  Ctrl
-        flow     C  *  data
+        C  -->  *  data
         """,
         id="connection-to-control",  # non-signal connection to a control item
     ),
@@ -93,7 +93,7 @@ PARSE_ERROR_CASES = [
         id="missing-item-args",  # item keyword with no name
     ),
     pytest.param(
-        "flow  A",
+        "A  -->",
         id="missing-connection-args",  # connection with too few arguments
     ),
     pytest.param(
@@ -101,15 +101,15 @@ PARSE_ERROR_CASES = [
         id="filter-no-args",  # filter keyword alone
     ),
     pytest.param(
-        "! <>2",
+        "!<>2",
         id="filter-spec-only",  # neighbour spec but no anchor names
     ),
     pytest.param(
-        "! =replacement A",
+        "!=replacement A",
         id="filter-replacer-on-only",  # replacer specification on Only (!) filter
     ),
     pytest.param(
-        "! <>z1 A",
+        "!<>z1 A",
         id="filter-bad-flag",  # unrecognized neighbour flag 'z'
     ),
 ]
