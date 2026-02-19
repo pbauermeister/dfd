@@ -1,40 +1,53 @@
 # Master diagram for filter tests.
-# Mirrors the data-pipeline example from doc/README.md section 7.
+# Generic indexed names for easy tracing in test output.
+#
+# Items:
+#   E1, E2          entities
+#   P1 .. P6        processes
+#   S1, S2          stores
+#   C1, C2          channels
+#
+# Reversed connections (layout differs from flow direction):
+#   f5:  P2 <-- S2
+#   f7:  S2 <-- P4
+#   f10: C1 <-- P5
+#   f15: S2 <-- P3
 
-entity  ds              Data source
-process etl             ETL
-process proc_flow       process data flow
-entity  user            User
-process ext             External system
+entity  E1      Entity 1
+entity  E2      Entity 2
 
-store   db_aggr         Aggregated data
-store   db_fcast        Forecasts
-store   db_raw          Raw data
-store   db_params       Parameters
+process P1      Process 1
+process P2      Process 2
+process P3      Process 3
+process P4      Process 4
+process P5      Process 5
+process P6      Process 6
 
-process optim           optimize params
-process forecast        compute forecasts
-process interact        handle interactions
+store   S1      Store 1
+store   S2      Store 2
 
-frame db_aggr db_fcast db_params = Computation results
-frame optim forecast = Batch processing
+channel C1      Channel 1
+channel C2      Channel 2
 
-ds              --> etl
-etl             --> db_raw
-db_raw          --> proc_flow
+frame C2 C1 S2 = Frame 1
+frame P4 P5 = Frame 2
 
-proc_flow       --> db_aggr
-proc_flow       <-- db_params       alert thresh
-proc_flow       ::> user            alert
+E1  --> P1              f1
+P1  --> S1              f2
+S1  --> P2              f3
 
-db_params       <-- optim           new params
+P2  --> C2              f4
+P2  <-- S2              f5
+P2  ::> E2              f6
 
-db_aggr         --> forecast
-db_params       --> forecast        horizon
-db_fcast        <-- forecast
+S2  <-- P4              f7
 
-db_aggr         --> interact
-db_fcast        --> interact
-interact        --> user
-interact        --> ext
-db_params       <-- interact        alert thresh
+C2  --> P5              f8
+S2  --> P5              f9
+C1  <-- P5              f10
+
+C2  --> P3              f11
+C1  --> P3              f12
+P3  --> E2              f13
+P3  --> P6              f14
+S2  <-- P3              f15

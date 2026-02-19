@@ -1,5 +1,5 @@
 #include tests/non-regression/028-filter-master.part
 
 # keep only specific items, using two additive Only filters
-! ds etl db_raw
-! proc_flow
+! E1 P1 S1
+! P2

@@ -6,68 +6,78 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 6: entity user User */
-  "user" [shape=rectangle label="User" ]
+  /* 16: entity E2 Entity 2 */
+  "E2" [shape=rectangle label="Entity 2" ]
 
-  /* 7: process ext External system */
-  "ext" [shape=ellipse label="External system" fillcolor="#eeeeee" style=filled ]
+  /* 20: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
 
-  /* 9: store db_aggr Aggregated data */
-  "db_aggr" [shape=none label=<
+  /* 21: process P4 Process 4 */
+  "P4" [shape=ellipse label="Process 4" fillcolor="#eeeeee" style=filled ]
+
+  /* 22: process P5 Process 5 */
+  "P5" [shape=ellipse label="Process 5" fillcolor="#eeeeee" style=filled ]
+
+  /* 23: process P6 Process 6 */
+  "P6" [shape=ellipse label="Process 6" fillcolor="#eeeeee" style=filled ]
+
+  /* 28: channel C1 Channel 1 */
+  "C1" [shape=none label=<
     <TABLE BORDER="0">
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 1</FONT></TD>
+      </TR>
     </TABLE>>]
 
-  /* 10: store db_fcast Forecasts */
-  "db_fcast" [shape=none label=<
+  /* 29: channel C2 Channel 2 */
+  "C2" [shape=none label=<
     <TABLE BORDER="0">
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Forecasts</FONT></TD></TR>
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 2</FONT></TD>
+      </TR>
     </TABLE>>]
 
-  /* 14: process optim optimize params */
-  "optim" [shape=ellipse label="optimize params" fillcolor="#eeeeee" style=filled ]
-
-  /* 15: process forecast compute forecasts */
-  "forecast" [shape=ellipse label="compute forecasts" fillcolor="#eeeeee" style=filled ]
-
-  /* 16: process interact handle interactions */
-  "interact" [shape=ellipse label="handle interactions" fillcolor="#eeeeee" style=filled ]
-
-  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  /* 31: frame C2 C1 S2 = Frame 1 */
   subgraph cluster_0 {
-    label="Computation results"
+    label="Frame 1"
     style=dashed
-    "db_aggr"
-    "db_fcast"
+    "C2"
+    "C1"
   }
 
-  /* 19: frame optim forecast = Batch processing */
+  /* 32: frame P4 P5 = Frame 2 */
   subgraph cluster_1 {
-    label="Batch processing"
+    label="Frame 2"
     style=dashed
-    "optim"
-    "forecast"
+    "P4"
+    "P5"
   }
 
-  /* 31: flow db_aggr forecast */
-  "db_aggr" -> "forecast" [label=""]
+  /* 44: flow C2 P5 f8 */
+  "C2":x:c -> "P5" [label="f8"]
 
-  /* 33: flow.r db_fcast forecast */
-  "db_fcast" -> "forecast" [label="" dir=back]
+  /* 46: flow.r C1 P5 f10 */
+  "C1":x:c -> "P5" [label="f10" dir=back]
 
-  /* 35: flow db_aggr interact */
-  "db_aggr" -> "interact" [label=""]
+  /* 48: flow C2 P3 f11 */
+  "C2":x:c -> "P3" [label="f11"]
 
-  /* 36: flow db_fcast interact */
-  "db_fcast" -> "interact" [label=""]
+  /* 49: flow C1 P3 f12 */
+  "C1":x:c -> "P3" [label="f12"]
 
-  /* 37: flow interact user */
-  "interact" -> "user" [label=""]
+  /* 50: flow P3 E2 f13 */
+  "P3" -> "E2" [label="f13"]
 
-  /* 38: flow interact ext */
-  "interact" -> "ext" [label=""]
+  /* 51: flow P3 P6 f14 */
+  "P3" -> "P6" [label="f14"]
 }

@@ -6,50 +6,55 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 3: entity ds Data source */
-  "ds" [shape=rectangle label="Data source" ]
+  /* 15: entity E1 Entity 1 */
+  "E1" [shape=rectangle label="Entity 1" ]
 
-  /* 5: process proc_flow process data flow */
-  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+  /* 19: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
 
-  /* 9: store db_aggr Aggregated data */
-  "db_aggr" [shape=none label=<
+  /* 25: store S1 Store 1 */
+  "S1" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 1</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 11: store db_raw Raw data */
-  "db_raw" [shape=none label=<
+  /* 26: store S2 Store 2 */
+  "S2" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Raw data</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 2</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 12: store db_params Parameters */
-  "db_params" [shape=none label=<
+  /* 29: channel C2 Channel 2 */
+  "C2" [shape=none label=<
     <TABLE BORDER="0">
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Parameters</FONT></TD></TR>
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 2</FONT></TD>
+      </TR>
     </TABLE>>]
 
-  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  /* 31: frame C2 C1 S2 = Frame 1 */
   subgraph cluster_0 {
-    label="Computation results"
+    label="Frame 1"
     style=dashed
-    "db_aggr"
-    "db_params"
+    "C2"
+    "S2"
   }
 
-  /* 23: flow db_raw proc_flow */
-  "db_raw" -> "proc_flow" [label=""]
+  /* 36: flow S1 P2 f3 */
+  "S1" -> "P2" [label="f3"]
 
-  /* 25: flow proc_flow db_aggr */
-  "proc_flow" -> "db_aggr" [label=""]
+  /* 38: flow P2 C2 f4 */
+  "P2" -> "C2":x:c [label="f4"]
 
-  /* 26: flow.r proc_flow db_params alert thresh */
-  "proc_flow" -> "db_params" [label="alert thresh" dir=back]
+  /* 39: flow.r P2 S2 f5 */
+  "P2" -> "S2" [label="f5" dir=back]
 }

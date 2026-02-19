@@ -6,35 +6,35 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 5: process proc_flow process data flow */
-  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+  /* 19: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
 
-  /* 11: store db_raw Raw data */
-  "db_raw" [shape=none label=<
+  /* 25: store S1 Store 1 */
+  "S1" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Raw data</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 1</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 12: store db_params Parameters */
-  "db_params" [shape=none label=<
+  /* 26: store S2 Store 2 */
+  "S2" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Parameters</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 2</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  /* 31: frame C2 C1 S2 = Frame 1 */
   subgraph cluster_0 {
-    label="Computation results"
+    label="Frame 1"
     style=dashed
-    "db_params"
+    "S2"
   }
 
-  /* 23: flow db_raw proc_flow */
-  "db_raw" -> "proc_flow" [label=""]
+  /* 36: flow S1 P2 f3 */
+  "S1" -> "P2" [label="f3"]
 
-  /* 26: flow.r proc_flow db_params alert thresh */
-  "proc_flow" -> "db_params" [label="alert thresh" dir=back]
+  /* 39: flow.r P2 S2 f5 */
+  "P2" -> "S2" [label="f5" dir=back]
 }

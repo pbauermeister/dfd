@@ -1,4 +1,4 @@
 #include tests/non-regression/028-filter-master.part
 
-# remove only neighbours of proc_flow (2 levels), keep the anchor itself ("x" flag)
-~<>x2 proc_flow
+# remove only neighbours of P2 (2 levels), keep the anchor itself ("x" flag)
+~<>x2 P2

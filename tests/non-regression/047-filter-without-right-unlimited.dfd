@@ -1,5 +1,5 @@
 #include tests/non-regression/028-filter-master.part
 
-# remove db_params and all neighbours to the right (layout direction, unlimited)
-# db_params has reversed connections, so layout-right differs from flow-downstream
-~]* db_params
+# remove S2 and all neighbours to the right (layout direction, unlimited)
+# S2 has reversed connections, so layout-right differs from flow-downstream
+~]* S2

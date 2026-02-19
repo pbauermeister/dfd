@@ -6,94 +6,99 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 4: process etl ETL */
-  "etl" [shape=ellipse label="ETL" fillcolor="#eeeeee" style=filled ]
+  /* 16: entity E2 Entity 2 */
+  "E2" [shape=rectangle label="Entity 2" ]
 
-  /* 5: process proc_flow process data flow */
-  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+  /* 18: process P1 Process 1 */
+  "P1" [shape=ellipse label="Process 1" fillcolor="#eeeeee" style=filled ]
 
-  /* 6: entity user User */
-  "user" [shape=rectangle label="User" ]
+  /* 19: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
 
-  /* 9: store db_aggr Aggregated data */
-  "db_aggr" [shape=none label=<
+  /* 20: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
+
+  /* 21: process P4 Process 4 */
+  "P4" [shape=ellipse label="Process 4" fillcolor="#eeeeee" style=filled ]
+
+  /* 22: process P5 Process 5 */
+  "P5" [shape=ellipse label="Process 5" fillcolor="#eeeeee" style=filled ]
+
+  /* 25: store S1 Store 1 */
+  "S1" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 1</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 11: store db_raw Raw data */
-  "db_raw" [shape=none label=<
+  /* 26: store S2 Store 2 */
+  "S2" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Raw data</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 2</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 12: store db_params Parameters */
-  "db_params" [shape=none label=<
+  /* 29: channel C2 Channel 2 */
+  "C2" [shape=none label=<
     <TABLE BORDER="0">
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Parameters</FONT></TD></TR>
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 2</FONT></TD>
+      </TR>
     </TABLE>>]
 
-  /* 14: process optim optimize params */
-  "optim" [shape=ellipse label="optimize params" fillcolor="#eeeeee" style=filled ]
-
-  /* 15: process forecast compute forecasts */
-  "forecast" [shape=ellipse label="compute forecasts" fillcolor="#eeeeee" style=filled ]
-
-  /* 16: process interact handle interactions */
-  "interact" [shape=ellipse label="handle interactions" fillcolor="#eeeeee" style=filled ]
-
-  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  /* 31: frame C2 C1 S2 = Frame 1 */
   subgraph cluster_0 {
-    label="Computation results"
+    label="Frame 1"
     style=dashed
-    "db_aggr"
-    "db_params"
+    "C2"
+    "S2"
   }
 
-  /* 19: frame optim forecast = Batch processing */
+  /* 32: frame P4 P5 = Frame 2 */
   subgraph cluster_1 {
-    label="Batch processing"
+    label="Frame 2"
     style=dashed
-    "optim"
-    "forecast"
+    "P4"
+    "P5"
   }
 
-  /* 22: flow etl db_raw */
-  "etl" -> "db_raw" [label=""]
+  /* 35: flow P1 S1 f2 */
+  "P1" -> "S1" [label="f2"]
 
-  /* 23: flow db_raw proc_flow */
-  "db_raw" -> "proc_flow" [label=""]
+  /* 36: flow S1 P2 f3 */
+  "S1" -> "P2" [label="f3"]
 
-  /* 25: flow proc_flow db_aggr */
-  "proc_flow" -> "db_aggr" [label=""]
+  /* 38: flow P2 C2 f4 */
+  "P2" -> "C2":x:c [label="f4"]
 
-  /* 26: flow.r proc_flow db_params alert thresh */
-  "proc_flow" -> "db_params" [label="alert thresh" dir=back]
+  /* 39: flow.r P2 S2 f5 */
+  "P2" -> "S2" [label="f5" dir=back]
 
-  /* 27: signal proc_flow user alert */
-  "proc_flow" -> "user" [label="alert" style=dashed]
+  /* 40: signal P2 E2 f6 */
+  "P2" -> "E2" [label="f6" style=dashed]
 
-  /* 29: flow.r db_params optim new params */
-  "db_params" -> "optim" [label="new params" dir=back]
+  /* 42: flow.r S2 P4 f7 */
+  "S2" -> "P4" [label="f7" dir=back]
 
-  /* 31: flow db_aggr forecast */
-  "db_aggr" -> "forecast" [label=""]
+  /* 44: flow C2 P5 f8 */
+  "C2":x:c -> "P5" [label="f8"]
 
-  /* 32: flow db_params forecast horizon */
-  "db_params" -> "forecast" [label="horizon"]
+  /* 45: flow S2 P5 f9 */
+  "S2" -> "P5" [label="f9"]
 
-  /* 35: flow db_aggr interact */
-  "db_aggr" -> "interact" [label=""]
+  /* 48: flow C2 P3 f11 */
+  "C2":x:c -> "P3" [label="f11"]
 
-  /* 37: flow interact user */
-  "interact" -> "user" [label=""]
+  /* 50: flow P3 E2 f13 */
+  "P3" -> "E2" [label="f13"]
 
-  /* 39: flow.r db_params interact alert thresh */
-  "db_params" -> "interact" [label="alert thresh" dir=back]
+  /* 52: flow.r S2 P3 f15 */
+  "S2" -> "P3" [label="f15" dir=back]
 }
