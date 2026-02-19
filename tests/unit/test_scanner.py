@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from data_flow_diagram import exception, model, scanner
+from data_flow_diagram import exception, model
+from data_flow_diagram.dsl import scanner
 
 
 def test_include_nonexistent_file() -> None:

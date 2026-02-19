@@ -1,5 +1,6 @@
-from . import exception, model, parser, scanner
-from .model import Keyword
+from .. import exception, model
+from ..model import Keyword
+from . import parser, scanner
 
 
 def check(

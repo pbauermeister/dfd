@@ -3,8 +3,8 @@
 import os
 import re
 
-from . import exception, model
-from .console import dprint
+from .. import exception, model
+from ..console import dprint
 
 # Regex to transform lines like:
 #   abc\

@@ -6,7 +6,8 @@ names, already-removed names, unknown style options, and bad style values.
 
 import pytest
 
-from data_flow_diagram import dfd, exception, model, parser, scanner
+from data_flow_diagram import dfd, exception, model
+from data_flow_diagram.dsl import parser, scanner
 
 
 def _parse(dfd_text: str) -> model.Statements:
