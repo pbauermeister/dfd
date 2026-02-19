@@ -48,11 +48,50 @@ Keeps:
 Replace `"UML sequence input file"` with `"DFD input file"` in the
 `INPUT_FILE` argument help text.
 
-### No new tests needed
+### Entry-point analysis and test coverage
 
-This is a pure mechanical move. Existing coverage is sufficient:
-- `tests/unit/test_cli.py` — imports `parse_args` from
-  `data_flow_diagram`
-- `tests/test_integration.py` — imports `main` from
-  `data_flow_diagram`
-- `make nr-test` — full pipeline via CLI
+There are four distinct invocation paths. Each resolves `main()` via a
+different mechanism, and a break in any one would be invisible to the
+others.
+
+| #   | Invocation path                   | Mechanism                                                               | Current test coverage                     | Gap?                  |
+| --- | --------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- | --------------------- |
+| 1   | `./data-flow-diagram` (local dev) | Script imports `src.data_flow_diagram` → `__init__.main` → `cli.main`  | `make nr-test` (56 cases)                 | None                  |
+| 2   | `make install` → global command   | `setup.py` console_scripts `data_flow_diagram:main` → `__init__.main`  | None                                      | **Entry-point resolve** |
+| 3   | PyPI install → global command     | Same `data_flow_diagram:main` entry point as #2                         | None (release verification)               | Out of scope          |
+| 4   | Tests (direct Python calls)       | `from data_flow_diagram import main` / `parse_args`                     | `test_cli.py`, `test_integration.py`      | None                  |
+
+**Diagnosis:** Paths 1 and 4 are well covered. Paths 2 and 3 share
+the same mechanism (`console_scripts` entry point string
+`data_flow_diagram:main`) and have zero automated coverage today. A
+broken re-export in `__init__.py` would pass all existing tests but
+fail on install.
+
+### Tests to add
+
+1. **Entry-point resolution test** (unit, `test_cli.py`): verify that
+   the string `data_flow_diagram:main` resolves to a callable. This
+   uses `importlib.metadata` to read the console_scripts entry point
+   from the installed package metadata — the same mechanism pip uses
+   to generate the wrapper script. Covers path 2 without needing an
+   actual install.
+
+2. **Subprocess CLI test** (integration, `test_integration.py`):
+   invoke `./data-flow-diagram` as a subprocess with a minimal DFD on
+   stdin and assert exit code 0 + SVG output. This tests the full
+   OS-level invocation (path 1) end-to-end, complementing the
+   existing in-process `main()` test.
+
+3. **`--version` flag test** (unit, `test_cli.py`): verify that
+   `main()` prints the version string and exits when called with
+   `--version`. This exercises the `VERSION` re-export path.
+
+4. **`--help` text test** (unit, `test_cli.py`): verify that the help
+   output contains `"DFD input file"` and does NOT contain the stale
+   `"UML sequence"` string. Locks in the help string fix.
+
+Path 3 (PyPI install) is out of scope — it uses the same mechanism as
+path 2 and is verified at release time.
+
+No new NR tests (golden DOT files) are needed — the refactoring does
+not change any diagram output.
