@@ -1,22 +1,23 @@
 """Pipeline orchestrator: scan → parse → check → filter → render."""
 
-import os.path
-
 from . import exception, model
 from .console import dprint
 from .dsl import checker, dependency_checker, filters, parser, scanner
-from .rendering import graphviz
 from .rendering.dot import Generator, generate_dot
 
 
 def build(
     provenance: model.SourceLine,
     dfd_src: str,
-    output_path: str,
+    title: str,
     options: model.Options,
     snippet_by_name: model.SnippetByName | None = None,
-) -> None:
-    """Take a DFD source and build the final image or document."""
+) -> tuple[str, model.GraphOptions]:
+    """Run the pure pipeline and return (DOT text, graph options).
+
+    No file I/O is performed here; the caller is responsible for writing
+    the DOT text to disk or invoking Graphviz.
+    """
 
     # scan (includes, line continuations) and parse the DSL into statements
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
@@ -33,8 +34,6 @@ def build(
     # resolve title and background color (CLI args override DFD style)
     if options.no_graph_title or graph_options.no_graph_title:
         title = ""
-    else:
-        title = os.path.splitext(output_path)[0]
 
     bg_color = (
         options.background_color
@@ -42,17 +41,11 @@ def build(
         else graph_options.background_color
     )
 
-    # generate DOT and produce the output file
+    # generate DOT text
     gen = Generator(graph_options, attribs)
     text = generate_dot(gen, title, bg_color, statements, items_by_name)
     dprint(text)
-    if options.format == "dot":
-        with open(output_path, "w") as f:
-            f.write(text)
-    else:
-        graphviz.generate_image(
-            graph_options, text, output_path, options.format
-        )
+    return text, graph_options
 
 
 def remove_unused_hidables(statements: model.Statements) -> model.Statements:

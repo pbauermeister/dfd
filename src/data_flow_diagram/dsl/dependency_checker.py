@@ -3,12 +3,34 @@ from ..model import Keyword
 from . import parser, scanner
 
 
+def _read_file(name: str, file_texts: dict[str, str] | None) -> str:
+    """Read graph source text from *file_texts* dict or from the filesystem.
+
+    When *file_texts* is provided (typically in tests), the file content is
+    looked up by name in the dict.  A missing key raises ``FileNotFoundError``
+    with the same format as a real missing file, so the caller's error
+    handling works identically in both modes.
+    """
+    if file_texts is not None:
+        if name not in file_texts:
+            raise FileNotFoundError(2, "No such file or directory", name)
+        return file_texts[name]
+    with open(name, encoding="utf-8") as f:
+        return f.read()
+
+
 def check(
     dependencies: model.GraphDependencies,
     snippet_by_name: model.SnippetByName | None,
     options: model.Options,
+    file_texts: dict[str, str] | None = None,
 ) -> None:
-    """Verify that all dependencies refer to existing items of compatible type."""
+    """Verify that all dependencies refer to existing items of compatible type.
+
+    *file_texts*, when provided, is a ``{filename: content}`` dict used
+    instead of the real filesystem.  This is intended for unit tests that
+    need to exercise dependency checking without creating temporary files.
+    """
 
     snippet_by_name = snippet_by_name or {}
     errors = exception.DfdException("Dependency error(s) found:")
@@ -29,8 +51,7 @@ def check(
             # from file
             name = dep.to_graph
             try:
-                with open(name, encoding="utf-8") as f:
-                    text = f.read()
+                text = _read_file(name, file_texts)
             except FileNotFoundError as e:
                 if name in snippet_by_name:
                     errors.add(

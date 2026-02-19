@@ -114,6 +114,29 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def write_output(
+    dot_text: str,
+    output_path: str,
+    fmt: str,
+    graph_options: model.GraphOptions,
+) -> None:
+    """Write pipeline output (DOT text or rendered image) to file or stdout."""
+    if fmt == "dot":
+        if output_path == "-":
+            print(dot_text)
+        else:
+            with open(output_path, "w") as f:
+                f.write(dot_text)
+    elif output_path == "-":
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "output." + fmt)
+            graphviz.generate_image(graph_options, dot_text, path, fmt)
+            with open(path) as f:
+                print(f.read())
+    else:
+        graphviz.generate_image(graph_options, dot_text, output_path, fmt)
+
+
 def handle_markdown_source(
     options: model.Options, provenance: str, input_fp: TextIO
 ) -> None:
@@ -125,15 +148,17 @@ def handle_markdown_source(
     markdown.check_snippets_unicity(provenance, snippets)
     snippets_params = markdown.make_snippets_params(provenance, snippets)
 
-    # call build() for each snippet
+    # build and write output for each snippet
     for params in snippets_params:
-        dfd.build(
+        title = os.path.splitext(params.file_name)[0]
+        dot_text, graph_options = dfd.build(
             params.root,
             params.input_fp.read(),
-            params.file_name,
+            title,
             options,
             snippet_by_name=params.snippet_by_name,
         )
+        write_output(dot_text, params.file_name, options.format, graph_options)
         dprint(f"{sys.argv[0]}: generated {params.file_name}")
 
 
@@ -143,16 +168,9 @@ def handle_dfd_source(
     """Call build() for when the DFD is given by a path, and output to another path or stdout."""
 
     root = model.SourceLine("", provenance, None, 0)
-    if output_path == "-":
-        # output to stdout
-        with tempfile.TemporaryDirectory() as d:
-            path = os.path.join(d, "file.svg")
-            dfd.build(root, input_fp.read(), path, options)
-            with open(path) as f:
-                print(f.read())
-    else:
-        # output to file
-        dfd.build(root, input_fp.read(), output_path, options)
+    title = "" if output_path == "-" else os.path.splitext(output_path)[0]
+    dot_text, graph_options = dfd.build(root, input_fp.read(), title, options)
+    write_output(dot_text, output_path, options.format, graph_options)
 
 
 def run(args: argparse.Namespace) -> None:
