@@ -149,6 +149,12 @@ an identifier must differ from the glossary term (e.g. to avoid a
 Python keyword clash), add a comment at the definition site explaining
 the deviation.
 
+## Language
+
+All identifiers, comments, documentation, and commit messages use
+**American English** (e.g. "neighbor", not "neighbour"; "color", not
+"colour").
+
 ## Related documents
 
 - **Commenting style**: `doc/COMMENTING.md`
