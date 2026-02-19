@@ -10,16 +10,17 @@ def check(
     """Verify that all dependencies refer to existing items of compatible type."""
 
     snippet_by_name = snippet_by_name or {}
-    errors: list[str] = []
+    errors = model.DfdException("Dependency error(s) found:")
     for dep in dependencies:
-        prefix = model.mk_err_prefix_from(dep.source)
-
         # load source text
         if dep.to_graph.startswith(model.SNIPPET_PREFIX):
             # from snippet
             name = dep.to_graph[len(model.SNIPPET_PREFIX) :]
             if name not in snippet_by_name:
-                errors.append(f'{prefix}Referring to unknown snippet "{name}"')
+                errors.add(
+                    f'Referring to unknown snippet "{name}"',
+                    source=dep.source,
+                )
                 continue
             text = snippet_by_name[name].text
             what = "snippet"
@@ -31,21 +32,23 @@ def check(
                     text = f.read()
             except FileNotFoundError as e:
                 if name in snippet_by_name:
-                    errors.append(
-                        f'{prefix}{e}. Did you mean "{model.SNIPPET_PREFIX}{name}" ?'
+                    errors.add(
+                        f'{e}. Did you mean "{model.SNIPPET_PREFIX}{name}" ?',
+                        source=dep.source,
                     )
                 else:
-                    errors.append(f"{prefix}{e}")
+                    errors.add(f"{e}", source=dep.source)
                 continue
             what = "file"
 
         # whole-graph reference: only check that the item type is "none"
         if dep.to_item is None:
             if dep.to_type != Keyword.NONE:
-                errors.append(
-                    f"{prefix}A whole graph may only be referred to "
+                errors.add(
+                    f"A whole graph may only be referred to "
                     f'by an item of type "{Keyword.NONE}", and not '
-                    f'"{dep.to_type}"'
+                    f'"{dep.to_type}"',
+                    source=dep.source,
                 )
             continue
 
@@ -57,23 +60,24 @@ def check(
         item = find_item(dep.to_item, statements)
         if item:
             if dep.to_type != item.type:
-                errors.append(
-                    f'{prefix}Referred item "{dep.to_item}" is of '
+                errors.add(
+                    f'Referred item "{dep.to_item}" is of '
                     f'type "{item.type}", but is referred to as '
-                    f'type "{dep.to_type}"'
+                    f'type "{dep.to_type}"',
+                    source=dep.source,
                 )
 
             continue  # Found!
 
-        errors.append(
-            f'{prefix}Referring to unknown item name "{dep.to_item}"'
-            f' of {what} "{name}"'
+        errors.add(
+            f'Referring to unknown item name "{dep.to_item}"'
+            f' of {what} "{name}"',
+            source=dep.source,
         )
 
     # raise all accumulated errors at once
     if errors:
-        errors.insert(0, "Dependency error(s) found:")
-        raise model.DfdException("\n\n".join(errors))
+        raise errors
 
 
 def find_item(name: str, statements: model.Statements) -> model.Item | None:
