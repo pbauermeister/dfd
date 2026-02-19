@@ -4,8 +4,8 @@ import os.path
 import re
 from typing import Callable, Tuple, get_type_hints
 
-from .. import dfd_dot_templates as TMPL
 from .. import exception, model
+from ..rendering import templates as TMPL
 from ..console import dprint
 from ..model import Keyword
 

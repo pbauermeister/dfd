@@ -17,8 +17,9 @@ import sys
 import tempfile
 from typing import TextIO
 
-from . import dfd, dot, exception, markdown, model
+from . import dfd, exception, markdown, model
 from .console import dprint, print_error, set_debug
+from .rendering import graphviz
 
 from importlib.metadata import PackageNotFoundError, version
 
@@ -197,7 +198,7 @@ def run(args: argparse.Namespace) -> None:
 def main() -> None:
     """Entry point for the application script."""
 
-    dot.check_installed()
+    graphviz.check_installed()
 
     args = parse_args()
     if args.version:

@@ -6,10 +6,10 @@ import re
 import textwrap
 from typing import Any
 
-from . import dfd_dot_templates as TMPL
-from . import dot, exception, model
+from . import exception, model
 from .console import dprint
 from .dsl import checker, parser, scanner
+from .rendering import graphviz, templates as TMPL
 
 
 def build(
@@ -53,7 +53,9 @@ def build(
         with open(output_path, "w") as f:
             f.write(text)
     else:
-        dot.generate_image(graph_options, text, output_path, options.format)
+        graphviz.generate_image(
+            graph_options, text, output_path, options.format
+        )
 
 
 def wrap(text: str, cols: int) -> str:

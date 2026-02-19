@@ -3,9 +3,9 @@
 import subprocess
 import sys
 
-from . import dfd_dot_templates as TMPL
-from . import model
-from .console import print_error
+from .. import model
+from ..console import print_error
+from . import templates as TMPL
 
 
 def generate_image(
