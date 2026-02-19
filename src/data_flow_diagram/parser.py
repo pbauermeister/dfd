@@ -16,7 +16,6 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
     # collect items and reject duplicates
     items_by_name: dict[str, model.Item] = {}
     for statement in statements:
-        error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Item() as item:
                 pass
@@ -32,13 +31,13 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
         other = items_by_name[name]
         other_text = model.pack(other.source.text)
         raise model.DfdException(
-            f'{error_prefix}Name "{name}" already exists '
-            f"at line {other.source.line_nr+1}: {other_text}"
+            f'Name "{name}" already exists '
+            f"at line {other.source.line_nr+1}: {other_text}",
+            source=statement.source,
         )
 
     # validate connection endpoints and type constraints
     for statement in statements:
-        error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Connection() as conn:
                 pass
@@ -51,45 +50,47 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             if point != model.NODE_STAR:
                 if point not in items_by_name:
                     raise model.DfdException(
-                        f'{error_prefix}Connection "{conn.type}" links to "{point}", '
-                        f"which is not defined"
+                        f'Connection "{conn.type}" links to "{point}", '
+                        f"which is not defined",
+                        source=statement.source,
                     )
                 if (
                     items_by_name[point].type == Keyword.CONTROL
                     and conn.type != Keyword.SIGNAL
                 ):
                     raise model.DfdException(
-                        f'{error_prefix}Connection to {Keyword.CONTROL} "{point}" is '
+                        f'Connection to {Keyword.CONTROL} "{point}" is '
                         f'of type "{conn.type}", however only connections of type '
-                        f'"{Keyword.SIGNAL}" are allowed'
+                        f'"{Keyword.SIGNAL}" are allowed',
+                        source=statement.source,
                     )
 
         if nb_stars == 2:
             raise model.DfdException(
-                f'{error_prefix}Connection "{conn.type}" may not link to two '
-                f"stars"
+                f'Connection "{conn.type}" may not link to two ' f"stars",
+                source=statement.source,
             )
 
     # validate frame membership: items must exist and not belong to multiple frames
     framed_items: set[str] = set()
     for statement in statements:
-        error_prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Frame() as frame:
                 pass
             case _:
                 continue
         if not frame.items:
-            raise model.DfdException(f"{error_prefix}Frame is empty")
+            raise model.DfdException("Frame is empty", source=statement.source)
         for name in frame.items:
             if name not in items_by_name:
                 raise model.DfdException(
-                    f'{error_prefix}Frame includes "{name}", '
-                    f"which is not defined"
+                    f'Frame includes "{name}", ' f"which is not defined",
+                    source=statement.source,
                 )
             if name in framed_items:
                 raise model.DfdException(
-                    f'{error_prefix}Item "{name}", ' f"is in multiple frames"
+                    f'Item "{name}", ' f"is in multiple frames",
+                    source=statement.source,
                 )
             framed_items.add(name)
 
@@ -113,7 +114,6 @@ def parse(
         src_line = src_line.strip()
         if not src_line or src_line.startswith("#"):
             continue
-        error_prefix = model.mk_err_prefix_from(source)
 
         # rewrite arrow sugar to keyword form
         line = _apply_syntactic_sugars(src_line)
@@ -125,13 +125,13 @@ def parse(
 
         if f is None:
             raise model.DfdException(
-                f"{error_prefix}Unrecognized keyword " f'"{word}"'
+                f'Unrecognized keyword "{word}"', source=source
             )
 
         try:
             statement = f(source)
         except model.DfdException as e:
-            raise model.DfdException(f'{error_prefix}{e}')
+            raise model.DfdException(str(e), source=source) from e
 
         # post-parse: extract inline attributes and register dependencies
         match statement:

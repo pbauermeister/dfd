@@ -247,7 +247,13 @@ def mk_err_prefix_from(src: SourceLine) -> str:
 
 
 class DfdException(Exception):
-    pass
+    def __init__(self, msg: str, source: SourceLine | None = None):
+        self.source = source
+        if source is not None:
+            prefix = mk_err_prefix_from(source)
+            super().__init__(f"{prefix}{msg}")
+        else:
+            super().__init__(msg)
 
 
 # Handy type aliases
