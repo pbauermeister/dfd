@@ -120,6 +120,16 @@ file), the branch and draft PR are created during the task start process
 Direct commits to `main` are reserved for trivial changes (`.postN`-level) that
 do not warrant a PR.
 
+## Task closing
+
+After the PR is merged:
+
+1. Switch to `main` and pull.
+2. Close the GitHub issue (`gh issue close NNN`).
+3. Update `MEMORY.md` with anything noteworthy from the task: completed
+   milestones, architectural decisions, new conventions, or design
+   preferences that emerged from discussion.
+
 ## Implementation workflow
 
 When implementing an approved plan:
