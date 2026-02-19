@@ -1,3 +1,9 @@
+## Version 1.16.7:
+
+- Fix #40: star-endpoint connections (`*`) were silently dropped by filters.
+  Stars are now resolved into unique items before filtering, so they
+  participate correctly in neighborhood expansion and only/without filters.
+
 ## Version 1.16.6.post2:
 
 - Break up large functions and extract `dsl/checker.py` (#47).
