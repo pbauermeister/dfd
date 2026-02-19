@@ -1,4 +1,4 @@
-## Version 1.16.6:
+## Version 1.16.6.post1:
 
 - Move CLI logic from `__init__.py` into dedicated `cli.py` module (#41).
 - Fix stale "UML sequence input file" help string to "DFD input file".
