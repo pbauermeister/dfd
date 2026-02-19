@@ -1,9 +1,10 @@
-"""Pipeline orchestrator: scan → parse → check → filter → render."""
+"""Pipeline orchestrator: scan → parse → check → resolve → filter → render."""
 
-from . import exception, model
+from . import config, exception, model
 from .console import dprint
 from .dsl import checker, dependency_checker, filters, parser, scanner
 from .rendering.dot import Generator, generate_dot
+from .rendering import templates as TMPL
 
 
 def build(
@@ -25,8 +26,9 @@ def build(
     if dependencies and not options.no_check_dependencies:
         dependency_checker.check(dependencies, snippet_by_name, options)
 
-    # validate statements and apply filters
+    # validate statements, resolve star endpoints, and apply filters
     items_by_name = checker.check(statements)
+    statements = resolve_star_endpoints(statements, items_by_name)
     statements = filters.handle_filters(statements, options.debug)
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
@@ -46,6 +48,42 @@ def build(
     text = generate_dot(gen, title, bg_color, statements, items_by_name)
     dprint(text)
     return text, graph_options
+
+
+def resolve_star_endpoints(
+    statements: model.Statements,
+    items_by_name: dict[str, model.Item],
+) -> model.Statements:
+    """Replace anonymous star endpoints with unique named items.
+
+    Each ENDPOINT_STAR ("*") in a connection becomes a distinct none item
+    with the connection's label. This must run before filtering so that
+    stars participate as regular items in the kept set.
+    """
+    star_nr = 0
+    new_statements: model.Statements = []
+    for statement in statements:
+        match statement:
+            case model.Connection() as conn:
+                for attr in ("src", "dst"):
+                    if getattr(conn, attr) == model.ENDPOINT_STAR:
+                        star_name = TMPL.STAR_ITEM_FMT.format(nr=star_nr)
+                        star_nr += 1
+                        # create a none item with the connection's label
+                        star_item = model.Item(
+                            source=conn.source,
+                            type=model.Keyword.STAR,
+                            text=conn.text or "",
+                            attrs=config.ITEM_STAR_ATTRS,
+                            name=star_name,
+                            hidable=False,
+                        )
+                        new_statements.append(star_item)
+                        items_by_name[star_name] = star_item
+                        setattr(conn, attr, star_name)
+                        conn.text = ""
+        new_statements.append(statement)
+    return new_statements
 
 
 def remove_unused_hidables(statements: model.Statements) -> model.Statements:

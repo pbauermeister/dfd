@@ -1,0 +1,29 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/069-filter-only-star-neighbor -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 2: process P1 Process 1 */
+  "P1" [shape=ellipse label="Process 1" fillcolor="#eeeeee" style=filled ]
+
+  /* 3: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
+
+  /* 4: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
+
+  /* 7: flow P1 P2 data */
+  "P1" -> "P2" [label="data"]
+
+  /* 8: flow P2 * external output */
+  "__star_1__" [shape=none label="external output" fontname="times-italic" fontsize=10]
+
+  /* 8: flow P2 * external output */
+  "P2" -> "__star_1__" [label=""]
+
+  /* 9: flow P2 P3 more data */
+  "P2" -> "P3" [label="more data"]
+}

@@ -1,0 +1,13 @@
+# Stars not kept by filter (no neighbor expansion) — should not disturb.
+
+process P1      Process 1
+process P2      Process 2
+process P3      Process 3
+
+* --> P1        external input
+P1 --> P2       data
+P2 --> *        external output
+P2 --> P3       more data
+
+# keep only P2 and P3 — no neighbor expansion, so both stars are dropped
+! P2 P3
