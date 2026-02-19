@@ -1,0 +1,13 @@
+# Stars removed by without filter with neighborhood.
+
+process P1      Process 1
+process P2      Process 2
+process P3      Process 3
+
+* --> P1        external input
+P1 --> P2       data
+P2 --> *        external output
+P2 --> P3       more data
+
+# remove P2 and 1-level downstream — star on P2 is removed
+~>1 P2
