@@ -1,4 +1,4 @@
-"""Tests for the DFD generation pipeline (dfd.handle_filters, dfd.handle_options).
+"""Tests for the DFD generation pipeline (filters.handle_filters, dfd.handle_options).
 
 These tests exercise error paths that occur after parsing: invalid filter
 names, already-removed names, unknown style options, and bad style values.
@@ -7,7 +7,7 @@ names, already-removed names, unknown style options, and bad style values.
 import pytest
 
 from data_flow_diagram import dfd, exception, model
-from data_flow_diagram.dsl import parser, scanner
+from data_flow_diagram.dsl import filters, parser, scanner
 
 
 def _parse(dfd_text: str) -> model.Statements:
@@ -30,7 +30,7 @@ def test_filter_unknown_name() -> None:
     """
     )
     with pytest.raises(exception.DfdException, match="unknown"):
-        dfd.handle_filters(statements)
+        filters.handle_filters(statements)
 
 
 def test_filter_already_removed() -> None:
@@ -44,7 +44,7 @@ def test_filter_already_removed() -> None:
     """
     )
     with pytest.raises(exception.DfdException, match="no longer available"):
-        dfd.handle_filters(statements)
+        filters.handle_filters(statements)
 
 
 def test_filter_replacer_unknown() -> None:
@@ -57,7 +57,7 @@ def test_filter_replacer_unknown() -> None:
     """
     )
     with pytest.raises(exception.DfdException, match="unknown"):
-        dfd.handle_filters(statements)
+        filters.handle_filters(statements)
 
 
 # ── handle_options error cases ────────────────────────────────────────────────
