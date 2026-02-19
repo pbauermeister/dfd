@@ -56,7 +56,7 @@ src/data_flow_diagram/          lines (approx.)
         scanner.py                110   ← from scanner.py
         parser.py                 523   ← from parser.py
         filters.py               ~272   ← extracted from dfd.py
-        checker.py                 89   ← from dependency_checker.py
+        dependency_checker.py       89   ← from dependency_checker.py
     rendering/
         __init__.py                 1   empty (package marker)
         dot.py                   ~302   ← extracted from dfd.py
@@ -166,7 +166,7 @@ Four logical commits, each leaving the codebase in a working state
 Move the three existing DSL modules into `dsl/`:
 - `git mv scanner.py dsl/scanner.py`
 - `git mv parser.py dsl/parser.py`
-- `git mv dependency_checker.py dsl/checker.py`
+- `git mv dependency_checker.py dsl/dependency_checker.py`
 - Create `dsl/__init__.py` (empty)
 - Update relative imports in moved files (`from .` → `from ..`)
 - Update imports in `dfd.py`, test files
@@ -215,7 +215,7 @@ Implemented in PR #46 on branch `refactor/045-module-boundaries`.
 | `dsl/scanner.py`      | 110   | DSL preprocessing                   |
 | `dsl/parser.py`       | 521   | DSL parsing                         |
 | `dsl/filters.py`      | 275   | filter engine                       |
-| `dsl/checker.py`      | 89    | dependency validation               |
+| `dsl/dependency_checker.py` | 89 | dependency validation               |
 | `rendering/dot.py`    | 301   | DOT code generation                 |
 | `rendering/templates.py` | 103 | DOT template strings              |
 | `rendering/graphviz.py` | 37   | Graphviz binary invocation         |

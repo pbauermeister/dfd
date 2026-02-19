@@ -175,7 +175,7 @@ target layout defined in `doc/CONVENTIONS.md`, reducing `dfd.py` from
   - Move `parser.py` → `dsl/parser.py`
   - Extract `handle_filters()` + `find_neighbors()` from `dfd.py` →
     `dsl/filters.py` (~260 lines, self-contained filter engine)
-  - Move `dependency_checker.py` → `dsl/checker.py`
+  - Move `dependency_checker.py` → `dsl/dependency_checker.py`
 - Create `rendering/` sub-package:
   - Extract `Generator` class + `generate_dot()` + `wrap()` from
     `dfd.py` → `rendering/dot.py` (~300 lines, DOT generation)

@@ -100,7 +100,7 @@ src/data_flow_diagram/
         scanner.py          # preprocessing: includes, line continuations
         parser.py           # DSL parsing: keyword dispatch, syntactic sugar
         filters.py          # filter engine: only/without, neighbours
-        checker.py          # cross-document dependency validation
+        dependency_checker.py  # cross-document dependency validation
     rendering/
         __init__.py
         dot.py              # DOT code generation (Generator class)

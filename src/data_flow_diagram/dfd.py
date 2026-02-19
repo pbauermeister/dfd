@@ -4,7 +4,7 @@ import os.path
 
 from . import exception, model
 from .console import dprint
-from .dsl import checker, filters, parser, scanner
+from .dsl import dependency_checker, filters, parser, scanner
 from .rendering import graphviz
 from .rendering.dot import Generator, generate_dot
 
@@ -22,7 +22,7 @@ def build(
     lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
     statements, dependencies, attribs = parser.parse(lines, options)
     if dependencies and not options.no_check_dependencies:
-        checker.check(dependencies, snippet_by_name, options)
+        dependency_checker.check(dependencies, snippet_by_name, options)
 
     # validate statements and apply filters
     items_by_name = parser.check(statements)
