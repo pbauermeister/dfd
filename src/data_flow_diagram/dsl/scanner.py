@@ -16,7 +16,7 @@ RX_LINE_CONT = re.compile("[\\\\]\\s*\n\\s*", re.MULTILINE)
 
 def scan(
     provenance: model.SourceLine | None,
-    input: str,
+    source_text: str,
     snippet_by_name: model.SnippetByName | None = None,
     debug: bool = False,
 ) -> model.SourceLines:
@@ -24,18 +24,18 @@ def scan(
     includes: set[str] = set()
 
     # stitch continuation lines (trailing backslash)
-    input = RX_LINE_CONT.sub("", input)
+    source_text = RX_LINE_CONT.sub("", source_text)
 
     # default provenance for top-level sources
     if provenance is None:
         provenance = model.SourceLine("", provenance, None, 0)
-    _scan(input, provenance, output, snippet_by_name, includes)
+    _scan(source_text, provenance, output, snippet_by_name, includes)
 
     if debug:
         dprint("=" * 40)
         dprint(provenance)
         dprint("----------")
-        dprint(input)
+        dprint(source_text)
         dprint("----------")
         for l in output:
             dprint(model.repr(l))
@@ -45,14 +45,14 @@ def scan(
 
 
 def _scan(
-    input: str,
+    source_text: str,
     parent: model.SourceLine,
     output: model.SourceLines,
     snippet_by_name: model.SnippetByName | None,
     includes: set[str],
 ) -> None:
     """Process each non-blank line: dispatch includes, collect the rest."""
-    for nr, line in enumerate(input.splitlines()):
+    for nr, line in enumerate(source_text.splitlines()):
         if not line.strip():
             continue
         source_line = model.SourceLine(line, line, parent, nr)

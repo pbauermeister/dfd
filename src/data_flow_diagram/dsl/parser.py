@@ -140,18 +140,18 @@ def _parse_neighbor_spec(
             is_down = True
         case "[":
             is_up = True
-            fn.layout_dir = True
+            fn.layout_direction = True
         case "]":
             is_down = True
-            fn.layout_dir = True
+            fn.layout_direction = True
 
     # parse optional modifier flags ("x", "f")
     for flag in m.group("flags"):
         match flag:
             case "x":
-                fn.no_anchors = True
+                fn.suppress_anchors = True
             case "f":
-                fn.no_frames = True
+                fn.suppress_frames = True
             case _:
                 raise exception.DfdException(
                     f"Unrecognized filter flag: {flag}"
@@ -176,7 +176,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     if len(terms) < 2:
         raise exception.DfdException(f"One or more arguments are expected")
 
-    # initialize a base filter with no neighbours
+    # initialize a base filter with no neighbors
     f = model.Filter(
         source,
         names=[],
@@ -188,7 +188,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     args = terms[1:]
     replacer = ""
 
-    # consume leading neighbour/replacer specifications before the anchor names
+    # consume leading neighbor/replacer specifications before the anchor names
     while args:
         arg = args[0]
 
