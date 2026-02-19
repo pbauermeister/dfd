@@ -99,3 +99,11 @@ net.
 
 Each step: modify → `make black` → `make lint` → `make test` →
 commit.
+
+### Module extraction (added during implementation)
+
+After splitting `check()` into 4 clean functions, these formed a
+self-contained validation concern with no dependency on the parsing
+code. Extracted them into `dsl/checker.py` (96 lines), reducing
+`parser.py` from 565 to 466 lines. Updated `doc/CONVENTIONS.md`
+package layout accordingly.
