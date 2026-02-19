@@ -1,4 +1,5 @@
 #include tests/non-regression/028-filter-master.part
 
-# keep proc_flow and all neighbours to the left (layout direction, not flow)
-![* proc_flow
+# keep db_params and all neighbours to the left (layout direction)
+# db_params has reversed connections, so layout-left differs from flow-upstream
+![* db_params
