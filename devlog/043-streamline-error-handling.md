@@ -121,3 +121,30 @@ Commit `d91c39c` implemented the design:
 
 **Totals:** 11 of 12 `mk_err_prefix_from` calls removed, ~23 raise sites
 converted. All 19 error-case NR golden files match byte-for-byte.
+
+### Phase 3: Move prefix logic into DfdException, add accumulation API — DONE
+
+Commit `cd6f975`:
+
+- Moved `_mk_prefix` (formerly `mk_err_prefix_from`) into `DfdException`
+  as a static method, removing the last standalone helper.
+- Added `add()` / `__bool__` accumulation API to `DfdException`, letting
+  `dependency_checker.py` collect multiple errors into a single exception
+  instead of using a separate list.
+- Removed `mk_err_prefix_from` from `model.py` (no remaining callers).
+
+### Phase 4: Extract DfdException into its own module — DONE
+
+Commit `477e32e`:
+
+- Created `src/data_flow_diagram/exception.py` containing `DfdException`
+  (moved verbatim from `model.py`).
+- Updated all 9 source files and 3 test files to import from `exception`
+  instead of `model`. No re-export from `model.py`.
+- No circular dependency: `exception` → `model` is one-way (`pack` at
+  runtime, `SourceLine` under `TYPE_CHECKING` only).
+
+**Mutation smoke-test:** Injected `[X]` into `_format()` output; all 19
+error NR tests failed, all 54 nominal tests passed. Reverted. Confirmed
+that error NR fixtures are fully effective. Added mutation smoke-test
+practice to `CLAUDE.md`.
