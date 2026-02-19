@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-18
 
-**Status:** ONGOING
+**Status:** DONE
 
 **Issue:** https://github.com/pbauermeister/dfd/issues/36
 
@@ -26,8 +26,10 @@ A shared master diagram (`028-filter-master.part`) provides a
 multi-item, multi-connection graph. Individual `.dfd` files include it
 and apply different filter combinations.
 
-The master diagram mirrors the "data pipeline" example from
-`doc/README.md` section 7, adapted to exercise all filter features.
+The master diagram uses generic indexed names (E1, P1, S1, C1, f1…)
+for easy tracing in test output. It covers all four main item types
+(entity, process, store, channel) and includes reversed connections
+to differentiate layout-direction from flow-direction tests.
 
 ### Test numbering
 
