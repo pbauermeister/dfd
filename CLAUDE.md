@@ -52,8 +52,9 @@ file), work on a dedicated branch and open a pull request:
    `doc`, or `test`.
 2. Commit all implementation work — including the `devlog/NNN-*.md` file — on
    that branch.
-3. Open a PR against `main` when the work is ready for review.
-4. Merge (or ask the user to merge) only after the PR is approved and CI passes.
+3. Open a PR against `main` when the work is ready for review. Include
+   `Closes #NNN` in the PR body so the issue auto-closes on merge.
+4. Follow the **Task conclusion** process below once implementation is complete.
 
 Direct commits to `main` are reserved for trivial changes (`.postN`-level) that
 do not warrant a PR.
@@ -66,6 +67,28 @@ When implementing an approved plan:
 - **Stop and ask** before continuing when: (a) the next step depends on validating the current result, (b) a decision is needed that was not resolved in the plan, or (c) something unexpected is discovered.
 - Otherwise, proceed autonomously through the remaining steps and commit as you go.
 - **At plan-approval time**, declare every permission category the implementation will need using `allowedPrompts` in `ExitPlanMode`, so the user can grant all permissions upfront and implementation can run unattended. Each entry should name the affected files or targets where known (e.g. `"delete tests/unit_tests.py, tests/inputs.py (irreversible)"`), and explicitly flag dangerous or irreversible actions.
+
+## Task conclusion
+
+Once implementation is complete and `make test` passes:
+
+1. **Reflect on oddities.** Review anything unexpected discovered during
+   implementation. Fix trivial issues immediately (stale imports, dead
+   code, minor inconsistencies). Surface non-trivial ones to the user
+   for discussion or tracking as a future task.
+2. **Reflect on lessons learned.** Consider whether any process
+   improvement, convention, or gotcha deserves a CLAUDE.md update. If
+   so, propose it to the user.
+3. **Debrief.** Update the `devlog/NNN-*.md` file: add an **Outcome**
+   section recording what was done, set status to `DONE`, and update
+   any parent strategy documents (e.g. `devlog/034-*`) if applicable.
+   Update MEMORY.md if the project architecture or conventions changed.
+4. **Commit and push** all remaining changes.
+5. **Ask the user** to do a final PR review on GitHub. Discussions may
+   follow; iterate as needed.
+6. **User merges** (by squash) and informs the agent.
+7. **Agent closes** the related GitHub issue (`gh issue close NNN`),
+   returns to `main`, pulls, and deletes the local feature branch.
 
 ## Design philosophy
 
