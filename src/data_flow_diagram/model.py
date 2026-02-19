@@ -175,6 +175,7 @@ class Keyword(StrEnum):
     STORE = "store"
     CHANNEL = "channel"
     NONE = "none"
+    STAR = "star"
 
     FLOW = "flow"
     BFLOW = "bflow"
@@ -206,7 +207,7 @@ class Keyword(StrEnum):
 ##############################################################################
 # DSL syntax literals
 
-ENDPOINT_STAR = "*"  # anonymous endpoint: generates a distinct "none" item
+ENDPOINT_STAR = "*"  # anonymous endpoint: generates a distinct star item
 ALL_NEIGHBORS = "*"  # unlimited span in filter neighbor spec
 SNIPPET_PREFIX = "#"  # prefix distinguishing snippet references from file paths
 INCLUDE_DIRECTIVE = "#include"  # DSL directive for including external sources

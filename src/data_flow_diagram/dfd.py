@@ -72,7 +72,7 @@ def resolve_star_endpoints(
                         # create a none item with the connection's label
                         star_item = model.Item(
                             source=conn.source,
-                            type=model.Keyword.NONE,
+                            type=model.Keyword.STAR,
                             text=conn.text or "",
                             attrs=config.ITEM_STAR_ATTRS,
                             name=star_name,

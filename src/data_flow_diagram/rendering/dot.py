@@ -99,7 +99,7 @@ class Generator:
             case model.Keyword.STORE:
                 d = self._attrib_to_dict(copy, attrs)
                 line = TMPL.STORE.format(**d)
-            case model.Keyword.NONE:
+            case model.Keyword.NONE | model.Keyword.STAR:
                 line = f'"{copy.name}" [shape={TMPL.SHAPE_NONE} label="{copy.text}" {attrs}]'
             case model.Keyword.CHANNEL:
                 d = self._attrib_to_dict(copy, attrs)
