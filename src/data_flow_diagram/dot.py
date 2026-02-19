@@ -3,6 +3,7 @@
 import subprocess
 import sys
 
+from . import dfd_dot_templates as TMPL
 from . import model
 from .console import print_error
 
@@ -12,9 +13,9 @@ def generate_image(
 ) -> None:
     # choose Graphviz engine based on diagram mode
     if graph_options.is_context:
-        engine = "neato"  # circo is not as good
+        engine = TMPL.ENGINE_CONTEXT
     else:
-        engine = "dot"
+        engine = TMPL.ENGINE_DEFAULT
 
     # invoke Graphviz and handle errors
     cmd = [engine, f"-T{format}", f"-o{output_path}"]
