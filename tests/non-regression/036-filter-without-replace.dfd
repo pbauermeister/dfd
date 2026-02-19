@@ -1,0 +1,9 @@
+#include tests/non-regression/028-filter-master.part
+
+store S0 Store 0
+
+# keep C2, C1, S2, their immediate neighbours, and the replacement item
+!<>1 C2 C1 S2 S0
+
+# remove C2, C1, S2 and rewire their connections to S0
+~=S0 C2 C1 S2

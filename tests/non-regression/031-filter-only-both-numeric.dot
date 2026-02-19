@@ -1,0 +1,104 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/031-filter-only-both-numeric -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 16: entity E2 Entity 2 */
+  "E2" [shape=rectangle label="Entity 2" ]
+
+  /* 18: process P1 Process 1 */
+  "P1" [shape=ellipse label="Process 1" fillcolor="#eeeeee" style=filled ]
+
+  /* 19: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
+
+  /* 20: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
+
+  /* 21: process P4 Process 4 */
+  "P4" [shape=ellipse label="Process 4" fillcolor="#eeeeee" style=filled ]
+
+  /* 22: process P5 Process 5 */
+  "P5" [shape=ellipse label="Process 5" fillcolor="#eeeeee" style=filled ]
+
+  /* 25: store S1 Store 1 */
+  "S1" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 1</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 26: store S2 Store 2 */
+  "S2" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 2</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 29: channel C2 Channel 2 */
+  "C2" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 2</FONT></TD>
+      </TR>
+    </TABLE>>]
+
+  /* 31: frame C2 C1 S2 = Frame 1 */
+  subgraph cluster_0 {
+    label="Frame 1"
+    style=dashed
+    "C2"
+    "S2"
+  }
+
+  /* 32: frame P4 P5 = Frame 2 */
+  subgraph cluster_1 {
+    label="Frame 2"
+    style=dashed
+    "P4"
+    "P5"
+  }
+
+  /* 35: flow P1 S1 f2 */
+  "P1" -> "S1" [label="f2"]
+
+  /* 36: flow S1 P2 f3 */
+  "S1" -> "P2" [label="f3"]
+
+  /* 38: flow P2 C2 f4 */
+  "P2" -> "C2":x:c [label="f4"]
+
+  /* 39: flow.r P2 S2 f5 */
+  "P2" -> "S2" [label="f5" dir=back]
+
+  /* 40: signal P2 E2 f6 */
+  "P2" -> "E2" [label="f6" style=dashed]
+
+  /* 42: flow.r S2 P4 f7 */
+  "S2" -> "P4" [label="f7" dir=back]
+
+  /* 44: flow C2 P5 f8 */
+  "C2":x:c -> "P5" [label="f8"]
+
+  /* 45: flow S2 P5 f9 */
+  "S2" -> "P5" [label="f9"]
+
+  /* 48: flow C2 P3 f11 */
+  "C2":x:c -> "P3" [label="f11"]
+
+  /* 50: flow P3 E2 f13 */
+  "P3" -> "E2" [label="f13"]
+
+  /* 52: flow.r S2 P3 f15 */
+  "S2" -> "P3" [label="f15" dir=back]
+}

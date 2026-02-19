@@ -1,0 +1,4 @@
+#include tests/non-regression/028-filter-master.part
+
+# remove S1 and all its upstream neighbours (unlimited span)
+~<* S1

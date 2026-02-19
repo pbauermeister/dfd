@@ -1,0 +1,83 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/045-filter-without-left -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 16: entity E2 Entity 2 */
+  "E2" [shape=rectangle label="Entity 2" ]
+
+  /* 20: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
+
+  /* 21: process P4 Process 4 */
+  "P4" [shape=ellipse label="Process 4" fillcolor="#eeeeee" style=filled ]
+
+  /* 22: process P5 Process 5 */
+  "P5" [shape=ellipse label="Process 5" fillcolor="#eeeeee" style=filled ]
+
+  /* 23: process P6 Process 6 */
+  "P6" [shape=ellipse label="Process 6" fillcolor="#eeeeee" style=filled ]
+
+  /* 28: channel C1 Channel 1 */
+  "C1" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 1</FONT></TD>
+      </TR>
+    </TABLE>>]
+
+  /* 29: channel C2 Channel 2 */
+  "C2" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 2</FONT></TD>
+      </TR>
+    </TABLE>>]
+
+  /* 31: frame C2 C1 S2 = Frame 1 */
+  subgraph cluster_0 {
+    label="Frame 1"
+    style=dashed
+    "C2"
+    "C1"
+  }
+
+  /* 32: frame P4 P5 = Frame 2 */
+  subgraph cluster_1 {
+    label="Frame 2"
+    style=dashed
+    "P4"
+    "P5"
+  }
+
+  /* 44: flow C2 P5 f8 */
+  "C2":x:c -> "P5" [label="f8"]
+
+  /* 46: flow.r C1 P5 f10 */
+  "C1":x:c -> "P5" [label="f10" dir=back]
+
+  /* 48: flow C2 P3 f11 */
+  "C2":x:c -> "P3" [label="f11"]
+
+  /* 49: flow C1 P3 f12 */
+  "C1":x:c -> "P3" [label="f12"]
+
+  /* 50: flow P3 E2 f13 */
+  "P3" -> "E2" [label="f13"]
+
+  /* 51: flow P3 P6 f14 */
+  "P3" -> "P6" [label="f14"]
+}

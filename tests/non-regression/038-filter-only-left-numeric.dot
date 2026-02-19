@@ -1,0 +1,40 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/038-filter-only-left-numeric -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 19: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
+
+  /* 25: store S1 Store 1 */
+  "S1" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 1</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 26: store S2 Store 2 */
+  "S2" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 2</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 31: frame C2 C1 S2 = Frame 1 */
+  subgraph cluster_0 {
+    label="Frame 1"
+    style=dashed
+    "S2"
+  }
+
+  /* 36: flow S1 P2 f3 */
+  "S1" -> "P2" [label="f3"]
+
+  /* 39: flow.r P2 S2 f5 */
+  "P2" -> "S2" [label="f5" dir=back]
+}

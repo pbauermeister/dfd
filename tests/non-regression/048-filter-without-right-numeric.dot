@@ -1,0 +1,80 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/048-filter-without-right-numeric -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 15: entity E1 Entity 1 */
+  "E1" [shape=rectangle label="Entity 1" ]
+
+  /* 16: entity E2 Entity 2 */
+  "E2" [shape=rectangle label="Entity 2" ]
+
+  /* 18: process P1 Process 1 */
+  "P1" [shape=ellipse label="Process 1" fillcolor="#eeeeee" style=filled ]
+
+  /* 19: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
+
+  /* 23: process P6 Process 6 */
+  "P6" [shape=ellipse label="Process 6" fillcolor="#eeeeee" style=filled ]
+
+  /* 25: store S1 Store 1 */
+  "S1" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Store 1</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 28: channel C1 Channel 1 */
+  "C1" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 1</FONT></TD>
+      </TR>
+    </TABLE>>]
+
+  /* 29: channel C2 Channel 2 */
+  "C2" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR>
+        <TD WIDTH="48"></TD>
+        <TD BGCOLOR="black" WIDTH="0" PORT="x"><BR/><BR/></TD>
+        <TD WIDTH="48"></TD>
+      </TR>
+      <TR>
+        <TD COLSPAN="3"><FONT COLOR="black">Channel 2</FONT></TD>
+      </TR>
+    </TABLE>>]
+
+  /* 31: frame C2 C1 S2 = Frame 1 */
+  subgraph cluster_0 {
+    label="Frame 1"
+    style=dashed
+    "C2"
+    "C1"
+  }
+
+  /* 34: flow E1 P1 f1 */
+  "E1" -> "P1" [label="f1"]
+
+  /* 35: flow P1 S1 f2 */
+  "P1" -> "S1" [label="f2"]
+
+  /* 36: flow S1 P2 f3 */
+  "S1" -> "P2" [label="f3"]
+
+  /* 38: flow P2 C2 f4 */
+  "P2" -> "C2":x:c [label="f4"]
+
+  /* 40: signal P2 E2 f6 */
+  "P2" -> "E2" [label="f6" style=dashed]
+}

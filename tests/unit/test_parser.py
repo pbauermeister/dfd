@@ -1,7 +1,7 @@
 """Tests for the scanner and parser (scanner.scan, parser.parse, parser.check).
 
 The scanner is exercised here as a prerequisite to parsing; dedicated scanner
-tests (e.g. for include resolution) belong in a future test_scanner.py.
+tests (e.g. for include resolution) belong in test_scanner.py.
 """
 
 import pytest
@@ -13,22 +13,26 @@ from data_flow_diagram import model, parser, scanner
 # A DFD snippet that exercises every item type and several connection types;
 # parse() and check() must both accept it without raising.
 ALL_ITEMS_AND_CONNECTIONS = """
-style\tvertical
-style\thorizontal
+    style    vertical
+    style    horizontal
 
-process\tP\tProcess
-process\tP2\tProcess 2
-entity\tT\tTerminal
-store\tS\tStore
-channel\tC\tChannel
-channel\tC2\tChannel 2b
+    process  P     Process
+    process  P2    Process 2
+    entity   T     Terminal
+    store    S     Store
+    channel  C     Channel
+    channel  C2    Channel 2b
+    control  Ctrl  Controller
 
-flow\tP\tC\tdata
-bflow\tP\tS\tconfig
-signal\tP\tP2\tevent
-flow\tP2\tC2\tmore data
-flow\t*\tP2\text data
-flow\tP\tT
+    P     -->  C     data
+    P     <->  S     config
+    P     ::>  P2    event
+    Ctrl  ::>  P     control event
+    P2    -->  C2    more data
+    *     -->  P2    ext data
+    P     -->  T
+
+    frame P P2 = Processes
 """
 
 # ── Error case fixtures ───────────────────────────────────────────────────────
@@ -36,16 +40,77 @@ flow\tP\tT
 # Each entry: (dfd_text, pytest id).  All should make parser.check() raise.
 CHECK_ERROR_CASES = [
     pytest.param(
-        "process\tP text\nentity P text",
+        """
+        process  P  text
+        entity   P  text
+        """,
         id="duplicate-item",  # two items share the same name
     ),
     pytest.param(
-        "process\tP text\nflow P Q text",
+        """
+        process  P  text
+        P  -->  Q  text
+        """,
         id="missing-ref",  # connection references undefined item Q
     ),
     pytest.param(
-        "flow * * text",
+        "*  -->  *  text",
         id="double-star",  # both endpoints of a connection are wildcards
+    ),
+    pytest.param(
+        """
+        control  C  Ctrl
+        C  -->  *  data
+        """,
+        id="connection-to-control",  # non-signal connection to a control item
+    ),
+    pytest.param(
+        "frame = Title",
+        id="empty-frame",  # frame with no item names
+    ),
+    pytest.param(
+        """
+        process  P  Proc
+        frame UNKNOWN = Title
+        """,
+        id="frame-undefined-item",  # frame references an item that doesn't exist
+    ),
+    pytest.param(
+        """
+        process  A  a
+        process  B  b
+        frame A = F1
+        frame A B = F2
+        """,
+        id="frame-item-in-multiple",  # item A appears in two different frames
+    ),
+]
+
+# Each entry: (dfd_text, pytest id).  All should make parser.parse() raise.
+PARSE_ERROR_CASES = [
+    pytest.param(
+        "process",
+        id="missing-item-args",  # item keyword with no name
+    ),
+    pytest.param(
+        "A  -->",
+        id="missing-connection-args",  # connection with too few arguments
+    ),
+    pytest.param(
+        "!",
+        id="filter-no-args",  # filter keyword alone
+    ),
+    pytest.param(
+        "!<>2",
+        id="filter-spec-only",  # neighbour spec but no anchor names
+    ),
+    pytest.param(
+        "!=replacement A",
+        id="filter-replacer-on-only",  # replacer specification on Only (!) filter
+    ),
+    pytest.param(
+        "!<>z1 A",
+        id="filter-bad-flag",  # unrecognized neighbour flag 'z'
     ),
 ]
 
@@ -57,7 +122,8 @@ def test_parse_valid_syntax() -> None:
     # Full valid DFD must pass both parse() and check() without error
     tokens = scanner.scan(None, ALL_ITEMS_AND_CONNECTIONS)
     try:
-        parser.parse(tokens)
+        statements, _, _ = parser.parse(tokens)
+        parser.check(statements)
     except model.DfdException as e:
         pytest.fail(f"Unexpected DfdException on valid syntax: {e}")
 
@@ -76,3 +142,11 @@ def test_check_raises(dfd_text: str) -> None:
     statements, _, _ = parser.parse(tokens)
     with pytest.raises(model.DfdException):
         parser.check(statements)
+
+
+@pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)  # type: ignore[misc]
+def test_parse_raises(dfd_text: str) -> None:
+    # Each malformed snippet must trigger a DfdException in parse()
+    tokens = scanner.scan(None, dfd_text)
+    with pytest.raises(model.DfdException):
+        parser.parse(tokens)
