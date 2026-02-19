@@ -2,7 +2,7 @@
 
 import os.path
 import re
-from typing import Callable, Tuple, get_type_hints
+from typing import Callable
 
 from .. import exception, model
 from ..rendering import templates as TMPL
@@ -174,7 +174,7 @@ def _split_args(
     return terms[1:]
 
 
-def _parse_item_name(name: str) -> Tuple[str, bool]:
+def _parse_item_name(name: str) -> tuple[str, bool]:
     """If name ends with ?, make it hidable"""
     if name.endswith("?"):
         return name[:-1], True
