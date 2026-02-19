@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 2: entity A a
+  line 1: <file:tests/non-regression/049-err-duplicate-item.dfd>
+Error: Name "A" already exists at line 1: process A a

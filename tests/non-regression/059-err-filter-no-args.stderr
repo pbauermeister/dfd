@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: !
+  line 1: <file:tests/non-regression/059-err-filter-no-args.dfd>
+Error: One or more arguments are expected

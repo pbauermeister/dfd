@@ -66,7 +66,7 @@ No fixture file needed.
 
 **Example to follow:** `tests/test_integration.py::test_stdin_to_stdout_produces_svg`.
 
-### Non-regression test
+### Non-regression test — nominal (success)
 
 **Fixtures (inputs):** `tests/non-regression/NNN-name.dfd` (standalone) or
 `tests/non-regression/NNN-name.md` (markdown mode). Use the next available number
@@ -77,7 +77,19 @@ No fixture file needed.
 - Standalone `.dfd` → `tests/non-regression/NNN-name.dot`
 - Markdown `.md` → `tests/non-regression/NNN-name/<output-name>.dot`
 
-Generate them with `make nr-approve` after visually checking `make nr-preview`.
+Generate them with `make nr-regenerate` after visually checking `make nr-review`.
+
+### Non-regression test — error (failure)
+
+**Fixtures (inputs):** `tests/non-regression/NNN-err-description.dfd` — the
+`-err-` infix in the filename identifies an error fixture. Each file contains
+minimal invalid DFD input that triggers a `DfdException`.
+
+**Golden files (expected output):** `tests/non-regression/NNN-err-description.stderr`
+— the exact stderr output produced by the tool.
+
+Generate them with `make nr-regenerate` (which runs the tool, expects failure, and
+captures stderr). Inspect error output with `make nr-review`.
 
 ---
 
@@ -108,6 +120,18 @@ diff "$dot" "$tmp"
 rm "$tmp"
 ```
 
+### Non-regression test — single error fixture
+
+```bash
+# Run the tool (expect failure) and diff stderr against golden
+dfd=tests/non-regression/049-err-duplicate-item.dfd
+stderr="${dfd%.dfd}.stderr"
+tmp_stderr="${dfd%.dfd}.tmp.stderr"
+./data-flow-diagram "$dfd" -f dot 2> "$tmp_stderr" || true
+diff "$stderr" "$tmp_stderr"
+rm "$tmp_stderr"
+```
+
 ### Non-regression test — single .md file
 
 ```bash
@@ -134,9 +158,9 @@ Run the full suite: `make test`
 
 ### Non-regression tests
 
-`make nr-approve` generates the golden `.dot` file(s). From that point on,
-`make nr-test` (called by `make test`) picks them up automatically — no registration
-needed.
+`make nr-regenerate` generates the golden `.dot` and `.stderr` file(s). From that
+point on, `make nr-test` (called by `make test`) picks them up automatically — no
+registration needed.
 
-Workflow: `make nr-preview` → inspect SVGs → `make nr-approve` → commit fixtures
-and golden files together.
+Workflow: `make nr-review` → inspect SVGs / error output → `make nr-regenerate` →
+commit fixtures and golden files together.

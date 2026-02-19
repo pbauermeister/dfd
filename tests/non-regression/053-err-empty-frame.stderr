@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: frame = Title
+  line 1: <file:tests/non-regression/053-err-empty-frame.dfd>
+Error: Frame is empty

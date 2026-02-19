@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: process
+  line 1: <file:tests/non-regression/057-err-missing-item-args.dfd>
+Error: Expected 1 or 2 argument

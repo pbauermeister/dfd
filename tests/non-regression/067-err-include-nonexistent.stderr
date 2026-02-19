@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: #include __nonexistent__.dfd
+  line 1: <file:tests/non-regression/067-err-include-nonexistent.dfd>
+Error: included file "__nonexistent__.dfd" not found.

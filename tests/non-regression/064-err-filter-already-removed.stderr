@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 4: ~ A
+  line 1: <file:tests/non-regression/064-err-filter-already-removed.dfd>
+Error:  Name(s) no longer available due to previous filters: A

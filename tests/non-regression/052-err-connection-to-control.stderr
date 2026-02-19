@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 3: A --> K data
+  line 1: <file:tests/non-regression/052-err-connection-to-control.dfd>
+Error: Connection to control "K" is of type "flow", however only connections of type "signal" are allowed

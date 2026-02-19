@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: ! <>2
+  line 1: <file:tests/non-regression/060-err-filter-spec-only.dfd>
+Error: One or more names are expected

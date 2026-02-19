@@ -37,8 +37,8 @@ Before adding or changing any test, read `tests/README.md`. It defines: how to c
 
 - **Fixtures** (test inputs) live in `tests/non-regression/`: `.dfd`, `.part`, `.md` files.
 - **Golden files** (expected outputs): `.dot` files. Standalone tests use `NNN-name.dot`; markdown tests use `NNN-name/output.dot` subdirectories.
-- **Workflow:** `make nr-preview` → inspect SVGs → `make nr-approve` → commit fixtures and golden files together.
-- `make nr-test` runs as part of `make test`. It compares regenerated DOT against golden `.dot` files.
+- **Workflow:** `make nr-review` → inspect SVGs / error output → `make nr-regenerate` → commit fixtures and golden files together.
+- `make nr-test` runs as part of `make test`. It compares regenerated output against golden files.
 - Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 027+).
 
 ## Branching and PR workflow

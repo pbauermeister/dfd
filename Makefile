@@ -57,13 +57,13 @@ test: ## run unit tests and non-regression tests
 	pytest
 	$(MAKE) nr-test
 
-nr-preview: ## generate SVGs from NR test DFDs for visual inspection
-	./tests/nr-preview.sh
+nr-review: ## generate pre-goldens (SVG + error msg) for review before regeneration
+	./tests/nr-review.sh
 
-nr-approve: ## (re)generate golden .dot files from NR test DFDs
-	./tests/nr-approve.sh
+nr-regenerate: ## regenerate golden files (.dot + .stderr) from NR fixtures
+	./tests/nr-regenerate.sh
 
-nr-test: ## compare generated DOT against golden .dot files
+nr-test: ## verify NR fixtures still match their golden files
 	./tests/nr-test.sh
 
 ################################################################################

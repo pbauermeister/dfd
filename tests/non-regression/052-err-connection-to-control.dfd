@@ -1,0 +1,3 @@
+control K  k
+process A  a
+A --> K  data

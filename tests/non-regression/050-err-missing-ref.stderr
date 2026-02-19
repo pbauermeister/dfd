@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 2: P --> Q label
+  line 1: <file:tests/non-regression/050-err-missing-ref.dfd>
+Error: Connection "flow" links to "Q", which is not defined

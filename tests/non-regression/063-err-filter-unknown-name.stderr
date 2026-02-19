@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 2: ! A
+  line 1: <file:tests/non-regression/063-err-filter-unknown-name.dfd>
+Error:  Name(s) unknown: A

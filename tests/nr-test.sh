@@ -46,5 +46,21 @@ for md in "$NR_DIR"/*.md; do
     rm -f "$tmp_md"
 done
 
+# Test error fixtures (*-err-*.dfd -> .stderr)
+for dfd in "$NR_DIR"/*-err-*.dfd; do
+    [ -f "$dfd" ] || continue
+    stderr="${dfd%.dfd}.stderr"
+    tmp_stderr="${dfd%.dfd}.tmp.stderr"
+    ./data-flow-diagram "$dfd" -f dot 2> "$tmp_stderr" || true
+    if diff -u "$stderr" "$tmp_stderr" > /dev/null 2>&1; then
+        echo "  PASS: $dfd"
+    else
+        echo "  FAIL: $dfd"
+        diff -u "$stderr" "$tmp_stderr" || true
+        fail=1
+    fi
+    rm -f "$tmp_stderr"
+done
+
 # Final result
 [ $fail -eq 0 ] || { echo "Non-regression test(s) FAILED"; exit 1; }

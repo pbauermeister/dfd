@@ -1,0 +1,4 @@
+process A  a
+process B  b
+~ A
+~ A

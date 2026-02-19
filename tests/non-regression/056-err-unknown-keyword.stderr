@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: foobar X
+  line 1: <file:tests/non-regression/056-err-unknown-keyword.dfd>
+Error: Unrecognized keyword "foobar"
