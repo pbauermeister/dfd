@@ -1,0 +1,4 @@
+#include tests/non-regression/028-filter-master.part
+
+# remove proc_flow and all neighbours to the left (layout direction)
+~[* proc_flow

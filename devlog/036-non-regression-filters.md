@@ -44,6 +44,17 @@ The master diagram mirrors the "data pipeline" example from
 | 035    | `035-filter-only-right.dfd`          | `!]1` — right (layout) direction, span 1          |
 | 036    | `036-filter-without-replace.dfd`     | `~=name` — without filter with replacement        |
 | 037    | `037-filter-combined.dfd`            | Combined `!` and `~` filters in sequence          |
+| 038    | `038-filter-only-left-numeric.dfd`   | `![2` — left (layout) direction, numeric span     |
+| 039    | `039-filter-only-right-unlimited.dfd`| `!]*` — right (layout) direction, unlimited span  |
+| 040    | `040-filter-without-upstream.dfd`    | `~<*` — remove upstream neighbours, unlimited     |
+| 041    | `041-filter-without-downstream.dfd`  | `~>*` — remove downstream neighbours, unlimited   |
+| 042    | `042-filter-without-both-numeric.dfd`| `~<>2` — remove both directions, numeric span     |
+| 043    | `043-filter-without-x-flag.dfd`      | `~<>x2` — neighbours only, suppress anchors       |
+| 044    | `044-filter-without-xf-flags.dfd`    | `~<>xf2` — suppress anchors and frames            |
+| 045    | `045-filter-without-left.dfd`        | `~[*` — left (layout) direction, unlimited        |
+| 046    | `046-filter-without-left-numeric.dfd`| `~[2` — left (layout) direction, numeric span     |
+| 047    | `047-filter-without-right-unlimited.dfd`| `~]*` — right (layout) direction, unlimited    |
+| 048    | `048-filter-without-right-numeric.dfd`| `~]1` — right (layout) direction, span 1          |
 
 ### Unit tests for error cases
 

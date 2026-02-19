@@ -1,0 +1,32 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/043-filter-without-x-flag -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 3: entity ds Data source */
+  "ds" [shape=rectangle label="Data source" ]
+
+  /* 5: process proc_flow process data flow */
+  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+
+  /* 7: process ext External system */
+  "ext" [shape=ellipse label="External system" fillcolor="#eeeeee" style=filled ]
+
+  /* 10: store db_fcast Forecasts */
+  "db_fcast" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Forecasts</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  subgraph cluster_0 {
+    label="Computation results"
+    style=dashed
+    "db_fcast"
+  }
+}
