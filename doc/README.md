@@ -1057,21 +1057,21 @@ You can combine them by sequential statements:
 
 `~[NEIGHBOURS ][ITEM_NAMES]`
 
-#### 7.3.3. Neighbours syntax
+#### 7.3.3. Neighbors syntax
 
 `DIRECTION[SPAN][FLAGS]`
 
 - DIRECTION:
-  - `>`: downstream neighbours
-  - `<`: upstream neighbours
+  - `>`: downstream neighbors
+  - `<`: upstream neighbors
   - `<>`: all directions
-  - `[`: left neighbours
-  - `]`: right neighbours
+  - `[`: left neighbors
+  - `]`: right neighbors
 - SPAN:
-  - `*`: all neighbours in the given direction
-  - _number_: this number of neighbours in the given direction
+  - `*`: all neighbors in the given direction
+  - _number_: this number of neighbors in the given direction
 - FLAGS:
-  - `x`: select only the neighbours, not the listed items
+  - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
 
 ### 7.4. Filters example
@@ -1159,7 +1159,7 @@ You can keep a list of items:
 
 ![Filtering](./img/filter-some.svg)
 
-##### 7.4.1.2. Keeping neighbours
+##### 7.4.1.2. Keeping neighbors
 
 Two kinds of neigborhood exist:
 
@@ -1183,12 +1183,12 @@ Here:
 - Seen from B, A is on the left
 - Seen from C, B is on the right
 
-##### 7.4.1.3. Keeping an item and the neighbours before
+##### 7.4.1.3. Keeping an item and the neighbors before
 
 ```data-flow-diagram img/filter-only-before.svg
 #include #img/data-pipeline
 
-# We keep db_raw, and upstream neighbours
+# We keep db_raw, and upstream neighbors
 !<* db_raw
 
 # Note the "<" span meaning "upstream", and "*" for "all in given direction"
@@ -1196,12 +1196,12 @@ Here:
 
 ![Filtering](./img/filter-only-before.svg)
 
-##### 7.4.1.4. Keeping an item and the neighbours after
+##### 7.4.1.4. Keeping an item and the neighbors after
 
 ```data-flow-diagram img/filter-only-after.svg
 #include #img/data-pipeline
 
-# We keep db_raw, and all downstream neighbours
+# We keep db_raw, and all downstream neighbors
 !>* db_raw
 
 # Note the ">" span meaning "downstream"
@@ -1209,12 +1209,12 @@ Here:
 
 ![Filtering](./img/filter-only-after.svg)
 
-##### 7.4.1.5. Keeping an item and only two levels of neighbours after
+##### 7.4.1.5. Keeping an item and only two levels of neighbors after
 
 ```data-flow-diagram img/filter-only-after-two.svg
 #include #img/data-pipeline
 
-# We keep proc_flow, and two levels of downstream neighbours
+# We keep proc_flow, and two levels of downstream neighbors
 !>2 proc_flow
 
 # Note the ">" for "downstream", and "2" for "two levels"
@@ -1222,12 +1222,12 @@ Here:
 
 ![Filtering](./img/filter-only-after-two.svg)
 
-##### 7.4.1.6. Keeping an item and only two levels of neighbours in all directions
+##### 7.4.1.6. Keeping an item and only two levels of neighbors in all directions
 
 ```data-flow-diagram img/filter-only-two.svg
 #include #img/data-pipeline
 
-# We keep proc_flow, and two levels of neighbours in all directions
+# We keep proc_flow, and two levels of neighbors in all directions
 !<>2 proc_flow
 
 # Note the "<>" meaning "all directions"
@@ -1240,10 +1240,10 @@ Here:
 ```data-flow-diagram img/filter-only-after-two-not-me.svg
 #include #img/data-pipeline
 
-# We keep two levels of downstream neighbours, but not proc_flow itself
+# We keep two levels of downstream neighbors, but not proc_flow itself
 !<>x2 proc_flow
 
-# Note the 'x' flag, meaning "not the item themselves, but the neighbours"
+# Note the 'x' flag, meaning "not the item themselves, but the neighbors"
 ```
 
 ![Filtering](./img/filter-only-after-two-not-me.svg)
@@ -1266,7 +1266,7 @@ Here:
 ```data-flow-diagram img/filter-only-left.svg
 #include #img/data-pipeline
 
-# Keep proc_flow, and all neighbours on its left
+# Keep proc_flow, and all neighbors on its left
 ![* proc_flow
 
 # Note the "[*" span, with "[" meaning "on the left"
@@ -1279,7 +1279,7 @@ Here:
 ```data-flow-diagram img/filter-only-right.svg
 #include #img/data-pipeline
 
-# Keep proc_flow, and one level of neighbours on its left
+# Keep proc_flow, and one level of neighbors on its left
 !]1 proc_flow
 
 # Note the "]1" span, with "]" meaning "on the right"
@@ -1298,7 +1298,7 @@ First, lets put our focus around the computation results:
 ```data-flow-diagram img/filter-dbs-context.svg
 #include #img/data-pipeline
 
-# Keep some databases and immediate neighbours
+# Keep some databases and immediate neighbors
 !<>1 db_aggr db_fcast db_params
 
 # (This is optional, just for clarity)
@@ -1314,7 +1314,7 @@ Then, let's collapse the DBs as a new one:
 # Declare a new super DB to later represent the other DBs
 store db_all All DBs
 
-# Keep the databases and immediate neighbours (as before), and also the super DB
+# Keep the databases and immediate neighbors (as before), and also the super DB
 !<>1 db_aggr db_fcast db_params db_all
 
 # Replace the DBs by the super DB

@@ -26,10 +26,10 @@ function into scannable blocks.
 names = set(f.names)
 _check_names(names, all_names, prefix)
 
-# add anchor names (suppressed by "x" flag: neighbours only)
+# add anchor names (suppressed by "x" flag: neighbors only)
 if (
-    not f.neighbors_up.no_anchors
-    and not f.neighbors_down.no_anchors
+    not f.neighbors_up.suppress_anchors
+    and not f.neighbors_down.suppress_anchors
 ):
     kept_names.update(f.names)
 ```
@@ -110,14 +110,14 @@ guideline, not a rigid rule:
 
 Use official terms from the glossary in `doc/SYNTAX.md`. When a comment's
 terminology differs from the identifier it annotates, prefer the official
-term in the comment; the identifier will be fixed in a future refactoring.
+term in the comment and fix the identifier.
 
 Examples: use "item" (not "node"), "anchor" (not "listed item"), "kept set"
 (not "kept names list").
 
 ## Reference example
 
-`dfd.py:handle_filters` (lines 492–691) demonstrates the full range:
+`dsl/filters.py:_collect_kept_names` demonstrates the full range:
 
 - Phase headers: `# phase 1: collect filtered names`
 - Chunk comments: `# add anchor names (suppressed by "x" flag: …)`
