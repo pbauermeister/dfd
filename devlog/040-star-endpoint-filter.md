@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-19
 
-**Status:** ONGOING
+**Status:** DONE
 
 **Issue:** https://github.com/pbauermeister/dfd/issues/40
 
@@ -135,3 +135,21 @@ Stars are regular `none` items that the filter engine handles normally.
 4. Regenerate NR goldens, inspect the diff.
 5. Run `make black && make lint && make test`.
 6. Mutation smoke-test.
+7. Add NR fixtures for star+filter interactions (068–071).
+
+## Result
+
+- `resolve_star_endpoints()` added to `dfd.py`, wired between
+  `checker.check()` and `handle_filters()`.
+- `ITEM_STAR_ATTRS` constant added to `config.py`.
+- `generate_star()` removed from `rendering/dot.py`; `_get_item()` and
+  `generate_connection()` simplified.
+- ENDPOINT_STAR exemption in `_apply_filters` reverted — no longer needed.
+- Golden files updated for 002, 003, 008.
+- Four new NR fixtures covering star+filter interactions:
+  - 068: only filter, stars dropped (no neighbor expansion)
+  - 069: only filter, stars kept (1-level neighborhood)
+  - 070: without filter, stars unaffected
+  - 071: without filter, stars removed (1-level neighborhood)
+- All mutation smoke-tests pass (both "leak" and "always-drop" mutations
+  caught).
