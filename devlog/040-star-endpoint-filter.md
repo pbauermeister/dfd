@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-19
 
-**Status:** PENDING
+**Status:** ONGOING
 
 **Issue:** https://github.com/pbauermeister/dfd/issues/40
 

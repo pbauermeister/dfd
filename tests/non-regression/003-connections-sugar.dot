@@ -23,4 +23,12 @@ digraph D {
 
   /* 6: cflow.r P1 P2 a continuous back flow */
   "P1" -> "P2" [label="a continuous\nback flow" dir=back arrowtail=normalnormal]
+  "__star_0__" [shape=none label="an unsourced\nflow" fontname="times-italic" fontsize=10]
+
+  /* 8: flow * P2 an unsourced flow */
+  "__star_0__" -> "P2" [label=""]
+  "__star_1__" [shape=none label="an untargetted\nsignal" fontname="times-italic" fontsize=10]
+
+  /* 9: signal P1 * an untargetted signal */
+  "P1" -> "__star_1__" [label="" style=dashed]
 }
