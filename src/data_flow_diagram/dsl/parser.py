@@ -9,10 +9,8 @@ from ..console import dprint
 from ..model import Keyword
 
 
-def check(statements: model.Statements) -> dict[str, model.Item]:
-    """Validate all statements: no duplicate items, valid connection endpoints, valid frames."""
-
-    # collect items and reject duplicates
+def _check_items(statements: model.Statements) -> dict[str, model.Item]:
+    """Collect items and reject duplicates."""
     items_by_name: dict[str, model.Item] = {}
     for statement in statements:
         match statement:
@@ -22,7 +20,6 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 continue
         name = item.name
 
-        # make sure there are no duplicates
         if name not in items_by_name:
             items_by_name[name] = item
             continue
@@ -34,8 +31,13 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             f"at line {other.source.line_nr+1}: {other_text}",
             source=statement.source,
         )
+    return items_by_name
 
-    # validate connection endpoints and type constraints
+
+def _check_connections(
+    statements: model.Statements, items_by_name: dict[str, model.Item]
+) -> None:
+    """Validate connection endpoints and type constraints."""
     for statement in statements:
         match statement:
             case model.Connection() as conn:
@@ -70,7 +72,11 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 source=statement.source,
             )
 
-    # validate frame membership: items must exist and not belong to multiple frames
+
+def _check_frames(
+    statements: model.Statements, items_by_name: dict[str, model.Item]
+) -> None:
+    """Validate frame membership: items must exist and not belong to multiple frames."""
     framed_items: set[str] = set()
     for statement in statements:
         match statement:
@@ -95,6 +101,12 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 )
             framed_items.add(name)
 
+
+def check(statements: model.Statements) -> dict[str, model.Item]:
+    """Validate all statements: no duplicate items, valid connection endpoints, valid frames."""
+    items_by_name = _check_items(statements)
+    _check_connections(statements, items_by_name)
+    _check_frames(statements, items_by_name)
     return items_by_name
 
 
@@ -340,6 +352,23 @@ def _make_connection_parser(
     return parse
 
 
+def _format_sugar(verb: str, args: list[str]) -> str:
+    """Format a rewritten arrow as keyword form."""
+    array = [verb] + args
+    del array[2]  # remove arrow
+    return "\t".join(array)
+
+
+def _resolve_sugar(
+    src_line: str, op: str, keyword: str, relaxed_keyword: str | None = None
+) -> str:
+    """Resolve an arrow operator to a keyword connection statement."""
+    parts = src_line.split(maxsplit=3)
+    if relaxed_keyword is not None and op.endswith("?"):
+        return _format_sugar(relaxed_keyword, parts)
+    return _format_sugar(keyword, parts)
+
+
 def _apply_syntactic_sugars(src_line: str) -> str:
     """Rewrite arrow operators and filter shorthands to canonical keyword form."""
 
@@ -356,53 +385,54 @@ def _apply_syntactic_sugars(src_line: str) -> str:
         return src_line
 
     op = terms[1]
-
-    def _fmt(verb: str, args: list[str]) -> str:
-        array = [verb] + args
-        del array[2]  # remove arrow
-        return "\t".join(array)
-
     new_line = ""
-
-    def _resolve(keyword: str, relaxed_keyword: str | None = None) -> str:
-        parts = src_line.split(maxsplit=3)
-        if relaxed_keyword is not None and op.endswith("?"):
-            return _fmt(relaxed_keyword, parts)
-        return _fmt(keyword, parts)
 
     # match arrow patterns against connection keywords
     if re.fullmatch(r"-+>[?]?", op):
-        new_line = _resolve(Keyword.FLOW, Keyword.FLOW_RELAXED)
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.FLOW, Keyword.FLOW_RELAXED
+        )
 
     elif re.fullmatch(r"<-+[?]?", op):
-        new_line = _resolve(
-            Keyword.FLOW_REVERSED, Keyword.FLOW_REVERSED_RELAXED
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.FLOW_REVERSED, Keyword.FLOW_REVERSED_RELAXED
         )
 
     if re.fullmatch(r"-+>>[?]?", op):
-        new_line = _resolve(Keyword.CFLOW, Keyword.CFLOW_RELAXED)
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.CFLOW, Keyword.CFLOW_RELAXED
+        )
     elif re.fullmatch(r"<<-+[?]?", op):
-        new_line = _resolve(
-            Keyword.CFLOW_REVERSED, Keyword.CFLOW_REVERSED_RELAXED
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.CFLOW_REVERSED, Keyword.CFLOW_REVERSED_RELAXED
         )
 
     elif re.fullmatch(r"<-+>[?]?", op):
-        new_line = _resolve(Keyword.BFLOW, Keyword.BFLOW_RELAXED)
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.BFLOW, Keyword.BFLOW_RELAXED
+        )
 
     elif re.fullmatch(r"--+[?]?", op):
-        new_line = _resolve(Keyword.UFLOW, Keyword.UFLOW_RELAXED)
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.UFLOW, Keyword.UFLOW_RELAXED
+        )
 
     elif re.fullmatch(r":+>[?]?", op):
-        new_line = _resolve(Keyword.SIGNAL, Keyword.SIGNAL_RELAXED)
+        new_line = _resolve_sugar(
+            src_line, op, Keyword.SIGNAL, Keyword.SIGNAL_RELAXED
+        )
     elif re.fullmatch(r"<:+[?]?", op):
-        new_line = _resolve(
-            Keyword.SIGNAL_REVERSED, Keyword.SIGNAL_REVERSED_RELAXED
+        new_line = _resolve_sugar(
+            src_line,
+            op,
+            Keyword.SIGNAL_REVERSED,
+            Keyword.SIGNAL_REVERSED_RELAXED,
         )
 
     elif re.fullmatch(r">+", op):
-        new_line = _resolve(Keyword.CONSTRAINT)
+        new_line = _resolve_sugar(src_line, op, Keyword.CONSTRAINT)
     elif re.fullmatch(r"<+", op):
-        new_line = _resolve(Keyword.CONSTRAINT_REVERSED)
+        new_line = _resolve_sugar(src_line, op, Keyword.CONSTRAINT_REVERSED)
 
     if new_line:
         return new_line
