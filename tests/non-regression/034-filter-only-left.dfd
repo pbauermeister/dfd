@@ -1,5 +1,5 @@
 #include tests/non-regression/028-filter-master.part
 
-# keep S2 and all neighbours to the left (layout direction)
+# keep S2 and all neighbors to the left (layout direction)
 # S2 has reversed connections, so layout-left differs from flow-upstream
 ![* S2

@@ -103,7 +103,7 @@ PARSE_ERROR_CASES = [
     ),
     pytest.param(
         "!<>2",
-        id="filter-spec-only",  # neighbour spec but no anchor names
+        id="filter-spec-only",  # neighbor spec but no anchor names
     ),
     pytest.param(
         "!=replacement A",
@@ -111,7 +111,7 @@ PARSE_ERROR_CASES = [
     ),
     pytest.param(
         "!<>z1 A",
-        id="filter-bad-flag",  # unrecognized neighbour flag 'z'
+        id="filter-bad-flag",  # unrecognized neighbor flag 'z'
     ),
 ]
 
