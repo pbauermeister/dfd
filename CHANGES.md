@@ -1,3 +1,8 @@
+## Version 1.16.6:
+
+- Move CLI logic from `__init__.py` into dedicated `cli.py` module (#41).
+- Fix stale "UML sequence input file" help string to "DFD input file".
+
 ## Version 1.16.5:
 
 - Fix #31: allow `background-color` and `no-graph-title` to be specified as
