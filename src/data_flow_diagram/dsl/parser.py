@@ -221,6 +221,56 @@ RX_FILTER_ARG = re.compile(
 )
 
 
+def _parse_neighbor_spec(
+    m: re.Match[str], arg: str
+) -> tuple[model.FilterNeighbors, bool, bool]:
+    """Parse a single neighbor specification from a regex match.
+
+    Returns (filter_neighbors, is_up, is_down).
+    """
+    fn = model.FilterNeighbors(0, False, False, False)
+    is_up = is_down = False
+
+    # parse direction indicator
+    match m.group("neighbors"):
+        case "<>":
+            is_up = is_down = True
+        case "<":
+            is_up = True
+        case ">":
+            is_down = True
+        case "[":
+            is_up = True
+            fn.layout_dir = True
+        case "]":
+            is_down = True
+            fn.layout_dir = True
+
+    # parse optional modifier flags ("x", "f")
+    for flag in m.group("flags"):
+        match flag:
+            case "x":
+                fn.no_anchors = True
+            case "f":
+                fn.no_frames = True
+            case _:
+                raise exception.DfdException(
+                    f"Unrecognized filter flag: {flag}"
+                )
+
+    # parse span (distance): "*" for unlimited, or a decimal number
+    if m.group("all"):
+        fn.distance = -1  # special value for "all neighbors"
+    elif m.group("num"):
+        fn.distance = int(m.group("num"))
+    else:
+        raise exception.DfdException(
+            f"Neighborhood size must be an integer or '*', not: {arg}"
+        )
+
+    return fn, is_up, is_down
+
+
 def _parse_filter(source: model.SourceLine) -> model.Statement:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
@@ -243,56 +293,19 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     while args:
         arg = args[0]
 
-        match = RX_FILTER_ARG.fullmatch(arg)
-        if not match:
+        m = RX_FILTER_ARG.fullmatch(arg)
+        if not m:
             break  # no neighbor/replacer specification
 
-        if match.group("replacer"):
+        if m.group("replacer"):
             if cmd != Keyword.WITHOUT:
                 raise exception.DfdException(
                     f"Replacer specification is only allowed for {Keyword.WITHOUT} filter"
                 )
             replacer = arg[1:]
             args = args[1:]
-        elif match.group("neighbors"):
-            fn = model.FilterNeighbors(0, False, False, False)
-            is_up = is_down = False
-
-            # parse direction indicator
-            match match.group("neighbors"):
-                case "<>":
-                    is_up = is_down = True
-                case "<":
-                    is_up = True
-                case ">":
-                    is_down = True
-                case "[":
-                    is_up = True
-                    fn.layout_dir = True
-                case "]":
-                    is_down = True
-                    fn.layout_dir = True
-
-            # parse optional modifier flags ("x", "f")
-            for flag in match.group("flags"):
-                match flag:
-                    case "x":
-                        fn.no_anchors = True
-                    case "f":
-                        fn.no_frames = True
-                    case _:
-                        raise exception.DfdException(
-                            f"Unrecognized filter flag: {flag}"
-                        )
-            # parse span (distance): "*" for unlimited, or a decimal number
-            if match.group("all"):
-                fn.distance = -1  # special value for "all neighbors"
-            elif match.group("num"):
-                fn.distance = int(match.group("num"))
-            else:
-                raise exception.DfdException(
-                    f"Neighborhood size must be an integer or '*', not: {arg}"
-                )
+        elif m.group("neighbors"):
+            fn, is_up, is_down = _parse_neighbor_spec(m, arg)
 
             # assign parsed spec to the matching direction(s)
             if is_up:
@@ -300,7 +313,6 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
             if is_down:
                 f.neighbors_down = fn
 
-            # ready for next argument
             args = args[1:]
 
     if len(args) == 0:
