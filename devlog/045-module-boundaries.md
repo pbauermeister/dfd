@@ -94,18 +94,14 @@ The orchestrator retains three functions (~125 lines total):
 - **`find_neighbors()`** (~67 lines) — neighbour traversal with its
   nested helpers (`_find_neighbors`, `_nb`, `_find_neighbors_in_dir`).
 
-### Cross-package import: parser → rendering.templates
+### Cross-package import: parser → rendering.templates (resolved)
 
-`dsl/parser.py` needs two constants from `rendering/templates.py`:
-- `ITEM_EXTERNAL_ATTRS` (used in `_parse_item_external()`)
-- `FRAME_DEFAULT_ATTRS` (used in `_parse_frame()`)
-
-This creates a one-way dependency: `dsl → rendering` (constants only,
-no behaviour). This is acceptable because:
-1. It's unidirectional (rendering never imports from dsl).
-2. The dependency is on string constants, not on classes or functions.
-3. Moving these constants elsewhere (e.g. config.py) would scatter
-   rendering concerns into infrastructure modules.
+`dsl/parser.py` originally needed two constants from
+`rendering/templates.py`: `ITEM_EXTERNAL_ATTRS` and
+`FRAME_DEFAULT_ATTRS`. Since these are only used at parse time (never
+by the rendering layer itself), they were moved to `config.py`,
+eliminating the `dsl → rendering` cross-package dependency. The two
+sub-packages are now independent siblings.
 
 ### Import style
 
@@ -206,3 +202,28 @@ Move the two existing rendering modules:
 - Update `doc/CONVENTIONS.md` target layout to include `exception.py`
 - Verify both entry points: `./data-flow-diagram` and `pip install`
 - Final `make test` on clean state
+
+## Outcome
+
+Implemented in PR #46 on branch `refactor/045-module-boundaries`.
+
+**Final line counts:**
+
+| Module                | Lines | Role                                |
+| --------------------- | ----- | ----------------------------------- |
+| `dfd.py`              | 130   | pipeline orchestrator               |
+| `dsl/scanner.py`      | 110   | DSL preprocessing                   |
+| `dsl/parser.py`       | 521   | DSL parsing                         |
+| `dsl/filters.py`      | 275   | filter engine                       |
+| `dsl/checker.py`      | 89    | dependency validation               |
+| `rendering/dot.py`    | 301   | DOT code generation                 |
+| `rendering/templates.py` | 103 | DOT template strings              |
+| `rendering/graphviz.py` | 37   | Graphviz binary invocation         |
+| `config.py`           | 8     | shared constants (incl. 2 migrated) |
+
+**Additional cleanups during review:**
+- Removed unused `get_type_hints` import and `Tuple` → `tuple` in parser
+- Removed commented-out `# dprint(text)` dead code in rendering/dot.py
+- Moved `ITEM_EXTERNAL_ATTRS` and `FRAME_DEFAULT_ATTRS` from
+  `rendering/templates.py` to `config.py`, eliminating the
+  `dsl → rendering` cross-package dependency

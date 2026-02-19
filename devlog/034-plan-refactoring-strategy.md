@@ -162,7 +162,7 @@ makes the structural moves in F easier to read and review.
 
 ---
 
-### F — Define module boundaries and move code
+### F — Define module boundaries and move code ✔ (#45, PR #46)
 
 **Goal:** Restructure the package into sub-packages following the
 target layout defined in `doc/CONVENTIONS.md`, reducing `dfd.py` from
