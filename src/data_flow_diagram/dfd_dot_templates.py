@@ -1,5 +1,48 @@
 """This module holds templates for DOT code generation."""
 
+# ── Item shapes and fills ──────────────────────────────────────────────
+
+SHAPE_PROCESS_CONTEXT = "circle"
+SHAPE_PROCESS = "ellipse"
+SHAPE_ENTITY = "rectangle"
+SHAPE_NONE = "none"
+
+FILL_PROCESS_CONTEXT = "white"
+FILL_PROCESS = '"#eeeeee"'
+
+STYLE_PROCESS = "filled"
+STYLE_CONTROL = '"filled,dashed"'
+
+# ── Connection attributes ──────────────────────────────────────────────
+# Leading space preserved — matches the existing `attrs +=` pattern.
+
+ATTR_CONSTRAINT_LABELED = " style=solid color=invis"
+ATTR_CONSTRAINT_HIDDEN = " style=invis dir=none"
+ATTR_DIR_BACK = " dir=back"
+ATTR_DIR_BOTH = " dir=both"
+ATTR_DIR_NONE = " dir=none"
+ATTR_CFLOW_TAIL = " arrowtail=normalnormal"
+ATTR_CFLOW_HEAD = " arrowhead=normalnormal"
+ATTR_STYLE_DASHED = " style=dashed"
+ATTR_RELAXED = " constraint=false"
+
+# ── Layout parameters ─────────────────────────────────────────────────
+
+LAYOUT_VERTICAL = "rankdir=TB"
+LAYOUT_HORIZONTAL = "rankdir=LR"
+ROTATION_DEGREES = 90
+
+# ── Channel, star, frame, engine ──────────────────────────────────────
+
+CHANNEL_PORT = ":x:c"
+STAR_NODE_FMT = "__star_{nr}__"
+HTML_ITEM_DEFAULTS: dict[str, str] = {"fontcolor": "black", "color": "black"}
+FRAME_DEFAULT_ATTRS = "style=dashed"
+ENGINE_CONTEXT = "neato"
+ENGINE_DEFAULT = "dot"
+
+# ── DOT templates ─────────────────────────────────────────────────────
+
 STORE = """
 "{name}" [shape=none label=<
   <TABLE BORDER="0">

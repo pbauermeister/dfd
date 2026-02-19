@@ -459,7 +459,7 @@ def _parse_frame(source: model.SourceLine) -> model.Statement:
         text = parts[1].strip()
 
     items = parts[0].split()[1:]
-    attrs = "style=dashed"
+    attrs = TMPL.FRAME_DEFAULT_ATTRS
     return model.Frame(source, Keyword.FRAME, text, attrs, items)
 
 

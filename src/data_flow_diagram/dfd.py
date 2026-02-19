@@ -99,31 +99,30 @@ class Generator:
         match copy.type:
             case model.Keyword.PROCESS:
                 if self.graph_options.is_context:
-                    shape = "circle"
-                    fc = "white"
+                    shape = TMPL.SHAPE_PROCESS_CONTEXT
+                    fc = TMPL.FILL_PROCESS_CONTEXT
                 else:
-                    shape = "ellipse"
-                    fc = '"#eeeeee"'
+                    shape = TMPL.SHAPE_PROCESS
+                    fc = TMPL.FILL_PROCESS
                 line = (
                     f'"{copy.name}" [shape={shape} label="{copy.text}" '
-                    f"fillcolor={fc} style=filled {attrs}]"
+                    f"fillcolor={fc} style={TMPL.STYLE_PROCESS} {attrs}]"
                 )
             case model.Keyword.CONTROL:
-                fc = '"#eeeeee"'
                 line = (
-                    f'"{copy.name}" [shape=ellipse label="{copy.text}" '
-                    f'fillcolor={fc} style="filled,dashed" {attrs}]'
+                    f'"{copy.name}" [shape={TMPL.SHAPE_PROCESS} label="{copy.text}" '
+                    f'fillcolor={TMPL.FILL_PROCESS} style={TMPL.STYLE_CONTROL} {attrs}]'
                 )
             case model.Keyword.ENTITY:
                 line = (
-                    f'"{copy.name}" [shape=rectangle label="{copy.text}" '
+                    f'"{copy.name}" [shape={TMPL.SHAPE_ENTITY} label="{copy.text}" '
                     f"{attrs}]"
                 )
             case model.Keyword.STORE:
                 d = self._attrib_to_dict(copy, attrs)
                 line = TMPL.STORE.format(**d)
             case model.Keyword.NONE:
-                line = f'"{copy.name}" [shape=none label="{copy.text}" {attrs}]'
+                line = f'"{copy.name}" [shape={TMPL.SHAPE_NONE} label="{copy.text}" {attrs}]'
             case model.Keyword.CHANNEL:
                 d = self._attrib_to_dict(copy, attrs)
                 if self.graph_options.is_vertical:
@@ -139,7 +138,7 @@ class Generator:
 
     def _attrib_to_dict(self, item: model.Item, attrs: str) -> dict[str, str]:
         d = self._item_to_html_dict(item)
-        d.update({"fontcolor": "black", "color": "black"})
+        d.update(TMPL.HTML_ITEM_DEFAULTS.copy())
 
         def strip_quotes(s: str) -> str:
             if s.startswith('"'):
@@ -198,7 +197,7 @@ class Generator:
 
     def generate_star(self, text: str) -> str:
         text = wrap(text, self.graph_options.item_text_width)
-        star_name = f"__star_{self.star_nr}__"
+        star_name = TMPL.STAR_NODE_FMT.format(nr=self.star_nr)
         line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
         self.lines.append(line)
         self.star_nr += 1
@@ -223,7 +222,7 @@ class Generator:
         else:
             src_name = src_item.name
             if src_item.type == model.Keyword.CHANNEL:
-                src_port = ":x:c"
+                src_port = TMPL.CHANNEL_PORT
 
         if not dst_item:
             dst_name = self.generate_star(text)
@@ -231,7 +230,7 @@ class Generator:
         else:
             dst_name = dst_item.name
             if dst_item.type == model.Keyword.CHANNEL:
-                dst_port = ":x:c"
+                dst_port = TMPL.CHANNEL_PORT
 
         # build edge attributes, starting with the label
         attrs = f'label="{text}"'
@@ -241,10 +240,10 @@ class Generator:
             case model.Keyword.CONSTRAINT:
                 if text and not conn.attrs:
                     # transparent edge, to reveal the label
-                    attrs += " style=solid color=invis"
+                    attrs += TMPL.ATTR_CONSTRAINT_LABELED
                 else:
                     # invisible edge and label
-                    attrs += " style=invis dir=none"
+                    attrs += TMPL.ATTR_CONSTRAINT_HIDDEN
 
         if conn.attrs:
             attrs += " " + self._expand_attribs(conn.attrs)
@@ -253,21 +252,21 @@ class Generator:
         match conn.type:
             case model.Keyword.FLOW:
                 if conn.reversed:
-                    attrs += " dir=back"
+                    attrs += TMPL.ATTR_DIR_BACK
             case model.Keyword.BFLOW:
-                attrs += " dir=both"
+                attrs += TMPL.ATTR_DIR_BOTH
             case model.Keyword.CFLOW:
                 if conn.reversed:
-                    attrs += " dir=back"
-                    attrs += " arrowtail=normalnormal"
+                    attrs += TMPL.ATTR_DIR_BACK
+                    attrs += TMPL.ATTR_CFLOW_TAIL
                 else:
-                    attrs += " arrowhead=normalnormal"
+                    attrs += TMPL.ATTR_CFLOW_HEAD
             case model.Keyword.UFLOW:
-                attrs += " dir=none"
+                attrs += TMPL.ATTR_DIR_NONE
             case model.Keyword.SIGNAL:
                 if conn.reversed:
-                    attrs += " dir=back"
-                attrs += " style=dashed"
+                    attrs += TMPL.ATTR_DIR_BACK
+                attrs += TMPL.ATTR_STYLE_DASHED
             case model.Keyword.CONSTRAINT:
                 pass
             case _:
@@ -276,7 +275,7 @@ class Generator:
                     f"{prefix}Unsupported connection type " f'"{conn.type}"'
                 )
         if conn.relaxed:
-            attrs += " constraint=false"
+            attrs += TMPL.ATTR_RELAXED
 
         line = f'"{src_name}"{src_port} -> "{dst_name}"{dst_port} [{attrs}]'
         self.append(line, conn)
@@ -312,12 +311,12 @@ class Generator:
             graph_params.append(TMPL.DOT_GRAPH_NOTITLE)
 
         if self.graph_options.is_vertical:
-            graph_params.append("rankdir=TB")
+            graph_params.append(TMPL.LAYOUT_VERTICAL)
         else:
-            graph_params.append("rankdir=LR")
+            graph_params.append(TMPL.LAYOUT_HORIZONTAL)
 
         if self.graph_options.is_rotated:
-            graph_params.append(f"rotate=90")
+            graph_params.append(f"rotate={TMPL.ROTATION_DEGREES}")
 
         if bg_color:
             graph_params.append(f"bgcolor={bg_color}")
