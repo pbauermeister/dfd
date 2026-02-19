@@ -1,4 +1,4 @@
-"""Tests for the scanner and parser (scanner.scan, parser.parse, parser.check).
+"""Tests for the scanner, parser, and checker (scanner.scan, parser.parse, checker.check).
 
 The scanner is exercised here as a prerequisite to parsing; dedicated scanner
 tests (e.g. for include resolution) belong in test_scanner.py.
@@ -7,7 +7,7 @@ tests (e.g. for include resolution) belong in test_scanner.py.
 import pytest
 
 from data_flow_diagram import exception, model
-from data_flow_diagram.dsl import parser, scanner
+from data_flow_diagram.dsl import checker, parser, scanner
 
 # ── Valid syntax fixture ──────────────────────────────────────────────────────
 
@@ -38,7 +38,7 @@ ALL_ITEMS_AND_CONNECTIONS = """
 
 # ── Error case fixtures ───────────────────────────────────────────────────────
 
-# Each entry: (dfd_text, pytest id).  All should make parser.check() raise.
+# Each entry: (dfd_text, pytest id).  All should make checker.check() raise.
 CHECK_ERROR_CASES = [
     pytest.param(
         """
@@ -124,7 +124,7 @@ def test_parse_valid_syntax() -> None:
     tokens = scanner.scan(None, ALL_ITEMS_AND_CONNECTIONS)
     try:
         statements, _, _ = parser.parse(tokens)
-        parser.check(statements)
+        checker.check(statements)
     except exception.DfdException as e:
         pytest.fail(f"Unexpected DfdException on valid syntax: {e}")
 
@@ -142,7 +142,7 @@ def test_check_raises(dfd_text: str) -> None:
     tokens = scanner.scan(None, dfd_text)
     statements, _, _ = parser.parse(tokens)
     with pytest.raises(exception.DfdException):
-        parser.check(statements)
+        checker.check(statements)
 
 
 @pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)  # type: ignore[misc]

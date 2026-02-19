@@ -99,6 +99,7 @@ src/data_flow_diagram/
         __init__.py
         scanner.py          # preprocessing: includes, line continuations
         parser.py           # DSL parsing: keyword dispatch, syntactic sugar
+        checker.py          # statement validation: items, connections, frames
         filters.py          # filter engine: only/without, neighbours
         dependency_checker.py  # cross-document dependency validation
     rendering/

@@ -9,6 +9,34 @@ from .. import exception, model
 from . import templates as TMPL
 
 
+def _strip_quotes(s: str) -> str:
+    """Remove matching quotes from a string."""
+    if s.startswith('"'):
+        return s.strip('"')
+    elif s.startswith("'"):
+        return s.strip("'")
+    return s
+
+
+def _split_attr(s: str, item: model.Item) -> tuple[str, str]:
+    """Split a key=value attribute string, raising on invalid format."""
+    pair = s.split("=", 1)
+    if len(pair) != 2:
+        raise exception.DfdException(
+            f'Invalid attribute "{s}" in item "{item.name}"'
+            "; maybe referring to an inexistent attrib alias?",
+            source=item.source,
+        )
+    return pair[0], pair[1]
+
+
+def _get_item(
+    name: str, items_by_name: dict[str, model.Item]
+) -> model.Item | None:
+    """Look up an item by name, returning None for star endpoints."""
+    return None if name == model.NODE_STAR else items_by_name[name]
+
+
 def wrap(text: str, cols: int) -> str:
     res: list[str] = []
     for each in text.strip().split("\\n"):
@@ -93,26 +121,9 @@ class Generator:
         d = self._item_to_html_dict(item)
         d.update(TMPL.HTML_ITEM_DEFAULTS.copy())
 
-        def strip_quotes(s: str) -> str:
-            if s.startswith('"'):
-                return s.strip('"')
-            elif s.startswith("'"):
-                return s.strip("'")
-            return s
-
-        def split_attr(s: str) -> tuple[str, str]:
-            pair = s.split("=", 1)
-            if len(pair) != 2:
-                raise exception.DfdException(
-                    f'Invalid attribute "{s}" in item "{item.name}"'
-                    "; maybe referring to an inexistent attrib alias?",
-                    source=item.source,
-                )
-            return pair[0], pair[1]
-
         attrs_d = {
-            k: strip_quotes(v)
-            for k, v in [split_attr(each) for each in attrs.split()]
+            k: _strip_quotes(v)
+            for k, v in [_split_attr(each, item) for each in attrs.split()]
         }
         d.update(attrs_d)
         return d
@@ -156,46 +167,16 @@ class Generator:
         self.star_nr += 1
         return star_name
 
-    def generate_connection(
-        self,
-        conn: model.Connection,
-        src_item: model.Item | None,
-        dst_item: model.Item | None,
-    ) -> None:
-        """Emit the DOT edge declaration for a connection."""
-        text = conn.text or ""
-        text = wrap(text, self.graph_options.connection_text_width)
-
-        # resolve endpoints: anonymous ("*") items become star nodes
-        src_port = dst_port = ""
-
-        if not src_item:
-            src_name = self.generate_star(text)
-            text = ""
-        else:
-            src_name = src_item.name
-            if src_item.type == model.Keyword.CHANNEL:
-                src_port = TMPL.CHANNEL_PORT
-
-        if not dst_item:
-            dst_name = self.generate_star(text)
-            text = ""
-        else:
-            dst_name = dst_item.name
-            if dst_item.type == model.Keyword.CHANNEL:
-                dst_port = TMPL.CHANNEL_PORT
-
-        # build edge attributes, starting with the label
+    def _build_connection_attrs(self, conn: model.Connection, text: str) -> str:
+        """Build the DOT attribute string for a connection edge."""
         attrs = f'label="{text}"'
 
+        # constraints are invisible layout-only edges
         match conn.type:
-            # Constraints are invisible layout-only edges
             case model.Keyword.CONSTRAINT:
                 if text and not conn.attrs:
-                    # transparent edge, to reveal the label
                     attrs += TMPL.ATTR_CONSTRAINT_LABELED
                 else:
-                    # invisible edge and label
                     attrs += TMPL.ATTR_CONSTRAINT_HIDDEN
 
         if conn.attrs:
@@ -230,6 +211,38 @@ class Generator:
         if conn.relaxed:
             attrs += TMPL.ATTR_RELAXED
 
+        return attrs
+
+    def generate_connection(
+        self,
+        conn: model.Connection,
+        src_item: model.Item | None,
+        dst_item: model.Item | None,
+    ) -> None:
+        """Emit the DOT edge declaration for a connection."""
+        text = conn.text or ""
+        text = wrap(text, self.graph_options.connection_text_width)
+
+        # resolve endpoints: anonymous ("*") items become star nodes
+        src_port = dst_port = ""
+
+        if not src_item:
+            src_name = self.generate_star(text)
+            text = ""
+        else:
+            src_name = src_item.name
+            if src_item.type == model.Keyword.CHANNEL:
+                src_port = TMPL.CHANNEL_PORT
+
+        if not dst_item:
+            dst_name = self.generate_star(text)
+            text = ""
+        else:
+            dst_name = dst_item.name
+            if dst_item.type == model.Keyword.CHANNEL:
+                dst_port = TMPL.CHANNEL_PORT
+
+        attrs = self._build_connection_attrs(conn, text)
         line = f'"{src_name}"{src_port} -> "{dst_name}"{dst_port} [{attrs}]'
         self.append(line, conn)
 
@@ -293,17 +306,14 @@ def generate_dot(
 ) -> str:
     """Iterate over statements and generate a dot source file"""
 
-    def get_item(name: str) -> model.Item | None:
-        return None if name == model.NODE_STAR else items_by_name[name]
-
     for statement in statements:
         match statement:
             case model.Item() as item:
                 gen.generate_item(item)
 
             case model.Connection() as connection:
-                src_item = get_item(connection.src)
-                dst_item = get_item(connection.dst)
+                src_item = _get_item(connection.src, items_by_name)
+                dst_item = _get_item(connection.dst, items_by_name)
                 gen.generate_connection(connection, src_item, dst_item)
 
             case model.Style() as style:
