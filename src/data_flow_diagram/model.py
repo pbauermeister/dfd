@@ -120,12 +120,12 @@ class Frame(Drawable):
 
 @dataclass
 class FilterNeighbors:
-    distance: int  # span: how many levels of neighbours (-1 = unlimited)
-    no_anchors: bool  # "x" flag: select only neighbours, not anchors
-    layout_dir: (
+    distance: int  # span: how many levels of neighbors (-1 = unlimited)
+    suppress_anchors: bool  # "x" flag: select only neighbors, not anchors
+    layout_direction: (
         bool  # use layout direction (left/right) instead of flow direction
     )
-    no_frames: bool  # "f" flag: suppress frames involving selected items
+    suppress_frames: bool  # "f" flag: suppress frames involving selected items
 
 
 @dataclass
@@ -206,8 +206,8 @@ class Keyword(StrEnum):
 ##############################################################################
 # DSL syntax literals
 
-NODE_STAR = "*"  # anonymous endpoint: generates a distinct "none" item
-ALL_NEIGHBORS = "*"  # unlimited span in filter neighbour spec
+ENDPOINT_STAR = "*"  # anonymous endpoint: generates a distinct "none" item
+ALL_NEIGHBORS = "*"  # unlimited span in filter neighbor spec
 SNIPPET_PREFIX = "#"  # prefix distinguishing snippet references from file paths
 INCLUDE_DIRECTIVE = "#include"  # DSL directive for including external sources
 

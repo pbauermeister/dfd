@@ -1,4 +1,4 @@
-"""Filter engine: only/without, neighbour expansion."""
+"""Filter engine: only/without, neighbor expansion."""
 
 from .. import exception, model
 from ..console import dprint
@@ -7,8 +7,8 @@ from ..console import dprint
 def _collect_connected_names(
     statements: model.Statements,
     names: set[str],
-    find_down: bool,
-    nreverse: bool,
+    search_downstream: bool,
+    use_layout_direction: bool,
 ) -> set[str]:
     """Find items connected to a set of names in one direction."""
     found_names: set[str] = set()
@@ -21,7 +21,7 @@ def _collect_connected_names(
                     continue
 
                 src, dst = conn.src, conn.dst
-                if conn.reversed and not nreverse:
+                if conn.reversed and not use_layout_direction:
                     src, dst = dst, src
 
                 if conn.type in (model.Keyword.BFLOW, model.Keyword.UFLOW):
@@ -30,7 +30,7 @@ def _collect_connected_names(
                     if src in names:
                         found_names.add(dst)
                 else:
-                    if find_down:
+                    if search_downstream:
                         if src in names:
                             found_names.add(dst)
                     else:
@@ -55,12 +55,15 @@ def _expand_neighbors_in_dir(
     fn: model.FilterNeighbors,
     down: bool,
 ) -> set[str]:
-    """Expand neighbours in one direction by successive waves of connections."""
+    """Expand neighbors in one direction by successive waves of connections."""
     names = set(anchor_names)
     neighbor_names: set[str] = set()
     for i in range(_resolve_distance(fn.distance, max_neighbors)):
         names = _collect_connected_names(
-            statements, names, find_down=down, nreverse=fn.layout_dir
+            statements,
+            names,
+            search_downstream=down,
+            use_layout_direction=fn.layout_direction,
         )
         if not names:
             break
@@ -78,7 +81,7 @@ def find_neighbors(
     max_neighbors: int,
     debug: bool,
 ) -> tuple[set[str], set[str]]:
-    """Collect neighbour names by following connections outward from filter anchors."""
+    """Collect neighbor names by following connections outward from filter anchors."""
     return _expand_neighbors_in_dir(
         statements,
         filter.names,
@@ -116,14 +119,14 @@ def _collect_frame_skips(
     ups: set[str],
     skip_frames_for_names: set[str],
 ) -> None:
-    """Record names whose frames should be suppressed (neighbor-only mode)."""
-    if f.neighbors_up.no_frames:
+    """Record names whose frames should be suppressed (neighbors-only mode)."""
+    if f.neighbors_up.suppress_frames:
         skip_frames_for_names.update(ups)
-        if not f.neighbors_up.no_anchors:
+        if not f.neighbors_up.suppress_anchors:
             skip_frames_for_names.update(names)
-    if f.neighbors_down.no_frames:
+    if f.neighbors_down.suppress_frames:
         skip_frames_for_names.update(downs)
-        if not f.neighbors_down.no_anchors:
+        if not f.neighbors_down.suppress_anchors:
             skip_frames_for_names.update(names)
 
 
@@ -158,16 +161,16 @@ def _collect_kept_names(
                     names, all_names, all_names, statement.source
                 )
 
-                # add anchor names (suppressed by "x" flag: neighbours only)
+                # add anchor names (suppressed by "x" flag: neighbors only)
                 if (
-                    not f.neighbors_up.no_anchors
-                    and not f.neighbors_down.no_anchors
+                    not f.neighbors_up.suppress_anchors
+                    and not f.neighbors_down.suppress_anchors
                 ):
-                    dprint("ONLY: adding nodes:", names)
+                    dprint("ONLY: adding items:", names)
                     kept_names.update(f.names)
                     only_names.update(f.names)
 
-                # add upstream/downstream neighbour names
+                # add upstream/downstream neighbor names
                 downs, ups = find_neighbors(
                     f, statements, len(all_names), debug
                 )
@@ -195,15 +198,15 @@ def _collect_kept_names(
                     names_to_check, kept_names, all_names, statement.source
                 )
 
-                # remove anchor names (suppressed by "x" flag: neighbours only)
+                # remove anchor names (suppressed by "x" flag: neighbors only)
                 if (
-                    not f.neighbors_up.no_anchors
-                    and not f.neighbors_down.no_anchors
+                    not f.neighbors_up.suppress_anchors
+                    and not f.neighbors_down.suppress_anchors
                 ):
-                    dprint("WITHOUT: removing nodes:", names)
+                    dprint("WITHOUT: removing items:", names)
                     kept_names.difference_update(names)
 
-                # remove upstream/downstream neighbour names
+                # remove upstream/downstream neighbor names
                 downs, ups = find_neighbors(
                     f, statements, len(all_names), debug
                 )

@@ -34,7 +34,7 @@ def _get_item(
     name: str, items_by_name: dict[str, model.Item]
 ) -> model.Item | None:
     """Look up an item by name, returning None for star endpoints."""
-    return None if name == model.NODE_STAR else items_by_name[name]
+    return None if name == model.ENDPOINT_STAR else items_by_name[name]
 
 
 def wrap(text: str, cols: int) -> str:
@@ -64,7 +64,7 @@ class Generator:
         self.lines.append(line)
 
     def generate_item(self, item: model.Item) -> None:
-        """Emit the DOT node declaration for a single item."""
+        """Emit the DOT declaration for a single item."""
 
         # prepare a working copy with text wrapping and attrib expansion
         copy = model.Item(**item.__dict__)
@@ -161,7 +161,7 @@ class Generator:
 
     def generate_star(self, text: str) -> str:
         text = wrap(text, self.graph_options.item_text_width)
-        star_name = TMPL.STAR_NODE_FMT.format(nr=self.star_nr)
+        star_name = TMPL.STAR_ITEM_FMT.format(nr=self.star_nr)
         line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
         self.lines.append(line)
         self.star_nr += 1
@@ -223,7 +223,7 @@ class Generator:
         text = conn.text or ""
         text = wrap(text, self.graph_options.connection_text_width)
 
-        # resolve endpoints: anonymous ("*") items become star nodes
+        # resolve endpoints: anonymous ("*") items become star items
         src_port = dst_port = ""
 
         if not src_item:

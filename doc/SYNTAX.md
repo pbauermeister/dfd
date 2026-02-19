@@ -9,10 +9,8 @@ user-facing documentation (`doc/README.md`) and the implementation.
 
 ## Glossary
 
-The terms below are authoritative. Use them in comments, documentation,
-and commit messages. When a code identifier uses a different word (e.g.
-`no_anchors` for the "x" flag), the comment should use the official term;
-the identifier will be fixed in a future refactoring.
+The terms below are authoritative. Use them in code identifiers, comments,
+documentation, and commit messages.
 
 ### Core concepts
 
@@ -82,14 +80,14 @@ the identifier will be fixed in a future refactoring.
 | **Only filter** (`!`)      | Additive: adds items to the kept set.                                     |
 | **Without filter** (`~`)   | Subtractive: removes items from the kept set.                             |
 | **kept set**               | The set of item names retained after all filters have been processed.     |
-| **anchor**                 | An item explicitly listed in a filter (as opposed to its neighbours). Called "listed items" in `doc/README.md`. |
-| **neighbour**              | An item reachable from an anchor by traversing connections.               |
+| **anchor**                 | An item explicitly listed in a filter (as opposed to its neighbors). Called "listed items" in `doc/README.md`. |
+| **neighbor**              | An item reachable from an anchor by traversing connections.               |
 | **upstream**               | Toward the source of a flow.                                              |
 | **downstream**             | Toward the destination of a flow.                                         |
 | **left** / **right**       | Layout-based direction (as rendered by Graphviz), orthogonal to the flow. |
 | **direction**              | Upstream, downstream, left, or right.                                     |
-| **span**                   | How many levels of neighbours to traverse (`*` = unlimited, or integer).  |
-| **"x" flag**               | Suppress anchors: select only neighbours, not the listed items themselves. |
+| **span**                   | How many levels of neighbors to traverse (`*` = unlimited, or integer).  |
+| **"x" flag**               | Suppress anchors: select only neighbors, not the listed items themselves. |
 | **"f" flag**               | Suppress frames: remove frames involving the selected items.              |
 | **replacement**            | An item that takes over connections from removed items (`=NAME` in Without). |
 
@@ -246,7 +244,7 @@ Filters manipulate the **kept set** to produce diagram subsets.
 ```
 
 Additive: the first `!` initialises the kept set to empty, then adds the
-anchors (and optionally their neighbours).
+anchors (and optionally their neighbors).
 
 ### 7.2. Without filter (`~`)
 
@@ -255,7 +253,7 @@ anchors (and optionally their neighbours).
 ```
 
 Subtractive: the first `~` initialises the kept set to all names, then
-removes the anchors (and optionally their neighbours).
+removes the anchors (and optionally their neighbors).
 
 The `=REPLACEMENT` syntax rewires connections from removed items to the
 replacement item instead of discarding them.
@@ -269,18 +267,18 @@ DIRECTION[FLAGS]SPAN
 | Part        | Values                                           |
 | ----------- | ------------------------------------------------ |
 | `DIRECTION` | `>` downstream, `<` upstream, `<>` both, `[` left, `]` right |
-| `FLAGS`     | `x` = suppress anchors (neighbours only), `f` = suppress frames |
+| `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames |
 | `SPAN`      | `*` = unlimited, or integer distance              |
 
 Examples: `>*` (all downstream), `<>2` (two levels in both directions),
-`<>xf2` (two levels, neighbours only, suppress frames).
+`<>xf2` (two levels, neighbors only, suppress frames).
 
 ### 7.4. Filter semantics
 
 Filters are processed **sequentially** in source order:
 
-1. Each `!` adds anchors (and their neighbours) to the kept set.
-2. Each `~` removes anchors (and their neighbours) from the kept set.
+1. Each `!` adds anchors (and their neighbors) to the kept set.
+2. Each `~` removes anchors (and their neighbors) from the kept set.
 3. Anchors referenced by a filter must exist and be currently available in
    the kept set; otherwise an error is raised.
 4. After all filters are processed, statements are filtered: items not in

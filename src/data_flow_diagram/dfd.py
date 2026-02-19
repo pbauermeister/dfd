@@ -58,8 +58,8 @@ def remove_unused_hidables(statements: model.Statements) -> model.Statements:
                 pass
             case _:
                 continue
-        for point in conn.src, conn.dst:
-            connected_items.add(point)
+        for endpoint in conn.src, conn.dst:
+            connected_items.add(endpoint)
 
     # filter out unconnected items
     new_statements = []

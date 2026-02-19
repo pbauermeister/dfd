@@ -35,7 +35,7 @@ ROTATION_DEGREES = 90
 # ── Channel, star, frame, engine ──────────────────────────────────────
 
 CHANNEL_PORT = ":x:c"
-STAR_NODE_FMT = "__star_{nr}__"
+STAR_ITEM_FMT = "__star_{nr}__"
 HTML_ITEM_DEFAULTS: dict[str, str] = {"fontcolor": "black", "color": "black"}
 ENGINE_CONTEXT = "neato"
 ENGINE_DEFAULT = "dot"

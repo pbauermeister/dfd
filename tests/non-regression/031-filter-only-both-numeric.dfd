@@ -1,4 +1,4 @@
 #include tests/non-regression/028-filter-master.part
 
-# keep P2 and neighbours up to 2 levels in both directions
+# keep P2 and neighbors up to 2 levels in both directions
 !<>2 P2

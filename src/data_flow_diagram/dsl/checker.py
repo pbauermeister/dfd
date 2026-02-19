@@ -40,22 +40,22 @@ def _check_connections(
             case _:
                 continue
         nb_stars = 0
-        for point in conn.src, conn.dst:
-            if point == model.NODE_STAR:
+        for endpoint in conn.src, conn.dst:
+            if endpoint == model.ENDPOINT_STAR:
                 nb_stars += 1
-            if point != model.NODE_STAR:
-                if point not in items_by_name:
+            if endpoint != model.ENDPOINT_STAR:
+                if endpoint not in items_by_name:
                     raise exception.DfdException(
-                        f'Connection "{conn.type}" links to "{point}", '
+                        f'Connection "{conn.type}" connects to "{endpoint}", '
                         f"which is not defined",
                         source=statement.source,
                     )
                 if (
-                    items_by_name[point].type == Keyword.CONTROL
+                    items_by_name[endpoint].type == Keyword.CONTROL
                     and conn.type != Keyword.SIGNAL
                 ):
                     raise exception.DfdException(
-                        f'Connection to {Keyword.CONTROL} "{point}" is '
+                        f'Connection to {Keyword.CONTROL} "{endpoint}" is '
                         f'of type "{conn.type}", however only connections of type '
                         f'"{Keyword.SIGNAL}" are allowed',
                         source=statement.source,
@@ -63,7 +63,8 @@ def _check_connections(
 
         if nb_stars == 2:
             raise exception.DfdException(
-                f'Connection "{conn.type}" may not link to two ' f"stars",
+                f'Connection "{conn.type}" may not connect two '
+                f"anonymous endpoints",
                 source=statement.source,
             )
 

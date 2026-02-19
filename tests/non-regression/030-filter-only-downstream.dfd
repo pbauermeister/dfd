@@ -1,4 +1,4 @@
 #include tests/non-regression/028-filter-master.part
 
-# keep S1 and all its downstream neighbours (unlimited span)
+# keep S1 and all its downstream neighbors (unlimited span)
 !>* S1
