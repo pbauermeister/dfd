@@ -6,9 +6,6 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 4: process etl ETL */
-  "etl" [shape=ellipse label="ETL" fillcolor="#eeeeee" style=filled ]
-
   /* 5: process proc_flow process data flow */
   "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
 
@@ -20,9 +17,24 @@ digraph D {
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 22: flow etl db_raw */
-  "etl" -> "db_raw" [label=""]
+  /* 12: store db_params Parameters */
+  "db_params" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Parameters</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
+
+  /* 18: frame db_aggr db_fcast db_params = Computation results */
+  subgraph cluster_0 {
+    label="Computation results"
+    style=dashed
+    "db_params"
+  }
 
   /* 23: flow db_raw proc_flow */
   "db_raw" -> "proc_flow" [label=""]
+
+  /* 26: flow.r proc_flow db_params alert thresh */
+  "proc_flow" -> "db_params" [label="alert thresh" dir=back]
 }

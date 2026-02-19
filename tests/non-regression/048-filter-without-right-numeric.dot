@@ -12,8 +12,22 @@ digraph D {
   /* 4: process etl ETL */
   "etl" [shape=ellipse label="ETL" fillcolor="#eeeeee" style=filled ]
 
+  /* 5: process proc_flow process data flow */
+  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
+
+  /* 6: entity user User */
+  "user" [shape=rectangle label="User" ]
+
   /* 7: process ext External system */
   "ext" [shape=ellipse label="External system" fillcolor="#eeeeee" style=filled ]
+
+  /* 9: store db_aggr Aggregated data */
+  "db_aggr" [shape=none label=<
+    <TABLE BORDER="0">
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
+      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
+    </TABLE>>]
 
   /* 10: store db_fcast Forecasts */
   "db_fcast" [shape=none label=<
@@ -31,28 +45,12 @@ digraph D {
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 
-  /* 14: process optim optimize params */
-  "optim" [shape=ellipse label="optimize params" fillcolor="#eeeeee" style=filled ]
-
-  /* 15: process forecast compute forecasts */
-  "forecast" [shape=ellipse label="compute forecasts" fillcolor="#eeeeee" style=filled ]
-
-  /* 16: process interact handle interactions */
-  "interact" [shape=ellipse label="handle interactions" fillcolor="#eeeeee" style=filled ]
-
   /* 18: frame db_aggr db_fcast db_params = Computation results */
   subgraph cluster_0 {
     label="Computation results"
     style=dashed
+    "db_aggr"
     "db_fcast"
-  }
-
-  /* 19: frame optim forecast = Batch processing */
-  subgraph cluster_1 {
-    label="Batch processing"
-    style=dashed
-    "optim"
-    "forecast"
   }
 
   /* 21: flow ds etl */
@@ -61,12 +59,12 @@ digraph D {
   /* 22: flow etl db_raw */
   "etl" -> "db_raw" [label=""]
 
-  /* 33: flow.r db_fcast forecast */
-  "db_fcast" -> "forecast" [label="" dir=back]
+  /* 23: flow db_raw proc_flow */
+  "db_raw" -> "proc_flow" [label=""]
 
-  /* 36: flow db_fcast interact */
-  "db_fcast" -> "interact" [label=""]
+  /* 25: flow proc_flow db_aggr */
+  "proc_flow" -> "db_aggr" [label=""]
 
-  /* 38: flow interact ext */
-  "interact" -> "ext" [label=""]
+  /* 27: signal proc_flow user alert */
+  "proc_flow" -> "user" [label="alert" style=dashed]
 }

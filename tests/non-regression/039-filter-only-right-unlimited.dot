@@ -6,22 +6,11 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 5: process proc_flow process data flow */
-  "proc_flow" [shape=ellipse label="process data flow" fillcolor="#eeeeee" style=filled ]
-
   /* 6: entity user User */
   "user" [shape=rectangle label="User" ]
 
   /* 7: process ext External system */
   "ext" [shape=ellipse label="External system" fillcolor="#eeeeee" style=filled ]
-
-  /* 9: store db_aggr Aggregated data */
-  "db_aggr" [shape=none label=<
-    <TABLE BORDER="0">
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Aggregated data</FONT></TD></TR>
-      <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-    </TABLE>>]
 
   /* 12: store db_params Parameters */
   "db_params" [shape=none label=<
@@ -44,7 +33,6 @@ digraph D {
   subgraph cluster_0 {
     label="Computation results"
     style=dashed
-    "db_aggr"
     "db_params"
   }
 
@@ -56,26 +44,11 @@ digraph D {
     "forecast"
   }
 
-  /* 25: flow proc_flow db_aggr */
-  "proc_flow" -> "db_aggr" [label=""]
-
-  /* 26: flow.r proc_flow db_params alert thresh */
-  "proc_flow" -> "db_params" [label="alert thresh" dir=back]
-
-  /* 27: signal proc_flow user alert */
-  "proc_flow" -> "user" [label="alert" style=dashed]
-
   /* 29: flow.r db_params optim new params */
   "db_params" -> "optim" [label="new params" dir=back]
 
-  /* 31: flow db_aggr forecast */
-  "db_aggr" -> "forecast" [label=""]
-
   /* 32: flow db_params forecast horizon */
   "db_params" -> "forecast" [label="horizon"]
-
-  /* 35: flow db_aggr interact */
-  "db_aggr" -> "interact" [label=""]
 
   /* 37: flow interact user */
   "interact" -> "user" [label=""]
