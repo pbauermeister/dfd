@@ -4,6 +4,74 @@ from .. import exception, model
 from ..console import dprint
 
 
+def _collect_connected_names(
+    statements: model.Statements,
+    names: set[str],
+    find_down: bool,
+    nreverse: bool,
+) -> set[str]:
+    """Find items connected to a set of names in one direction."""
+    found_names: set[str] = set()
+    for statement in statements:
+        match statement:
+            case model.Connection() as conn:
+
+                # constraints do not define neighborhood
+                if conn.type == model.Keyword.CONSTRAINT:
+                    continue
+
+                src, dst = conn.src, conn.dst
+                if conn.reversed and not nreverse:
+                    src, dst = dst, src
+
+                if conn.type in (model.Keyword.BFLOW, model.Keyword.UFLOW):
+                    if dst in names:
+                        found_names.add(src)
+                    if src in names:
+                        found_names.add(dst)
+                else:
+                    if find_down:
+                        if src in names:
+                            found_names.add(dst)
+                    else:
+                        if dst in names:
+                            found_names.add(src)
+            case _:
+                continue
+    return found_names
+
+
+def _resolve_distance(distance: int, max_neighbors: int) -> int:
+    """Resolve a neighbor distance, treating negative as unlimited."""
+    if distance < 0:
+        return max_neighbors
+    return distance
+
+
+def _expand_neighbors_in_dir(
+    statements: model.Statements,
+    anchor_names: list[str],
+    max_neighbors: int,
+    fn: model.FilterNeighbors,
+    down: bool,
+) -> set[str]:
+    """Expand neighbours in one direction by successive waves of connections."""
+    names = set(anchor_names)
+    neighbor_names: set[str] = set()
+    for i in range(_resolve_distance(fn.distance, max_neighbors)):
+        names = _collect_connected_names(
+            statements, names, find_down=down, nreverse=fn.layout_dir
+        )
+        if not names:
+            break
+        dprint(f"  - {i} {down} {fn}")
+        dprint(f"     :", neighbor_names)
+        dprint(f"   + :", names)
+        neighbor_names.update(names)
+        dprint(f"   = :", neighbor_names)
+    return neighbor_names
+
+
 def find_neighbors(
     filter: model.Filter,
     statements: model.Statements,
@@ -11,66 +79,15 @@ def find_neighbors(
     debug: bool,
 ) -> tuple[set[str], set[str]]:
     """Collect neighbour names by following connections outward from filter anchors."""
-
-    def _find_neighbors(
-        names: set[str], find_down: bool, nreverse: bool
-    ) -> set[str]:
-        found_names: set[str] = set()
-        for statement in statements:
-            match statement:
-                case model.Connection() as conn:
-
-                    # constraints do not define neighborhood
-                    if conn.type == model.Keyword.CONSTRAINT:
-                        continue
-
-                    src, dst = conn.src, conn.dst
-                    if conn.reversed and not nreverse:
-                        src, dst = dst, src
-
-                    if conn.type in (model.Keyword.BFLOW, model.Keyword.UFLOW):
-                        if dst in names:
-                            found_names.add(src)
-                        if src in names:
-                            found_names.add(dst)
-                    else:
-                        if find_down:
-                            if src in names:
-                                found_names.add(dst)
-                        else:
-                            if dst in names:
-                                found_names.add(src)
-                case _:
-                    continue
-        return found_names
-
-    def _nb(nb: int) -> int:
-        if nb < 0:
-            return max_neighbors
-        return nb
-
-    # expand neighbours in one direction by successive waves of connections
-    def _find_neighbors_in_dir(
-        fn: model.FilterNeighbors, down: bool
-    ) -> set[str]:
-        names = set(filter.names)
-        neighbor_names: set[str] = set()
-        for i in range(_nb(fn.distance)):
-            names = _find_neighbors(
-                names, find_down=down, nreverse=fn.layout_dir
-            )
-            if not names:
-                break
-            dprint(f"  - {i} {down} {fn}")
-            dprint(f"     :", neighbor_names)
-            dprint(f"   + :", names)
-            neighbor_names.update(names)
-            dprint(f"   = :", neighbor_names)
-        return neighbor_names
-
-    return _find_neighbors_in_dir(
-        filter.neighbors_down, down=True
-    ), _find_neighbors_in_dir(filter.neighbors_up, down=False)
+    return _expand_neighbors_in_dir(
+        statements,
+        filter.names,
+        max_neighbors,
+        filter.neighbors_down,
+        down=True,
+    ), _expand_neighbors_in_dir(
+        statements, filter.names, max_neighbors, filter.neighbors_up, down=False
+    )
 
 
 def handle_filters(
