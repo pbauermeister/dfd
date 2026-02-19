@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: ! =replacement A
+  line 1: <file:tests/non-regression/061-err-filter-replacer-on-only.dfd>
+Error: Replacer specification is only allowed for ~ filter

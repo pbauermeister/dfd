@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 3: frame A = F2
+  line 1: <file:tests/non-regression/055-err-frame-item-in-multiple.dfd>
+Error: Item "A", is in multiple frames

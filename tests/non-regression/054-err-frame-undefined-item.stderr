@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: frame X = Title
+  line 1: <file:tests/non-regression/054-err-frame-undefined-item.dfd>
+Error: Frame includes "X", which is not defined

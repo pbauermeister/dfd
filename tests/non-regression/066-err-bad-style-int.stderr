@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: style item-text-width abc
+  line 1: <file:tests/non-regression/066-err-bad-style-int.dfd>
+Error: invalid literal for int() with base 10: 'abc'"

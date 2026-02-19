@@ -6,9 +6,17 @@ set -e
 NR_DIR=tests/non-regression
 
 for dfd in "$NR_DIR"/*.dfd; do
+    case "$dfd" in *-err-*) continue ;; esac
     svg="${dfd%.dfd}.svg"
     echo "  $dfd -> $svg"
     ./data-flow-diagram "$dfd" -f svg -o "$svg"
+done
+
+# Error fixtures: show stderr output for inspection
+for dfd in "$NR_DIR"/*-err-*.dfd; do
+    [ -f "$dfd" ] || continue
+    echo "  $dfd (error output):"
+    ./data-flow-diagram "$dfd" -f dot 2>&1 || true
 done
 
 for md in "$NR_DIR"/*.md; do

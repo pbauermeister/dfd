@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: ! <>z1 A
+  line 1: <file:tests/non-regression/062-err-filter-bad-flag.dfd>
+Error: Unrecognized filter flag: z

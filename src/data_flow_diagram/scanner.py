@@ -3,7 +3,7 @@
 import os
 import re
 
-from . import model
+from . import exception, model
 from .console import dprint
 
 # Regex to transform lines like:
@@ -73,10 +73,11 @@ def include(
     # extract the include target and guard against recursion
     pair = line.split(maxsplit=1)
     name = pair[1]
-    prefix = model.mk_err_prefix_from(parent)
 
     if name in includes:
-        raise model.DfdException(f'{prefix}Recursive include of "{name}"')
+        raise exception.DfdException(
+            f'Recursive include of "{name}"', source=parent
+        )
     includes.add(name)
 
     # resolve the includee: snippet (#-prefixed) or file
@@ -84,16 +85,16 @@ def include(
     if name.startswith(model.SNIPPET_PREFIX):
         # include from MD snippet
         if not snippet_by_name:
-            raise model.DfdException(
-                f"{prefix}source is not markdown, "
-                f'cannot include snippet "{name}".'
+            raise exception.DfdException(
+                f"source is not markdown, " f'cannot include snippet "{name}".',
+                source=parent,
             )
         name0 = name
         name = name[len(model.SNIPPET_PREFIX) :]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
-            raise model.DfdException(
-                f'{prefix}included snippet "{name}" not found.'
+            raise exception.DfdException(
+                f'included snippet "{name}" not found.', source=parent
             )
 
         _scan(snippet.text, caller, output, snippet_by_name, includes)
@@ -101,8 +102,8 @@ def include(
     else:
         # include from file
         if not os.path.exists(name):
-            raise model.DfdException(
-                f'{prefix}included file "{name}" not found.'
+            raise exception.DfdException(
+                f'included file "{name}" not found.', source=parent
             )
         with open(name, encoding="utf-8") as f:
             text = f.read()

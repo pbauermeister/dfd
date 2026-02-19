@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: style unknown_name
+  line 1: <file:tests/non-regression/065-err-unknown-style.dfd>
+Error: Unsupported style "unknown_name"

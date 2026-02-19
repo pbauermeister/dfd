@@ -8,7 +8,7 @@ from typing import Any
 
 from . import dependency_checker
 from . import dfd_dot_templates as TMPL
-from . import dot, model, parser, scanner
+from . import dot, exception, model, parser, scanner
 from .console import dprint
 
 
@@ -130,9 +130,9 @@ class Generator:
                 else:
                     line = TMPL.CHANNEL.format(**d)
             case _:
-                prefix = model.mk_err_prefix_from(copy.source)
-                raise model.DfdException(
-                    f"{prefix}Unsupported item type " f'"{copy.type}"'
+                raise exception.DfdException(
+                    f'Unsupported item type "{copy.type}"',
+                    source=copy.source,
                 )
         self.append(line, item)
 
@@ -150,10 +150,10 @@ class Generator:
         def split_attr(s: str) -> tuple[str, str]:
             pair = s.split("=", 1)
             if len(pair) != 2:
-                prefix = model.mk_err_prefix_from(item.source)
-                raise model.DfdException(
-                    f'{prefix}Invalid attribute "{s}" in item "{item.name}"'
-                    "; maybe referring to an inexistent attrib alias?"
+                raise exception.DfdException(
+                    f'Invalid attribute "{s}" in item "{item.name}"'
+                    "; maybe referring to an inexistent attrib alias?",
+                    source=item.source,
                 )
             return pair[0], pair[1]
 
@@ -182,7 +182,7 @@ class Generator:
         def replacer(m: re.Match[str]) -> str:
             alias = m[0]
             if alias not in self.attribs:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f"Alias "
                     f'"{alias}" '
                     f"not found in "
@@ -270,9 +270,9 @@ class Generator:
             case model.Keyword.CONSTRAINT:
                 pass
             case _:
-                prefix = model.mk_err_prefix_from(conn.source)
-                raise model.DfdException(
-                    f"{prefix}Unsupported connection type " f'"{conn.type}"'
+                raise exception.DfdException(
+                    f'Unsupported connection type "{conn.type}"',
+                    source=conn.source,
                 )
         if conn.relaxed:
             attrs += TMPL.ATTR_RELAXED
@@ -395,7 +395,6 @@ def handle_options(
     new_statements = []
     options = model.GraphOptions()
     for statement in statements:
-        prefix = model.mk_err_prefix_from(statement.source)
         match statement:
             case model.Style() as style:
                 match style.style:
@@ -413,19 +412,24 @@ def handle_options(
                         try:
                             options.item_text_width = int(style.value)
                         except ValueError as e:
-                            raise model.DfdException(f'{prefix}{e}"')
+                            raise exception.DfdException(
+                                f'{e}"', source=statement.source
+                            ) from e
                     case model.StyleOption.CONNECTION_TEXT_WIDTH:
                         try:
                             options.connection_text_width = int(style.value)
                         except ValueError as e:
-                            raise model.DfdException(f'{prefix}{e}"')
+                            raise exception.DfdException(
+                                f'{e}"', source=statement.source
+                            ) from e
                     case model.StyleOption.BACKGROUND_COLOR:
                         options.background_color = style.value
                     case model.StyleOption.NO_GRAPH_TITLE:
                         options.no_graph_title = True
                     case _:
-                        raise model.DfdException(
-                            f"{prefix}Unsupported style " f'"{style.style}"'
+                        raise exception.DfdException(
+                            f'Unsupported style "{style.style}"',
+                            source=statement.source,
                         )
 
                 continue
@@ -511,15 +515,20 @@ def handle_filters(
     kept_names: set[str] | None = None
     only_names: set[str] = set()
 
-    def _check_names(names: set[str], in_names: set[str], prefix: str) -> None:
+    def _check_names(
+        names: set[str], in_names: set[str], source: model.SourceLine
+    ) -> None:
         if not names.issubset(all_names):
             diff = ", ".join(names - all_names)
-            raise model.DfdException(f'{prefix} Name(s) unknown: {diff}')
+            raise exception.DfdException(
+                f' Name(s) unknown: {diff}', source=source
+            )
 
         if not names.issubset(in_names):
             diff = ", ".join(names - in_names)
-            raise model.DfdException(
-                f'{prefix} Name(s) no longer available due to previous filters: {diff}'
+            raise exception.DfdException(
+                f' Name(s) no longer available due to previous filters: {diff}',
+                source=source,
             )
 
     # state for name replacement (Without→replace) and frame suppression
@@ -530,8 +539,6 @@ def handle_filters(
 
     # phase 1: collect filtered names
     for statement in statements:
-        prefix = model.mk_err_prefix_from(statement.source)
-
         if isinstance(statement, model.Filter):
             dprint("*** Filter:", statement)
             dprint("    before:", kept_names)
@@ -559,7 +566,7 @@ def handle_filters(
 
                 # validate filter names
                 names = set(f.names)
-                _check_names(names, all_names, prefix)
+                _check_names(names, all_names, statement.source)
 
                 # add anchor names (suppressed by "x" flag: neighbours only)
                 if (
@@ -592,7 +599,7 @@ def handle_filters(
                     names_to_check.add(f.replaced_by)
                     for name in names:
                         replacement[name] = f.replaced_by
-                _check_names(names_to_check, kept_names, prefix)
+                _check_names(names_to_check, kept_names, statement.source)
 
                 # remove anchor names (suppressed by "x" flag: neighbours only)
                 if (

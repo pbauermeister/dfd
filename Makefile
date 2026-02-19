@@ -16,7 +16,7 @@ help: ## print this help
 
 	@# capture section headers and documented targets:
 	@grep -E '^#* *[ a-zA-Z_-]+:.*?##.*$$' Makefile \
-	| awk 'BEGIN {FS = ":[^:]*?##"}; {printf "  %-20s %s\n", $$1, $$2}' \
+	| awk 'BEGIN {FS = ":[^:]*?##"}; {printf "  %-16s %s\n", $$1, $$2}' \
 	| sed -E 's/^ *#+/\n/g' \
 	| sed -E 's/ +$$//g'
 
@@ -57,13 +57,13 @@ test: ## run unit tests and non-regression tests
 	pytest
 	$(MAKE) nr-test
 
-nr-preview: ## generate SVGs from NR test DFDs for visual inspection
-	./tests/nr-preview.sh
+nr-review: ## gen. pre-goldens (SVG + error msg) for review before regen.
+	./tests/nr-review.sh
 
-nr-approve: ## (re)generate golden .dot files from NR test DFDs
-	./tests/nr-approve.sh
+nr-regenerate: ## regen. golden files (.dot + .stderr) from NR fixtures
+	./tests/nr-regenerate.sh
 
-nr-test: ## compare generated DOT against golden .dot files
+nr-test: ## NR tests: verify fixtures still match their golden files
 	./tests/nr-test.sh
 
 ################################################################################

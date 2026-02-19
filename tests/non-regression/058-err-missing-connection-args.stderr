@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 2: flow A
+  line 1: <file:tests/non-regression/058-err-missing-connection-args.dfd>
+Error: Expected 2 or 3 argument

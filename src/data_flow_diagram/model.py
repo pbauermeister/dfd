@@ -222,34 +222,6 @@ def pack(src_line: str | None) -> str:
     return " ".join(src_line.split())
 
 
-def mk_err_prefix_from(src: SourceLine) -> str:
-    """Build an error prefix showing the source location stack (most recent first)."""
-
-    def _add_to_stack(stack: list[str], src: SourceLine) -> None:
-        if src.line_nr is None:
-            stack += [f"  {pack(src.raw_text)}"]
-        else:
-            if src.parent and src.parent.is_container:
-                nr = src.parent.line_nr + 1
-                delta = src.line_nr + 1
-                final = nr + delta
-                stack += [f"  line {final}: {pack(src.raw_text)}"]
-            else:
-                nr = src.line_nr + 1
-                stack += [f"  line {nr}: {pack(src.raw_text)}"]
-        if src.parent:
-            _add_to_stack(stack, src.parent)
-
-    stack: list[str] = ["(most recent first)"]
-    _add_to_stack(stack, src)
-    stack += [""]
-    return "\n".join(stack) + "Error: "
-
-
-class DfdException(Exception):
-    pass
-
-
 # Handy type aliases
 Snippets = list[Snippet]
 SourceLines = list[SourceLine]

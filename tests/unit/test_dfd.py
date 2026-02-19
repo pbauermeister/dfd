@@ -6,7 +6,7 @@ names, already-removed names, unknown style options, and bad style values.
 
 import pytest
 
-from data_flow_diagram import dfd, model, parser, scanner
+from data_flow_diagram import dfd, exception, model, parser, scanner
 
 
 def _parse(dfd_text: str) -> model.Statements:
@@ -28,7 +28,7 @@ def test_filter_unknown_name() -> None:
         ! unknown_item
     """
     )
-    with pytest.raises(model.DfdException, match="unknown"):
+    with pytest.raises(exception.DfdException, match="unknown"):
         dfd.handle_filters(statements)
 
 
@@ -42,7 +42,7 @@ def test_filter_already_removed() -> None:
         ~ A
     """
     )
-    with pytest.raises(model.DfdException, match="no longer available"):
+    with pytest.raises(exception.DfdException, match="no longer available"):
         dfd.handle_filters(statements)
 
 
@@ -55,7 +55,7 @@ def test_filter_replacer_unknown() -> None:
         ~ =NONEXISTENT A
     """
     )
-    with pytest.raises(model.DfdException, match="unknown"):
+    with pytest.raises(exception.DfdException, match="unknown"):
         dfd.handle_filters(statements)
 
 
@@ -69,7 +69,7 @@ def test_style_unknown() -> None:
         style  unknown_style_name
     """
     )
-    with pytest.raises(model.DfdException, match="Unsupported style"):
+    with pytest.raises(exception.DfdException, match="Unsupported style"):
         dfd.handle_options(statements)
 
 
@@ -80,5 +80,5 @@ def test_style_bad_int() -> None:
         style  item-text-width  abc
     """
     )
-    with pytest.raises(model.DfdException):
+    with pytest.raises(exception.DfdException):
         dfd.handle_options(statements)

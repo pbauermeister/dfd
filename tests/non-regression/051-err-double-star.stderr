@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 1: * --> * text
+  line 1: <file:tests/non-regression/051-err-double-star.dfd>
+Error: Connection "flow" may not link to two stars
