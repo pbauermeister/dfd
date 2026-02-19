@@ -6,7 +6,8 @@ tests (e.g. for include resolution) belong in test_scanner.py.
 
 import pytest
 
-from data_flow_diagram import exception, model, parser, scanner
+from data_flow_diagram import exception, model
+from data_flow_diagram.dsl import parser, scanner
 
 # ── Valid syntax fixture ──────────────────────────────────────────────────────
 

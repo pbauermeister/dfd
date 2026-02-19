@@ -37,7 +37,6 @@ ROTATION_DEGREES = 90
 CHANNEL_PORT = ":x:c"
 STAR_NODE_FMT = "__star_{nr}__"
 HTML_ITEM_DEFAULTS: dict[str, str] = {"fontcolor": "black", "color": "black"}
-FRAME_DEFAULT_ATTRS = "style=dashed"
 ENGINE_CONTEXT = "neato"
 ENGINE_DEFAULT = "dot"
 
@@ -102,6 +101,3 @@ digraph D {{
 
 
 GRAPH_PARAMS_CONTEXT_DIAGRAM = "edge [len=2.25]"
-
-
-ITEM_EXTERNAL_ATTRS = "fillcolor=white color=grey fontcolor=grey"
