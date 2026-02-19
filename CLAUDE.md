@@ -1,16 +1,67 @@
 # Project Instructions
 
-## Task kickoff checklist
+## Task start process
 
-When starting a non-trivial task, provide as many of these as applicable:
+When starting a non-trivial task, follow these phases in order.
 
-1. **GitHub issue number** — needed for the devlog file name (`devlog/NNN-*.md`).
-2. **Scope boundary** — which doc sections, files, or features are in scope. Explicit lists prevent missed items (e.g. "all examples in doc/README.md sections E and F").
-3. **Developer workflow** — how you intend to use the result (preview, approve, commit, clean). Helps Claude design scripts that fit your actual workflow, not an assumed one.
-4. **Naming/ordering conventions** — if output must follow a specific order or naming scheme, state it upfront (e.g. "number test cases to match doc section order").
-5. **Terminology** — if the domain has specific terms (fixtures, golden files, etc.), mention them early so documentation stays consistent.
+### Phase 1 — Task origin
 
-Claude: if the user starts a task without covering these points, briefly remind them of this checklist.
+Two paths:
+
+- **From devlog:** The user references a `devlog/DEVLOG.md` section (or other
+  high-level devlog) and the desired chapter. The agent drafts a GitHub issue
+  title and body from that content and presents it to the user for confirmation
+  before creating it (`gh issue create`). This is a good opportunity to
+  reconsider whether the task still applies.
+- **From GitHub issue:** The user provides a GitHub issue number whose
+  description contains the specs.
+
+### Phase 2 — Scaffolding
+
+The agent performs these steps in sequence:
+
+1. Fetch the issue title and description (`gh issue view NNN`).
+2. Create a branch named `<prefix>/NNN-short-description` (prefix: `fix`,
+   `feature`, `refactor`, `doc`, or `test`).
+3. Create `devlog/NNN-short-description.md` with the **Requirement** section
+   populated from the issue description.
+4. Commit the devlog file on the branch.
+5. Open a **draft** PR against `main` (`gh pr create --draft`) with a minimal
+   body (link to the devlog file).
+
+### Phase 3 — Specification refinement
+
+Agent and user discuss until the specs are clear:
+
+- All decisions are recorded in the devlog's **Requirement** section.
+- Reflect together on whether new NR test fixtures are needed. If yes, add
+  "create NR fixtures" as the first implementation step.
+- Agree on ordered implementation steps; record them in the devlog's **Design**
+  section. Steps may include intermediate checkpoints where the agent stops
+  for user validation or decision.
+- Once specs are agreed, update the PR body to reflect the refined requirements
+  (may include checklists).
+
+### Phase 4 — Implementation
+
+On explicit user confirmation, the agent updates the devlog status from
+`PENDING` to `ONGOING`, commits, and begins implementing per the agreed steps
+and the rules in "Implementation workflow".
+
+Before starting each step, the agent:
+
+1. Lists all actions the step will involve (files to create/modify, commands
+   to run, permissions needed).
+2. Offers the user the choice to let the step run **unattended** (the agent
+   proceeds autonomously through the entire step, stopping only if a question
+   or unexpected problem arises) or **attended** (the agent stops at each
+   sub-action for validation).
+
+This way the user can grant autonomy for straightforward steps and keep
+tighter control over sensitive or uncertain ones.
+
+Claude: if the user starts a task without following this process, briefly
+remind them of it.
 
 ## devlog/DEVLOG.md general file
 
@@ -23,10 +74,15 @@ Claude: if the user starts a task without covering these points, briefly remind 
 
 ## devlog/NNN-short-description.md files
 
-- For each feature or bug fix of non-trivial scope, create a file in `devlog/` named `NNN-short-description.md`.
-- **NNN** is the GitHub issue number. The user must provide it. If the user also provides a short description, use it directly; otherwise, fetch the issue title from GitHub (`gh issue view NNN`) and derive a slug from it.
-- The file must start with a title (`# NNN — Short Description`), a date, and a status (`PENDING`, `ONGOING`, `DONE`, or `REJECTED`).
-- Include a **Requirement** section describing what was asked for, and a **Design** section describing the agreed-upon approach, before implementation begins.
+- For each feature or bug fix of non-trivial scope, a file in `devlog/` named
+  `NNN-short-description.md` is created during the task start process (phase 2).
+- **NNN** is the GitHub issue number. If the user provides a short description,
+  use it directly; otherwise, derive a slug from the issue title.
+- The file must start with a title (`# NNN — Short Description`), a date, and
+  a status (`PENDING`, `ONGOING`, `DONE`, or `REJECTED`).
+- Include a **Requirement** section describing what was asked for, and a
+  **Design** section describing the agreed-upon approach (including ordered
+  implementation steps), before implementation begins.
 - Update the status in-place as work progresses.
 
 ## Writing or modifying tests
@@ -45,15 +101,21 @@ Before adding or changing any test, read `tests/README.md`. It defines: how to c
 ## Branching and PR workflow
 
 For every non-trivial fix or feature (i.e. anything with a `devlog/NNN-*.md`
-file), work on a dedicated branch and open a pull request:
+file), the branch and draft PR are created during the task start process
+(phase 2):
 
-1. Create a branch named `<prefix>/NNN-short-description` before writing any code,
-   where `<prefix>` reflects the kind of work: `fix`, `feature`, `refactor`,
-   `doc`, or `test`.
-2. Commit all implementation work — including the `devlog/NNN-*.md` file — on
-   that branch.
-3. Open a PR against `main` when the work is ready for review.
-4. Merge (or ask the user to merge) only after the PR is approved and CI passes.
+1. Branch is named `<prefix>/NNN-short-description` (prefix: `fix`, `feature`,
+   `refactor`, `doc`, or `test`).
+2. A **draft** PR is opened against `main` immediately, so the work is visible
+   from the start. The PR body starts minimal (link to devlog), is updated
+   after specification is agreed (may include checklists), and may be updated
+   again when the PR is marked ready (to account for changes decided during
+   implementation).
+3. All implementation work — including the `devlog/NNN-*.md` file — is committed
+   on that branch.
+4. When implementation is complete, mark the PR as ready for review
+   (`gh pr ready`).
+5. Merge (or ask the user to merge) only after the PR is approved and CI passes.
 
 Direct commits to `main` are reserved for trivial changes (`.postN`-level) that
 do not warrant a PR.
@@ -65,7 +127,10 @@ When implementing an approved plan:
 - Complete work in **logical units** and commit each one separately, so changes are traceable at medium granularity (not one giant commit, not one commit per file).
 - **Stop and ask** before continuing when: (a) the next step depends on validating the current result, (b) a decision is needed that was not resolved in the plan, or (c) something unexpected is discovered.
 - Otherwise, proceed autonomously through the remaining steps and commit as you go.
-- **At plan-approval time**, declare every permission category the implementation will need using `allowedPrompts` in `ExitPlanMode`, so the user can grant all permissions upfront and implementation can run unattended. Each entry should name the affected files or targets where known (e.g. `"delete tests/unit_tests.py, tests/inputs.py (irreversible)"`), and explicitly flag dangerous or irreversible actions.
+- **Before each step** (as described in Phase 4), list all actions the step
+  will involve — files to create/modify, commands to run, and any dangerous or
+  irreversible actions — so the user can make an informed unattended/attended
+  choice.
 
 ## Design philosophy
 
