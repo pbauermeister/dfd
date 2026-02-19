@@ -4,8 +4,7 @@ import os.path
 import re
 from typing import Callable
 
-from .. import exception, model
-from ..rendering import templates as TMPL
+from .. import config, exception, model
 from ..console import dprint
 from ..model import Keyword
 
@@ -430,7 +429,7 @@ def _parse_item_external(
     parts = item.name.split(":", 1)
     if len(parts) > 1:
         # mark as external (greyed-out style) and extract item name
-        item.attrs = TMPL.ITEM_EXTERNAL_ATTRS
+        item.attrs = config.ITEM_EXTERNAL_ATTRS
         if parts[-1]:
             item.name = parts[-1]
         else:
@@ -461,7 +460,7 @@ def _parse_frame(source: model.SourceLine) -> model.Statement:
         text = parts[1].strip()
 
     items = parts[0].split()[1:]
-    attrs = TMPL.FRAME_DEFAULT_ATTRS
+    attrs = config.FRAME_DEFAULT_ATTRS
     return model.Frame(source, Keyword.FRAME, text, attrs, items)
 
 
