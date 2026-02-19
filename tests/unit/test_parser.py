@@ -13,26 +13,26 @@ from data_flow_diagram import model, parser, scanner
 # A DFD snippet that exercises every item type and several connection types;
 # parse() and check() must both accept it without raising.
 ALL_ITEMS_AND_CONNECTIONS = """
-style\tvertical
-style\thorizontal
+    style    vertical
+    style    horizontal
 
-process\tP\tProcess
-process\tP2\tProcess 2
-entity\tT\tTerminal
-store\tS\tStore
-channel\tC\tChannel
-channel\tC2\tChannel 2b
-control\tCtrl\tController
+    process  P     Process
+    process  P2    Process 2
+    entity   T     Terminal
+    store    S     Store
+    channel  C     Channel
+    channel  C2    Channel 2b
+    control  Ctrl  Controller
 
-flow\tP\tC\tdata
-bflow\tP\tS\tconfig
-signal\tP\tP2\tevent
-signal\tCtrl\tP\tcontrol event
-flow\tP2\tC2\tmore data
-flow\t*\tP2\text data
-flow\tP\tT
+    flow     P     C     data
+    bflow    P     S     config
+    signal   P     P2    event
+    signal   Ctrl  P     control event
+    flow     P2    C2    more data
+    flow     *     P2    ext data
+    flow     P     T
 
-frame P P2 = Processes
+    frame P P2 = Processes
 """
 
 # ── Error case fixtures ───────────────────────────────────────────────────────
@@ -40,19 +40,28 @@ frame P P2 = Processes
 # Each entry: (dfd_text, pytest id).  All should make parser.check() raise.
 CHECK_ERROR_CASES = [
     pytest.param(
-        "process\tP\ttext\nentity\tP\ttext",
+        """
+        process  P  text
+        entity   P  text
+        """,
         id="duplicate-item",  # two items share the same name
     ),
     pytest.param(
-        "process\tP\ttext\nflow\tP\tQ\ttext",
+        """
+        process  P  text
+        flow     P  Q  text
+        """,
         id="missing-ref",  # connection references undefined item Q
     ),
     pytest.param(
-        "flow\t*\t*\ttext",
+        "flow  *  *  text",
         id="double-star",  # both endpoints of a connection are wildcards
     ),
     pytest.param(
-        "control\tC\tCtrl\nflow\tC\t*\tdata",
+        """
+        control  C  Ctrl
+        flow     C  *  data
+        """,
         id="connection-to-control",  # non-signal connection to a control item
     ),
     pytest.param(
@@ -60,11 +69,19 @@ CHECK_ERROR_CASES = [
         id="empty-frame",  # frame with no item names
     ),
     pytest.param(
-        "process\tP\tProc\nframe UNKNOWN = Title",
+        """
+        process  P  Proc
+        frame UNKNOWN = Title
+        """,
         id="frame-undefined-item",  # frame references an item that doesn't exist
     ),
     pytest.param(
-        "process\tA\ta\nprocess\tB\tb\nframe A = F1\nframe A B = F2",
+        """
+        process  A  a
+        process  B  b
+        frame A = F1
+        frame A B = F2
+        """,
         id="frame-item-in-multiple",  # item A appears in two different frames
     ),
 ]
@@ -76,7 +93,7 @@ PARSE_ERROR_CASES = [
         id="missing-item-args",  # item keyword with no name
     ),
     pytest.param(
-        "flow\tA",
+        "flow  A",
         id="missing-connection-args",  # connection with too few arguments
     ),
     pytest.param(

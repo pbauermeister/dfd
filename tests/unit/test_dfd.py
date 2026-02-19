@@ -22,21 +22,39 @@ def _parse(dfd_text: str) -> model.Statements:
 
 def test_filter_unknown_name() -> None:
     # Filtering on a name that doesn't exist in the diagram must raise
-    statements = _parse("process\tA\taaa\n! unknown_item")
+    statements = _parse(
+        """
+        process  A  aaa
+        ! unknown_item
+    """
+    )
     with pytest.raises(model.DfdException, match="unknown"):
         dfd.handle_filters(statements)
 
 
 def test_filter_already_removed() -> None:
     # Removing a name that was already removed by a previous filter must raise
-    statements = _parse("process\tA\taaa\nprocess\tB\tbbb\n~ A\n~ A")
+    statements = _parse(
+        """
+        process  A  aaa
+        process  B  bbb
+        ~ A
+        ~ A
+    """
+    )
     with pytest.raises(model.DfdException, match="no longer available"):
         dfd.handle_filters(statements)
 
 
 def test_filter_replacer_unknown() -> None:
     # Replacing with a name that doesn't exist in the diagram must raise
-    statements = _parse("process\tA\taaa\nprocess\tB\tbbb\n~ =NONEXISTENT A")
+    statements = _parse(
+        """
+        process  A  aaa
+        process  B  bbb
+        ~ =NONEXISTENT A
+    """
+    )
     with pytest.raises(model.DfdException, match="unknown"):
         dfd.handle_filters(statements)
 
@@ -46,13 +64,21 @@ def test_filter_replacer_unknown() -> None:
 
 def test_style_unknown() -> None:
     # An unrecognized style name must raise
-    statements = _parse("style\tunknown_style_name")
+    statements = _parse(
+        """
+        style  unknown_style_name
+    """
+    )
     with pytest.raises(model.DfdException, match="Unsupported style"):
         dfd.handle_options(statements)
 
 
 def test_style_bad_int() -> None:
     # A style that expects an integer but receives text must raise
-    statements = _parse("style\titem-text-width\tabc")
+    statements = _parse(
+        """
+        style  item-text-width  abc
+    """
+    )
     with pytest.raises(model.DfdException):
         dfd.handle_options(statements)
