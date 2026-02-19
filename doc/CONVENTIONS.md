@@ -85,16 +85,14 @@ data_flow_diagram/dsl/scanner.py
 
 ### Target package structure
 
-This is the target structure after refactoring (task F). It will be
-implemented incrementally.
-
 ```
 src/data_flow_diagram/
     __init__.py             # package interface, re-exports main()
     cli.py                  # CLI: argument parsing, I/O dispatch
     config.py               # shared constants and defaults
     console.py              # debug/error output utilities
-    model.py                # data types, exceptions, enums
+    exception.py            # DfdException class
+    model.py                # data types, enums
     markdown.py             # markdown snippet extraction
     dfd.py                  # pipeline orchestrator (build)
     dsl/
