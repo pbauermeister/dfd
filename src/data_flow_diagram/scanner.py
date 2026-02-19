@@ -3,7 +3,7 @@
 import os
 import re
 
-from . import model
+from . import exception, model
 from .console import dprint
 
 # Regex to transform lines like:
@@ -75,7 +75,7 @@ def include(
     name = pair[1]
 
     if name in includes:
-        raise model.DfdException(
+        raise exception.DfdException(
             f'Recursive include of "{name}"', source=parent
         )
     includes.add(name)
@@ -85,7 +85,7 @@ def include(
     if name.startswith(model.SNIPPET_PREFIX):
         # include from MD snippet
         if not snippet_by_name:
-            raise model.DfdException(
+            raise exception.DfdException(
                 f"source is not markdown, " f'cannot include snippet "{name}".',
                 source=parent,
             )
@@ -93,7 +93,7 @@ def include(
         name = name[len(model.SNIPPET_PREFIX) :]
         snippet = snippet_by_name.get(name) or snippet_by_name.get(name0)
         if not snippet:
-            raise model.DfdException(
+            raise exception.DfdException(
                 f'included snippet "{name}" not found.', source=parent
             )
 
@@ -102,7 +102,7 @@ def include(
     else:
         # include from file
         if not os.path.exists(name):
-            raise model.DfdException(
+            raise exception.DfdException(
                 f'included file "{name}" not found.', source=parent
             )
         with open(name, encoding="utf-8") as f:

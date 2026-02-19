@@ -6,7 +6,7 @@ tests (e.g. for include resolution) belong in test_scanner.py.
 
 import pytest
 
-from data_flow_diagram import model, parser, scanner
+from data_flow_diagram import exception, model, parser, scanner
 
 # ── Valid syntax fixture ──────────────────────────────────────────────────────
 
@@ -124,14 +124,14 @@ def test_parse_valid_syntax() -> None:
     try:
         statements, _, _ = parser.parse(tokens)
         parser.check(statements)
-    except model.DfdException as e:
+    except exception.DfdException as e:
         pytest.fail(f"Unexpected DfdException on valid syntax: {e}")
 
 
 def test_parse_unknown_keyword_raises() -> None:
     # An unrecognised keyword must be caught by parse(), not silently ignored
     tokens = scanner.scan(None, "xyz")
-    with pytest.raises(model.DfdException):
+    with pytest.raises(exception.DfdException):
         parser.parse(tokens)
 
 
@@ -140,7 +140,7 @@ def test_check_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in check()
     tokens = scanner.scan(None, dfd_text)
     statements, _, _ = parser.parse(tokens)
-    with pytest.raises(model.DfdException):
+    with pytest.raises(exception.DfdException):
         parser.check(statements)
 
 
@@ -148,5 +148,5 @@ def test_check_raises(dfd_text: str) -> None:
 def test_parse_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in parse()
     tokens = scanner.scan(None, dfd_text)
-    with pytest.raises(model.DfdException):
+    with pytest.raises(exception.DfdException):
         parser.parse(tokens)

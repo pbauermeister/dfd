@@ -8,7 +8,7 @@ from typing import Any
 
 from . import dependency_checker
 from . import dfd_dot_templates as TMPL
-from . import dot, model, parser, scanner
+from . import dot, exception, model, parser, scanner
 from .console import dprint
 
 
@@ -130,7 +130,7 @@ class Generator:
                 else:
                     line = TMPL.CHANNEL.format(**d)
             case _:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f'Unsupported item type "{copy.type}"',
                     source=copy.source,
                 )
@@ -150,7 +150,7 @@ class Generator:
         def split_attr(s: str) -> tuple[str, str]:
             pair = s.split("=", 1)
             if len(pair) != 2:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f'Invalid attribute "{s}" in item "{item.name}"'
                     "; maybe referring to an inexistent attrib alias?",
                     source=item.source,
@@ -182,7 +182,7 @@ class Generator:
         def replacer(m: re.Match[str]) -> str:
             alias = m[0]
             if alias not in self.attribs:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f"Alias "
                     f'"{alias}" '
                     f"not found in "
@@ -270,7 +270,7 @@ class Generator:
             case model.Keyword.CONSTRAINT:
                 pass
             case _:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f'Unsupported connection type "{conn.type}"',
                     source=conn.source,
                 )
@@ -412,14 +412,14 @@ def handle_options(
                         try:
                             options.item_text_width = int(style.value)
                         except ValueError as e:
-                            raise model.DfdException(
+                            raise exception.DfdException(
                                 f'{e}"', source=statement.source
                             ) from e
                     case model.StyleOption.CONNECTION_TEXT_WIDTH:
                         try:
                             options.connection_text_width = int(style.value)
                         except ValueError as e:
-                            raise model.DfdException(
+                            raise exception.DfdException(
                                 f'{e}"', source=statement.source
                             ) from e
                     case model.StyleOption.BACKGROUND_COLOR:
@@ -427,7 +427,7 @@ def handle_options(
                     case model.StyleOption.NO_GRAPH_TITLE:
                         options.no_graph_title = True
                     case _:
-                        raise model.DfdException(
+                        raise exception.DfdException(
                             f'Unsupported style "{style.style}"',
                             source=statement.source,
                         )
@@ -520,11 +520,13 @@ def handle_filters(
     ) -> None:
         if not names.issubset(all_names):
             diff = ", ".join(names - all_names)
-            raise model.DfdException(f' Name(s) unknown: {diff}', source=source)
+            raise exception.DfdException(
+                f' Name(s) unknown: {diff}', source=source
+            )
 
         if not names.issubset(in_names):
             diff = ", ".join(names - in_names)
-            raise model.DfdException(
+            raise exception.DfdException(
                 f' Name(s) no longer available due to previous filters: {diff}',
                 source=source,
             )

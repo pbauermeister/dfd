@@ -5,7 +5,7 @@ import re
 from typing import Callable, Tuple, get_type_hints
 
 from . import dfd_dot_templates as TMPL
-from . import model
+from . import exception, model
 from .console import dprint
 from .model import Keyword
 
@@ -30,7 +30,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
 
         other = items_by_name[name]
         other_text = model.pack(other.source.text)
-        raise model.DfdException(
+        raise exception.DfdException(
             f'Name "{name}" already exists '
             f"at line {other.source.line_nr+1}: {other_text}",
             source=statement.source,
@@ -49,7 +49,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                 nb_stars += 1
             if point != model.NODE_STAR:
                 if point not in items_by_name:
-                    raise model.DfdException(
+                    raise exception.DfdException(
                         f'Connection "{conn.type}" links to "{point}", '
                         f"which is not defined",
                         source=statement.source,
@@ -58,7 +58,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                     items_by_name[point].type == Keyword.CONTROL
                     and conn.type != Keyword.SIGNAL
                 ):
-                    raise model.DfdException(
+                    raise exception.DfdException(
                         f'Connection to {Keyword.CONTROL} "{point}" is '
                         f'of type "{conn.type}", however only connections of type '
                         f'"{Keyword.SIGNAL}" are allowed',
@@ -66,7 +66,7 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
                     )
 
         if nb_stars == 2:
-            raise model.DfdException(
+            raise exception.DfdException(
                 f'Connection "{conn.type}" may not link to two ' f"stars",
                 source=statement.source,
             )
@@ -80,15 +80,17 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
             case _:
                 continue
         if not frame.items:
-            raise model.DfdException("Frame is empty", source=statement.source)
+            raise exception.DfdException(
+                "Frame is empty", source=statement.source
+            )
         for name in frame.items:
             if name not in items_by_name:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f'Frame includes "{name}", ' f"which is not defined",
                     source=statement.source,
                 )
             if name in framed_items:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f'Item "{name}", ' f"is in multiple frames",
                     source=statement.source,
                 )
@@ -124,14 +126,14 @@ def parse(
         f = _PARSERS.get(word)
 
         if f is None:
-            raise model.DfdException(
+            raise exception.DfdException(
                 f'Unrecognized keyword "{word}"', source=source
             )
 
         try:
             statement = f(source)
-        except model.DfdException as e:
-            raise model.DfdException(str(e), source=source) from e
+        except exception.DfdException as e:
+            raise exception.DfdException(str(e), source=source) from e
 
         # post-parse: extract inline attributes and register dependencies
         match statement:
@@ -165,9 +167,9 @@ def _split_args(
 
     if len(terms) - 1 != n:
         if not last_is_optional:
-            raise model.DfdException(f"Expected {n} argument(s)")
+            raise exception.DfdException(f"Expected {n} argument(s)")
         else:
-            raise model.DfdException(f"Expected {n-1} or {n} argument")
+            raise exception.DfdException(f"Expected {n-1} or {n} argument")
 
     return terms[1:]
 
@@ -212,7 +214,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
-        raise model.DfdException(f"One or more arguments are expected")
+        raise exception.DfdException(f"One or more arguments are expected")
 
     # initialize a base filter with no neighbours
     f = model.Filter(
@@ -236,7 +238,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
 
         if match.group("replacer"):
             if cmd != Keyword.WITHOUT:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f"Replacer specification is only allowed for {Keyword.WITHOUT} filter"
                 )
             replacer = arg[1:]
@@ -268,7 +270,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                     case "f":
                         fn.no_frames = True
                     case _:
-                        raise model.DfdException(
+                        raise exception.DfdException(
                             f"Unrecognized filter flag: {flag}"
                         )
             # parse span (distance): "*" for unlimited, or a decimal number
@@ -277,7 +279,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
             elif match.group("num"):
                 fn.distance = int(match.group("num"))
             else:
-                raise model.DfdException(
+                raise exception.DfdException(
                     f"Neighborhood size must be an integer or '*', not: {arg}"
                 )
 
@@ -291,7 +293,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
             args = args[1:]
 
     if len(args) == 0:
-        raise model.DfdException(f"One or more names are expected")
+        raise exception.DfdException(f"One or more names are expected")
 
     # remaining args are anchor names
     f.names = args

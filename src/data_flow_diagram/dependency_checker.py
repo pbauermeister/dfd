@@ -1,4 +1,4 @@
-from . import model, scanner, parser
+from . import exception, model, parser, scanner
 from .model import Keyword
 
 
@@ -10,7 +10,7 @@ def check(
     """Verify that all dependencies refer to existing items of compatible type."""
 
     snippet_by_name = snippet_by_name or {}
-    errors = model.DfdException("Dependency error(s) found:")
+    errors = exception.DfdException("Dependency error(s) found:")
     for dep in dependencies:
         # load source text
         if dep.to_graph.startswith(model.SNIPPET_PREFIX):

@@ -7,7 +7,7 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import TextIO
 
-from . import model
+from . import exception, model
 
 
 @dataclass
@@ -73,6 +73,6 @@ def check_snippets_unicity(provenance: str, snippets: model.Snippets) -> None:
     multiples = {k: n for k, n in counts.items() if n > 1}
     if multiples:
         root = model.SourceLine("", provenance, None, 0)
-        raise model.DfdException(
+        raise exception.DfdException(
             f"Snippets defined multiple times: {multiples}", source=root
         )

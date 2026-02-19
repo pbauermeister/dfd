@@ -17,7 +17,7 @@ import sys
 import tempfile
 from typing import TextIO
 
-from . import dfd, dot, markdown, model
+from . import dfd, dot, exception, markdown, model
 from .console import dprint, print_error, set_debug
 
 from importlib.metadata import PackageNotFoundError, version
@@ -206,7 +206,7 @@ def main() -> None:
 
     try:
         run(args)
-    except model.DfdException as e:
+    except exception.DfdException as e:
         text = f"ERROR: {e}"
         print_error(text)
         sys.exit(1)
