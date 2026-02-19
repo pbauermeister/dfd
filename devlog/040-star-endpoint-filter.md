@@ -56,50 +56,82 @@ So `002-connections.dfd` and `008-complete-example.dfd` — which have
 zero filters — have been silently losing their star connections all
 along. The golden files were approved with the bug present.
 
-### Neighborhood expansion cannot reach stars either
+### Stars must be proper items for filters to work correctly
 
-Even if a filter's neighborhood expansion were to "reach" a star
-endpoint by traversing connections, the star wouldn't be in `all_names`
-to begin with, so it could never enter `kept_names` that way. But this
-is moot — the connections are already gone before neighborhood
-expansion has any effect.
+All star endpoints share the sentinel value `"*"` during parsing. This
+causes two problems:
+
+1. **Filter exemption is too broad.** Simply exempting `ENDPOINT_STAR`
+   from the kept-names check (initial fix) means `! P1` would keep
+   a star connection to P1 even though the filter specifies no
+   neighbors — the star should NOT be kept.
+
+2. **Neighborhood conflation.** During neighbor expansion, all `*`
+   endpoints are treated as the same name. If P1 and P2 each have
+   a star connection, expanding neighbors from P1 could falsely
+   discover P2 through the shared `"*"` value.
 
 ### Root cause
 
-The kept-names check in `_apply_filters` treats `ENDPOINT_STAR` like a
-regular item name, but it is a sentinel value that is never declared as
-an item. Star endpoints are resolved later during DOT generation
-(`Generator.generate_star()`), not during filtering.
+Star endpoints are resolved too late — during DOT generation
+(`Generator.generate_star()`), after filtering has already run. For
+filters to handle stars correctly, each star must have a unique name
+and exist as a real item before the filter engine runs.
+
+### Correct filter behavior for stars
+
+- Stars cannot be filter anchors (they have no user-visible name).
+- Stars participate in neighborhood traversal: `!>1 P1` with
+  `P1 --> * label` keeps the star (it is at distance 1 downstream).
+- `! P1` (no neighbor spec) does NOT keep the star connection.
+- Stars cannot be in frames (not declared by the user).
 
 ## Design
 
-### Fix
+### Resolve stars early in the pipeline
 
-In `_apply_filters` (line 272), exempt `ENDPOINT_STAR` from the
-kept-names check. A star endpoint should never be filtered out — it is
-not a declared item but a sentinel resolved during rendering:
+Add a new step in `dfd.py:build()` after `checker.check()` and before
+`handle_filters()`:
 
-```python
-# skip if either endpoint was filtered out (star endpoints are always kept)
-if (
-    conn.src not in kept_names and conn.src != model.ENDPOINT_STAR
-) or (
-    conn.dst not in kept_names and conn.dst != model.ENDPOINT_STAR
-):
-```
+1. Scan all connections for `ENDPOINT_STAR` endpoints.
+2. For each occurrence, generate a unique name using `STAR_ITEM_FMT`
+   (`__star_0__`, `__star_1__`, etc.).
+3. Replace `conn.src` or `conn.dst` with the unique name.
+4. Create a `model.Item(type=NONE, name=unique_name, text=conn.text)`
+   with edge font attrs, and clear `conn.text`.
+5. Insert the new item into the statements list.
+6. Add the star item to `items_by_name`.
+
+After this step, no `ENDPOINT_STAR` sentinel remains in any connection.
+Stars are regular `none` items that the filter engine handles normally.
+
+### Simplifications enabled
+
+- **`_apply_filters`**: revert the `ENDPOINT_STAR` exemption — stars
+  are now regular items in `kept_names`.
+- **`_get_item()`**: remove `ENDPOINT_STAR` special case.
+- **`generate_star()`**: remove entirely — stars are rendered via
+  `generate_item()` as regular `none` items.
+- **`generate_connection()`**: remove star branches (`if not src_item`
+  / `if not dst_item`).
+- **`checker.py`**: remove `ENDPOINT_STAR` special case (resolution
+  happens after checking).
 
 ### NR impact
 
 - `002-connections.dot`, `003-connections-sugar.dot`,
   `008-complete-example.dot` — golden files will change (star
-  connections will now correctly appear).
-- Filter NR fixtures that use star connections in their source may also
-  produce updated goldens — need to inspect after regeneration.
+  connections appear, star numbering may differ).
+- Filter NR fixtures with star connections in their shared
+  `028-filter-master.part` may also produce updated goldens.
 
 ### Implementation steps
 
-1. Fix the filter check in `_apply_filters`.
-2. Regenerate NR goldens, inspect the diff.
-3. Run full test suite (`make black && make lint && make test`).
-4. Mutation smoke-test (revert the fix, confirm NR fails on affected
-   fixtures, re-apply).
+1. Add `resolve_star_endpoints()` in `dfd.py`, wire it into the
+   pipeline after `checker.check()`.
+2. Revert the `ENDPOINT_STAR` exemption in `_apply_filters`.
+3. Simplify rendering: remove `generate_star()`, `_get_item()` special
+   case, and star branches in `generate_connection()`.
+4. Regenerate NR goldens, inspect the diff.
+5. Run `make black && make lint && make test`.
+6. Mutation smoke-test.

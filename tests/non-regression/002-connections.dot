@@ -56,10 +56,14 @@ digraph D {
 
   /* 26: uflow E1 E2 an undirected flow */
   "E1" -> "E2" [label="an undirected\nflow" dir=none]
-  "__star_0__" [shape=none label="an unsourced\nflow" fontname="times-italic" fontsize=10]
+
+  /* 29: flow * X an unsourced flow */
+  "__star_0__" [shape=none label="an unsourced flow" fontname="times-italic" fontsize=10]
 
   /* 29: flow * X an unsourced flow */
   "__star_0__" -> "X" [label=""]
+
+  /* 30: signal Y * an untargetted signal */
   "__star_1__" [shape=none label="an untargetted\nsignal" fontname="times-italic" fontsize=10]
 
   /* 30: signal Y * an untargetted signal */

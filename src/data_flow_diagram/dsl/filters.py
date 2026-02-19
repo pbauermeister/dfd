@@ -269,14 +269,7 @@ def _apply_filters(
                     replaced_connections[conn.signature()] = conn
                 else:
                     # skip if either endpoint was filtered out
-                    # (star endpoints are always kept — they are not declared items)
-                    if (
-                        conn.src not in kept_names
-                        and conn.src != model.ENDPOINT_STAR
-                    ) or (
-                        conn.dst not in kept_names
-                        and conn.dst != model.ENDPOINT_STAR
-                    ):
+                    if conn.src not in kept_names or conn.dst not in kept_names:
                         dprint(
                             "=> Skipping connection: some end is not in the kept list"
                         )

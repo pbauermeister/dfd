@@ -30,11 +30,9 @@ def _split_attr(s: str, item: model.Item) -> tuple[str, str]:
     return pair[0], pair[1]
 
 
-def _get_item(
-    name: str, items_by_name: dict[str, model.Item]
-) -> model.Item | None:
-    """Look up an item by name, returning None for star endpoints."""
-    return None if name == model.ENDPOINT_STAR else items_by_name[name]
+def _get_item(name: str, items_by_name: dict[str, model.Item]) -> model.Item:
+    """Look up an item by name."""
+    return items_by_name[name]
 
 
 def wrap(text: str, cols: int) -> str:
@@ -51,7 +49,6 @@ class Generator:
         self, graph_options: model.GraphOptions, attribs: model.Attribs
     ) -> None:
         self.lines: list[str] = []
-        self.star_nr = 0
         self.frame_nr = 0
         self.graph_options = graph_options
         self.attribs = attribs
@@ -159,14 +156,6 @@ class Generator:
             self.attribs_rx.sub(replacer, attrs) if self.attribs_rx else attrs
         )
 
-    def generate_star(self, text: str) -> str:
-        text = wrap(text, self.graph_options.item_text_width)
-        star_name = TMPL.STAR_ITEM_FMT.format(nr=self.star_nr)
-        line = f'"{star_name}" [shape=none label="{text}" {TMPL.DOT_FONT_EDGE}]'
-        self.lines.append(line)
-        self.star_nr += 1
-        return star_name
-
     def _build_connection_attrs(self, conn: model.Connection, text: str) -> str:
         """Build the DOT attribute string for a connection edge."""
         attrs = f'label="{text}"'
@@ -216,34 +205,23 @@ class Generator:
     def generate_connection(
         self,
         conn: model.Connection,
-        src_item: model.Item | None,
-        dst_item: model.Item | None,
+        src_item: model.Item,
+        dst_item: model.Item,
     ) -> None:
         """Emit the DOT edge declaration for a connection."""
         text = conn.text or ""
         text = wrap(text, self.graph_options.connection_text_width)
 
-        # resolve endpoints: anonymous ("*") items become star items
-        src_port = dst_port = ""
-
-        if not src_item:
-            src_name = self.generate_star(text)
-            text = ""
-        else:
-            src_name = src_item.name
-            if src_item.type == model.Keyword.CHANNEL:
-                src_port = TMPL.CHANNEL_PORT
-
-        if not dst_item:
-            dst_name = self.generate_star(text)
-            text = ""
-        else:
-            dst_name = dst_item.name
-            if dst_item.type == model.Keyword.CHANNEL:
-                dst_port = TMPL.CHANNEL_PORT
+        # resolve channel ports
+        src_port = (
+            TMPL.CHANNEL_PORT if src_item.type == model.Keyword.CHANNEL else ""
+        )
+        dst_port = (
+            TMPL.CHANNEL_PORT if dst_item.type == model.Keyword.CHANNEL else ""
+        )
 
         attrs = self._build_connection_attrs(conn, text)
-        line = f'"{src_name}"{src_port} -> "{dst_name}"{dst_port} [{attrs}]'
+        line = f'"{src_item.name}"{src_port} -> "{dst_item.name}"{dst_port} [{attrs}]'
         self.append(line, conn)
 
     def generate_style(self, style: model.Style) -> None:

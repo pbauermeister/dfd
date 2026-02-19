@@ -38,14 +38,20 @@ digraph D {
         <TD COLSPAN="3"><FONT COLOR="black">API</FONT></TD>
       </TR>
     </TABLE>>]
+
+  /* 7: signal * Control clock */
   "__star_0__" [shape=none label="clock" fontname="times-italic" fontsize=10]
 
   /* 7: signal * Control clock */
   "__star_0__" -> "Control" [label="" style=dashed]
+
+  /* 8: signal.r Control * enable */
   "__star_1__" [shape=none label="enable" fontname="times-italic" fontsize=10]
 
   /* 8: signal.r Control * enable */
   "Control" -> "__star_1__" [label="" dir=back style=dashed]
+
+  /* 9: signal.r Control * disable */
   "__star_2__" [shape=none label="disable" fontname="times-italic" fontsize=10]
 
   /* 9: signal.r Control * disable */
