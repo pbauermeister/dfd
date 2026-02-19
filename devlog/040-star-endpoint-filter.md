@@ -19,8 +19,8 @@ star-endpoint connections are unconditionally filtered out — even when no
 ```
 process P1
 process P2
-flow * P1 external input
-flow P2 * external output
+* --> P1 external input
+P2 --> * external output
 ```
 
 Expected: two star items with labels connected to P1 and P2.
