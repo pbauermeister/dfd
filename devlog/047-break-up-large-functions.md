@@ -107,3 +107,35 @@ self-contained validation concern with no dependency on the parsing
 code. Extracted them into `dsl/checker.py` (96 lines), reducing
 `parser.py` from 565 to 466 lines. Updated `doc/CONVENTIONS.md`
 package layout accordingly.
+
+## Lessons learned
+
+1. **Naming gets harder when promoting inner functions.** Inner
+   functions like `_fmt` and `_resolve` were clear inside
+   `_apply_syntactic_sugars` — the outer function provided context. At
+   module level they needed renaming to `_format_sugar` and
+   `_resolve_sugar`. Systematic pattern: inner functions borrow context
+   from their parent; module-level functions must carry their own.
+
+2. **The NR test safety net worked as designed.** Every step passed
+   `make test` on the first try. 73 fixtures catching structural
+   regressions mechanically — this validates the investment in task A.
+   "Safety net" was a plan-time claim; now confirmed in practice.
+
+3. **Python `match` keyword shadowing.** In `_parse_filter`, the
+   original code had `match = RX_FILTER_ARG.fullmatch(arg)` followed
+   by `match match.group(...)`. When extracting `_parse_neighbor_spec`,
+   the variable was renamed to `m` to avoid colliding with the `match`
+   statement keyword. Minor Python 3.10+ gotcha.
+
+4. **Chunk comments served as a structural map.** Phase headers
+   (`# phase 1:`, `# phase 2:`, etc.) and chunk comments mapped
+   directly to extraction boundaries. They made split points obvious
+   without reverse-engineering the logic.
+
+5. **Modules suffice for concern grouping; classes not needed.** After
+   the splits, we evaluated whether classes (e.g. `FilterEngine`) would
+   help. Conclusion: when shared mutable state accumulates across calls
+   (like `Generator`), a class is justified. When state flows linearly
+   through a pipeline (like filters), explicit parameters between
+   module-level functions are clearer than `self`-mediated state.
