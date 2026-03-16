@@ -443,6 +443,8 @@ After (current state, v1.16.7):
 | Boilerplate |        641 |  4.8% |
 | **Total**   | **13,241** | **100%** |
 
+![Project composition before and after Claude](055-composition-chart.svg)
+
 The application code represents less than one fifth of the project. Documentation
 alone — process, developer, and user-facing combined — is 2.3× the app code.
 Test infrastructure (code + NR fixtures + golden files) is 1.6× the app code.
