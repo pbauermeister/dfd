@@ -419,15 +419,29 @@ MEMORY.md, devlogs, convention docs) that the user and Claude built together.
 | Other (LICENSE, TODO…)                                |       823 |                   |
 | **Grand total**                                       | **13,241** |                  |
 
-| Category        | Lines      |     % |
-|-----------------|----------: |------:|
-| Doc — AI        |      3,004 | 22.7% |
-| Tests           |      3,852 | 29.1% |
-| Doc — other     |      2,492 | 18.8% |
-| App code        |      2,429 | 18.3% |
-| Other           |        823 |  6.2% |
-| Boilerplate     |        641 |  4.8% |
-| **Total**       | **13,241** | **100%** |
+Before Claude (commit `02b8756`, Feb 17 2026):
+
+| Category    | Lines     |     % |
+|-------------|----------:|------:|
+| App code    |     2,093 | 44.1% |
+| Doc — other |     1,278 | 26.9% |
+| Other       |       700 | 14.8% |
+| Boilerplate |       479 | 10.1% |
+| Tests       |       195 |  4.1% |
+| Doc — AI    |         0 |  0.0% |
+| **Total**   | **4,745** | **100%** |
+
+After (current state, v1.16.7):
+
+| Category    | Lines      |     % |
+|-------------|----------: |------:|
+| Tests       |      3,852 | 29.1% |
+| Doc — AI    |      3,004 | 22.7% |
+| Doc — other |      2,492 | 18.8% |
+| App code    |      2,429 | 18.3% |
+| Other       |        823 |  6.2% |
+| Boilerplate |        641 |  4.8% |
+| **Total**   | **13,241** | **100%** |
 
 The application code represents less than one fifth of the project. Documentation
 alone — process, developer, and user-facing combined — is 2.3× the app code.
