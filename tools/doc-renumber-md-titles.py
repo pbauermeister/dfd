@@ -104,7 +104,13 @@ def renumber_title(
     last_depth: int | None,
 ) -> str:
     hashes = '#' * t.depth
+
+    # check accepted depth
     if t.depth < min_level:
+        return f'{hashes} {t.text}'
+
+    # skip unnumbered titles
+    if t.text.endswith('{-}'):
         return f'{hashes} {t.text}'
 
     # find out index and increment it
