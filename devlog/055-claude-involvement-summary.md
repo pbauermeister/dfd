@@ -469,3 +469,92 @@ The most significant outcome is not any individual change, but the
 behavioral contract, and the devlog-driven task process mean that the next
 refactoring — or the next collaborator — starts from a much stronger
 foundation.
+
+## 6. Equivalent human effort estimate
+
+This section estimates how long the same work would have taken a solo human
+developer, excluding the 3,004 lines of AI-specific documentation (CLAUDE.md,
+devlogs, MEMORY.md) which would not exist in a non-AI workflow.
+
+### Calibration
+
+The author's solo baseline is PRs #18–20 (model StrEnum, parser dispatch,
+misc DRY): 358 additions, 410 deletions, 13 commits across ~13 files, all
+focused refactoring on code the author knows intimately. **4 hours.**
+
+This gives a rate for "refactoring familiar code" of ~3 focused refactoring
+commits/hour — but the rate varies greatly with structural complexity.
+
+### Work breakdown by cognitive type
+
+| Work type                | What it involves                                                                    | PRs                                    |
+|--------------------------|-------------------------------------------------------------------------------------|-----------------------------------------|
+| Green-field creation     | NR framework, pytest migration, test infrastructure                                 | #24, #27                                |
+| Codification             | Writing CONVENTIONS.md, COMMENTING.md, SYNTAX.md, tests/README.md                   | #33, #35                                |
+| Bulk fixture creation    | 73 NR fixtures — writing .dfd inputs, reviewing SVG outputs, approving golden files | #24, #37, #44, #54                      |
+| Structural refactoring   | 12 file moves/extractions, 18 function-level restructurings, all imports updated    | #39, #42, #44, #46, #48, #50, #53      |
+| Bug investigation + fix  | Star-endpoint analysis, pipeline reasoning, fix + test                               | #54                                     |
+| Housekeeping             | Lint fix, style options fix                                                          | #30, #32                                |
+
+### Key complexity factors
+
+- **Refactoring tasks were sequential and dependent** (A→B→C→D→F→H→I→J).
+  Each changed the shape of the codebase for the next. A human cannot
+  parallelize this.
+- **PR #46 alone** (module boundaries): 7 module moves + 2 extractions,
+  884 additions / 627 deletions across 15 files. Every import in the project
+  had to be traced and updated. One mistake = broken imports in one of the
+  4 invocation contexts.
+- **PR #48** (break up functions): 18 function-level structural changes. Each
+  requires reading the function, identifying the extraction boundary, ensuring
+  no closure captures leak, renaming variables, updating callers.
+- **73 NR fixtures**: each .dfd file is small, but each golden file must be
+  visually verified as an SVG. That is 73 review cycles.
+- **Convention docs** require distilling implicit knowledge into explicit
+  rules — slow, high-judgment work.
+
+### Estimate by work type
+
+| Work type                 | PRs              | Key complexity driver                                                     | Est. hours |
+|---------------------------|------------------|---------------------------------------------------------------------------|----------:|
+| NR test framework         | #24              | Design from scratch, 26 fixtures × visual SVG review, Makefile targets    |     16–20 |
+| Unit test migration       | #27              | unittest→pytest, parametrize, conftest, CI fix, tests/README.md           |     12–16 |
+| Housekeeping              | #30, #32         | Lint fix + style options bug + 1 NR fixture                               |       4–5 |
+| Convention codification   | #33, #35         | Read entire codebase, distill implicit rules, write 3 reference docs      |     16–20 |
+| NR filter fixtures        | #37              | 22 filter fixtures × SVG review + 19 error-case unit tests               |      8–12 |
+| Constants consolidation   | #39              | Find ~20 magic literals, name them, update all references                 |       2–3 |
+| CLI relocation            | #42              | Move code, update entry points, test all 4 invocation paths               |       4–6 |
+| Error handling            | #44              | Design new exception API, update all call sites, 19 error NR fixtures     |     12–16 |
+| Module boundaries         | #46              | 7 module moves + 2 extractions, every import rewritten, 4 contexts tested |     16–24 |
+| Break up functions        | #48              | 18 function-level restructurings, closure analysis, 1 new module          |     12–16 |
+| Testability               | #50              | Add seams to pipeline, create pipeline stage tests                        |       6–8 |
+| Identifier alignment      | #53              | Glossary-driven rename across 34 files, American English pass             |       4–6 |
+| Star-endpoint bug         | #54              | Pipeline analysis, fix, 4 NR fixtures                                     |       6–8 |
+| **Total**                 |                  |                                                                           | **118–160** |
+
+### In working days
+
+At 8 hours/day: **15–20 days** (3–4 weeks).
+
+Two factors push the adjusted estimate higher in practice:
+
+- **Sequential dependency tax**: tasks A→J cannot be parallelized. Each
+  reshapes the codebase for the next. Over 3–4 weeks, the mental model
+  degrades between sessions — the developer spends time re-orienting each
+  morning. Realistic overhead: +25%.
+- **No safety net at the start**: the NR framework (task A) takes ~2–3 days
+  to build. Until it exists, every subsequent refactoring is higher-risk,
+  meaning slower, more cautious work.
+
+Adjusted estimate: **19–25 working days** (~4–5 weeks).
+
+### Comparison
+
+| Metric            | With Claude | Solo estimate | Ratio |
+|-------------------|----------:|-------------:|------:|
+| Human hours spent |        32 |      118–160 |  4–5× |
+| Calendar days     |         4 |        19–25 |  5–6× |
+
+The speedup is larger in calendar days than in hours because Claude eliminates
+the context-switching overhead between sessions — the burst was continuous
+enough that neither human nor AI lost the thread.
