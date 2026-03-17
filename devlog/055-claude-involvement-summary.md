@@ -550,10 +550,11 @@ Adjusted estimate: **19–25 working days** (~4–5 weeks).
 
 ### Comparison
 
-| Metric            | With Claude | Solo estimate | Ratio |
-|-------------------|----------:|-------------:|------:|
-| Human hours spent |        32 |      118–160 |  4–5× |
-| Calendar days     |         4 |        19–25 |  5–6× |
+|                   | Human hours | Calendar days | Months      |
+|-------------------|------------:|--------------:|------------:|
+| With Claude       |          32 |             4 |         0.2 |
+| Solo estimate     |     118–160 |         19–25 |     1.0–1.3 |
+| Ratio             |        4–5× |          5–6× |        5–6× |
 
 The speedup is larger in calendar days than in hours because Claude eliminates
 the context-switching overhead between sessions — the burst was continuous
