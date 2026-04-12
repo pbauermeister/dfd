@@ -1,3 +1,7 @@
+## Version 1.16.7.post1:
+
+- Bump to post1, to re-publish on PyPi.
+
 ## Version 1.16.7:
 
 - Fix #40: star-endpoint connections (`*`) were silently dropped by filters.

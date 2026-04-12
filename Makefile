@@ -99,8 +99,6 @@ doc: readme ## remake doc
 publish-to-pypi: venv clean ## publish to Pypi and create GitHub Release
 	. $(VENV)/bin/activate && \
 	./tools/publish-to-pypi.sh
-	. $(VENV)/bin/activate && \
-	python3 ./tools/publish-to-github.py
 
 publish-to-gh: venv clean ## create GitHub Release (standalone)
 	. $(VENV)/bin/activate && \
