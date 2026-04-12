@@ -46,8 +46,9 @@ version (1.16.7) as the latest GitHub Release.
    - Extract version from `CHANGES.md` (same logic as `setup.py`).
    - Extract the changelog entry for that version (lines between the first
      `## Version` heading and the next one) for the release body.
-   - Build the distribution (`python3 setup.py sdist bdist_wheel` or
-     equivalent) if `dist/` artifacts are not already present.
+   - Build the distribution via `./tools/build.sh` (default). A
+     `--no-rebuild` flag skips the build and reuses existing `dist/`
+     artifacts (used by the Makefile when chaining after PyPI publish).
    - Tag: `git tag -f "v$VERSION"` then `git push origin "v$VERSION" --force`.
    - Release: use `gh release create` with `--notes` and attach the dist
      files. If the release already exists, delete it first
@@ -69,8 +70,10 @@ version (1.16.7) as the latest GitHub Release.
 - **Tag format:** `v1.16.7` (with `v` prefix) — standard convention.
 - **Changelog extraction:** parse `CHANGES.md` between consecutive
   `## Version` headings to get the release notes body.
-- **Dist artifacts:** run `./tools/build.sh` so the script works
-  independently (for testing and backfilling), not just after PyPI publish.
+- **Dist artifacts:** default runs `./tools/build.sh` so the script works
+  independently. `--no-rebuild` skips the build and reuses `dist/` — used
+  by the Makefile when chaining after `publish-to-pypi.sh` which already
+  built everything.
 - **Idempotency:** delete-then-create is simpler and safer than
   update-in-place for GH releases with attached assets.
 - **Branch check:** by default, the script enforces that the current branch
