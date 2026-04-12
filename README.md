@@ -41,21 +41,16 @@ Compute   -->  API        records
 
 ## Features
 
-- **Multiple output formats** — SVG, PNG, PDF, JPG, EPS, and any other format
-  supported by your Graphviz installation (run `dot -Thelp` for the full list),
-  plus raw DOT source
-- **Markdown embedding** — embed diagrams directly in Markdown files and
-  generate all images in one pass (`--markdown` mode)
-- **Includes and reuse** — split large diagrams across files, share common
-  item definitions via `include`
-- **Dependency checking** — verify that all referenced includes and items are
-  consistent
-- **Filters** — render focused subsets of a large diagram (neighborhood,
-  only/without)
-- **Frames and grouping** — visually group related items
-- **Styling** — background color, graph title suppression, context diagrams
-- **SA/RT support** — signals, control processes, and channels for real-time
-  and embedded systems
+| Feature                  | Description                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Multiple output formats  | SVG, PNG, PDF, JPG, EPS, and any other format supported by your Graphviz installation (run `dot -Thelp` for the full list), plus raw DOT source |
+| Markdown embedding       | Embed diagrams directly in Markdown files and generate all images in one pass (`--markdown` mode)                              |
+| Includes and reuse       | Split large diagrams across files, share common item definitions via `include`                                                 |
+| Dependency checking      | Verify that all referenced includes and items are consistent                                                                   |
+| Filters                  | Render focused subsets of a large diagram (neighborhood, only/without)                                                         |
+| Frames and grouping      | Visually group related items                                                                                                   |
+| Styling                  | Background color, graph title suppression, context diagrams                                                                    |
+| SA/RT support            | Signals, control processes, and channels for real-time and embedded systems                                                    |
 
 ## Quick start
 
