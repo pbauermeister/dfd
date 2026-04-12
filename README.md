@@ -1,4 +1,4 @@
-# DFD — Diagrams as Code
+# DFD — Data Flow Diagrams as Code
 
 <!-- AUTO:version -->
 1.16.7
@@ -76,6 +76,10 @@ Generate the diagram:
 ```bash
 data-flow-diagram hello.dfd -o hello.svg
 ```
+
+You should obtain:
+
+![Quick start result](https://raw.githubusercontent.com/pbauermeister/dfd/main/doc/img/quick-start.svg "Quick start example")
 
 Or pipe directly from stdin:
 
