@@ -47,7 +47,7 @@ require-system: ## install system packages (graphviz, python3-venv)
 
 require: ## install needed dev+install tools, in venv
 	. $(VENV)/bin/activate && \
-	pip install setuptools twine pytest typing_extensions
+	pip install setuptools twine pytest typing_extensions mypy
 
 all: require-system venv require black lint test doc clean ## make all, except publish
 

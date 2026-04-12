@@ -42,11 +42,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Create venv and install deps
-        run: |
-          python3 -m venv .venv
-          . .venv/bin/activate
-          pip install setuptools pytest typing_extensions mypy
+      - name: Install deps
+        run: make venv require
 
       - name: Run lint
         run: make lint
