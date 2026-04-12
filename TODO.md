@@ -9,6 +9,18 @@ collected here can later be specified as tasks, grouped together, or
 discarded. If a TODO item becomes significant effort, it must be
 turned into a standard task (GH ticket, PR, devlog).
 
+## Won't do
+
+1. Redesign DSL parser with a formal grammar (lark, PEG, ANTLR)
+
+   The DSL is one-statement-per-line by design — no nesting, no
+   precedence, no multi-line constructs. The current regex-based
+   scanner/parser is the right tool for this grammar. After the
+   refactoring (#34), the pipeline stages are clean and independently
+   modifiable. A formal parser would add a dependency and migration risk
+   for no proportional benefit. Revisit only if a future feature
+   genuinely requires multi-line syntax.
+
 ## TODO Items
 
 1. Replace Black and add ruff
