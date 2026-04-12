@@ -18,7 +18,7 @@ from a simple text-based DSL, rendered via [Graphviz](https://graphviz.org/).
 It supports the SA/SD and SA/RT methodologies (Structured Analysis /
 Structured Design, with real-time extensions) as described by Edward Yourdon.
 
-![Complete example](doc/img/complete-example.svg "Complete example — an SA/RT data acquisition system")
+![Complete example](doc/img/hero.svg "Complete example — an SA/RT data acquisition system")
 
 The diagram above is generated from this input:
 
@@ -78,7 +78,7 @@ App  --> User   response
 Generate the diagram:
 
 ```bash
-data-flow-diagram hello.dfd -o hello.svg
+data-flow-diagram hello.dfd -o hello.svg --no-graph-title
 ```
 
 You should obtain:
@@ -90,7 +90,7 @@ Or pipe directly from stdin:
 ```bash
 echo 'entity User
 process App
-User --> App  request' | data-flow-diagram -o quick.svg
+User --> App  request' | data-flow-diagram -o quick.svg --no-graph-title
 ```
 
 ![Stdin pipe result](doc/img/quick-start-stdin.svg "Stdin pipe example")
