@@ -73,8 +73,8 @@ version (1.16.7) as the latest GitHub Release.
   independently (for testing and backfilling), not just after PyPI publish.
 - **Idempotency:** delete-then-create is simpler and safer than
   update-in-place for GH releases with attached assets.
-- **Branch check:** `publish-to-github.sh` enforces that the current branch
-  is `main` (and the working tree is clean). Publishing from a feature
-  branch is almost always a mistake, and the cost of the guard is near zero
-  compared to the cost of a wrong release. Since we are only backfilling
-  the latest version, there is no need to run from other branches.
+- **Branch check:** `publish-to-github.sh` enforces that the current commit
+  is an ancestor of `main` (`git merge-base --is-ancestor HEAD main`) and
+  the working tree is clean. This allows both normal use (on `main` HEAD)
+  and backfilling (detached HEAD at an older `main` commit), while blocking
+  publishes from feature branches.
