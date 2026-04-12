@@ -13,16 +13,16 @@ from a simple text-based DSL, rendered via [Graphviz](https://graphviz.org/).
 It supports the SA/SD and SA/RT methodologies (Structured Analysis /
 Structured Design, with real-time extensions) as described by Edward Yourdon.
 
-![Complete example](img/hero.svg "Complete example — an SA/RT data acquisition system")
+![Complete example](https://raw.githubusercontent.com/pbauermeister/dfd/main/img/hero.svg "Complete example — an SA/RT data acquisition system")
 
 The diagram above is generated from this input:
 
 ```
-process   Acquire   Acquire data
+process   Acquire         Acquire data
 process   Compute
 control   Control
 entity    Device
-store     Config    Configuration
+store     Config          Configuration
 channel   API
 
 *         ::>  Control    clock
@@ -78,7 +78,7 @@ data-flow-diagram hello.dfd -o hello.svg --no-graph-title
 
 You should obtain:
 
-![Quick start result](img/quick-start.svg "Quick start example")
+![Quick start result](https://raw.githubusercontent.com/pbauermeister/dfd/main/img/quick-start.svg "Quick start example")
 
 Or pipe directly from stdin:
 
@@ -88,7 +88,7 @@ process App
 User --> App  request' | data-flow-diagram -o quick.svg --no-graph-title
 ```
 
-![Stdin pipe result](img/quick-start-stdin.svg "Stdin pipe example")
+![Stdin pipe result](https://raw.githubusercontent.com/pbauermeister/dfd/main/img/quick-start-stdin.svg "Stdin pipe example")
 
 ## Installing
 
