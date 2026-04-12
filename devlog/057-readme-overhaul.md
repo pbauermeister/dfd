@@ -30,6 +30,42 @@ for new users discovering the project on GitHub.
 10. Make the documentation link more prominent with a mini-TOC.
 11. Add a "Diagrams as Code" positioning.
 
+### Re-evaluation (final step)
+
+After implementation, evaluate the result against these criteria.
+
+**Criteria from original analysis (2026-02-12):**
+
+1. CLI help matches actual `data-flow-diagram --help` output — no stale text.
+2. All URLs point to `main` branch (no `master` references).
+3. Code fence is either plain or explained.
+4. Hero image visible above the fold.
+5. Badges present (PyPI version, license, Python version at minimum).
+6. Opening reads as an elevator pitch, not an academic abstract.
+7. Quick-start section: install + first diagram in 3 steps or fewer.
+8. Input → output visual mapping is immediately obvious.
+9. Feature highlights scannable without reading prose.
+10. Documentation link is prominent with a mini-TOC or summary.
+11. "Diagrams as Code" value proposition is front and center.
+
+**Updated criteria — modern best practices (2026, based on Mermaid/D2/PlantUML
+benchmarking):**
+
+12. Visual example (code + rendered output) is the very first thing after
+    badges — before any prose explanation.
+13. Install instructions clearly separated: **user** (pip) vs **developer**
+    (clone + make).
+14. Auto-updatable sections are demarcated and regenerable via `make readme` —
+    no manual copy-paste needed to keep README in sync.
+15. `make require` works on both Linux and macOS without manual intervention.
+16. Contributing pathway is visible (link to dev setup or CONTRIBUTING guide).
+17. No orphan/stale content — every section either auto-generated or
+    deliberately hand-written with a clear owner.
+
+**Evaluation outcome:** after scoring each criterion pass/fail, decide whether
+a follow-up iteration is needed. If yes, open a new issue with the failing
+criteria as requirements.
+
 ## Design
 
 ### Principle: auto-updatable README sections
@@ -51,13 +87,25 @@ are invisible when rendered:
 The update script replaces everything between the opening and closing markers.
 Hand-edited content lives outside these markers and is never touched.
 
-**Candidate auto-generated sections:**
+**Auto-generated sections — feasibility analysis:**
 
-| Section          | Source of truth                                       |
-| ---------------- | ---------------------------------------------------- |
-| CLI help output  | `data-flow-diagram --help`                           |
-| Badges           | PyPI version, license, Python version (shield.io)    |
-| _Others?_        | _To be identified during implementation_             |
+| Section         | Source of truth                    | Effort | Verdict          |
+| --------------- | ---------------------------------- | ------ | ---------------- |
+| CLI help output | `data-flow-diagram --help`         | Easy   | **Auto-generate** |
+| Doc TOC         | `doc/README.md` section headings   | Easy   | **Auto-generate** |
+| Version         | `CHANGES.md` header                | Easy   | **Auto-generate** |
+| Badges          | shields.io URLs (self-updating)    | N/A    | Hand-write once  |
+| Supported fmts  | `cli.py` argparse help string      | Medium | Hand-write once  |
+| Feature list    | Needs curation, not just keywords  | Hard   | Hand-write       |
+| Example SVG     | Would need render pipeline in CI   | Hard   | Hand-write       |
+| License type    | `setup.py` `license=` field        | Easy   | Hand-write once  |
+
+**Rationale:** Three sections are worth auto-generating because they derive
+from a single source of truth and drift silently when hand-maintained. Badges
+use shields.io URLs that resolve dynamically at render time — the README just
+needs the correct static URLs written once. Features and examples require
+human judgment to curate what's compelling; raw extraction produces a keyword
+dump, not a pitch.
 
 ### Installation sections
 
@@ -86,20 +134,24 @@ auto-detection so that:
 
 1. **Create `tools/update-readme.sh`** — script that reads `README.md`,
    regenerates content between `<!-- AUTO:* -->` markers, and writes it back.
-   Start with CLI help; add badges.
-2. **Add `<!-- AUTO:* -->` markers to `README.md`** — wrap the CLI help block
-   and badge line(s) with the appropriate markers. Hand-edit the rest of the
-   README for the structural/content improvements (elevator pitch, hero image,
-   quick-start, feature highlights, documentation TOC, "Diagrams as Code"
-   positioning, installation sections for users and developers).
+   Three auto-generated sections: CLI help (`data-flow-diagram --help`),
+   documentation TOC (headings from `doc/README.md`), and version (from
+   `CHANGES.md`). Badges are NOT auto-generated — shields.io URLs are
+   self-updating at render time, so they are written once by hand.
+2. **Rewrite `README.md`** — restructure with:
+   - `<!-- AUTO:* -->` markers around the three auto-generated sections.
+   - Hand-written structural improvements: elevator pitch, hero image,
+     quick-start, feature highlights, "Diagrams as Code" positioning,
+     installation sections (user vs developer), documentation mini-TOC.
+   - Fix stale content: `master` → `main` URLs, code fence language tag.
 3. **Add `make readme` target** — calls `tools/update-readme.sh`. Wire it into
    `make doc` so it runs alongside diagram generation.
 4. **Make `require` OS-aware** — auto-detect Linux vs macOS and install the
    right system packages. Keep venv/pip parts cross-platform.
-5. **Fix remaining stale content** — update `master` → `main` URLs, fix code
-   fence language tag, and any other manual fixes not covered by the script.
-6. **Verify** — run `make readme`, diff the result, confirm the rendered
+5. **Verify** — run `make readme`, diff the result, confirm the rendered
    GitHub preview looks correct.
+6. **Re-evaluate** — score against the 17 criteria in the Requirement section.
+   If any fail, advise whether a follow-up iteration is needed.
 
 ## Analysis
 
