@@ -69,9 +69,12 @@ version (1.16.7) as the latest GitHub Release.
 - **Tag format:** `v1.16.7` (with `v` prefix) — standard convention.
 - **Changelog extraction:** parse `CHANGES.md` between consecutive
   `## Version` headings to get the release notes body.
-- **Dist artifacts:** reuse whatever `publish-to-pypi.sh` already built in
-  `dist/` rather than rebuilding.
+- **Dist artifacts:** run `./tools/build.sh` so the script works
+  independently (for testing and backfilling), not just after PyPI publish.
 - **Idempotency:** delete-then-create is simpler and safer than
   update-in-place for GH releases with attached assets.
-- **No branch check:** the user controls positioning. The script is a tool,
-  not a policy enforcer.
+- **Branch check:** `publish-to-github.sh` enforces that the current branch
+  is `main` (and the working tree is clean). Publishing from a feature
+  branch is almost always a mistake, and the cost of the guard is near zero
+  compared to the cost of a wrong release. Since we are only backfilling
+  the latest version, there is no need to run from other branches.
