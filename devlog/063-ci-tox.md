@@ -17,17 +17,58 @@ Set up GitHub Actions CI with a Python version matrix (3.10, 3.11, 3.12,
 
 ## Design
 
+### Key design decision: tox delegates to Makefile
+
+All tests continue to go through the Makefile — tox is just the
+orchestrator that selects which Python version runs them. tox passes
+its venv path to Make via a configurable `VENV` variable:
+
+**Makefile** (top):
+```makefile
+VENV ?= .venv
+```
+
+All targets use `$(VENV)` instead of hardcoded `.venv`:
+```makefile
+test:
+    . $(VENV)/bin/activate && pytest
+    $(MAKE) nr-test
+nr-test:
+    . $(VENV)/bin/activate && ./tests/nr-test.sh
+```
+
+**tox.ini:**
+```ini
+[testenv]
+commands =
+    make test VENV={envdir}
+    make lint VENV={envdir}
+```
+
+Locally: `make test` uses `.venv` as before (default). In tox: each
+Python version passes its own venv path via `{envdir}`.
+
+**NR test fix:** the `nr-test` target currently does not activate the
+venv — `./data-flow-diagram` runs with whatever Python is on PATH.
+This must be fixed: `nr-test` must activate `$(VENV)` so the correct
+Python version is used. Similarly for `nr-review` and `nr-regenerate`.
+
 ### Implementation steps
 
-1. **Rewrite `tox.ini`** for this project:
+1. **Make venv path configurable in Makefile:**
+   - Add `VENV ?= .venv` at the top.
+   - Replace all `. .venv/bin/activate` with `. $(VENV)/bin/activate`.
+   - Add venv activation to `nr-test`, `nr-review`, `nr-regenerate`
+     targets (currently missing — they use system Python).
+
+2. **Rewrite `tox.ini`:**
    - `envlist = py{310,311,312,313}`
-   - Dependencies: `pytest` (from `pyproject.toml` or inline)
-   - Commands: `pytest` + `make nr-test` (NR tests use shell scripts, not
-     pytest — need to verify they work under tox)
+   - Dependencies: `pytest` (plus any test deps)
+   - Commands: `make test VENV={envdir}` and `make lint VENV={envdir}`
    - `isolated_build = true` (PEP 517/518)
    - Remove stale flake8/check-manifest config
 
-2. **Create `.github/workflows/ci.yml`:**
+3. **Create `.github/workflows/ci.yml`:**
    - Triggers: `push` to `main`, `pull_request` targeting `main`
    - Matrix: `python-version: ["3.10", "3.11", "3.12", "3.13"]`
    - Steps:
@@ -39,16 +80,12 @@ Set up GitHub Actions CI with a Python version matrix (3.10, 3.11, 3.12,
    - Consider: also run `make lint` (mypy) as a separate job or tox env,
      since type-checking only needs one Python version
 
-3. **Add CI badge to README:**
+4. **Add CI badge to README:**
    - Place in the badge row after PyPI version
 
-4. **Verify and fix compatibility:**
-   - Push to branch and let GH Actions run it
+5. **Verify and fix compatibility:**
+   - Push to branch and let GH Actions run the matrix
    - Fix any 3.10/3.11/3.13-specific failures (likely none, but verify)
-   - The NR test scripts (`tests/nr-test.sh`, etc.) shell out to
-     `./data-flow-diagram` — need to verify this works inside tox's
-     virtualenv where the package is installed, not run from the repo root
 
-5. **Clean up:**
-   - Delete or update any references to the old tox.ini config
-   - Verify `make test` and `tox` don't conflict
+6. **Clean up:**
+   - Verify `make test` still works locally with `.venv` (default path)
