@@ -10,7 +10,7 @@ PyPI publish workflow.
 
 ### 1. Release script
 
-A script (`tools/publish-to-github.sh`) that:
+A script (`tools/publish-to-github.py`) that:
 
 - Reads the version from `CHANGES.md` (first `## Version X.Y.Z:` line).
 - Tags the repo at the current HEAD according to the version.
@@ -42,7 +42,7 @@ version (1.16.7) as the latest GitHub Release.
 
 ### Implementation steps
 
-1. **Create `tools/publish-to-github.sh`** — the release script:
+1. **Create `tools/publish-to-github.py`** — the release script:
    - Extract version from `CHANGES.md` (same logic as `setup.py`).
    - Extract the changelog entry for that version (lines between the first
      `## Version` heading and the next one) for the release body.
@@ -56,7 +56,7 @@ version (1.16.7) as the latest GitHub Release.
    - Print a summary (version, tag, assets uploaded).
 
 2. **Wire into Makefile** — chain in the `publish-to-pypi` target: call
-   `tools/publish-to-github.sh` after `tools/publish-to-pypi.sh` succeeds.
+   `tools/publish-to-github.py` after `tools/publish-to-pypi.sh` succeeds.
    The PyPI script stays unchanged (does exactly what its name says).
 
 3. **Test** — tamper `CHANGES.md` to declare a temporary test version
@@ -73,8 +73,8 @@ version (1.16.7) as the latest GitHub Release.
   independently (for testing and backfilling), not just after PyPI publish.
 - **Idempotency:** delete-then-create is simpler and safer than
   update-in-place for GH releases with attached assets.
-- **Branch check:** `publish-to-github.sh` enforces that the current commit
-  is an ancestor of `main` (`git merge-base --is-ancestor HEAD main`) and
-  the working tree is clean. This allows both normal use (on `main` HEAD)
-  and backfilling (detached HEAD at an older `main` commit), while blocking
-  publishes from feature branches.
+- **Branch check:** by default, the script enforces that the current branch
+  is `main` and the working tree is clean. A `--no-check` flag disables
+  the branch check entirely (for backfilling from detached HEAD at older
+  commits). The script is written in Python using `argparse` for option
+  parsing.
