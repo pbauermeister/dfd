@@ -114,6 +114,9 @@ pip install --upgrade --force-reinstall reportlab
 
 ### For developers
 
+Requires GNU Make (pre-installed on most Linux distributions; on macOS, install
+the Xcode Command Line Tools if not already present: `xcode-select --install`).
+
 ```bash
 git clone https://github.com/pbauermeister/dfd.git
 cd dfd
