@@ -92,13 +92,13 @@ doc: readme ## remake doc
 	. .venv/bin/activate && \
 	./tools/make-doc.sh
 
-publish-to-pypi: venv ## publish to Pypi and create GitHub Release
+publish-to-pypi: venv clean ## publish to Pypi and create GitHub Release
 	. .venv/bin/activate && \
 	./tools/publish-to-pypi.sh
 	. .venv/bin/activate && \
 	python3 ./tools/publish-to-github.py
 
-publish-to-github: venv ## create GitHub Release (standalone)
+publish-to-gh: venv clean ## create GitHub Release (standalone)
 	. .venv/bin/activate && \
 	python3 ./tools/publish-to-github.py
 
