@@ -51,7 +51,9 @@ Compute   -->  API        records
 | **Dependency** checking     | Verify that all referenced includes and items are consistent                                                                                    |
 | **Filters**                 | Render focused subsets of a large master diagram (neighborhood, only/without)                                                                   |
 | **Frames** and grouping     | Visually group related items                                                                                                                    |
-| **Styling**                 | Background color, graph title suppression, context diagrams                                                                                     |
+| **Styling**                 | Background color, graph title suppression, inline Graphviz attributes, reusable attribute aliases                                               |
+| **Context** diagrams        | Generate a top-level SA/SD context diagram (`style context`)                                                                                    |
+| **Layout** control          | Horizontal or vertical orientation, placement constraints between items, relaxed constraints on connections                                     |
 | **SA/RT** support           | Signals, control processes, and channels for real-time and embedded systems                                                                     |
 
 ## Quick start
