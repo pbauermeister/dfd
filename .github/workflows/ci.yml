@@ -28,22 +28,5 @@ jobs:
       - name: Install tox
         run: pip install tox
 
-      - name: Run tests via tox
+      - name: Run tests and lint via tox
         run: tox -e py
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install deps
-        run: make venv require
-
-      - name: Run lint
-        run: make lint
