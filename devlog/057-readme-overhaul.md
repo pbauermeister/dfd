@@ -95,7 +95,7 @@ Hand-edited content lives outside these markers and is never touched.
 | Doc TOC         | `doc/README.md` section headings   | Easy   | **Auto-generate** |
 | Version         | `CHANGES.md` header                | Easy   | **Auto-generate** |
 | Badges          | shields.io URLs (self-updating)    | N/A    | Hand-write once  |
-| Supported fmts  | `cli.py` argparse help string      | Medium | Hand-write once  |
+| Supported fmts  | Hand-curated frequent list + hint   | N/A    | Hand-write once  |
 | Feature list    | Needs curation, not just keywords  | Hard   | Hand-write       |
 | Example SVG     | Would need render pipeline in CI   | Hard   | Hand-write       |
 | License type    | `setup.py` `license=` field        | Easy   | Hand-write once  |
@@ -103,9 +103,13 @@ Hand-edited content lives outside these markers and is never touched.
 **Rationale:** Three sections are worth auto-generating because they derive
 from a single source of truth and drift silently when hand-maintained. Badges
 use shields.io URLs that resolve dynamically at render time — the README just
-needs the correct static URLs written once. Features and examples require
-human judgment to curate what's compelling; raw extraction produces a keyword
-dump, not a pitch.
+needs the correct static URLs written once. Supported formats: keep the
+current hand-curated list of frequent formats (svg, png, pdf, etc.) and add a
+hint that users can run `dot -Thelp` to see all formats their Graphviz
+installation supports — the full list varies by version and platform, so
+auto-generating it would be misleading. Features and examples require human
+judgment to curate what's compelling; raw extraction produces a keyword dump,
+not a pitch.
 
 ### Installation sections
 
