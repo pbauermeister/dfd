@@ -157,6 +157,40 @@ auto-detection so that:
 6. **Re-evaluate** — score against the 17 criteria in the Requirement section.
    If any fail, advise whether a follow-up iteration is needed.
 
+## Re-evaluation
+
+### Scoring (17 criteria)
+
+| #  | Criterion                                             | Verdict     |
+| -- | ----------------------------------------------------- | ----------- |
+| 1  | CLI help matches actual `--help` output               | PASS        |
+| 2  | All URLs point to `main` (no `master`)                | PASS        |
+| 3  | Code fence is plain or explained                      | PASS        |
+| 4  | Hero image visible above the fold                     | PASS        |
+| 5  | Badges present (PyPI, license, Python)                | PASS        |
+| 6  | Opening reads as elevator pitch                       | PASS        |
+| 7  | Quick-start: install + first diagram in 3 steps       | PASS        |
+| 8  | Input → output visual mapping                         | PASS        |
+| 9  | Feature highlights scannable                          | PASS        |
+| 10 | Documentation link prominent with mini-TOC            | PASS        |
+| 11 | "Diagrams as Code" value proposition                  | PASS        |
+| 12 | Visual example first thing after badges               | PASS        |
+| 13 | Install separated: user vs developer                  | PASS        |
+| 14 | Auto-updatable sections demarcated and regenerable    | PASS        |
+| 15 | `make require` works on Linux and macOS               | PASS        |
+| 16 | Contributing pathway visible                          | PARTIAL     |
+| 17 | No orphan/stale content                               | PASS        |
+
+### Verdict
+
+**16/17 pass, 1 partial.** Criterion 16: the developer install section is
+present, but there is no explicit "Contributing" section or link to a
+contributing guide. This is a minor gap — not worth a full follow-up
+iteration. Can be addressed as a one-liner in a future `.postN` or adjacent
+task.
+
+**No follow-up iteration required.**
+
 ## Analysis
 
 ### Original analysis (2026-02-12)
