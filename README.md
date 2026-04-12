@@ -1,7 +1,9 @@
 # DFD — Data Flow Diagrams as Code
 
 <!-- AUTO:version -->
+
 1.16.7
+
 <!-- /AUTO:version -->
 
 [![PyPI version](https://img.shields.io/pypi/v/data-flow-diagram)](https://pypi.org/project/data-flow-diagram/)
@@ -41,16 +43,16 @@ Compute   -->  API        records
 
 ## Features
 
-| Feature                  | Description                                                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| Multiple output formats  | SVG, PNG, PDF, JPG, EPS, and any other format supported by your Graphviz installation (run `dot -Thelp` for the full list), plus raw DOT source |
-| Markdown embedding       | Embed diagrams directly in Markdown files and generate all images in one pass (`--markdown` mode)                              |
-| Includes and reuse       | Split large diagrams across files, share common item definitions via `include`                                                 |
-| Dependency checking      | Verify that all referenced includes and items are consistent                                                                   |
-| Filters                  | Render focused subsets of a large diagram (neighborhood, only/without)                                                         |
-| Frames and grouping      | Visually group related items                                                                                                   |
-| Styling                  | Background color, graph title suppression, context diagrams                                                                    |
-| SA/RT support            | Signals, control processes, and channels for real-time and embedded systems                                                    |
+| Feature                     | Description                                                                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Multiple **output formats** | SVG, PNG, PDF, JPG, EPS, and any other format supported by your Graphviz installation (run `dot -Thelp` for the full list), plus raw DOT source |
+| **Markdown** embedding      | Embed diagrams directly in Markdown files and generate all images in one pass (`--markdown` mode)                                               |
+| **Includes** and reuse      | Split large diagrams across files, share common item definitions via `include`                                                                  |
+| **Dependency** checking     | Verify that all referenced includes and items are consistent                                                                                    |
+| **Filters**                 | Render focused subsets of a large master diagram (neighborhood, only/without)                                                                   |
+| **Frames** and grouping     | Visually group related items                                                                                                                    |
+| **Styling**                 | Background color, graph title suppression, context diagrams                                                                                     |
+| **SA/RT** support           | Signals, control processes, and channels for real-time and embedded systems                                                                     |
 
 ## Quick start
 
@@ -137,6 +139,7 @@ make all    # creates venv, installs deps, formats, lints, tests, builds docs
 Full syntax reference, examples, and advanced features:
 
 <!-- AUTO:doc-toc -->
+
 - [1. Methodology and scope](doc/README.md#1-methodology-and-scope)
 - [2. Syntax](doc/README.md#2-syntax)
 - [3. Details with examples](doc/README.md#3-details-with-examples)
@@ -145,6 +148,7 @@ Full syntax reference, examples, and advanced features:
 - [6. Dependencies](doc/README.md#6-dependencies)
 - [7. Filters](doc/README.md#7-filters)
 - [8. Influencing the layout](doc/README.md#8-influencing-the-layout)
+
 <!-- /AUTO:doc-toc -->
 
 ## Usage
@@ -152,6 +156,7 @@ Full syntax reference, examples, and advanced features:
 `data-flow-diagram -h` says:
 
 <!-- AUTO:cli-help -->
+
 ````
 usage: data-flow-diagram [-h] [--output-file OUTPUT_FILE] [--markdown]
                          [--format FORMAT]
@@ -194,6 +199,7 @@ options:
 
 See https://github.com/pbauermeister/dfd for information, syntax and examples.
 ````
+
 <!-- /AUTO:cli-help -->
 
 ## Links

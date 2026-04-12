@@ -69,16 +69,17 @@ replace_section() {
         return
     fi
 
-    # build the replacement block (markers + content)
+    # build the replacement block (markers + blank line + content + blank line)
     local replacement
-    replacement=$(printf '%s\n%s\n%s' "$open_marker" "$new_content" "$close_marker")
+    replacement=$(printf '%s\n\n%s\n\n%s' "$open_marker" "$new_content" "$close_marker")
 
     # replace everything between (and including) the markers
     # use awk for reliable multi-line replacement
     awk -v open_m="$open_marker" -v close_m="$close_marker" -v repl="$replacement" '
         $0 == open_m { print repl; skip=1; next }
         $0 == close_m { skip=0; next }
-        !skip { print }
+        skip { next }
+        { print }
     ' "$file" > "${file}.tmp"
 
     mv "${file}.tmp" "$file"
