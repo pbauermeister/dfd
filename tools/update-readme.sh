@@ -46,14 +46,6 @@ generate_doc_toc() {
     done
 }
 
-generate_version() {
-    # same extraction logic as setup.py
-    grep '^## ' "$ROOT_DIR/CHANGES.md" \
-        | head -1 \
-        | sed 's/^## *Version *//; s/:.*//' \
-        | tr -d '[:space:]'
-}
-
 # ── generic marker replacement ───────────────────────────────────────
 
 replace_section() {
@@ -96,9 +88,5 @@ echo "  - cli-help: done"
 doc_toc=$(generate_doc_toc)
 replace_section "doc-toc" "$doc_toc"
 echo "  - doc-toc: done"
-
-version=$(generate_version)
-replace_section "version" "$version"
-echo "  - version: done"
 
 echo "README.md updated."
