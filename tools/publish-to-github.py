@@ -65,16 +65,16 @@ def check_branch():
 
 
 def build():
-    """Build dist artifacts via tools/build.sh."""
+    """Build sdist and wheel."""
     print("\n--- Building dist artifacts ---")
-    run(["./tools/build.sh"])
+    run(["python3", "setup.py", "sdist", "bdist_wheel"])
 
 
 def find_dist_files() -> list[str]:
     """Find dist artifacts to attach to the release."""
     dist_dir = ROOT_DIR / "dist"
     if not dist_dir.exists():
-        sys.exit("ERROR: dist/ directory not found. Run without --no-rebuild.")
+        sys.exit("ERROR: dist/ directory not found.")
     files = sorted(str(p) for p in dist_dir.iterdir() if p.is_file())
     if not files:
         sys.exit("ERROR: no files found in dist/.")
@@ -120,11 +120,6 @@ def main():
         action="store_true",
         help="skip branch and clean-tree checks (for backfilling)",
     )
-    parser.add_argument(
-        "--no-rebuild",
-        action="store_true",
-        help="skip build, reuse existing dist/ artifacts",
-    )
     args = parser.parse_args()
 
     # extract version and changelog
@@ -140,10 +135,7 @@ def main():
         print("(branch check skipped)")
 
     # build
-    if not args.no_rebuild:
-        build()
-    else:
-        print("(rebuild skipped, reusing dist/)")
+    build()
 
     # find dist files
     dist_files = find_dist_files()

@@ -96,7 +96,7 @@ publish-to-pypi: venv ## publish to Pypi and create GitHub Release
 	. .venv/bin/activate && \
 	./tools/publish-to-pypi.sh
 	. .venv/bin/activate && \
-	python3 ./tools/publish-to-github.py --no-rebuild
+	python3 ./tools/publish-to-github.py
 
 publish-to-github: venv ## create GitHub Release (standalone)
 	. .venv/bin/activate && \
