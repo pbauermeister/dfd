@@ -31,15 +31,24 @@ venv-activate: ## activate .venv and start an interactive shell
 	@bash --rcfile <(echo "unset MAKELEVEL"; cat ~/.bashrc .venv/bin/activate)
 
 _venv:
-	python3 -m venv .venv || \
-	(apt install python3.12-venv && python3 -m venv .venv)
 	$(PYTHON3) -m venv .venv
+
+require-system: ## install system packages (graphviz, python3-venv)
+	@case "$$(uname -s)" in \
+	  Linux)  which apt >/dev/null 2>&1 && \
+	          sudo apt install -y graphviz python3-venv || \
+	          echo "Non-Debian Linux: install graphviz manually" ;; \
+	  Darwin) which brew >/dev/null 2>&1 && \
+	          brew install graphviz python3 || \
+	          echo "macOS without Homebrew: install graphviz manually" ;; \
+	  *)      echo "Unknown OS: install graphviz manually" ;; \
+	esac
 
 require: ## install needed dev+install tools, in venv
 	. .venv/bin/activate && \
 	pip install setuptools twine pytest typing_extensions
 
-all: venv require black lint test doc clean ## make all, except publish
+all: require-system venv require black lint test doc clean ## make all, except publish
 
 ################################################################################
 # Quality:: ##
@@ -75,7 +84,11 @@ install: ## install locally
 ################################################################################
 # Release:: ##
 
-doc: ## remake doc
+readme: ## regenerate auto-updatable sections of README.md
+	. .venv/bin/activate && \
+	./tools/update-readme.sh
+
+doc: readme ## remake doc
 	. .venv/bin/activate && \
 	./tools/make-doc.sh
 
