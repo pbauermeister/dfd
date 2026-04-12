@@ -25,6 +25,6 @@ if [ ! -f .token ]; then
     exit 1
 fi
 
-python3 setup.py sdist
+python3 setup.py sdist bdist_wheel
 python3 -m twine upload --username __token__ dist/* \
 	--password $(cat .token) --verbose

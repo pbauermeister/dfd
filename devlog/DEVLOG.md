@@ -12,14 +12,13 @@ Analysis outcomes and informal notes that are not yet tracked by a dedicated
 Promoted to issue #57 and tracked in
 [`devlog/057-readme-overhaul.md`](057-readme-overhaul.md).
 
-## 2. 2026-04-12 — Evaluate GitHub Releases strategy [PENDING]
+## 2. 2026-04-12 — Evaluate GitHub Releases strategy [DONE]
 
 **Prompt:** Given versions are published to PyPI, GitHub Releases are no longer
 actively generated and the releases page shows stale entries.
 
-Options to evaluate: (a) automate GH releases via GitHub Actions on version
-tag push, (b) delete stale releases and add a note pointing to PyPI, or
-(c) leave as-is. Consider project size and maintenance overhead.
+Promoted to issue #61 and tracked in
+[`devlog/061-gh-releases.md`](061-gh-releases.md).
 
 ## 3. 2026-04-12 — Add CI/build status badge to README [PENDING]
 
