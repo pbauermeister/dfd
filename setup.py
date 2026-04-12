@@ -42,7 +42,7 @@ setup(
     license="GNU General Public License v3 (GPLv3)",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    python_requires=">=3.10, <4",
+    python_requires=">=3.11, <4",
     install_requires=[],
     extras_require={
         "dev": ["check-manifest"],

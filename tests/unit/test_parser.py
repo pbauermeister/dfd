@@ -136,7 +136,7 @@ def test_parse_unknown_keyword_raises() -> None:
         parser.parse(tokens)
 
 
-@pytest.mark.parametrize("dfd_text", CHECK_ERROR_CASES)  # type: ignore[misc]
+@pytest.mark.parametrize("dfd_text", CHECK_ERROR_CASES)
 def test_check_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in check()
     tokens = scanner.scan(None, dfd_text)
@@ -145,7 +145,7 @@ def test_check_raises(dfd_text: str) -> None:
         checker.check(statements)
 
 
-@pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)  # type: ignore[misc]
+@pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)
 def test_parse_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in parse()
     tokens = scanner.scan(None, dfd_text)
