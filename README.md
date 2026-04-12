@@ -45,16 +45,16 @@ Compute   -->  API        records
 
 | Feature                     | Description                                                                                                                                     |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Multiple **output formats** | SVG, PNG, PDF, JPG, EPS, and any other format supported by your Graphviz installation (run `dot -Thelp` for the full list), plus raw DOT source |
-| **Markdown** embedding      | Embed diagrams directly in Markdown files and generate all images in one pass (`--markdown` mode)                                               |
-| **Includes** and reuse      | Split large diagrams across files, share common item definitions via `include`                                                                  |
-| **Dependency** checking     | Verify that all referenced includes and items are consistent                                                                                    |
-| **Filters**                 | Render focused subsets of a large master diagram (neighborhood, only/without)                                                                   |
-| **Frames** and grouping     | Visually group related items                                                                                                                    |
-| **Styling**                 | Background color, graph title suppression, inline Graphviz attributes, reusable attribute aliases                                               |
-| **Context** diagrams        | Generate a top-level SA/SD context diagram (`style context`)                                                                                    |
-| **Layout** control          | Horizontal or vertical orientation, placement constraints between items, relaxed constraints on connections                                     |
 | **SA/RT** support           | Signals, control processes, and channels for real-time and embedded systems                                                                     |
+| **Context** diagrams        | Generate a top-level SA/SD context diagram (`style context`)                                                                                    |
+| **Frames** and grouping     | Visually group related items                                                                                                                    |
+| **Filters**                 | Render focused subsets of a large master diagram (neighborhood, only/without)                                                                   |
+| **Dependency** checking     | Verify that all referenced includes and items are consistent                                                                                    |
+| **Includes** and reuse      | Split large diagrams across files, share common item definitions via `include`                                                                  |
+| **Markdown** embedding      | Embed diagrams directly in Markdown files and generate all images in one pass (`--markdown` mode)                                               |
+| **Layout** control          | Horizontal or vertical orientation, placement constraints between items, relaxed constraints on connections                                     |
+| **Styling**                 | Background color, graph title suppression, inline Graphviz attributes, reusable attribute aliases                                               |
+| Multiple **output formats** | SVG, PNG, PDF, JPG, EPS, and any other format supported by your Graphviz installation (run `dot -Thelp` for the full list), plus raw DOT source |
 
 ## Quick start
 
