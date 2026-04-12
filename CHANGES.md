@@ -1,6 +1,6 @@
-## Version 1.16.7.post1:
+## Version 1.16.7.post2:
 
-- Bump to post1, to re-publish on PyPi.
+- Bump to post2, to re-publish on PyPi.
 
 ## Version 1.16.7:
 
