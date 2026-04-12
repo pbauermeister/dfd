@@ -75,7 +75,11 @@ install: ## install locally
 ################################################################################
 # Release:: ##
 
-doc: ## remake doc
+readme: ## regenerate auto-updatable sections of README.md
+	. .venv/bin/activate && \
+	./tools/update-readme.sh
+
+doc: readme ## remake doc
 	. .venv/bin/activate && \
 	./tools/make-doc.sh
 
