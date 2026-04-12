@@ -55,9 +55,9 @@ version (1.16.7) as the latest GitHub Release.
      trying to update assets.
    - Print a summary (version, tag, assets uploaded).
 
-2. **Wire into `publish-to-pypi`** — in `tools/publish-to-pypi.sh`, add a
-   call to `tools/publish-to-github.sh` after the successful `twine upload`
-   line. Alternatively, chain them in the Makefile target.
+2. **Wire into Makefile** — chain in the `publish-to-pypi` target: call
+   `tools/publish-to-github.sh` after `tools/publish-to-pypi.sh` succeeds.
+   The PyPI script stays unchanged (does exactly what its name says).
 
 3. **Test** — dry-run the script (verify version extraction, tag creation,
    release body). Then run for real on version 1.16.7.
