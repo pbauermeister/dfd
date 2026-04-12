@@ -1,81 +1,153 @@
-# DFD
+# DFD — Diagrams as Code
 
-DFD (Data Flow Diagram) Generator - Commandline tool to generate
-diagrams as images in various formats (SVG, PNG, JPG, PDF, etc.) from
-source text files.
+<!-- AUTO:version -->
+1.16.7
+<!-- /AUTO:version -->
 
-The source for this project is [available here][src].
-The package page is [available here][pypi].
+[![PyPI version](https://img.shields.io/pypi/v/data-flow-diagram)](https://pypi.org/project/data-flow-diagram/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-## Scope
+Describe system architectures as text, get diagrams as SVG, PNG, PDF, and
+more. Version-controlled, diffable, no GUI needed.
 
-The present tool allows to create diagrams following the "Structured
-Analysis / Stuctured Design" (SA/SD) modelling technique as described
-by Edward Yourdon.
+DFD generates [Data Flow Diagrams](https://en.wikipedia.org/wiki/Data-flow_diagram)
+from a simple text-based DSL, rendered via [Graphviz](https://graphviz.org/).
+It supports the SA/SD and SA/RT methodologies (Structured Analysis /
+Structured Design, with real-time extensions) as described by Edward Yourdon.
 
-SA/RT (which is SA/SD with a real-time extension), can be found in the
-design of real-time and embedded systems.
-Example: [Firmware modelling of the Active Descent
-System](https://www.spyr.ch/ps/ads/qm/node18.html) of the [Rosetta
-Lander](<https://en.wikipedia.org/wiki/Rosetta_(spacecraft)>)
-spacecraft.
+![Complete example](https://raw.githubusercontent.com/pbauermeister/dfd/main/doc/img/complete-example.svg "Complete example — an SA/RT data acquisition system")
 
-Surprisingly, SA/RT is also well-suited to the analyse and design of
-web micro-services and IoT architectures.
-
-## Summary
-
-Data Flow Diagram are used to model the flow and processing of
-information through a system.
-
-```data-flow-diagram example.svg
-process	P	Process
-process	P2	Process
-entity	E	Entity
-store	S	Store
-channel	C	Channel
-
-E  --> P	flow
-P  ::> P2	signal
-P  <-> S	bidirectional flow
-P  --- C	undirected flow
-```
-
-![simple example](https://raw.githubusercontent.com/pbauermeister/dfd/master/example.svg "Simple example")
-
-## Syntax and examples
-
-See the [documentation page][doc].
-
-## Dependencies
-
-- Python3
-- Graphviz
-
-## Installing via pip3
+The diagram above is generated from this input:
 
 ```
-[sudo] pip3 install data-flow-diagram
+process   Acquire   Acquire data
+process   Compute
+control   Control
+entity    Device
+store     Config    Configuration
+channel   API
+
+*         ::>  Control    clock
+Control   <::  *          enable
+Control   <::  *          disable
+Control   ::>? Acquire    sampling
+
+Device    ->>  Acquire    continuous raw data
+Acquire   -->  Compute    raw records
+Config    <->  Compute    parameters
+Compute   -->  API        records
 ```
 
-## Installation troubleshooting
+## Features
 
-If you get an error at runtime like:
+- **Multiple output formats** — SVG, PNG, PDF, JPG, EPS, and any other format
+  supported by your Graphviz installation (run `dot -Thelp` for the full list),
+  plus raw DOT source
+- **Markdown embedding** — embed diagrams directly in Markdown files and
+  generate all images in one pass (`--markdown` mode)
+- **Includes and reuse** — split large diagrams across files, share common
+  item definitions via `include`
+- **Dependency checking** — verify that all referenced includes and items are
+  consistent
+- **Filters** — render focused subsets of a large diagram (neighborhood,
+  only/without)
+- **Frames and grouping** — visually group related items
+- **Styling** — background color, graph title suppression, context diagrams
+- **SA/RT support** — signals, control processes, and channels for real-time
+  and embedded systems
+
+## Quick start
+
+```bash
+pip install data-flow-diagram
+```
+
+Create a file `hello.dfd`:
 
 ```
-ModuleNotFoundError: No module named 'reportlab.graphics._renderPM'
+entity    User
+process   App
+store     DB
+
+User --> App    request
+App  --> DB     query
+DB   --> App    result
+App  --> User   response
 ```
 
-you may have to reinstall reportlab:
+Generate the diagram:
 
+```bash
+data-flow-diagram hello.dfd -o hello.svg
 ```
-[sudo] python3 -m pip install --upgrade --force-reinstall reportlab
+
+Or pipe directly from stdin:
+
+```bash
+echo 'entity User
+process App
+User --> App  request' | data-flow-diagram -o quick.svg
 ```
+
+## Installing
+
+### For users
+
+Requires Python 3.10+ and [Graphviz](https://graphviz.org/download/).
+
+**Linux (Debian/Ubuntu):**
+
+```bash
+sudo apt install graphviz
+pip install data-flow-diagram
+```
+
+**macOS (Homebrew):**
+
+```bash
+brew install graphviz python3
+pip install data-flow-diagram
+```
+
+If you get a `ModuleNotFoundError: No module named 'reportlab.graphics._renderPM'`
+error at runtime, reinstall reportlab:
+
+```bash
+pip install --upgrade --force-reinstall reportlab
+```
+
+### For developers
+
+```bash
+git clone https://github.com/pbauermeister/dfd.git
+cd dfd
+make all    # creates venv, installs deps, formats, lints, tests, builds docs
+```
+
+`make all` auto-detects your OS and installs the required system packages
+(Debian `apt` or macOS `brew`). Run `make help` for all available targets.
+
+## Documentation
+
+Full syntax reference, examples, and advanced features:
+
+<!-- AUTO:doc-toc -->
+- [1. Methodology and scope](doc/README.md#1-methodology-and-scope)
+- [2. Syntax](doc/README.md#2-syntax)
+- [3. Details with examples](doc/README.md#3-details-with-examples)
+- [4. Markdown snippets](doc/README.md#4-markdown-snippets)
+- [5. Including](doc/README.md#5-including)
+- [6. Dependencies](doc/README.md#6-dependencies)
+- [7. Filters](doc/README.md#7-filters)
+- [8. Influencing the layout](doc/README.md#8-influencing-the-layout)
+<!-- /AUTO:doc-toc -->
 
 ## Usage
 
 `data-flow-diagram -h` says:
 
+<!-- AUTO:cli-help -->
 ````
 usage: data-flow-diagram [-h] [--output-file OUTPUT_FILE] [--markdown]
                          [--format FORMAT]
@@ -88,7 +160,7 @@ Command-line DFD diagram generator. Converts a textual description into a
 graphic file.
 
 positional arguments:
-  INPUT_FILE            UML sequence input file; if omitted, stdin is used
+  INPUT_FILE            DFD input file; if omitted, stdin is used
 
 options:
   -h, --help            show this help message and exit
@@ -97,31 +169,32 @@ options:
                         use INPUT_FILE base name with '.svg' extension, or
                         stdout
   --markdown, -m        consider snippets between opening marker: ```data-
-                        flow-diagram OUTFILE, and closing marker: ```
-                        allowing to generate all diagrams contained in an
-                        INPUT_FILE that is a markdown file
+                        flow-diagram OUTFILE, and closing marker: ``` allowing
+                        to generate all diagrams contained in an INPUT_FILE
+                        that is a markdown file
   --format FORMAT, -f FORMAT
-                        output format: gif, jpg, tiff, bmp, pnm, eps, pdf,
-                        svg (any supported by Graphviz), or dot (raw Graphviz
-                        DOT text); default is svg
+                        output format: gif, jpg, tiff, bmp, pnm, eps, pdf, svg
+                        (any supported by Graphviz), or dot (raw Graphviz DOT
+                        text); default is svg
   --background-color BACKGROUND_COLOR, -b BACKGROUND_COLOR
-                        (not yet available) background color name (including
-                        'none' for transparent) in web color notation; see
+                        background color name (including 'none' for
+                        transparent) in web color notation; see
                         https://developer.mozilla.org/en-
-                        US/docs/Web/CSS/color_value for a list of valid
-                        names; default is white; deprecated: use 'style
-                        background-color VALUE' in the DFD itself
-  --no-graph-title      suppress graph title; deprecated: use 'style no-
-                        graph-title' in the DFD itself
+                        US/docs/Web/CSS/color_value for a list of valid names;
+                        default is white
+  --no-graph-title      suppress graph title
   --no-check-dependencies
                         suppress dependencies checking
   --debug               emit debug messages
   --version, -V         print the version and exit
 
-See https://github.com/pbauermeister/dfd for information, syntax and
-examples.
+See https://github.com/pbauermeister/dfd for information, syntax and examples.
 ````
+<!-- /AUTO:cli-help -->
 
-[src]: https://github.com/pbauermeister/dfd
-[pypi]: https://pypi.org/project/data-flow-diagram
-[doc]: https://github.com/pbauermeister/dfd/tree/master/doc/README.md
+## Links
+
+- **Source code:** [github.com/pbauermeister/dfd](https://github.com/pbauermeister/dfd)
+- **Package:** [pypi.org/project/data-flow-diagram](https://pypi.org/project/data-flow-diagram/)
+- **Changelog:** [CHANGES.md](CHANGES.md)
+- **License:** [GPLv3](LICENSE)
