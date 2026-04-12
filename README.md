@@ -12,7 +12,7 @@ from a simple text-based DSL, rendered via [Graphviz](https://graphviz.org/).
 It supports the SA/SD and SA/RT methodologies (Structured Analysis /
 Structured Design, with real-time extensions) as described by Edward Yourdon.
 
-![Complete example](doc/img/hero.svg "Complete example — an SA/RT data acquisition system")
+![Complete example](img/hero.svg "Complete example — an SA/RT data acquisition system")
 
 The diagram above is generated from this input:
 
@@ -77,7 +77,7 @@ data-flow-diagram hello.dfd -o hello.svg --no-graph-title
 
 You should obtain:
 
-![Quick start result](doc/img/quick-start.svg "Quick start example")
+![Quick start result](img/quick-start.svg "Quick start example")
 
 Or pipe directly from stdin:
 
@@ -87,7 +87,7 @@ process App
 User --> App  request' | data-flow-diagram -o quick.svg --no-graph-title
 ```
 
-![Stdin pipe result](doc/img/quick-start-stdin.svg "Stdin pipe example")
+![Stdin pipe result](img/quick-start-stdin.svg "Stdin pipe example")
 
 ## Installing
 
