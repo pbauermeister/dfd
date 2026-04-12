@@ -29,3 +29,14 @@ turned into a standard task (GH ticket, PR, devlog).
    locally) and add `ruff check` for style/import linting that mypy
    doesn't cover (unused imports, style issues). mypy stays for type
    checking. Consolidates formatting and linting into one tool.
+
+2. Fix README images on PyPI
+
+   The README.md doubles as the PyPI project homepage. Images (e.g.
+   `img/hero.svg`) use relative paths that resolve on GitHub but return
+   404 on PyPI (PyPI proxies them through `pypi-camo.freetls.fastly.net`
+   which cannot reach relative paths). Simplest fix: replace relative
+   image paths in README.md with absolute GitHub raw URLs (e.g.
+   `https://raw.githubusercontent.com/pbauermeister/dfd/main/img/hero.svg`).
+   This works on both GitHub and PyPI with no publish-time preprocessing.
+   Trade-off: URLs break if the repo is renamed, but that's acceptable.
