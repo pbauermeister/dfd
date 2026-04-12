@@ -1,0 +1,75 @@
+# 061 — Automate GitHub Releases from publish-to-pypi
+
+**Date:** 2026-04-12
+**Status:** PENDING
+
+## Requirement
+
+Create a script to publish GitHub Releases, integrated into the existing
+PyPI publish workflow.
+
+### 1. Release script
+
+A script (`tools/publish-to-github.sh`) that:
+
+- Reads the version from `CHANGES.md` (first `## Version X.Y.Z:` line).
+- Tags the repo at the current HEAD according to the version.
+- Creates a GitHub Release for that tag, including:
+  - Source archive (tarball)
+  - Wheel (`.whl`)
+- Is idempotent on re-run:
+  - Tag is repositioned to current HEAD.
+  - GitHub Release is updated (or deleted and re-created).
+
+### 2. Integration with publish-to-pypi
+
+The Makefile target `publish-to-pypi` calls the new script **after** a
+successful PyPI upload. PyPI enforces version uniqueness, so the GH release
+is a secondary artifact that follows the PyPI publish.
+
+### 3. Branch positioning
+
+The script applies on the current branch. The user is responsible for being
+on the correct branch (typically `main` after merging). The script does not
+check or enforce branch.
+
+### 4. Backfill
+
+After implementation, the user will run the script to publish the current
+version (1.16.7) as the latest GitHub Release.
+
+## Design
+
+### Implementation steps
+
+1. **Create `tools/publish-to-github.sh`** — the release script:
+   - Extract version from `CHANGES.md` (same logic as `setup.py`).
+   - Extract the changelog entry for that version (lines between the first
+     `## Version` heading and the next one) for the release body.
+   - Build the distribution (`python3 setup.py sdist bdist_wheel` or
+     equivalent) if `dist/` artifacts are not already present.
+   - Tag: `git tag -f "v$VERSION"` then `git push origin "v$VERSION" --force`.
+   - Release: use `gh release create` with `--notes` and attach the dist
+     files. If the release already exists, delete it first
+     (`gh release delete "v$VERSION" -y`) and re-create — simpler than
+     trying to update assets.
+   - Print a summary (version, tag, assets uploaded).
+
+2. **Wire into `publish-to-pypi`** — in `tools/publish-to-pypi.sh`, add a
+   call to `tools/publish-to-github.sh` after the successful `twine upload`
+   line. Alternatively, chain them in the Makefile target.
+
+3. **Test** — dry-run the script (verify version extraction, tag creation,
+   release body). Then run for real on version 1.16.7.
+
+### Key decisions
+
+- **Tag format:** `v1.16.7` (with `v` prefix) — standard convention.
+- **Changelog extraction:** parse `CHANGES.md` between consecutive
+  `## Version` headings to get the release notes body.
+- **Dist artifacts:** reuse whatever `publish-to-pypi.sh` already built in
+  `dist/` rather than rebuilding.
+- **Idempotency:** delete-then-create is simpler and safer than
+  update-in-place for GH releases with attached assets.
+- **No branch check:** the user controls positioning. The script is a tool,
+  not a policy enforcer.
