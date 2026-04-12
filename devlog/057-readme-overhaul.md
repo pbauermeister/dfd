@@ -1,7 +1,7 @@
 # 057 — Overhaul Top-level README for New Users
 
 **Date:** 2026-04-12
-**Status:** ONGOING
+**Status:** DONE
 
 ## Requirement
 
@@ -93,7 +93,7 @@ Hand-edited content lives outside these markers and is never touched.
 | --------------- | ---------------------------------- | ------ | ---------------- |
 | CLI help output | `data-flow-diagram --help`         | Easy   | **Auto-generate** |
 | Doc TOC         | `doc/README.md` section headings   | Easy   | **Auto-generate** |
-| Version         | `CHANGES.md` header                | Easy   | **Auto-generate** |
+| Version         | `CHANGES.md` header                | Easy   | Removed (redundant with PyPI badge) |
 | Badges          | shields.io URLs (self-updating)    | N/A    | Hand-write once  |
 | Supported fmts  | Hand-curated frequent list + hint   | N/A    | Hand-write once  |
 | Feature list    | Needs curation, not just keywords  | Hard   | Hand-write       |
