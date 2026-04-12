@@ -10,6 +10,30 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run tests via tox
+        run: tox -e py
+
+  lint:
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -18,15 +42,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Graphviz is required by the integration test and the non-regression tests
-      - name: Install Graphviz
-        run: sudo apt-get install -y graphviz
+      - name: Create venv and install deps
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install setuptools pytest typing_extensions
 
-      - name: Install Python dependencies
-        run: pip install pytest typing_extensions .
-
-      - name: Run unit and integration tests
-        run: pytest
-
-      - name: Run non-regression tests
-        run: ./tests/nr-test.sh
+      - name: Run lint
+        run: make lint
