@@ -59,8 +59,10 @@ version (1.16.7) as the latest GitHub Release.
    `tools/publish-to-github.sh` after `tools/publish-to-pypi.sh` succeeds.
    The PyPI script stays unchanged (does exactly what its name says).
 
-3. **Test** — dry-run the script (verify version extraction, tag creation,
-   release body). Then run for real on version 1.16.7.
+3. **Test** — tamper `CHANGES.md` to declare a temporary test version
+   (e.g. `0.0.0-test`), run the script, verify the GH release is created
+   (leave it for user review), then restore `CHANGES.md`. The user will
+   manually run the script to publish version 1.16.7.
 
 ### Key decisions
 
