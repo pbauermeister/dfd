@@ -2,6 +2,7 @@
 
 PYTHON3 := python3
 SHELL := /bin/bash
+VENV ?= .venv
 
 # Special targets:
 .PHONY:  * # In this makefile, targets are not built artifacts.
@@ -25,13 +26,13 @@ help: ## print this help
 
 venv: _venv ## setup a local .venv and tell how to activate it
 	@echo "Now please run:"
-	@echo ". .venv/bin/activate"
+	@echo ". $(VENV)/bin/activate"
 
 venv-activate: ## activate .venv and start an interactive shell
-	@bash --rcfile <(echo "unset MAKELEVEL"; cat ~/.bashrc .venv/bin/activate)
+	@bash --rcfile <(echo "unset MAKELEVEL"; cat ~/.bashrc $(VENV)/bin/activate)
 
 _venv:
-	$(PYTHON3) -m venv .venv
+	$(PYTHON3) -m venv $(VENV)
 
 require-system: ## install system packages (graphviz, python3-venv)
 	@case "$$(uname -s)" in \
@@ -45,7 +46,7 @@ require-system: ## install system packages (graphviz, python3-venv)
 	esac
 
 require: ## install needed dev+install tools, in venv
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	pip install setuptools twine pytest typing_extensions
 
 all: require-system venv require black lint test doc clean ## make all, except publish
@@ -54,25 +55,28 @@ all: require-system venv require black lint test doc clean ## make all, except p
 # Quality:: ##
 
 black: ## run black (changes shall be committed)
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	black --skip-string-normalization --line-length 80 .
 
 lint: ## lint source files
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	./tools/lint.sh
 
 test: ## run unit tests and non-regression tests
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	pytest
 	$(MAKE) nr-test
 
 nr-review: ## gen. pre-goldens (SVG + error msg) for review before regen.
+	. $(VENV)/bin/activate && \
 	./tests/nr-review.sh
 
 nr-regenerate: ## regen. golden files (.dot + .stderr) from NR fixtures
+	. $(VENV)/bin/activate && \
 	./tests/nr-regenerate.sh
 
 nr-test: ## NR tests: verify fixtures still match their golden files
+	. $(VENV)/bin/activate && \
 	./tests/nr-test.sh
 
 ################################################################################
@@ -85,21 +89,21 @@ install: ## install locally
 # Release:: ##
 
 readme: ## regenerate auto-updatable sections of README.md
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	./tools/update-readme.sh
 
 doc: readme ## remake doc
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	./tools/make-doc.sh
 
 publish-to-pypi: venv clean ## publish to Pypi and create GitHub Release
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	./tools/publish-to-pypi.sh
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	python3 ./tools/publish-to-github.py
 
 publish-to-gh: venv clean ## create GitHub Release (standalone)
-	. .venv/bin/activate && \
+	. $(VENV)/bin/activate && \
 	python3 ./tools/publish-to-github.py
 
 ################################################################################
