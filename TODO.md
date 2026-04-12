@@ -13,7 +13,7 @@ turned into a standard task (GH ticket, PR, devlog).
 
 1. Replace Black and add ruff
 
-   Replace `black` with `ruff format` (drop-in compatible, ~100x faster)
-   and add `ruff check` for style/import linting. mypy stays for type
-   checking — ruff doesn't cover that. This consolidates formatting and
-   linting into one tool, speeds up CI, and simplifies the toolchain.
+   Replace `black` with `ruff format` (drop-in compatible, ~100x faster
+   locally) and add `ruff check` for style/import linting that mypy
+   doesn't cover (unused imports, style issues). mypy stays for type
+   checking. Consolidates formatting and linting into one tool.
