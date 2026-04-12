@@ -1,7 +1,7 @@
 # 063 — GitHub Actions CI with tox Multi-version Testing
 
 **Date:** 2026-04-12
-**Status:** ONGOING
+**Status:** DONE
 
 ## Requirement
 
