@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 2: process P Dir C:\hello
+  line 1: <file:tests/non-regression/074-err-stray-backslash.dfd>
+Error: Stray backslash in "Dir C:\hello"; use \\ for a literal backslash, \n for a line break

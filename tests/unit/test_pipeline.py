@@ -85,6 +85,31 @@ class TestBuild:
         )
         assert "ShouldNotAppear" not in dot_text
 
+    def test_title_with_quotes_is_escaped(self) -> None:
+        # A title containing double quotes must be escaped in the DOT output
+        provenance = _src("<test>")
+        options = _default_options()
+        dot_text, _ = dfd.build(
+            provenance, "process P Process", 'My "Diagram"', options
+        )
+        assert 'My \\"Diagram\\"' in dot_text
+
+    def test_label_backslash_escapes_forwarded(self) -> None:
+        # recognized escapes (\\, \n) pass through to Graphviz untouched
+        provenance = _src("<test>")
+        options = _default_options()
+        dot_text, _ = dfd.build(
+            provenance, r"process P Dir C:\\hello\nnext", "", options
+        )
+        assert r'label="Dir C:\\hello\nnext"' in dot_text
+
+    def test_label_stray_backslash_raises(self) -> None:
+        # a backslash not starting a recognized escape is an error
+        provenance = _src("<test>")
+        options = _default_options()
+        with pytest.raises(exception.DfdException, match="Stray backslash"):
+            dfd.build(provenance, r"process P Dir C:\hello", "", options)
+
     def test_empty_title(self) -> None:
         # Empty title (e.g. stdout output) should not crash
         provenance = _src("<test>")

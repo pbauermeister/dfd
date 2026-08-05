@@ -1,7 +1,12 @@
 """Validate parsed statements: items, connections, frames."""
 
+import re
+
 from .. import exception, model
 from ..model import Keyword
+
+# recognized label escapes: \n (line break), \l and \r (reserved), \\ (literal)
+RX_LABEL_ESCAPE = re.compile(r"\\[nlr\\]")
 
 
 def _check_items(statements: model.Statements) -> dict[str, model.Item]:
@@ -98,9 +103,32 @@ def _check_frames(
             framed_items.add(name)
 
 
+def _check_backslashes(statements: model.Statements) -> None:
+    """Reject stray backslashes in names and labels."""
+    for statement in statements:
+        match statement:
+            case model.Item() as item:
+                values = [item.name, item.text]
+            case model.Connection() as conn:
+                values = [conn.text or ""]
+            case model.Frame() as frame:
+                values = [frame.text]
+            case _:
+                continue
+        for value in values:
+            # a backslash surviving removal of recognized escapes is stray
+            if "\\" in RX_LABEL_ESCAPE.sub("", value):
+                raise exception.DfdException(
+                    f'Stray backslash in "{value}"; use \\\\ for a literal '
+                    "backslash, \\n for a line break",
+                    source=statement.source,
+                )
+
+
 def check(statements: model.Statements) -> dict[str, model.Item]:
     """Validate all statements: no duplicate items, valid connection endpoints, valid frames."""
     items_by_name = _check_items(statements)
     _check_connections(statements, items_by_name)
     _check_frames(statements, items_by_name)
+    _check_backslashes(statements)
     return items_by_name

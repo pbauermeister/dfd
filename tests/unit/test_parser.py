@@ -70,6 +70,10 @@ CHECK_ERROR_CASES = [
         id="empty-frame",  # frame with no item names
     ),
     pytest.param(
+        r"process  P  Dir C:\hello",
+        id="stray-backslash",  # backslash not starting a recognized escape
+    ),
+    pytest.param(
         """
         process  P  Proc
         frame UNKNOWN = Title
