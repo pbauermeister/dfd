@@ -7,11 +7,11 @@ none	N	A "quoted" point
 # quote in an item name:
 entity	T"2	Entity with quoted name
 
-# backslashes: stray ones become literal, \n stays a line break:
-entity	B	Dir C:\tmp\nnext line
+# backslashes: \\ renders one literal backslash, \n is a line break:
+entity	B	Dir C:\\hello\nnext line
 
-# backslash-quote combination:
-entity	Q	label with \" should work
+# backslash-quote combination (\\ then "):
+entity	Q	label with \\" should work
 
 # quotes in connection labels:
 P --> T	data with "quotes"

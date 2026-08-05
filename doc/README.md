@@ -545,7 +545,9 @@ P1 -->  P3  [OK penwidth=2] all OK
 
 ### 3.7. Text wrapping and line breaks
 
-Newlines can be inserted in any label by means of `\n`.
+Newlines can be inserted in any label by means of `\n`. A literal
+backslash must be written `\\`; any other backslash sequence (except
+`\l` and `\r`, reserved for future alignment support) is an error.
 
 Lines are wrapped by default by:
 

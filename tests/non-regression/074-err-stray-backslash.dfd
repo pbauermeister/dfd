@@ -1,0 +1,2 @@
+# a backslash not starting a recognized escape (\n \l \r \\) is an error:
+process	P	Dir C:\hello

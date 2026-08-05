@@ -94,14 +94,21 @@ class TestBuild:
         )
         assert 'My \\"Diagram\\"' in dot_text
 
-    def test_label_backslash_escaping(self) -> None:
-        # stray backslashes are escaped; \n label escapes are forwarded
+    def test_label_backslash_escapes_forwarded(self) -> None:
+        # recognized escapes (\\, \n) pass through to Graphviz untouched
         provenance = _src("<test>")
         options = _default_options()
         dot_text, _ = dfd.build(
-            provenance, r"process P Dir C:\tmp\nnext", "", options
+            provenance, r"process P Dir C:\\hello\nnext", "", options
         )
-        assert r'label="Dir C:\\tmp\nnext"' in dot_text
+        assert r'label="Dir C:\\hello\nnext"' in dot_text
+
+    def test_label_stray_backslash_raises(self) -> None:
+        # a backslash not starting a recognized escape is an error
+        provenance = _src("<test>")
+        options = _default_options()
+        with pytest.raises(exception.DfdException, match="Stray backslash"):
+            dfd.build(provenance, r"process P Dir C:\hello", "", options)
 
     def test_empty_title(self) -> None:
         # Empty title (e.g. stdout output) should not crash

@@ -21,11 +21,11 @@ digraph D {
   /* 7: entity T"2 Entity with quoted name */
   "T\"2" [shape=rectangle label="Entity with quoted\nname" ]
 
-  /* 10: entity B Dir C:\tmp\nnext line */
-  "B" [shape=rectangle label="Dir C:\\tmp\nnext line" ]
+  /* 10: entity B Dir C:\\hello\nnext line */
+  "B" [shape=rectangle label="Dir C:\\hello\nnext line" ]
 
-  /* 13: entity Q label with \" should work */
-  "Q" [shape=rectangle label="label with \\\" should\nwork" ]
+  /* 13: entity Q label with \\" should work */
+  "Q" [shape=rectangle label="label with \\\"\nshould work" ]
 
   /* 16: flow P T data with "quotes" */
   "P" -> "T" [label="data with\n\"quotes\""]

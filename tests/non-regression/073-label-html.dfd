@@ -1,5 +1,5 @@
 # HTML-special characters in HTML-like labels (store, channel):
-store	S	Store a < b & c > d
+store	S	Store a < b & c > d \\ e
 channel	C	Channel x <y> & "z"
 
 process	P	A process

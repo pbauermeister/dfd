@@ -6,11 +6,11 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 1: store S Store a < b & c > d */
+  /* 1: store S Store a < b & c > d \\ e */
   "S" [shape=none label=<
     <TABLE BORDER="0">
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
-      <TR><TD><FONT COLOR="black">Store a &lt; b &amp; c &gt; d</FONT></TD></TR>
+      <TR><TD><FONT COLOR="black">Store a &lt; b &amp; c &gt; d<br/>\ e</FONT></TD></TR>
       <TR><TD BGCOLOR="black" WIDTH="6"></TD></TR>
     </TABLE>>]
 

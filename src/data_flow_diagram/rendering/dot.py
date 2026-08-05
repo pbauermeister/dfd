@@ -9,17 +9,17 @@ from typing import Any
 from .. import exception, model
 from . import templates as TMPL
 
-# backslash not starting a recognized Graphviz label escape (\n \l \r \\)
-RX_STRAY_BACKSLASH = re.compile(r'\\(?![nlr\\])')
+# label escapes needing translation in HTML-like label context
+RX_HTML_LABEL_ESCAPE = re.compile(r"\\(\\|n)")
 
 
 def _escape_dot_string(s: str) -> str:
     """Escape a value for embedding in a double-quoted DOT string.
 
-    Escapes double quotes and stray backslashes; recognized label escapes
-    (\\n, \\l, \\r, \\\\) are deliberately forwarded to Graphviz.
+    Only double quotes need escaping: the checker rejects stray
+    backslashes, and recognized label escapes (\\n, \\l, \\r, \\\\) are
+    deliberately forwarded to Graphviz.
     """
-    s = RX_STRAY_BACKSLASH.sub(r'\\\\', s)
     return s.replace('"', '\\"')
 
 
@@ -148,8 +148,12 @@ class Generator:
 
     def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
         d = item.__dict__
-        # HTML-like label context: entity-escape, then turn \n into <br/>
-        d["text"] = html.escape(d["text"]).replace("\\n", "<br/>")
+        # HTML-like label context: entity-escape, then translate label
+        # escapes left-to-right (\\ -> literal backslash, \n -> <br/>)
+        d["text"] = RX_HTML_LABEL_ESCAPE.sub(
+            lambda m: "<br/>" if m[1] == "n" else "\\",
+            html.escape(d["text"]),
+        )
         d["name"] = _escape_dot_string(d["name"])
         return d
 
