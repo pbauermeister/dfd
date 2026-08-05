@@ -1,3 +1,12 @@
+## Version 1.16.9:
+
+- Fix #67: labels containing double quotes (or stray backslashes) produced
+  invalid DOT and crashed rendering. All values are now escaped for their
+  DOT emission context: quotes and stray backslashes in double-quoted
+  strings (item names and labels, connection labels, frame labels, graph
+  title); HTML entities in store/channel HTML-like labels. The documented
+  `\n` label escape (and `\l`/`\r`, reserved) still pass through.
+
 ## Version 1.16.8:
 
 - Fix #65: pip-installed package crashed on startup in a clean venv
