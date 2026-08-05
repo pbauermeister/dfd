@@ -34,3 +34,13 @@ turned into a standard task (GH ticket, PR, devlog).
 
    Replaced relative image paths in README.md with absolute GitHub raw
    URLs so images render on both GitHub and PyPI.
+
+3. Include TestPyPI in a full testing cycle
+
+   Extend the release testing cycle to upload to TestPyPI
+   (`twine upload -r testpypi`) and install from there in a clean venv,
+   as an end-to-end test of the publishing pipeline before the real
+   PyPI upload. Context: #65 showed that install-time breakage (missing
+   dependency) is invisible to the dev-venv test suite; the clean-venv
+   wheel smoke test covers the artifact, TestPyPI would also cover the
+   transport/publishing path.

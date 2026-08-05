@@ -1,3 +1,10 @@
+## Version 1.16.8:
+
+- Fix #65: pip-installed package crashed on startup in a clean venv
+  (`ModuleNotFoundError: No module named 'typing_extensions'`). `Literal`
+  is now imported from stdlib `typing`; the `typing_extensions`
+  dependency is gone.
+
 ## Version 1.16.7.post2:
 
 - Bump to post2, to re-publish on PyPi.
