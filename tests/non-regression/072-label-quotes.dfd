@@ -13,6 +13,9 @@ entity	B	Dir C:\\hello\nnext line
 # backslash-quote combination (\\ then "):
 entity	Q	label with \\" should work
 
+# */ must not close the generated source-echo comment prematurely:
+entity	C	label with */ inside
+
 # quotes in connection labels:
 P --> T	data with "quotes"
 T"2 --> P	more "data"

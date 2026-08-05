@@ -27,16 +27,19 @@ digraph D {
   /* 13: entity Q label with \\" should work */
   "Q" [shape=rectangle label="label with \\\"\nshould work" ]
 
-  /* 16: flow P T data with "quotes" */
+  /* 16: entity C label with * / inside */
+  "C" [shape=rectangle label="label with */ inside" ]
+
+  /* 19: flow P T data with "quotes" */
   "P" -> "T" [label="data with\n\"quotes\""]
 
-  /* 17: flow T"2 P more "data" */
+  /* 20: flow T"2 P more "data" */
   "T\"2" -> "P" [label="more \"data\""]
 
-  /* 18: signal K N signal with "quotes" */
+  /* 21: signal K N signal with "quotes" */
   "K" -> "N" [label="signal with\n\"quotes\"" style=dashed]
 
-  /* 21: frame P K = A "quoted" frame */
+  /* 24: frame P K = A "quoted" frame */
   subgraph cluster_0 {
     label="A \"quoted\" frame"
     style=dashed
