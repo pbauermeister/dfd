@@ -2,7 +2,7 @@
 
 Date: 2026-08-05
 
-Status: ONGOING
+Status: DONE
 
 ## Requirement
 
@@ -48,3 +48,14 @@ Agreed implementation steps:
 
 No new NR fixtures: the change does not touch diagram-generation behavior;
 the clean-venv smoke test covers the actual failure mode.
+
+## Outcome
+
+- `console.py` now imports `Literal` from stdlib `typing`;
+  `typing_extensions` removed from `make require`.
+- `make black`, `make lint` (mypy strict), `make test` (60 pytest + 77 NR):
+  all pass.
+- Clean-venv smoke test: wheel installed into a fresh venv (only
+  `data-flow-diagram` present, no `typing_extensions`); `--help` and an NR
+  fixture render both succeed.
+- Version bumped to 1.16.8 in `CHANGES.md`.
