@@ -2,7 +2,7 @@
 
 Date: 2026-08-05
 
-Status: PENDING
+Status: ONGOING
 
 ## Requirement
 
@@ -36,4 +36,15 @@ This is a user-facing bug fix → PATCH version bump.
 
 ## Design
 
-(To be agreed before implementation.)
+Agreed implementation steps:
+
+1. Change `console.py` to `from typing import Literal`; remove
+   `typing_extensions` from the `make require` pip install list in the
+   Makefile.
+2. Run `make black`, `make lint`, `make test`.
+3. Clean-venv smoke test: build the package, `pip install` it into a fresh
+   venv, run `data-flow-diagram --help` and a small render.
+4. Bump version to 1.16.8, update `CHANGES.md`.
+
+No new NR fixtures: the change does not touch diagram-generation behavior;
+the clean-venv smoke test covers the actual failure mode.
