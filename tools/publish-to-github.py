@@ -95,18 +95,21 @@ def create_release(version: str, changelog: str, dist_files: list[str]):
     print(f"\n--- Creating GitHub Release {tag} ---")
 
     # delete existing release if present
-    result = run(
-        ["gh", "release", "view", tag], check=False
-    )
+    result = run(["gh", "release", "view", tag], check=False)
     if result.returncode == 0:
         print(f"  Release {tag} exists, deleting...")
         run(["gh", "release", "delete", tag, "-y"])
 
     # create release with assets
     cmd = [
-        "gh", "release", "create", tag,
-        "--title", f"v{version}",
-        "--notes", changelog,
+        "gh",
+        "release",
+        "create",
+        tag,
+        "--title",
+        f"v{version}",
+        "--notes",
+        changelog,
     ] + dist_files
     run(cmd)
 
