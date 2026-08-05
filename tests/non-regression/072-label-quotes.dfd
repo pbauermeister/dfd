@@ -1,0 +1,22 @@
+# quotes in plain-label item texts:
+process	P	A "quoted" process
+control	K	A "quoted" control
+entity	T	A "quoted" entity
+none	N	A "quoted" point
+
+# quote in an item name:
+entity	T"2	Entity with quoted name
+
+# backslashes: stray ones become literal, \n stays a line break:
+entity	B	Dir C:\tmp\nnext line
+
+# backslash-quote combination:
+entity	Q	label with \" should work
+
+# quotes in connection labels:
+P --> T	data with "quotes"
+T"2 --> P	more "data"
+K ::> N	signal with "quotes"
+
+# quote in a frame label:
+frame P K = A "quoted" frame

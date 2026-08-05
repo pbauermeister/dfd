@@ -1,5 +1,6 @@
 """DOT code generation: Generator class and statement-to-DOT dispatch."""
 
+import html
 import pprint
 import re
 import textwrap
@@ -7,6 +8,19 @@ from typing import Any
 
 from .. import exception, model
 from . import templates as TMPL
+
+# backslash not starting a recognized Graphviz label escape (\n \l \r \\)
+RX_STRAY_BACKSLASH = re.compile(r'\\(?![nlr\\])')
+
+
+def _escape_dot_string(s: str) -> str:
+    """Escape a value for embedding in a double-quoted DOT string.
+
+    Escapes double quotes and stray backslashes; recognized label escapes
+    (\\n, \\l, \\r, \\\\) are deliberately forwarded to Graphviz.
+    """
+    s = RX_STRAY_BACKSLASH.sub(r'\\\\', s)
+    return s.replace('"', '\\"')
 
 
 def _strip_quotes(s: str) -> str:
@@ -56,7 +70,8 @@ class Generator:
 
     def append(self, line: str, statement: model.Statement) -> None:
         self.lines.append("")
-        text = model.pack(statement.source.text)
+        # break any */ in the source echo so the DOT comment stays valid
+        text = model.pack(statement.source.text).replace("*/", "* /")
         self.lines.append(f"/* {statement.source.line_nr}: {text} */")
         self.lines.append(line)
 
@@ -73,6 +88,10 @@ class Generator:
         attrs = copy.attrs or ""
         attrs = self._expand_attribs(attrs)
 
+        # escape for the double-quoted emission sites below
+        name = _escape_dot_string(copy.name)
+        text = _escape_dot_string(copy.text)
+
         # emit shape-specific DOT declaration
         match copy.type:
             case model.Keyword.PROCESS:
@@ -83,24 +102,26 @@ class Generator:
                     shape = TMPL.SHAPE_PROCESS
                     fc = TMPL.FILL_PROCESS
                 line = (
-                    f'"{copy.name}" [shape={shape} label="{copy.text}" '
+                    f'"{name}" [shape={shape} label="{text}" '
                     f"fillcolor={fc} style={TMPL.STYLE_PROCESS} {attrs}]"
                 )
             case model.Keyword.CONTROL:
                 line = (
-                    f'"{copy.name}" [shape={TMPL.SHAPE_PROCESS} label="{copy.text}" '
+                    f'"{name}" [shape={TMPL.SHAPE_PROCESS} label="{text}" '
                     f'fillcolor={TMPL.FILL_PROCESS} style={TMPL.STYLE_CONTROL} {attrs}]'
                 )
             case model.Keyword.ENTITY:
                 line = (
-                    f'"{copy.name}" [shape={TMPL.SHAPE_ENTITY} label="{copy.text}" '
+                    f'"{name}" [shape={TMPL.SHAPE_ENTITY} label="{text}" '
                     f"{attrs}]"
                 )
             case model.Keyword.STORE:
                 d = self._attrib_to_dict(copy, attrs)
                 line = TMPL.STORE.format(**d)
             case model.Keyword.NONE | model.Keyword.STAR:
-                line = f'"{copy.name}" [shape={TMPL.SHAPE_NONE} label="{copy.text}" {attrs}]'
+                line = (
+                    f'"{name}" [shape={TMPL.SHAPE_NONE} label="{text}" {attrs}]'
+                )
             case model.Keyword.CHANNEL:
                 d = self._attrib_to_dict(copy, attrs)
                 if self.graph_options.is_vertical:
@@ -127,7 +148,9 @@ class Generator:
 
     def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
         d = item.__dict__
-        d["text"] = d["text"].replace("\\n", "<br/>")
+        # HTML-like label context: entity-escape, then turn \n into <br/>
+        d["text"] = html.escape(d["text"]).replace("\\n", "<br/>")
+        d["name"] = _escape_dot_string(d["name"])
         return d
 
     def _compile_attribs_names(
@@ -158,7 +181,7 @@ class Generator:
 
     def _build_connection_attrs(self, conn: model.Connection, text: str) -> str:
         """Build the DOT attribute string for a connection edge."""
-        attrs = f'label="{text}"'
+        attrs = f'label="{_escape_dot_string(text)}"'
 
         # constraints are invisible layout-only edges
         match conn.type:
@@ -221,7 +244,9 @@ class Generator:
         )
 
         attrs = self._build_connection_attrs(conn, text)
-        line = f'"{src_item.name}"{src_port} -> "{dst_item.name}"{dst_port} [{attrs}]'
+        src_name = _escape_dot_string(src_item.name)
+        dst_name = _escape_dot_string(dst_item.name)
+        line = f'"{src_name}"{src_port} -> "{dst_name}"{dst_port} [{attrs}]'
         self.append(line, conn)
 
     def generate_style(self, style: model.Style) -> None:
@@ -231,13 +256,13 @@ class Generator:
         self.append(f"subgraph cluster_{self.frame_nr} {{", frame)
         self.frame_nr += 1
 
-        self.lines.append(f'  label="{frame.text}"')
+        self.lines.append(f'  label="{_escape_dot_string(frame.text)}"')
         if frame.attrs:
             attrs = self._expand_attribs(frame.attrs)
             self.lines.append(f"  {attrs}")
 
         for item in frame.items:
-            self.lines.append(f'  "{item}"')
+            self.lines.append(f'  "{_escape_dot_string(item)}"')
         self.lines.append("}")
 
     def generate_dot_text(self, title: str, bg_color: str | None) -> str:
@@ -250,7 +275,10 @@ class Generator:
             graph_params.append(TMPL.GRAPH_PARAMS_CONTEXT_DIAGRAM)
 
         if title:
-            graph_params.append(TMPL.DOT_GRAPH_TITLE.format(title=title))
+            escaped_title = _escape_dot_string(title)
+            graph_params.append(
+                TMPL.DOT_GRAPH_TITLE.format(title=escaped_title)
+            )
         else:
             graph_params.append(TMPL.DOT_GRAPH_NOTITLE)
 

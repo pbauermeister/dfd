@@ -1,0 +1,46 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/072-label-quotes -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 1: process P A "quoted" process */
+  "P" [shape=ellipse label="A \"quoted\" process" fillcolor="#eeeeee" style=filled ]
+
+  /* 2: control K A "quoted" control */
+  "K" [shape=ellipse label="A \"quoted\" control" fillcolor="#eeeeee" style="filled,dashed" ]
+
+  /* 3: entity T A "quoted" entity */
+  "T" [shape=rectangle label="A \"quoted\" entity" ]
+
+  /* 4: none N A "quoted" point */
+  "N" [shape=none label="A \"quoted\" point" ]
+
+  /* 7: entity T"2 Entity with quoted name */
+  "T\"2" [shape=rectangle label="Entity with quoted\nname" ]
+
+  /* 10: entity B Dir C:\tmp\nnext line */
+  "B" [shape=rectangle label="Dir C:\\tmp\nnext line" ]
+
+  /* 13: entity Q label with \" should work */
+  "Q" [shape=rectangle label="label with \\\" should\nwork" ]
+
+  /* 16: flow P T data with "quotes" */
+  "P" -> "T" [label="data with\n\"quotes\""]
+
+  /* 17: flow T"2 P more "data" */
+  "T\"2" -> "P" [label="more \"data\""]
+
+  /* 18: signal K N signal with "quotes" */
+  "K" -> "N" [label="signal with\n\"quotes\"" style=dashed]
+
+  /* 21: frame P K = A "quoted" frame */
+  subgraph cluster_0 {
+    label="A \"quoted\" frame"
+    style=dashed
+    "P"
+    "K"
+  }
+}

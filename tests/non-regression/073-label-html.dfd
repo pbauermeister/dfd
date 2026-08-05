@@ -1,0 +1,8 @@
+# HTML-special characters in HTML-like labels (store, channel):
+store	S	Store a < b & c > d
+channel	C	Channel x <y> & "z"
+
+process	P	A process
+
+P --> S	write
+C --> P	read

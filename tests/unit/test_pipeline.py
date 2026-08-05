@@ -85,6 +85,24 @@ class TestBuild:
         )
         assert "ShouldNotAppear" not in dot_text
 
+    def test_title_with_quotes_is_escaped(self) -> None:
+        # A title containing double quotes must be escaped in the DOT output
+        provenance = _src("<test>")
+        options = _default_options()
+        dot_text, _ = dfd.build(
+            provenance, "process P Process", 'My "Diagram"', options
+        )
+        assert 'My \\"Diagram\\"' in dot_text
+
+    def test_label_backslash_escaping(self) -> None:
+        # stray backslashes are escaped; \n label escapes are forwarded
+        provenance = _src("<test>")
+        options = _default_options()
+        dot_text, _ = dfd.build(
+            provenance, r"process P Dir C:\tmp\nnext", "", options
+        )
+        assert r'label="Dir C:\\tmp\nnext"' in dot_text
+
     def test_empty_title(self) -> None:
         # Empty title (e.g. stdout output) should not crash
         provenance = _src("<test>")
