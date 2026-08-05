@@ -1,11 +1,14 @@
 ## Version 1.16.9:
 
-- Fix #67: labels containing double quotes (or stray backslashes) produced
-  invalid DOT and crashed rendering. All values are now escaped for their
-  DOT emission context: quotes and stray backslashes in double-quoted
-  strings (item names and labels, connection labels, frame labels, graph
-  title); HTML entities in store/channel HTML-like labels. The documented
-  `\n` label escape (and `\l`/`\r`, reserved) still pass through.
+- Fix #67: labels containing double quotes produced invalid DOT and crashed
+  rendering. All values are now escaped for their DOT emission context:
+  quotes in double-quoted strings (item names and labels, connection labels,
+  frame labels, graph title); HTML entities in store/channel HTML-like
+  labels.
+- Labels form a small escape language: `\n` inserts a line break
+  (documented), `\\` a literal backslash; `\l`/`\r` are reserved (#59). Any
+  other backslash is now rejected with a clear error instead of producing
+  undefined DOT behavior.
 
 ## Version 1.16.8:
 
