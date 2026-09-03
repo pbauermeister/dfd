@@ -2,7 +2,7 @@
 
 Date: 2026-09-03
 
-Status: ONGOING
+Status: DONE
 
 ## Requirement
 
@@ -121,3 +121,29 @@ extract the marker section, compare to the generator output.
    in the registry, confirm the test fails, revert.
 4. **Wrap-up.** `CHANGES.md` 1.17.1, PR body update, `gh pr ready`.
 5. **Follow-up issue** for CLI flag derivation, opened after merge.
+
+## Outcome
+
+All steps completed as designed; PR #72 ready for review.
+
+- Adding a style option is now one field declaration in `GraphOptions`
+  followed by `make readme`. Six edit sites in five files became one.
+- `model.style()` wraps `dataclasses.field(metadata=...)`; `STYLE_SPECS`
+  is built at import from the field declarations. Kind is inferred from
+  the resolved type hint (`bool` → flag, `int` → int, else str). A
+  `placeholder` metadata (default `N`, `COLOR` for `background-color`)
+  feeds the value word shown in both tables.
+- Declaration order in `GraphOptions` is the doc order; fields were
+  regrouped as layout / text / graph, so both tables changed order.
+- `doc/SYNTAX.md` gained a Default column, derived from the field default.
+- `tools/update-readme.sh` was renamed `tools/update-docs.sh`; the top-level
+  `README.md` and both doc files were already prettier-clean, so prettier
+  is a no-op today and a safety net for later. Prettier lives in
+  `$(VENV)/node_modules`, installed by `make require`; `make require-system`
+  installs `npm` (apt) / `node` (brew). tox and CI do not call
+  `make require`, so CI is unaffected.
+- Drift test `tests/test_doc_sync.py` runs the generator as a subprocess
+  and compares with the marker sections. Mutation smoke-test: altering a doc
+  string and adding a keyword both made it fail; reverted.
+- All 81 NR goldens passed unchanged throughout; 66 pytest.
+- Follow-up: derive CLI flags from the same metadata (separate task).
