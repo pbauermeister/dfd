@@ -67,3 +67,29 @@ Review findings to fix on the branch:
 4. Mutation smoke-test: mutate the size plumbing (e.g. ignore
    `item_text_size`), confirm the new fixtures fail, revert.
 5. `make black`, `make lint`, `make test`; update PR body; mark PR ready.
+
+## Outcome
+
+All implementation steps completed as designed; PR #70 green and ready.
+
+- The hand-written implementation was committed as-is, then both review
+  findings were fixed:
+  - `DOT_GRAPH_NOTITLE` placeholder leak — reproduced first (with
+    `style no-graph-title`, the DOT output literally contained
+    `fontsize={graph_title_size}`), fixed by formatting at the point of
+    use, then verified via CLI.
+  - Unused `typing.Any` import removed.
+- NR fixtures added: `075-style-text-sizes` (titled graph, all three sizes
+  at non-default values 14/12/16) and `076-style-text-sizes-no-title`
+  (regression guard for the `DOT_GRAPH_NOTITLE` path). The
+  `066-err-bad-style-int` golden was regenerated: `get_style_int()`
+  dropped a stray trailing `"` from the old error message.
+- Mutation smoke-tests behaved exactly as designed: hardcoding
+  `item_text_size` failed 075+076; hardcoding the no-title
+  `graph_title_size` failed 076 only.
+- `make black`, `make lint`, `make test` all green (64 pytest + 83 NR);
+  CI green on the final commit.
+- Side effect: the CLAUDE.md versioning convention was amended (user
+  decision): MINOR for new non-breaking features; PATCH for bug fixes,
+  refactorings, doc, build/tooling, tests, deployment. The 1.17.0 bump
+  conforms.
