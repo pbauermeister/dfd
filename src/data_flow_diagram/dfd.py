@@ -1,5 +1,7 @@
 """Pipeline orchestrator: scan → parse → check → resolve → filter → render."""
 
+from typing import Any
+
 from . import config, exception, model
 from .console import dprint
 from .dsl import checker, dependency_checker, filters, parser, scanner
@@ -111,6 +113,14 @@ def remove_unused_hidables(statements: model.Statements) -> model.Statements:
     return new_statements
 
 
+def get_style_int(statement: model.Style) -> int:
+    """Parse an integer style value and return it, or raise a DfdException."""
+    try:
+        return int(statement.value)
+    except ValueError as e:
+        raise exception.DfdException(f'{e}', source=statement.source) from e
+
+
 def handle_options(
     statements: model.Statements,
 ) -> tuple[model.Statements, model.GraphOptions]:
@@ -132,23 +142,19 @@ def handle_options(
                     case model.StyleOption.UNROTATED:
                         options.is_rotated = False
                     case model.StyleOption.ITEM_TEXT_WIDTH:
-                        try:
-                            options.item_text_width = int(style.value)
-                        except ValueError as e:
-                            raise exception.DfdException(
-                                f'{e}"', source=statement.source
-                            ) from e
+                        options.item_text_width = get_style_int(statement)
                     case model.StyleOption.CONNECTION_TEXT_WIDTH:
-                        try:
-                            options.connection_text_width = int(style.value)
-                        except ValueError as e:
-                            raise exception.DfdException(
-                                f'{e}"', source=statement.source
-                            ) from e
+                        options.connection_text_width = get_style_int(statement)
                     case model.StyleOption.BACKGROUND_COLOR:
                         options.background_color = style.value
                     case model.StyleOption.NO_GRAPH_TITLE:
                         options.no_graph_title = True
+                    case model.StyleOption.CONNECTION_TEXT_SIZE:
+                        options.connection_text_size = get_style_int(statement)
+                    case model.StyleOption.ITEM_TEXT_SIZE:
+                        options.item_text_size = get_style_int(statement)
+                    case model.StyleOption.GRAPH_TITLE_SIZE:
+                        options.graph_title_size = get_style_int(statement)
                     case _:
                         raise exception.DfdException(
                             f'Unsupported style "{style.style}"',

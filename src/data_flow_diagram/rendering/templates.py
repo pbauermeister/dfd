@@ -77,9 +77,11 @@ CHANNEL_HORIZONTAL = """
 
 
 # Graphviz font defaults for edges, items, and graph label
-DOT_FONT_EDGE = 'fontname="times-italic" fontsize=10'
-DOT_FONT_NODE = 'fontname="helvetica" fontsize=10'
-DOT_FONT_GRAPH = 'fontname="helvetica" fontsize=9 fontcolor="#000060"'
+DOT_FONT_EDGE = 'fontname="times-italic" fontsize={connection_text_size}'
+DOT_FONT_NODE = 'fontname="helvetica" fontsize={item_text_size}'
+DOT_FONT_GRAPH = (
+    'fontname="helvetica" fontsize={graph_title_size} fontcolor="#000060"'
+)
 
 DOT_GRAPH_TITLE = """graph[label="\n- {title} -" """ + DOT_FONT_GRAPH + """]"""
 DOT_GRAPH_NOTITLE = f"graph[{DOT_FONT_GRAPH}]"

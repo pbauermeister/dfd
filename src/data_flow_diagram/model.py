@@ -69,6 +69,9 @@ class GraphOptions:
     connection_text_width: int = config.DEFAULT_CONNECTION_TEXT_WIDTH
     background_color: str | None = None
     no_graph_title: bool = False
+    connection_text_size: int = config.DEFAULT_CONNECTION_TEXT_SIZE
+    item_text_size: int = config.DEFAULT_ITEM_TEXT_SIZE
+    graph_title_size: int = config.DEFAULT_GRAPH_TITLE_SIZE
 
 
 @dataclass
@@ -159,6 +162,9 @@ class StyleOption(StrEnum):
     CONNECTION_TEXT_WIDTH = "connection-text-width"
     BACKGROUND_COLOR = "background-color"
     NO_GRAPH_TITLE = "no-graph-title"
+    CONNECTION_TEXT_SIZE = "connection-text-size"
+    ITEM_TEXT_SIZE = "item-text-size"
+    GRAPH_TITLE_SIZE = "graph-title-size"
 
 
 ##############################################################################
