@@ -1,3 +1,10 @@
+## Version 1.17.0:
+
+- Add style statements:
+  - `style item-text-size N`
+  - `style connection-text-size N`
+  - `style graph-title-size N`
+
 ## Version 1.16.9:
 
 - Fix #67: labels containing double quotes produced invalid DOT and crashed

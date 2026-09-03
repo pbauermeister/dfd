@@ -281,10 +281,17 @@ class Generator:
         if title:
             escaped_title = _escape_dot_string(title)
             graph_params.append(
-                TMPL.DOT_GRAPH_TITLE.format(title=escaped_title)
+                TMPL.DOT_GRAPH_TITLE.format(
+                    title=escaped_title,
+                    graph_title_size=self.graph_options.graph_title_size,
+                )
             )
         else:
-            graph_params.append(TMPL.DOT_GRAPH_NOTITLE)
+            graph_params.append(
+                TMPL.DOT_GRAPH_NOTITLE.format(
+                    graph_title_size=self.graph_options.graph_title_size
+                )
+            )
 
         if self.graph_options.is_vertical:
             graph_params.append(TMPL.LAYOUT_VERTICAL)
@@ -303,6 +310,8 @@ class Generator:
             title=title,
             block=block,
             graph_params="\n  ".join(graph_params),
+            connection_text_size=self.graph_options.connection_text_size,
+            item_text_size=self.graph_options.item_text_size,
         ).replace("\n  \n", "\n\n")
         return text
 

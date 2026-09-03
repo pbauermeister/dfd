@@ -227,10 +227,13 @@ diagram:
 | ------------------------------- | --------------------------------------------------------------------------------- |
 | `style background-color COLOR`  | Sets a graph background color as per https://graphviz.org/docs/attr-types/color/. |
 | `style connection-text-width N` | Sets the connections labels wrapping to use N chars columns.                      |
+| `style connection-text-size N`  | Sets the connection label text size                                               |
 | `style context`                 | Makes the diagram a context diagram.                                              |
 | `style horizontal`              | Layouts flows in the horizontal direction (the default).                          |
 | `style item-text-width N`       | Sets the items labels wrapping to use N chars columns.                            |
+| `style item-text-size N`        | Sets the items label text size                                                    |
 | `style no-graph-title`          | Suppress graph title containing the image file path (without extension).          |
+| `style graph-title-size N`      | Sets the graph title text size                                                    |
 | `style rotated`                 | Rotates the diagram by 90°.                                                       |
 | `style unrotated`               | Reverts the diagram rotation, if any.                                             |
 | `style vertical`                | Layouts flows in the vertical direction.                                          |

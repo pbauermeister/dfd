@@ -1,0 +1,9 @@
+style item-text-size 14
+style connection-text-size 12
+style graph-title-size 16
+
+process	P1
+entity	E1
+store	S1
+E1 --> P1	request
+P1 --> S1	record
