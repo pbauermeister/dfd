@@ -1,0 +1,16 @@
+
+digraph D {
+  graph[fontname="helvetica" fontsize=16 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=12]
+  node[fontname="helvetica" fontsize=14]
+
+  /* 5: process P1 */
+  "P1" [shape=ellipse label="P1" fillcolor="#eeeeee" style=filled ]
+
+  /* 6: entity E1 */
+  "E1" [shape=rectangle label="E1" ]
+
+  /* 7: flow E1 P1 request */
+  "E1" -> "P1" [label="request"]
+}
