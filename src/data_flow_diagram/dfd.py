@@ -1,7 +1,5 @@
 """Pipeline orchestrator: scan → parse → check → resolve → filter → render."""
 
-from typing import Any
-
 from . import config, exception, model
 from .console import dprint
 from .dsl import checker, dependency_checker, filters, parser, scanner

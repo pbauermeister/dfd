@@ -287,7 +287,11 @@ class Generator:
                 )
             )
         else:
-            graph_params.append(TMPL.DOT_GRAPH_NOTITLE)
+            graph_params.append(
+                TMPL.DOT_GRAPH_NOTITLE.format(
+                    graph_title_size=self.graph_options.graph_title_size
+                )
+            )
 
         if self.graph_options.is_vertical:
             graph_params.append(TMPL.LAYOUT_VERTICAL)
