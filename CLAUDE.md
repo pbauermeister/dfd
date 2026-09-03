@@ -190,7 +190,10 @@ Full rules are in **`doc/COMMENTING.md`**. Key points:
 
 Versions follow `MAJOR.MINOR.PATCH` with an optional `.postN` suffix:
 
-- Bump `PATCH` for user-facing changes: bug fixes, new features, doc additions.
+- Bump `MINOR` for new features (even minor ones), as long as they are
+  non-breaking.
+- Bump `PATCH` for bug fixes, refactorings, doc additions, build and
+  tooling changes, tests, and deployment changes.
 - Use `.postN` only for publishing/packaging fixes and trivial wording corrections
   (e.g. fixing a typo in `README.md`, a broken PyPI upload, a CI script tweak)
   that do not affect the tool's behaviour or documentation content.
