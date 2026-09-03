@@ -128,38 +128,28 @@ def handle_options(
     for statement in statements:
         match statement:
             case model.Style() as style:
-                match style.style:
-                    case model.StyleOption.VERTICAL:
-                        options.is_vertical = True
-                    case model.StyleOption.CONTEXT:
-                        options.is_context = True
-                    case model.StyleOption.HORIZONTAL:
-                        options.is_vertical = False
-                    case model.StyleOption.ROTATED:
-                        options.is_rotated = True
-                    case model.StyleOption.UNROTATED:
-                        options.is_rotated = False
-                    case model.StyleOption.ITEM_TEXT_WIDTH:
-                        options.item_text_width = get_style_int(statement)
-                    case model.StyleOption.CONNECTION_TEXT_WIDTH:
-                        options.connection_text_width = get_style_int(statement)
-                    case model.StyleOption.BACKGROUND_COLOR:
-                        options.background_color = style.value
-                    case model.StyleOption.NO_GRAPH_TITLE:
-                        options.no_graph_title = True
-                    case model.StyleOption.CONNECTION_TEXT_SIZE:
-                        options.connection_text_size = get_style_int(statement)
-                    case model.StyleOption.ITEM_TEXT_SIZE:
-                        options.item_text_size = get_style_int(statement)
-                    case model.StyleOption.GRAPH_TITLE_SIZE:
-                        options.graph_title_size = get_style_int(statement)
-                    case _:
-                        raise exception.DfdException(
-                            f'Unsupported style "{style.style}"',
-                            source=statement.source,
-                        )
-
+                apply_style(style, options)
                 continue
         new_statements.append(statement)
 
     return new_statements, options
+
+
+def apply_style(style: model.Style, options: model.GraphOptions) -> None:
+    """Set the GraphOptions field designated by a style statement."""
+    spec = model.STYLE_SPECS.get(style.style)
+    if spec is None:
+        raise exception.DfdException(
+            f'Unsupported style "{style.style}"', source=style.source
+        )
+
+    # convert the value as per the option kind
+    value: object
+    match spec.kind:
+        case "flag":
+            value = spec.value
+        case "int":
+            value = get_style_int(style)
+        case _:
+            value = style.value
+    setattr(options, spec.field, value)

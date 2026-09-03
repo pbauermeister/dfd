@@ -49,7 +49,7 @@ Rules:
 
 - Abstract bases use semantic role names: `Statement`, `Drawable`.
 - Concrete types use domain nouns: `Item`, `Connection`, `Frame`.
-- Enums use singular nouns: `Keyword`, `StyleOption`.
+- Enums use singular nouns: `Keyword`.
 - Type aliases use descriptive plurals: `Statements`, `SourceLines`.
 
 ## Modules (files)
@@ -135,7 +135,10 @@ The package structure must work in all installation modes:
 ## Constants
 
 - **Configuration values** (defaults, thresholds): define in
-  `config.py` with `UPPER_SNAKE_CASE` names.
+  `config.py` with `UPPER_SNAKE_CASE` names. Exception: defaults of
+  `style` options live on the `GraphOptions` field declarations in
+  `model.py`, which are the single source of truth for those options
+  (keyword, type, default, documentation).
 - **Graphviz-specific constants** (templates, font specs, colours):
   define in `rendering/templates.py`.
 - **DSL syntax literals** (sentinel values, directive keywords):

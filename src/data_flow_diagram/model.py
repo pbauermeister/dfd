@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import typing
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any
-
-from . import config
+from typing import Any, Literal, TypeVar
 
 
 def repr(o: Any) -> str:
@@ -60,18 +59,144 @@ class Statement(Base):
 # Statements: options
 
 
+T = TypeVar("T")
+
+# Metadata attached to each GraphOptions field: which `style` keyword(s) set
+# it and how it is documented. Everything else (registry, parsing, doc
+# tables) is derived from these declarations.
+StyleFlags = dict[str, tuple[bool, str]]  # keyword -> (value, doc)
+
+
+def style(
+    default: T,
+    *,
+    name: str = "",
+    doc: str = "",
+    placeholder: str = "N",
+    flags: StyleFlags | None = None,
+) -> T:
+    """Declare a GraphOptions field settable by a `style` statement.
+
+    Valued options (int or str fields) give `name` (the DSL keyword),
+    `doc`, and the `placeholder` word shown for the value in the docs.
+    Flag options (bool fields) give `flags`, mapping each DSL keyword to the
+    value it sets and its doc. Type and default come from the field itself.
+    """
+    metadata = {
+        "name": name,
+        "doc": doc,
+        "placeholder": placeholder,
+        "flags": flags or {},
+    }
+    return dataclasses.field(default=default, metadata=metadata)
+
+
 @dataclass
 class GraphOptions:
-    is_vertical: bool = False
-    is_context: bool = False
-    is_rotated: bool = False
-    item_text_width: int = config.DEFAULT_ITEM_TEXT_WIDTH
-    connection_text_width: int = config.DEFAULT_CONNECTION_TEXT_WIDTH
-    background_color: str | None = None
-    no_graph_title: bool = False
-    connection_text_size: int = config.DEFAULT_CONNECTION_TEXT_SIZE
-    item_text_size: int = config.DEFAULT_ITEM_TEXT_SIZE
-    graph_title_size: int = config.DEFAULT_GRAPH_TITLE_SIZE
+    """Whole-diagram rendering options. Declaration order is the doc order."""
+
+    # layout
+    is_vertical: bool = style(
+        False,
+        flags={
+            "horizontal": (
+                False,
+                "Layouts flows in the horizontal direction (the default).",
+            ),
+            "vertical": (True, "Layouts flows in the vertical direction."),
+        },
+    )
+    is_rotated: bool = style(
+        False,
+        flags={
+            "rotated": (True, "Rotates the diagram by 90°."),
+            "unrotated": (False, "Reverts the diagram rotation, if any."),
+        },
+    )
+    is_context: bool = style(
+        False,
+        flags={"context": (True, "Makes the diagram a context diagram.")},
+    )
+
+    # text
+    item_text_width: int = style(
+        20,
+        name="item-text-width",
+        doc="Sets the items labels wrapping to use N chars columns.",
+    )
+    item_text_size: int = style(
+        10,
+        name="item-text-size",
+        doc="Sets the items label text size.",
+    )
+    connection_text_width: int = style(
+        14,
+        name="connection-text-width",
+        doc="Sets the connections labels wrapping to use N chars columns.",
+    )
+    connection_text_size: int = style(
+        10,
+        name="connection-text-size",
+        doc="Sets the connections label text size.",
+    )
+
+    # graph
+    background_color: str | None = style(
+        None,
+        name="background-color",
+        placeholder="COLOR",
+        doc="Sets a graph background color as per "
+        "https://graphviz.org/docs/attr-types/color/.",
+    )
+    no_graph_title: bool = style(
+        False,
+        flags={
+            "no-graph-title": (
+                True,
+                "Suppress graph title containing the image file path "
+                "(without extension).",
+            ),
+        },
+    )
+    graph_title_size: int = style(
+        9,
+        name="graph-title-size",
+        doc="Sets the graph title text size.",
+    )
+
+
+StyleKind = Literal["flag", "int", "str"]
+
+
+@dataclass(frozen=True)
+class StyleSpec:
+    """One `style` keyword: the GraphOptions field it sets, and how."""
+
+    field: str
+    kind: StyleKind
+    value: Any  # fixed value for flags; default value otherwise
+    doc: str
+    placeholder: str  # value placeholder word in docs (valued options only)
+
+
+def _build_style_specs() -> dict[str, StyleSpec]:
+    """Derive the keyword registry from the GraphOptions declarations."""
+    specs: dict[str, StyleSpec] = {}
+    hints = typing.get_type_hints(GraphOptions)
+    for f in dataclasses.fields(GraphOptions):
+        md = f.metadata
+        if md["flags"]:
+            for keyword, (value, doc) in md["flags"].items():
+                specs[keyword] = StyleSpec(f.name, "flag", value, doc, "")
+        else:
+            kind: StyleKind = "int" if hints[f.name] is int else "str"
+            specs[md["name"]] = StyleSpec(
+                f.name, kind, f.default, md["doc"], md["placeholder"]
+            )
+    return specs
+
+
+STYLE_SPECS = _build_style_specs()  # keyword -> spec, in doc order
 
 
 @dataclass
@@ -146,25 +271,6 @@ class Only(Filter):
 @dataclass
 class Without(Filter):
     replaced_by: str
-
-
-##############################################################################
-# Style options
-
-
-class StyleOption(StrEnum):
-    VERTICAL = "vertical"
-    HORIZONTAL = "horizontal"
-    CONTEXT = "context"
-    ROTATED = "rotated"
-    UNROTATED = "unrotated"
-    ITEM_TEXT_WIDTH = "item-text-width"
-    CONNECTION_TEXT_WIDTH = "connection-text-width"
-    BACKGROUND_COLOR = "background-color"
-    NO_GRAPH_TITLE = "no-graph-title"
-    CONNECTION_TEXT_SIZE = "connection-text-size"
-    ITEM_TEXT_SIZE = "item-text-size"
-    GRAPH_TITLE_SIZE = "graph-title-size"
 
 
 ##############################################################################
