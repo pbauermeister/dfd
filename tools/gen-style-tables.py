@@ -11,6 +11,7 @@ like prettier / VSCode format tables, so re-formatting produces no diff.
 import pathlib
 import sys
 from collections.abc import Iterator
+from typing import assert_never
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "src"))
 
@@ -32,7 +33,7 @@ def format_table(header: list[str], rows: list[list[str]]) -> str:
 def readme_rows() -> Iterator[list[str]]:
     """Rows for doc/README.md: full statement form and effect."""
     for keyword, spec in model.STYLE_SPECS.items():
-        if spec.kind == "flag":
+        if spec.kind is model.StyleKind.FLAG:
             statement = f"`style {keyword}`"
         else:
             statement = f"`style {keyword} {spec.placeholder}`"
@@ -43,13 +44,15 @@ def syntax_rows() -> Iterator[list[str]]:
     """Rows for doc/SYNTAX.md: option, value kind, default, and effect."""
     for keyword, spec in model.STYLE_SPECS.items():
         match spec.kind:
-            case "flag":
+            case model.StyleKind.FLAG:
                 value, default = "-", "-"
-            case "int":
+            case model.StyleKind.INT:
                 value, default = "integer", str(spec.value)
-            case _:
+            case model.StyleKind.STR:
                 value = spec.placeholder.lower()
                 default = "-" if spec.value is None else str(spec.value)
+            case _:
+                assert_never(spec.kind)
         yield [f"`{keyword}`", value, default, spec.doc]
 
 

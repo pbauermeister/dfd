@@ -6,8 +6,8 @@ import dataclasses
 import json
 import typing
 from dataclasses import dataclass
-from enum import StrEnum
-from typing import Any, Literal, TypeVar
+from enum import Enum, StrEnum, auto
+from typing import Any, TypeVar, assert_never
 
 from . import config
 
@@ -63,10 +63,23 @@ class Statement(Base):
 
 T = TypeVar("T")
 
-# Metadata attached to each GraphOptions field: which `style` keyword(s) set
-# it and how it is documented. Everything else (registry, parsing, doc
-# tables) is derived from these declarations.
+# Declarations attached to GraphOptions fields as dataclass metadata: which
+# `style` keyword(s) set the field and how it is documented. Everything else
+# (registry, parsing, doc tables) is derived from these declarations.
 StyleFlags = dict[str, tuple[bool, str]]  # keyword -> (value, doc)
+STYLE_METADATA = "style"  # the single dataclass metadata key
+
+
+@dataclass(frozen=True)
+class StyleFlagsDecl:
+    flags: StyleFlags
+
+
+@dataclass(frozen=True)
+class StyleValueDecl:
+    name: str  # DSL keyword
+    doc: str
+    placeholder: str  # word shown for the value in the docs
 
 
 def declare_style_as_flags(*, default: bool, flags: StyleFlags) -> bool:
@@ -74,8 +87,8 @@ def declare_style_as_flags(*, default: bool, flags: StyleFlags) -> bool:
 
     `flags` maps each DSL keyword to the value it sets and its doc.
     """
-    metadata = {"kind": "flags", "flags": flags}
-    return dataclasses.field(default=default, metadata=metadata)
+    decl = StyleFlagsDecl(flags)
+    return dataclasses.field(default=default, metadata={STYLE_METADATA: decl})
 
 
 def declare_style_as_value(
@@ -86,13 +99,8 @@ def declare_style_as_value(
     `name` is the DSL keyword; `placeholder` is the word shown for the value
     in the docs. Type and default come from the field itself.
     """
-    metadata = {
-        "kind": "value",
-        "name": name,
-        "doc": doc,
-        "placeholder": placeholder,
-    }
-    return dataclasses.field(default=default, metadata=metadata)
+    decl = StyleValueDecl(name, doc, placeholder)
+    return dataclasses.field(default=default, metadata={STYLE_METADATA: decl})
 
 
 @dataclass
@@ -169,7 +177,10 @@ class GraphOptions:
     )
 
 
-StyleKind = Literal["flag", "int", "str"]
+class StyleKind(Enum):
+    FLAG = auto()  # keyword sets a fixed bool value
+    INT = auto()  # keyword takes an integer value
+    STR = auto()  # keyword takes a string value
 
 
 @dataclass(frozen=True)
@@ -188,15 +199,19 @@ def _build_style_specs() -> dict[str, StyleSpec]:
     specs: dict[str, StyleSpec] = {}
     hints = typing.get_type_hints(GraphOptions)
     for f in dataclasses.fields(GraphOptions):
-        md = f.metadata
-        if md["kind"] == "flags":
-            for keyword, (value, doc) in md["flags"].items():
-                specs[keyword] = StyleSpec(f.name, "flag", value, doc, "")
-        else:
-            kind: StyleKind = "int" if hints[f.name] is int else "str"
-            specs[md["name"]] = StyleSpec(
-                f.name, kind, f.default, md["doc"], md["placeholder"]
-            )
+        match f.metadata[STYLE_METADATA]:
+            case StyleFlagsDecl(flags):
+                for keyword, (value, doc) in flags.items():
+                    specs[keyword] = StyleSpec(
+                        f.name, StyleKind.FLAG, value, doc, ""
+                    )
+            case StyleValueDecl(name, doc, placeholder):
+                kind = StyleKind.INT if hints[f.name] is int else StyleKind.STR
+                specs[name] = StyleSpec(
+                    f.name, kind, f.default, doc, placeholder
+                )
+            case decl:
+                raise TypeError(f"unexpected style declaration {decl!r}")
     return specs
 
 

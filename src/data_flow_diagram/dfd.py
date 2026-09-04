@@ -1,5 +1,7 @@
 """Pipeline orchestrator: scan → parse → check → resolve → filter → render."""
 
+from typing import assert_never
+
 from . import config, exception, model
 from .console import dprint
 from .dsl import checker, dependency_checker, filters, parser, scanner
@@ -146,10 +148,12 @@ def apply_style(style: model.Style, options: model.GraphOptions) -> None:
     # convert the value as per the option kind
     value: object
     match spec.kind:
-        case "flag":
+        case model.StyleKind.FLAG:
             value = spec.value
-        case "int":
+        case model.StyleKind.INT:
             value = get_style_int(style)
-        case _:
+        case model.StyleKind.STR:
             value = style.value
+        case _:
+            assert_never(spec.kind)
     setattr(options, spec.field, value)

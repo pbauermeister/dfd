@@ -85,6 +85,12 @@ class GraphOptions:
   and str fields (revised in PR review from a single `style()` helper with
   positional default, so that mandatory arguments are enforced by the
   signature and call sites read explicitly).
+- Metadata is one key (`STYLE_METADATA`) holding a typed declaration
+  object, `StyleFlagsDecl` or `StyleValueDecl`; the registry builder
+  dispatches with `match` on the class. `StyleKind` is an `Enum` (FLAG /
+  INT / STR); `apply_style` and the doc generator match on its members
+  with `assert_never` for exhaustiveness. Both revised in PR review from
+  string-keyed dicts and a `Literal` type, for lint-time checkability.
 - `StyleSpec(field, kind, value, doc)` with `kind` in `flag | int | str`,
   inferred from the resolved type hint (`bool` → flag, `int` → int, else
   str). `value` is the fixed value for flags, the default otherwise.
