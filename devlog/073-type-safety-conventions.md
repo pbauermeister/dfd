@@ -1,8 +1,8 @@
-# 73 — Type-Safety Conventions
+# 073 — Type-Safety Conventions
 
 Date: 2026-09-04
 
-Status: PENDING
+Status: ONGOING
 
 ## Requirement
 
