@@ -141,6 +141,47 @@ The package structure must work in all installation modes:
 - **DSL syntax literals** (sentinel values, directive keywords):
   define in `model.py` alongside the data types that use them.
 
+## Type safety
+
+Python is treated as a fully type-safe language. The overhead of precise
+types (dataclasses, enums, keyword-only signatures, possibly inheritance)
+is accepted for the comprehensiveness and quality that lint-time checking
+brings.
+
+| Data shape                                  | Use                                      | Never                                 |
+| ------------------------------------------- | ---------------------------------------- | ------------------------------------- |
+| Record with a fixed set of fields           | `@dataclass` (frozen when immutable)     | `dict[str, Any]`, positional `tuple`  |
+| Closed set of tags or kinds                 | `Enum` / `StrEnum` members               | string literals, `Literal[...]`       |
+| Data keyed by names from the input          | `dict[K, V]` with precise `K` and `V`    | `dict[str, Any]`, `dict[str, object]` |
+| Dispatch on kind or class                   | `match` ending with `assert_never`       | `if kind == "...":` chains            |
+| Values crossing an I/O boundary (JSON, CLI) | `Any` converted to typed objects at once | `Any` flowing into the pipeline       |
+
+Rules:
+
+- `dict[str, *]` is reserved for string-indexed data: item names, DSL
+  keywords, file names. A dict whose keys are known identifiers is a
+  record and must be a dataclass.
+- A `tuple` is a record only when it is unpacked once at its single
+  consumer; if read positionally in more than one place, make it a
+  dataclass.
+- `Any` is allowed only at boundaries and carries an inline comment
+  naming the boundary.
+- `Literal[...]` is for strings owned by an external API, not for
+  internal tags.
+
+Parameters:
+
+- One to three parameters: positional, no rule.
+- Four or more parameters: keyword-only, enforced with `*` in the
+  signature.
+- Booleans are always passed by keyword, whatever the parameter count.
+- Three parameters with adjacent parameters of the same type: pass by
+  keyword at the call site (judgment, not enforced).
+- Dataclasses with four or more fields use `kw_only=True`.
+
+Tooling: mypy runs in strict mode. Ruff rules ANN401, PLR0913 and FBT
+enforce the `Any` and parameter rules once ruff is adopted (TODO.md).
+
 ## Terminology
 
 All identifiers, comments, and documentation must use the official
