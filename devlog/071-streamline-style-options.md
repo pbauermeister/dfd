@@ -29,10 +29,14 @@ Decisions taken with the user:
   metadata via a small helper; type and default come from the field itself.
   Everything else is derived: the keyword registry, the generic
   `handle_options`, and the two documentation tables.
-- **Fold the defaults**: the style-related `DEFAULT_*` constants in
-  `config.py` are removed; the field default is the default.
-  `doc/CONVENTIONS.md` is updated accordingly. The `StyleOption` enum is
-  removed (it was referenced only by `handle_options`).
+- **Defaults stay in `config.py`** (revised in PR review: initially
+  folded into the field declarations). The user prefers value tuning in a
+  distinct module; the field default references the constant
+  (`default=config.DEFAULT_ITEM_TEXT_WIDTH`), so the registry and the
+  generated docs still read the value from the field and cannot drift.
+  Adding a valued option thus means two edits (constant + declaration).
+  Flag defaults stay literal. The `StyleOption` enum is removed (it was
+  referenced only by `handle_options`).
 - **One doc string per option**, shared by both tables. `doc/SYNTAX.md`
   derives its "Value" and default columns from the field type and default.
   SYNTAX wording changes slightly as a consequence.
@@ -75,7 +79,12 @@ class GraphOptions:
     ...
 ```
 
-- `style()` wraps `dataclasses.field(default=..., metadata=...)`.
+- Two keyword-only helpers wrap `dataclasses.field(default=..., metadata=...)`:
+  `declare_style_as_flags(default, flags)` for bool fields and
+  `declare_style_as_value(default, name, doc, placeholder="N")` for int
+  and str fields (revised in PR review from a single `style()` helper with
+  positional default, so that mandatory arguments are enforced by the
+  signature and call sites read explicitly).
 - `StyleSpec(field, kind, value, doc)` with `kind` in `flag | int | str`,
   inferred from the resolved type hint (`bool` → flag, `int` → int, else
   str). `value` is the fixed value for flags, the default otherwise.
@@ -127,9 +136,11 @@ extract the marker section, compare to the generator output.
 All steps completed as designed; PR #72 ready for review.
 
 - Adding a style option is now one field declaration in `GraphOptions`
-  followed by `make readme`. Six edit sites in five files became one.
-- `model.style()` wraps `dataclasses.field(metadata=...)`; `STYLE_SPECS`
-  is built at import from the field declarations. Kind is inferred from
+  (plus its default constant in `config.py` for valued options) followed
+  by `make readme`. Six edit sites in five files became one or two.
+- `model.declare_style_as_flags()` / `declare_style_as_value()` wrap
+  `dataclasses.field(metadata=...)`; `STYLE_SPECS` is built at import from
+  the field declarations. Kind is inferred from
   the resolved type hint (`bool` → flag, `int` → int, else str). A
   `placeholder` metadata (default `N`, `COLOR` for `background-color`)
   feeds the value word shown in both tables.

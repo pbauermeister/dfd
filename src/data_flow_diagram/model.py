@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, Literal, TypeVar
 
+from . import config
+
 
 def repr(o: Any) -> str:
     name: str = o.__class__.__name__
@@ -67,26 +69,28 @@ T = TypeVar("T")
 StyleFlags = dict[str, tuple[bool, str]]  # keyword -> (value, doc)
 
 
-def style(
-    default: T,
-    *,
-    name: str = "",
-    doc: str = "",
-    placeholder: str = "N",
-    flags: StyleFlags | None = None,
-) -> T:
-    """Declare a GraphOptions field settable by a `style` statement.
+def declare_style_as_flags(*, default: bool, flags: StyleFlags) -> bool:
+    """Declare a bool GraphOptions field set by flag `style` keywords.
 
-    Valued options (int or str fields) give `name` (the DSL keyword),
-    `doc`, and the `placeholder` word shown for the value in the docs.
-    Flag options (bool fields) give `flags`, mapping each DSL keyword to the
-    value it sets and its doc. Type and default come from the field itself.
+    `flags` maps each DSL keyword to the value it sets and its doc.
+    """
+    metadata = {"kind": "flags", "flags": flags}
+    return dataclasses.field(default=default, metadata=metadata)
+
+
+def declare_style_as_value(
+    *, default: T, name: str, doc: str, placeholder: str = "N"
+) -> T:
+    """Declare an int or str GraphOptions field set by a valued `style` keyword.
+
+    `name` is the DSL keyword; `placeholder` is the word shown for the value
+    in the docs. Type and default come from the field itself.
     """
     metadata = {
+        "kind": "value",
         "name": name,
         "doc": doc,
         "placeholder": placeholder,
-        "flags": flags or {},
     }
     return dataclasses.field(default=default, metadata=metadata)
 
@@ -96,8 +100,8 @@ class GraphOptions:
     """Whole-diagram rendering options. Declaration order is the doc order."""
 
     # layout
-    is_vertical: bool = style(
-        False,
+    is_vertical: bool = declare_style_as_flags(
+        default=False,
         flags={
             "horizontal": (
                 False,
@@ -106,50 +110,50 @@ class GraphOptions:
             "vertical": (True, "Layouts flows in the vertical direction."),
         },
     )
-    is_rotated: bool = style(
-        False,
+    is_rotated: bool = declare_style_as_flags(
+        default=False,
         flags={
             "rotated": (True, "Rotates the diagram by 90°."),
             "unrotated": (False, "Reverts the diagram rotation, if any."),
         },
     )
-    is_context: bool = style(
-        False,
+    is_context: bool = declare_style_as_flags(
+        default=False,
         flags={"context": (True, "Makes the diagram a context diagram.")},
     )
 
     # text
-    item_text_width: int = style(
-        20,
+    item_text_width: int = declare_style_as_value(
+        default=config.DEFAULT_ITEM_TEXT_WIDTH,
         name="item-text-width",
         doc="Sets the items labels wrapping to use N chars columns.",
     )
-    item_text_size: int = style(
-        10,
+    item_text_size: int = declare_style_as_value(
+        default=config.DEFAULT_ITEM_TEXT_SIZE,
         name="item-text-size",
         doc="Sets the items label text size.",
     )
-    connection_text_width: int = style(
-        14,
+    connection_text_width: int = declare_style_as_value(
+        default=config.DEFAULT_CONNECTION_TEXT_WIDTH,
         name="connection-text-width",
         doc="Sets the connections labels wrapping to use N chars columns.",
     )
-    connection_text_size: int = style(
-        10,
+    connection_text_size: int = declare_style_as_value(
+        default=config.DEFAULT_CONNECTION_TEXT_SIZE,
         name="connection-text-size",
         doc="Sets the connections label text size.",
     )
 
     # graph
-    background_color: str | None = style(
-        None,
+    background_color: str | None = declare_style_as_value(
+        default=None,
         name="background-color",
         placeholder="COLOR",
         doc="Sets a graph background color as per "
         "https://graphviz.org/docs/attr-types/color/.",
     )
-    no_graph_title: bool = style(
-        False,
+    no_graph_title: bool = declare_style_as_flags(
+        default=False,
         flags={
             "no-graph-title": (
                 True,
@@ -158,8 +162,8 @@ class GraphOptions:
             ),
         },
     )
-    graph_title_size: int = style(
-        9,
+    graph_title_size: int = declare_style_as_value(
+        default=config.DEFAULT_GRAPH_TITLE_SIZE,
         name="graph-title-size",
         doc="Sets the graph title text size.",
     )
@@ -185,7 +189,7 @@ def _build_style_specs() -> dict[str, StyleSpec]:
     hints = typing.get_type_hints(GraphOptions)
     for f in dataclasses.fields(GraphOptions):
         md = f.metadata
-        if md["flags"]:
+        if md["kind"] == "flags":
             for keyword, (value, doc) in md["flags"].items():
                 specs[keyword] = StyleSpec(f.name, "flag", value, doc, "")
         else:
