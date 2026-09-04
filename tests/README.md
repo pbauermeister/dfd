@@ -66,6 +66,14 @@ No fixture file needed.
 
 **Example to follow:** `tests/test_integration.py::test_stdin_to_stdout_produces_svg`.
 
+### Documentation sync test
+
+**File:** `tests/test_doc_sync.py`
+
+Guards generated documentation sections (`<!-- AUTO:... -->` markers) against
+drifting from the code they are derived from. When it fails, run `make readme`
+and commit the refreshed docs. Extend it when adding a new generated section.
+
 ### Non-regression test — nominal (success)
 
 **Fixtures (inputs):** `tests/non-regression/NNN-name.dfd` (standalone) or

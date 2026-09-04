@@ -49,7 +49,7 @@ Rules:
 
 - Abstract bases use semantic role names: `Statement`, `Drawable`.
 - Concrete types use domain nouns: `Item`, `Connection`, `Frame`.
-- Enums use singular nouns: `Keyword`, `StyleOption`.
+- Enums use singular nouns: `Keyword`.
 - Type aliases use descriptive plurals: `Statements`, `SourceLines`.
 
 ## Modules (files)

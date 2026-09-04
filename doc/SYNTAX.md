@@ -198,20 +198,24 @@ one frame.
 style OPTION [VALUE]
 ```
 
-| Option                  | Value   | Effect                             |
-| ----------------------- | ------- | ---------------------------------- |
-| `horizontal`            | -       | Left-to-right layout (default)     |
-| `vertical`              | -       | Top-to-bottom layout               |
-| `context`               | -       | Context diagram mode               |
-| `rotated`               | -       | Rotate diagram 90 degrees          |
-| `unrotated`             | -       | Cancel rotation                    |
-| `item-text-width`       | integer | Item label wrap width (default 20) |
-| `item-text-size`        | integer | Item label text size (default 10)  |
-| `connection-text-width` | integer | Connection label wrap width (14)   |
-| `connection-text-size`  | integer | Connection label text size (10)    |
-| `background-color`      | color   | Graphviz color spec                |
-| `no-graph-title`        | -       | Suppress auto-generated title      |
-| `graph-title-size`      | integer | Graph title text size (default 9)  |
+<!-- AUTO:style-table -->
+
+| Option                  | Value   | Default | Effect                                                                            |
+| ----------------------- | ------- | ------- | --------------------------------------------------------------------------------- |
+| `horizontal`            | -       | -       | Layouts flows in the horizontal direction (the default).                          |
+| `vertical`              | -       | -       | Layouts flows in the vertical direction.                                          |
+| `rotated`               | -       | -       | Rotates the diagram by 90°.                                                       |
+| `unrotated`             | -       | -       | Reverts the diagram rotation, if any.                                             |
+| `context`               | -       | -       | Makes the diagram a context diagram.                                              |
+| `item-text-width`       | integer | 20      | Sets the items labels wrapping to use N chars columns.                            |
+| `item-text-size`        | integer | 10      | Sets the items label text size.                                                   |
+| `connection-text-width` | integer | 14      | Sets the connections labels wrapping to use N chars columns.                      |
+| `connection-text-size`  | integer | 10      | Sets the connections label text size.                                             |
+| `background-color`      | color   | -       | Sets a graph background color as per https://graphviz.org/docs/attr-types/color/. |
+| `no-graph-title`        | -       | -       | Suppress graph title containing the image file path (without extension).          |
+| `graph-title-size`      | integer | 9       | Sets the graph title text size.                                                   |
+
+<!-- /AUTO:style-table -->
 
 Styles apply globally. Last declaration wins if redefined.
 

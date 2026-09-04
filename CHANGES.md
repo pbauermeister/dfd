@@ -1,3 +1,12 @@
+## Version 1.17.1:
+
+- Refactor #71: `style` options are now declared in one place (the
+  `GraphOptions` field declarations in `model.py`; default values stay in
+  `config.py`), from which the keyword registry, the parsing, and the style
+  tables of `doc/README.md` and `doc/SYNTAX.md` are derived. `make readme` regenerates the tables and
+  reformats the docs with prettier; a pytest guards against drift. No
+  behavior change.
+
 ## Version 1.17.0:
 
 - Add style statements:
