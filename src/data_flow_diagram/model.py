@@ -7,12 +7,12 @@ import json
 import typing
 from dataclasses import dataclass
 from enum import Enum, StrEnum, auto
-from typing import Any, TypeVar, assert_never
+from typing import TypeVar, assert_never
 
 from . import config
 
 
-def repr(o: Any) -> str:
+def repr(o: Base) -> str:
     name: str = o.__class__.__name__
     val: str = json.dumps(dataclasses.asdict(o), indent="  ")
     return f"{name} {val}"
@@ -63,10 +63,17 @@ class Statement(Base):
 
 T = TypeVar("T")
 
+
 # Declarations attached to GraphOptions fields as dataclass metadata: which
 # `style` keyword(s) set the field and how it is documented. Everything else
 # (registry, parsing, doc tables) is derived from these declarations.
-StyleFlags = dict[str, tuple[bool, str]]  # keyword -> (value, doc)
+@dataclass(frozen=True)
+class StyleFlag:
+    value: bool  # the value the keyword sets
+    doc: str
+
+
+StyleFlags = dict[str, StyleFlag]  # DSL keyword -> flag
 STYLE_METADATA = "style"  # the single dataclass metadata key
 
 
@@ -111,23 +118,31 @@ class GraphOptions:
     is_vertical: bool = declare_style_as_flags(
         default=False,
         flags={
-            "horizontal": (
-                False,
-                "Layouts flows in the horizontal direction (the default).",
+            "horizontal": StyleFlag(
+                value=False,
+                doc="Layouts flows in the horizontal direction (the default).",
             ),
-            "vertical": (True, "Layouts flows in the vertical direction."),
+            "vertical": StyleFlag(
+                value=True, doc="Layouts flows in the vertical direction."
+            ),
         },
     )
     is_rotated: bool = declare_style_as_flags(
         default=False,
         flags={
-            "rotated": (True, "Rotates the diagram by 90°."),
-            "unrotated": (False, "Reverts the diagram rotation, if any."),
+            "rotated": StyleFlag(value=True, doc="Rotates the diagram by 90°."),
+            "unrotated": StyleFlag(
+                value=False, doc="Reverts the diagram rotation, if any."
+            ),
         },
     )
     is_context: bool = declare_style_as_flags(
         default=False,
-        flags={"context": (True, "Makes the diagram a context diagram.")},
+        flags={
+            "context": StyleFlag(
+                value=True, doc="Makes the diagram a context diagram."
+            )
+        },
     )
 
     # text
@@ -163,9 +178,9 @@ class GraphOptions:
     no_graph_title: bool = declare_style_as_flags(
         default=False,
         flags={
-            "no-graph-title": (
-                True,
-                "Suppress graph title containing the image file path "
+            "no-graph-title": StyleFlag(
+                value=True,
+                doc="Suppress graph title containing the image file path "
                 "(without extension).",
             ),
         },
@@ -189,7 +204,7 @@ class StyleSpec:
 
     field: str
     kind: StyleKind
-    value: Any  # fixed value for flags; default value otherwise
+    value: bool | int | str | None  # fixed value for flags; default otherwise
     doc: str
     placeholder: str  # value placeholder word in docs (valued options only)
 
@@ -201,20 +216,23 @@ def _build_style_specs() -> dict[str, StyleSpec]:
     for f in dataclasses.fields(GraphOptions):
         match f.metadata[STYLE_METADATA]:
             case StyleFlagsDecl(flags):
-                for keyword, (value, doc) in flags.items():
+                for keyword, flag in flags.items():
                     specs[keyword] = StyleSpec(
                         field=f.name,
                         kind=StyleKind.FLAG,
-                        value=value,
-                        doc=doc,
+                        value=flag.value,
+                        doc=flag.doc,
                         placeholder="",
                     )
             case StyleValueDecl(name, doc, placeholder):
                 kind = StyleKind.INT if hints[f.name] is int else StyleKind.STR
+                # narrow the dataclasses.Field default (typed Any | MISSING)
+                default = f.default
+                assert default is None or isinstance(default, (int, str)), name
                 specs[name] = StyleSpec(
                     field=f.name,
                     kind=kind,
-                    value=f.default,
+                    value=default,
                     doc=doc,
                     placeholder=placeholder,
                 )

@@ -33,12 +33,12 @@ def parse(
 
         # dispatch to the keyword-specific parser
         word = source.text.split()[0]
-        f = _PARSERS.get(word)
-
-        if f is None:
+        try:
+            f = _PARSERS[Keyword(word)]
+        except (ValueError, KeyError):
             raise exception.DfdException(
                 f'Unrecognized keyword "{word}"', source=source
-            )
+            ) from None
 
         try:
             statement = f(source)
@@ -442,7 +442,7 @@ def _parse_frame(source: model.SourceLine) -> model.Statement:
 ##############################################################################
 # Keyword-to-parser dispatch table (module-level, built once)
 
-_PARSERS: dict[str, Callable[[model.SourceLine], model.Statement]] = {
+_PARSERS: dict[Keyword, Callable[[model.SourceLine], model.Statement]] = {
     # Options
     Keyword.STYLE: _parse_style,
     Keyword.ATTRIB: _parse_attrib,
