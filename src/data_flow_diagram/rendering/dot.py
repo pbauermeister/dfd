@@ -315,6 +315,7 @@ class Generator:
 
 
 def generate_dot(
+    *,
     gen: Generator,
     title: str,
     bg_color: str | None,

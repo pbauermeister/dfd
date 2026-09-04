@@ -20,6 +20,7 @@ def _read_file(name: str, file_texts: dict[str, str] | None) -> str:
 
 
 def check(
+    *,
     dependencies: model.GraphDependencies,
     snippet_by_name: model.SnippetByName | None,
     options: model.Options,
@@ -75,7 +76,12 @@ def check(
             continue
 
         # scan and parse the referred graph to look up the item
-        lines = scanner.scan(dep.source, text, snippet_by_name, options.debug)
+        lines = scanner.scan(
+            provenance=dep.source,
+            source_text=text,
+            snippet_by_name=snippet_by_name,
+            debug=options.debug,
+        )
         statements, _, _ = parser.parse(lines, options)
 
         # verify the referred item exists and has the expected type

@@ -15,6 +15,7 @@ RX_LINE_CONT = re.compile("[\\\\]\\s*\n\\s*", re.MULTILINE)
 
 
 def scan(
+    *,
     provenance: model.SourceLine | None,
     source_text: str,
     snippet_by_name: model.SnippetByName | None = None,
@@ -31,7 +32,13 @@ def scan(
         provenance = model.SourceLine(
             text="", raw_text=provenance, parent=None, line_nr=0
         )
-    _scan(source_text, provenance, output, snippet_by_name, includes)
+    _scan(
+        source_text=source_text,
+        parent=provenance,
+        output=output,
+        snippet_by_name=snippet_by_name,
+        includes=includes,
+    )
 
     if debug:
         dprint("=" * 40)
@@ -47,6 +54,7 @@ def scan(
 
 
 def _scan(
+    *,
     source_text: str,
     parent: model.SourceLine,
     output: model.SourceLines,
@@ -62,12 +70,19 @@ def _scan(
         )
         pair = line.split(maxsplit=1)
         if len(pair) == 2 and pair[0] == model.INCLUDE_DIRECTIVE:
-            include(line, source_line, output, snippet_by_name, includes)
+            include(
+                line=line,
+                parent=source_line,
+                output=output,
+                snippet_by_name=snippet_by_name,
+                includes=includes,
+            )
         else:
             output.append(source_line)
 
 
 def include(
+    *,
     line: str,
     parent: model.SourceLine,
     output: model.SourceLines,
@@ -103,7 +118,13 @@ def include(
                 f'included snippet "{name}" not found.', source=parent
             )
 
-        _scan(snippet.text, caller, output, snippet_by_name, includes)
+        _scan(
+            source_text=snippet.text,
+            parent=caller,
+            output=output,
+            snippet_by_name=snippet_by_name,
+            includes=includes,
+        )
 
     else:
         # include from file
@@ -113,4 +134,10 @@ def include(
             )
         with open(name, encoding="utf-8") as f:
             text = f.read()
-        _scan(text, caller, output, snippet_by_name, includes)
+        _scan(
+            source_text=text,
+            parent=caller,
+            output=output,
+            snippet_by_name=snippet_by_name,
+            includes=includes,
+        )
