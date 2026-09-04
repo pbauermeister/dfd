@@ -1,5 +1,7 @@
 """Filter engine: only/without, neighbor expansion."""
 
+from dataclasses import dataclass
+
 from .. import exception, model
 from ..console import dprint
 
@@ -130,15 +132,22 @@ def _collect_frame_skips(
             skip_frames_for_names.update(names)
 
 
+@dataclass(frozen=True, kw_only=True)
+class _FilterDecisions:
+    """Outcome of the filter statements, consumed by _apply_filters()."""
+
+    kept_names: set[str] | None  # None: no filter statement encountered
+    only_names: set[str]  # anchors of "only" filters, made non-hidable
+    replacement: dict[str, str]  # removed name -> replacing name
+    skip_frames_for_names: set[str]
+
+
 def _collect_kept_names(
     statements: model.Statements,
     all_names: set[str],
     debug: bool,
-) -> tuple[set[str] | None, set[str], dict[str, str], set[str]]:
-    """Process filter statements to determine which names to keep.
-
-    Returns (kept_names, only_names, replacement, skip_frames_for_names).
-    """
+) -> _FilterDecisions:
+    """Process filter statements to determine which names to keep."""
     kept_names: set[str] | None = None
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
@@ -221,7 +230,12 @@ def _collect_kept_names(
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
 
-    return kept_names, only_names, replacement, skip_frames_for_names
+    return _FilterDecisions(
+        kept_names=kept_names,
+        only_names=only_names,
+        replacement=replacement,
+        skip_frames_for_names=skip_frames_for_names,
+    )
 
 
 def _mark_non_hidable(
@@ -335,19 +349,22 @@ def handle_filters(
     all_names = set([s.name for s in statements if isinstance(s, model.Item)])
 
     # phase 1: collect filtered names
-    kept_names, only_names, replacement, skip_frames_for_names = (
-        _collect_kept_names(statements, all_names, debug)
-    )
+    decisions = _collect_kept_names(statements, all_names, debug)
 
-    _mark_non_hidable(statements, only_names)
+    _mark_non_hidable(statements, decisions.only_names)
 
     # default to keeping all names if no filter was encountered
-    kept_names = kept_names if kept_names is not None else all_names
+    kept_names = (
+        decisions.kept_names if decisions.kept_names is not None else all_names
+    )
     dprint("\nItems to keep", kept_names)
 
     # phase 2: apply filters to statements
     new_statements, replaced_connections = _apply_filters(
-        statements, kept_names, replacement, skip_frames_for_names
+        statements,
+        kept_names,
+        decisions.replacement,
+        decisions.skip_frames_for_names,
     )
 
     # phase 3: deduplicate connections created by replacements

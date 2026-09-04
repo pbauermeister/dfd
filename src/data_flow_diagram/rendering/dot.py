@@ -4,7 +4,6 @@ import html
 import pprint
 import re
 import textwrap
-from typing import Any
 
 from .. import exception, model
 from . import templates as TMPL
@@ -146,16 +145,15 @@ class Generator:
         d.update(attrs_d)
         return d
 
-    def _item_to_html_dict(self, item: model.Item) -> dict[str, Any]:
-        d = item.__dict__
+    def _item_to_html_dict(self, item: model.Item) -> dict[str, str]:
+        """Build the placeholder fields of the HTML-like item templates."""
         # HTML-like label context: entity-escape, then translate label
         # escapes left-to-right (\\ -> literal backslash, \n -> <br/>)
-        d["text"] = RX_HTML_LABEL_ESCAPE.sub(
+        text = RX_HTML_LABEL_ESCAPE.sub(
             lambda m: "<br/>" if m[1] == "n" else "\\",
-            html.escape(d["text"]),
+            html.escape(item.text),
         )
-        d["name"] = _escape_dot_string(d["name"])
-        return d
+        return {"name": _escape_dot_string(item.name), "text": text}
 
     def _compile_attribs_names(
         self, attribs: model.Attribs
