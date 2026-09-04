@@ -35,7 +35,7 @@ class Base:
 # Source text
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Snippet(Base):
     text: str
     name: str
@@ -43,7 +43,7 @@ class Snippet(Base):
     line_nr: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SourceLine(Base):
     text: str  # after pre-processor
     raw_text: str | None
@@ -53,7 +53,7 @@ class SourceLine(Base):
 
 
 # Statements
-@dataclass
+@dataclass(kw_only=True)
 class Statement(Base):
     source: SourceLine
 
@@ -183,7 +183,7 @@ class StyleKind(Enum):
     STR = auto()  # keyword takes a string value
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class StyleSpec:
     """One `style` keyword: the GraphOptions field it sets, and how."""
 
@@ -203,12 +203,20 @@ def _build_style_specs() -> dict[str, StyleSpec]:
             case StyleFlagsDecl(flags):
                 for keyword, (value, doc) in flags.items():
                     specs[keyword] = StyleSpec(
-                        f.name, StyleKind.FLAG, value, doc, ""
+                        field=f.name,
+                        kind=StyleKind.FLAG,
+                        value=value,
+                        doc=doc,
+                        placeholder="",
                     )
             case StyleValueDecl(name, doc, placeholder):
                 kind = StyleKind.INT if hints[f.name] is int else StyleKind.STR
                 specs[name] = StyleSpec(
-                    f.name, kind, f.default, doc, placeholder
+                    field=f.name,
+                    kind=kind,
+                    value=f.default,
+                    doc=doc,
+                    placeholder=placeholder,
                 )
             case decl:
                 raise TypeError(f"unexpected style declaration {decl!r}")
@@ -218,13 +226,13 @@ def _build_style_specs() -> dict[str, StyleSpec]:
 STYLE_SPECS = _build_style_specs()  # keyword -> spec, in doc order
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Style(Statement):
     style: str
     value: str = ""
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Attrib(Statement):
     alias: str
     text: str
@@ -234,20 +242,20 @@ Attribs = dict[str, Attrib]
 
 
 # Statements: elements
-@dataclass
+@dataclass(kw_only=True)
 class Drawable(Statement):
     type: Keyword
     text: str
     attrs: str
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Item(Drawable):
     name: str
     hidable: bool
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Connection(Drawable):
     src: str
     dst: str
@@ -260,12 +268,12 @@ class Connection(Drawable):
         return json.dumps(d, sort_keys=True)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Frame(Drawable):
     items: list[str]
 
 
-@dataclass
+@dataclass(kw_only=True)
 class FilterNeighbors:
     distance: int  # span: how many levels of neighbors (-1 = unlimited)
     suppress_anchors: bool  # "x" flag: select only neighbors, not anchors
@@ -275,19 +283,19 @@ class FilterNeighbors:
     suppress_frames: bool  # "f" flag: suppress frames involving selected items
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Filter(Statement):
     names: list[str]
     neighbors_up: FilterNeighbors
     neighbors_down: FilterNeighbors
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Only(Filter):
     pass
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Without(Filter):
     replaced_by: str
 
@@ -361,7 +369,7 @@ Statements = list[Statement]
 SnippetByName = dict[str, Snippet]
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Options:
     """These options can be specified as commandline args."""
 
@@ -372,7 +380,7 @@ class Options:
     debug: bool
 
 
-@dataclass
+@dataclass(kw_only=True)
 class GraphDependency:
     to_graph: str
     to_item: str | None

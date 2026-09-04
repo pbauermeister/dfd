@@ -95,13 +95,13 @@ def _parse_item_name(name: str) -> tuple[str, bool]:
 def _parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
     style, value = _split_args(source.text, 2, True)
-    return model.Style(source, style, value)
+    return model.Style(source=source, style=style, value=value)
 
 
 def _parse_attrib(source: model.SourceLine) -> model.Statement:
     """Parse attrib name text"""
     alias, text = _split_args(source.text, 2, True)
-    return model.Attrib(source, alias, text)
+    return model.Attrib(source=source, alias=alias, text=text)
 
 
 RX_FILTER_ARG = re.compile(
@@ -127,7 +127,12 @@ def _parse_neighbor_spec(
 
     Returns (filter_neighbors, is_up, is_down).
     """
-    fn = model.FilterNeighbors(0, False, False, False)
+    fn = model.FilterNeighbors(
+        distance=0,
+        suppress_anchors=False,
+        layout_direction=False,
+        suppress_frames=False,
+    )
     is_up = is_down = False
 
     # parse direction indicator
@@ -178,10 +183,20 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
 
     # initialize a base filter with no neighbors
     f = model.Filter(
-        source,
+        source=source,
         names=[],
-        neighbors_up=model.FilterNeighbors(0, False, False, False),
-        neighbors_down=model.FilterNeighbors(0, False, False, False),
+        neighbors_up=model.FilterNeighbors(
+            distance=0,
+            suppress_anchors=False,
+            layout_direction=False,
+            suppress_frames=False,
+        ),
+        neighbors_down=model.FilterNeighbors(
+            distance=0,
+            suppress_anchors=False,
+            layout_direction=False,
+            suppress_frames=False,
+        ),
     )
 
     cmd = terms[0]
@@ -239,7 +254,14 @@ def _make_item_parser(
     def parse(source: model.SourceLine) -> model.Statement:
         name, text = _split_args(source.text, 2, True)
         name, hidable = _parse_item_name(name)
-        return model.Item(source, keyword, text, "", name, hidable)
+        return model.Item(
+            source=source,
+            type=keyword,
+            text=text,
+            attrs="",
+            name=name,
+            hidable=hidable,
+        )
 
     return parse
 
@@ -257,7 +279,14 @@ def _make_connection_parser(
         if swap:
             src, dst = dst, src
         return model.Connection(
-            source, keyword, text, "", src, dst, reversed, relaxed
+            source=source,
+            type=keyword,
+            text=text,
+            attrs="",
+            src=src,
+            dst=dst,
+            reversed=reversed,
+            relaxed=relaxed,
         )
 
     return parse
@@ -387,7 +416,10 @@ def _parse_item_external(
 
         # register the dependency for later verification
         dependency = model.GraphDependency(
-            parts[0], parts[1] or None, item.type, item.source
+            to_graph=parts[0],
+            to_item=parts[1] or None,
+            to_type=item.type,
+            source=item.source,
         )
         dependencies.append(dependency)
 
@@ -402,7 +434,9 @@ def _parse_frame(source: model.SourceLine) -> model.Statement:
 
     items = parts[0].split()[1:]
     attrs = config.FRAME_DEFAULT_ATTRS
-    return model.Frame(source, Keyword.FRAME, text, attrs, items)
+    return model.Frame(
+        source=source, type=Keyword.FRAME, text=text, attrs=attrs, items=items
+    )
 
 
 ##############################################################################

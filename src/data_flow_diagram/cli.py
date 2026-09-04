@@ -167,7 +167,9 @@ def handle_dfd_source(
 ) -> None:
     """Call build() for when the DFD is given by a path, and output to another path or stdout."""
 
-    root = model.SourceLine("", provenance, None, 0)
+    root = model.SourceLine(
+        text="", raw_text=provenance, parent=None, line_nr=0
+    )
     title = "" if output_path == "-" else os.path.splitext(output_path)[0]
     dot_text, graph_options = dfd.build(root, input_fp.read(), title, options)
     write_output(dot_text, output_path, options.format, graph_options)

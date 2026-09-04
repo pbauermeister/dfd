@@ -28,7 +28,9 @@ def scan(
 
     # default provenance for top-level sources
     if provenance is None:
-        provenance = model.SourceLine("", provenance, None, 0)
+        provenance = model.SourceLine(
+            text="", raw_text=provenance, parent=None, line_nr=0
+        )
     _scan(source_text, provenance, output, snippet_by_name, includes)
 
     if debug:
@@ -55,7 +57,9 @@ def _scan(
     for nr, line in enumerate(source_text.splitlines()):
         if not line.strip():
             continue
-        source_line = model.SourceLine(line, line, parent, nr)
+        source_line = model.SourceLine(
+            text=line, raw_text=line, parent=parent, line_nr=nr
+        )
         pair = line.split(maxsplit=1)
         if len(pair) == 2 and pair[0] == model.INCLUDE_DIRECTIVE:
             include(line, source_line, output, snippet_by_name, includes)
@@ -81,7 +85,9 @@ def include(
     includes.add(name)
 
     # resolve the includee: snippet (#-prefixed) or file
-    caller = model.SourceLine("", f"<snippet {name}>", parent, 0)
+    caller = model.SourceLine(
+        text="", raw_text=f"<snippet {name}>", parent=parent, line_nr=0
+    )
     if name.startswith(model.SNIPPET_PREFIX):
         # include from MD snippet
         if not snippet_by_name:
