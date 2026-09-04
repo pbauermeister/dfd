@@ -1,3 +1,12 @@
+## Version 1.17.2:
+
+- Refactor #73: codify the type-safety conventions (new "Type safety"
+  section in `doc/CONVENTIONS.md`) and align the code: `kw_only`
+  dataclasses, keyword-only signatures from four parameters, booleans
+  passed by keyword, dataclasses instead of tuples and `Any` dicts for
+  internal records, parser dispatch table keyed by `Keyword`. No behavior
+  change.
+
 ## Version 1.17.1:
 
 - Refactor #71: `style` options are now declared in one place (the

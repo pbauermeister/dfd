@@ -33,12 +33,12 @@ def parse(
 
         # dispatch to the keyword-specific parser
         word = source.text.split()[0]
-        f = _PARSERS.get(word)
-
-        if f is None:
+        try:
+            f = _PARSERS[Keyword(word)]
+        except (ValueError, KeyError):
             raise exception.DfdException(
                 f'Unrecognized keyword "{word}"', source=source
-            )
+            ) from None
 
         try:
             statement = f(source)
@@ -94,14 +94,14 @@ def _parse_item_name(name: str) -> tuple[str, bool]:
 
 def _parse_style(source: model.SourceLine) -> model.Statement:
     """Parse style statement"""
-    style, value = _split_args(source.text, 2, True)
-    return model.Style(source, style, value)
+    style, value = _split_args(source.text, 2, last_is_optional=True)
+    return model.Style(source=source, style=style, value=value)
 
 
 def _parse_attrib(source: model.SourceLine) -> model.Statement:
     """Parse attrib name text"""
-    alias, text = _split_args(source.text, 2, True)
-    return model.Attrib(source, alias, text)
+    alias, text = _split_args(source.text, 2, last_is_optional=True)
+    return model.Attrib(source=source, alias=alias, text=text)
 
 
 RX_FILTER_ARG = re.compile(
@@ -127,7 +127,12 @@ def _parse_neighbor_spec(
 
     Returns (filter_neighbors, is_up, is_down).
     """
-    fn = model.FilterNeighbors(0, False, False, False)
+    fn = model.FilterNeighbors(
+        distance=0,
+        suppress_anchors=False,
+        layout_direction=False,
+        suppress_frames=False,
+    )
     is_up = is_down = False
 
     # parse direction indicator
@@ -178,10 +183,20 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
 
     # initialize a base filter with no neighbors
     f = model.Filter(
-        source,
+        source=source,
         names=[],
-        neighbors_up=model.FilterNeighbors(0, False, False, False),
-        neighbors_down=model.FilterNeighbors(0, False, False, False),
+        neighbors_up=model.FilterNeighbors(
+            distance=0,
+            suppress_anchors=False,
+            layout_direction=False,
+            suppress_frames=False,
+        ),
+        neighbors_down=model.FilterNeighbors(
+            distance=0,
+            suppress_anchors=False,
+            layout_direction=False,
+            suppress_frames=False,
+        ),
     )
 
     cmd = terms[0]
@@ -237,14 +252,22 @@ def _make_item_parser(
     """Create a parser for an item statement of the given type."""
 
     def parse(source: model.SourceLine) -> model.Statement:
-        name, text = _split_args(source.text, 2, True)
+        name, text = _split_args(source.text, 2, last_is_optional=True)
         name, hidable = _parse_item_name(name)
-        return model.Item(source, keyword, text, "", name, hidable)
+        return model.Item(
+            source=source,
+            type=keyword,
+            text=text,
+            attrs="",
+            name=name,
+            hidable=hidable,
+        )
 
     return parse
 
 
 def _make_connection_parser(
+    *,
     keyword: Keyword,
     reversed: bool = False,
     relaxed: bool = False,
@@ -253,11 +276,18 @@ def _make_connection_parser(
     """Create a parser for a connection statement."""
 
     def parse(source: model.SourceLine) -> model.Statement:
-        src, dst, text = _split_args(source.text, 3, True)
+        src, dst, text = _split_args(source.text, 3, last_is_optional=True)
         if swap:
             src, dst = dst, src
         return model.Connection(
-            source, keyword, text, "", src, dst, reversed, relaxed
+            source=source,
+            type=keyword,
+            text=text,
+            attrs="",
+            src=src,
+            dst=dst,
+            reversed=reversed,
+            relaxed=relaxed,
         )
 
     return parse
@@ -271,7 +301,7 @@ def _format_sugar(verb: str, args: list[str]) -> str:
 
 
 def _resolve_sugar(
-    src_line: str, op: str, keyword: str, relaxed_keyword: str | None = None
+    *, src_line: str, op: str, keyword: str, relaxed_keyword: str | None = None
 ) -> str:
     """Resolve an arrow operator to a keyword connection statement."""
     parts = src_line.split(maxsplit=3)
@@ -301,49 +331,74 @@ def _apply_syntactic_sugars(src_line: str) -> str:
     # match arrow patterns against connection keywords
     if re.fullmatch(r"-+>[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.FLOW, Keyword.FLOW_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.FLOW,
+            relaxed_keyword=Keyword.FLOW_RELAXED,
         )
 
     elif re.fullmatch(r"<-+[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.FLOW_REVERSED, Keyword.FLOW_REVERSED_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.FLOW_REVERSED,
+            relaxed_keyword=Keyword.FLOW_REVERSED_RELAXED,
         )
 
     if re.fullmatch(r"-+>>[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.CFLOW, Keyword.CFLOW_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.CFLOW,
+            relaxed_keyword=Keyword.CFLOW_RELAXED,
         )
     elif re.fullmatch(r"<<-+[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.CFLOW_REVERSED, Keyword.CFLOW_REVERSED_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.CFLOW_REVERSED,
+            relaxed_keyword=Keyword.CFLOW_REVERSED_RELAXED,
         )
 
     elif re.fullmatch(r"<-+>[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.BFLOW, Keyword.BFLOW_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.BFLOW,
+            relaxed_keyword=Keyword.BFLOW_RELAXED,
         )
 
     elif re.fullmatch(r"--+[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.UFLOW, Keyword.UFLOW_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.UFLOW,
+            relaxed_keyword=Keyword.UFLOW_RELAXED,
         )
 
     elif re.fullmatch(r":+>[?]?", op):
         new_line = _resolve_sugar(
-            src_line, op, Keyword.SIGNAL, Keyword.SIGNAL_RELAXED
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.SIGNAL,
+            relaxed_keyword=Keyword.SIGNAL_RELAXED,
         )
     elif re.fullmatch(r"<:+[?]?", op):
         new_line = _resolve_sugar(
-            src_line,
-            op,
-            Keyword.SIGNAL_REVERSED,
-            Keyword.SIGNAL_REVERSED_RELAXED,
+            src_line=src_line,
+            op=op,
+            keyword=Keyword.SIGNAL_REVERSED,
+            relaxed_keyword=Keyword.SIGNAL_REVERSED_RELAXED,
         )
 
     elif re.fullmatch(r">+", op):
-        new_line = _resolve_sugar(src_line, op, Keyword.CONSTRAINT)
+        new_line = _resolve_sugar(
+            src_line=src_line, op=op, keyword=Keyword.CONSTRAINT
+        )
     elif re.fullmatch(r"<+", op):
-        new_line = _resolve_sugar(src_line, op, Keyword.CONSTRAINT_REVERSED)
+        new_line = _resolve_sugar(
+            src_line=src_line, op=op, keyword=Keyword.CONSTRAINT_REVERSED
+        )
 
     if new_line:
         return new_line
@@ -387,7 +442,10 @@ def _parse_item_external(
 
         # register the dependency for later verification
         dependency = model.GraphDependency(
-            parts[0], parts[1] or None, item.type, item.source
+            to_graph=parts[0],
+            to_item=parts[1] or None,
+            to_type=item.type,
+            source=item.source,
         )
         dependencies.append(dependency)
 
@@ -402,13 +460,15 @@ def _parse_frame(source: model.SourceLine) -> model.Statement:
 
     items = parts[0].split()[1:]
     attrs = config.FRAME_DEFAULT_ATTRS
-    return model.Frame(source, Keyword.FRAME, text, attrs, items)
+    return model.Frame(
+        source=source, type=Keyword.FRAME, text=text, attrs=attrs, items=items
+    )
 
 
 ##############################################################################
 # Keyword-to-parser dispatch table (module-level, built once)
 
-_PARSERS: dict[str, Callable[[model.SourceLine], model.Statement]] = {
+_PARSERS: dict[Keyword, Callable[[model.SourceLine], model.Statement]] = {
     # Options
     Keyword.STYLE: _parse_style,
     Keyword.ATTRIB: _parse_attrib,
@@ -420,40 +480,50 @@ _PARSERS: dict[str, Callable[[model.SourceLine], model.Statement]] = {
     Keyword.NONE: _make_item_parser(Keyword.NONE),
     Keyword.CHANNEL: _make_item_parser(Keyword.CHANNEL),
     # Connections
-    Keyword.FLOW: _make_connection_parser(Keyword.FLOW),
-    Keyword.CFLOW: _make_connection_parser(Keyword.CFLOW),
-    Keyword.BFLOW: _make_connection_parser(Keyword.BFLOW),
-    Keyword.UFLOW: _make_connection_parser(Keyword.UFLOW),
-    Keyword.SIGNAL: _make_connection_parser(Keyword.SIGNAL),
-    Keyword.CONSTRAINT: _make_connection_parser(Keyword.CONSTRAINT),
+    Keyword.FLOW: _make_connection_parser(keyword=Keyword.FLOW),
+    Keyword.CFLOW: _make_connection_parser(keyword=Keyword.CFLOW),
+    Keyword.BFLOW: _make_connection_parser(keyword=Keyword.BFLOW),
+    Keyword.UFLOW: _make_connection_parser(keyword=Keyword.UFLOW),
+    Keyword.SIGNAL: _make_connection_parser(keyword=Keyword.SIGNAL),
+    Keyword.CONSTRAINT: _make_connection_parser(keyword=Keyword.CONSTRAINT),
     # Connections: reversed
-    Keyword.FLOW_REVERSED: _make_connection_parser(Keyword.FLOW, reversed=True),
+    Keyword.FLOW_REVERSED: _make_connection_parser(
+        keyword=Keyword.FLOW, reversed=True
+    ),
     Keyword.CFLOW_REVERSED: _make_connection_parser(
-        Keyword.CFLOW, reversed=True
+        keyword=Keyword.CFLOW, reversed=True
     ),
     Keyword.SIGNAL_REVERSED: _make_connection_parser(
-        Keyword.SIGNAL, reversed=True
+        keyword=Keyword.SIGNAL, reversed=True
     ),
     Keyword.CONSTRAINT_REVERSED: _make_connection_parser(
-        Keyword.CONSTRAINT, swap=True
+        keyword=Keyword.CONSTRAINT, swap=True
     ),
     # Connections: relaxed
-    Keyword.FLOW_RELAXED: _make_connection_parser(Keyword.FLOW, relaxed=True),
-    Keyword.CFLOW_RELAXED: _make_connection_parser(Keyword.CFLOW, relaxed=True),
-    Keyword.BFLOW_RELAXED: _make_connection_parser(Keyword.BFLOW, relaxed=True),
-    Keyword.UFLOW_RELAXED: _make_connection_parser(Keyword.UFLOW, relaxed=True),
+    Keyword.FLOW_RELAXED: _make_connection_parser(
+        keyword=Keyword.FLOW, relaxed=True
+    ),
+    Keyword.CFLOW_RELAXED: _make_connection_parser(
+        keyword=Keyword.CFLOW, relaxed=True
+    ),
+    Keyword.BFLOW_RELAXED: _make_connection_parser(
+        keyword=Keyword.BFLOW, relaxed=True
+    ),
+    Keyword.UFLOW_RELAXED: _make_connection_parser(
+        keyword=Keyword.UFLOW, relaxed=True
+    ),
     Keyword.SIGNAL_RELAXED: _make_connection_parser(
-        Keyword.SIGNAL, relaxed=True
+        keyword=Keyword.SIGNAL, relaxed=True
     ),
     # Connections: reversed + relaxed
     Keyword.FLOW_REVERSED_RELAXED: _make_connection_parser(
-        Keyword.FLOW, reversed=True, relaxed=True
+        keyword=Keyword.FLOW, reversed=True, relaxed=True
     ),
     Keyword.CFLOW_REVERSED_RELAXED: _make_connection_parser(
-        Keyword.CFLOW, reversed=True, relaxed=True
+        keyword=Keyword.CFLOW, reversed=True, relaxed=True
     ),
     Keyword.SIGNAL_REVERSED_RELAXED: _make_connection_parser(
-        Keyword.SIGNAL, reversed=True, relaxed=True
+        keyword=Keyword.SIGNAL, reversed=True, relaxed=True
     ),
     # Frame
     Keyword.FRAME: _parse_frame,

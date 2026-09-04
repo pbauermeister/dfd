@@ -125,7 +125,9 @@ PARSE_ERROR_CASES = [
 
 def test_parse_valid_syntax() -> None:
     # Full valid DFD must pass both parse() and check() without error
-    tokens = scanner.scan(None, ALL_ITEMS_AND_CONNECTIONS)
+    tokens = scanner.scan(
+        provenance=None, source_text=ALL_ITEMS_AND_CONNECTIONS
+    )
     try:
         statements, _, _ = parser.parse(tokens)
         checker.check(statements)
@@ -135,7 +137,7 @@ def test_parse_valid_syntax() -> None:
 
 def test_parse_unknown_keyword_raises() -> None:
     # An unrecognised keyword must be caught by parse(), not silently ignored
-    tokens = scanner.scan(None, "xyz")
+    tokens = scanner.scan(provenance=None, source_text="xyz")
     with pytest.raises(exception.DfdException):
         parser.parse(tokens)
 
@@ -143,7 +145,7 @@ def test_parse_unknown_keyword_raises() -> None:
 @pytest.mark.parametrize("dfd_text", CHECK_ERROR_CASES)
 def test_check_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in check()
-    tokens = scanner.scan(None, dfd_text)
+    tokens = scanner.scan(provenance=None, source_text=dfd_text)
     statements, _, _ = parser.parse(tokens)
     with pytest.raises(exception.DfdException):
         checker.check(statements)
@@ -152,6 +154,6 @@ def test_check_raises(dfd_text: str) -> None:
 @pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)
 def test_parse_raises(dfd_text: str) -> None:
     # Each malformed snippet must trigger a DfdException in parse()
-    tokens = scanner.scan(None, dfd_text)
+    tokens = scanner.scan(provenance=None, source_text=dfd_text)
     with pytest.raises(exception.DfdException):
         parser.parse(tokens)

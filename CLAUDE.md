@@ -141,6 +141,8 @@ When implementing an approved plan:
   will involve — files to create/modify, commands to run, and any dangerous or
   irreversible actions — so the user can make an informed unattended/attended
   choice.
+- Before marking a PR ready, self-review the diff against the Type safety
+  section of `doc/CONVENTIONS.md`.
 
 ## Design philosophy
 
@@ -170,6 +172,9 @@ Full rules are in **`doc/CONVENTIONS.md`**. Key points:
 - **Packages**: generic → specific path order, e.g. `dsl/scanner.py`.
 - **Constants**: `UPPER_SNAKE_CASE` in their designated module.
 - Use official terminology from `doc/SYNTAX.md` in all identifiers.
+- **Type safety**: see the Type safety section of `doc/CONVENTIONS.md`
+  — dataclasses for records, enums for tags, no `dict[str, *]` for
+  non-string-indexed data, keyword-only from 4 parameters.
 
 ## Commenting style
 

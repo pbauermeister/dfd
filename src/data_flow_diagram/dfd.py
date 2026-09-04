@@ -10,6 +10,7 @@ from .rendering import templates as TMPL
 
 
 def build(
+    *,
     provenance: model.SourceLine,
     dfd_src: str,
     title: str,
@@ -23,15 +24,24 @@ def build(
     """
 
     # scan (includes, line continuations) and parse the DSL into statements
-    lines = scanner.scan(provenance, dfd_src, snippet_by_name, options.debug)
+    lines = scanner.scan(
+        provenance=provenance,
+        source_text=dfd_src,
+        snippet_by_name=snippet_by_name,
+        debug=options.debug,
+    )
     statements, dependencies, attribs = parser.parse(lines, options)
     if dependencies and not options.no_check_dependencies:
-        dependency_checker.check(dependencies, snippet_by_name, options)
+        dependency_checker.check(
+            dependencies=dependencies,
+            snippet_by_name=snippet_by_name,
+            options=options,
+        )
 
     # validate statements, resolve star endpoints, and apply filters
     items_by_name = checker.check(statements)
     statements = resolve_star_endpoints(statements, items_by_name)
-    statements = filters.handle_filters(statements, options.debug)
+    statements = filters.handle_filters(statements, debug=options.debug)
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
 
@@ -47,7 +57,13 @@ def build(
 
     # generate DOT text
     gen = Generator(graph_options, attribs)
-    text = generate_dot(gen, title, bg_color, statements, items_by_name)
+    text = generate_dot(
+        gen=gen,
+        title=title,
+        bg_color=bg_color,
+        statements=statements,
+        items_by_name=items_by_name,
+    )
     dprint(text)
     return text, graph_options
 

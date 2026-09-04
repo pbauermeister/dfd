@@ -115,6 +115,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def write_output(
+    *,
     dot_text: str,
     output_path: str,
     fmt: str,
@@ -130,11 +131,21 @@ def write_output(
     elif output_path == "-":
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "output." + fmt)
-            graphviz.generate_image(graph_options, dot_text, path, fmt)
+            graphviz.generate_image(
+                graph_options=graph_options,
+                text=dot_text,
+                output_path=path,
+                fmt=fmt,
+            )
             with open(path) as f:
                 print(f.read())
     else:
-        graphviz.generate_image(graph_options, dot_text, output_path, fmt)
+        graphviz.generate_image(
+            graph_options=graph_options,
+            text=dot_text,
+            output_path=output_path,
+            fmt=fmt,
+        )
 
 
 def handle_markdown_source(
@@ -152,25 +163,43 @@ def handle_markdown_source(
     for params in snippets_params:
         title = os.path.splitext(params.file_name)[0]
         dot_text, graph_options = dfd.build(
-            params.root,
-            params.input_fp.read(),
-            title,
-            options,
+            provenance=params.root,
+            dfd_src=params.input_fp.read(),
+            title=title,
+            options=options,
             snippet_by_name=params.snippet_by_name,
         )
-        write_output(dot_text, params.file_name, options.format, graph_options)
+        write_output(
+            dot_text=dot_text,
+            output_path=params.file_name,
+            fmt=options.format,
+            graph_options=graph_options,
+        )
         dprint(f"{sys.argv[0]}: generated {params.file_name}")
 
 
 def handle_dfd_source(
-    options: model.Options, provenance: str, input_fp: TextIO, output_path: str
+    *,
+    options: model.Options,
+    provenance: str,
+    input_fp: TextIO,
+    output_path: str,
 ) -> None:
     """Call build() for when the DFD is given by a path, and output to another path or stdout."""
 
-    root = model.SourceLine("", provenance, None, 0)
+    root = model.SourceLine(
+        text="", raw_text=provenance, parent=None, line_nr=0
+    )
     title = "" if output_path == "-" else os.path.splitext(output_path)[0]
-    dot_text, graph_options = dfd.build(root, input_fp.read(), title, options)
-    write_output(dot_text, output_path, options.format, graph_options)
+    dot_text, graph_options = dfd.build(
+        provenance=root, dfd_src=input_fp.read(), title=title, options=options
+    )
+    write_output(
+        dot_text=dot_text,
+        output_path=output_path,
+        fmt=options.format,
+        graph_options=graph_options,
+    )
 
 
 def run(args: argparse.Namespace) -> None:
@@ -192,7 +221,7 @@ def run(args: argparse.Namespace) -> None:
         debug=args.debug,
     )
 
-    set_debug(args.debug)
+    set_debug(value=args.debug)
 
     # dispatch to markdown or single-source mode
     if args.markdown:
@@ -210,7 +239,12 @@ def run(args: argparse.Namespace) -> None:
         output_path = args.output_file
 
     # DFD source
-    handle_dfd_source(options, provenance, input_fp, output_path)
+    handle_dfd_source(
+        options=options,
+        provenance=provenance,
+        input_fp=input_fp,
+        output_path=output_path,
+    )
 
 
 def main() -> None:

@@ -1,10 +1,13 @@
 """Filter engine: only/without, neighbor expansion."""
 
+from dataclasses import dataclass
+
 from .. import exception, model
 from ..console import dprint
 
 
 def _collect_connected_names(
+    *,
     statements: model.Statements,
     names: set[str],
     search_downstream: bool,
@@ -49,6 +52,7 @@ def _resolve_distance(distance: int, max_neighbors: int) -> int:
 
 
 def _expand_neighbors_in_dir(
+    *,
     statements: model.Statements,
     anchor_names: list[str],
     max_neighbors: int,
@@ -60,8 +64,8 @@ def _expand_neighbors_in_dir(
     neighbor_names: set[str] = set()
     for i in range(_resolve_distance(fn.distance, max_neighbors)):
         names = _collect_connected_names(
-            statements,
-            names,
+            statements=statements,
+            names=names,
             search_downstream=down,
             use_layout_direction=fn.layout_direction,
         )
@@ -76,6 +80,7 @@ def _expand_neighbors_in_dir(
 
 
 def find_neighbors(
+    *,
     filter: model.Filter,
     statements: model.Statements,
     max_neighbors: int,
@@ -83,17 +88,22 @@ def find_neighbors(
 ) -> tuple[set[str], set[str]]:
     """Collect neighbor names by following connections outward from filter anchors."""
     return _expand_neighbors_in_dir(
-        statements,
-        filter.names,
-        max_neighbors,
-        filter.neighbors_down,
+        statements=statements,
+        anchor_names=filter.names,
+        max_neighbors=max_neighbors,
+        fn=filter.neighbors_down,
         down=True,
     ), _expand_neighbors_in_dir(
-        statements, filter.names, max_neighbors, filter.neighbors_up, down=False
+        statements=statements,
+        anchor_names=filter.names,
+        max_neighbors=max_neighbors,
+        fn=filter.neighbors_up,
+        down=False,
     )
 
 
 def _check_filter_names(
+    *,
     names: set[str],
     in_names: set[str],
     all_names: set[str],
@@ -113,6 +123,7 @@ def _check_filter_names(
 
 
 def _collect_frame_skips(
+    *,
     f: model.Filter,
     names: set[str],
     downs: set[str],
@@ -130,15 +141,22 @@ def _collect_frame_skips(
             skip_frames_for_names.update(names)
 
 
+@dataclass(frozen=True, kw_only=True)
+class _FilterDecisions:
+    """Outcome of the filter statements, consumed by _apply_filters()."""
+
+    kept_names: set[str] | None  # None: no filter statement encountered
+    only_names: set[str]  # anchors of "only" filters, made non-hidable
+    replacement: dict[str, str]  # removed name -> replacing name
+    skip_frames_for_names: set[str]
+
+
 def _collect_kept_names(
     statements: model.Statements,
     all_names: set[str],
     debug: bool,
-) -> tuple[set[str] | None, set[str], dict[str, str], set[str]]:
-    """Process filter statements to determine which names to keep.
-
-    Returns (kept_names, only_names, replacement, skip_frames_for_names).
-    """
+) -> _FilterDecisions:
+    """Process filter statements to determine which names to keep."""
     kept_names: set[str] | None = None
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
@@ -158,7 +176,10 @@ def _collect_kept_names(
                 # validate filter names
                 names = set(f.names)
                 _check_filter_names(
-                    names, all_names, all_names, statement.source
+                    names=names,
+                    in_names=all_names,
+                    all_names=all_names,
+                    source=statement.source,
                 )
 
                 # add anchor names (suppressed by "x" flag: neighbors only)
@@ -172,14 +193,21 @@ def _collect_kept_names(
 
                 # add upstream/downstream neighbor names
                 downs, ups = find_neighbors(
-                    f, statements, len(all_names), debug
+                    filter=f,
+                    statements=statements,
+                    max_neighbors=len(all_names),
+                    debug=debug,
                 )
                 dprint("ONLY: adding neighbors:", downs, ups)
                 kept_names.update(downs)
                 kept_names.update(ups)
 
                 _collect_frame_skips(
-                    f, names, downs, ups, skip_frames_for_names
+                    f=f,
+                    names=names,
+                    downs=downs,
+                    ups=ups,
+                    skip_frames_for_names=skip_frames_for_names,
                 )
 
             case model.Without() as f:
@@ -195,7 +223,10 @@ def _collect_kept_names(
                     for name in names:
                         replacement[name] = f.replaced_by
                 _check_filter_names(
-                    names_to_check, kept_names, all_names, statement.source
+                    names=names_to_check,
+                    in_names=kept_names,
+                    all_names=all_names,
+                    source=statement.source,
                 )
 
                 # remove anchor names (suppressed by "x" flag: neighbors only)
@@ -208,20 +239,32 @@ def _collect_kept_names(
 
                 # remove upstream/downstream neighbor names
                 downs, ups = find_neighbors(
-                    f, statements, len(all_names), debug
+                    filter=f,
+                    statements=statements,
+                    max_neighbors=len(all_names),
+                    debug=debug,
                 )
                 dprint("WITHOUT: removing neighbors:", downs, ups)
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
 
                 _collect_frame_skips(
-                    f, names, downs, ups, skip_frames_for_names
+                    f=f,
+                    names=names,
+                    downs=downs,
+                    ups=ups,
+                    skip_frames_for_names=skip_frames_for_names,
                 )
 
         if isinstance(statement, model.Filter):
             dprint("    after:", kept_names)
 
-    return kept_names, only_names, replacement, skip_frames_for_names
+    return _FilterDecisions(
+        kept_names=kept_names,
+        only_names=only_names,
+        replacement=replacement,
+        skip_frames_for_names=skip_frames_for_names,
+    )
 
 
 def _mark_non_hidable(
@@ -236,6 +279,7 @@ def _mark_non_hidable(
 
 
 def _apply_filters(
+    *,
     statements: model.Statements,
     kept_names: set[str],
     replacement: dict[str, str],
@@ -335,19 +379,22 @@ def handle_filters(
     all_names = set([s.name for s in statements if isinstance(s, model.Item)])
 
     # phase 1: collect filtered names
-    kept_names, only_names, replacement, skip_frames_for_names = (
-        _collect_kept_names(statements, all_names, debug)
-    )
+    decisions = _collect_kept_names(statements, all_names, debug=debug)
 
-    _mark_non_hidable(statements, only_names)
+    _mark_non_hidable(statements, decisions.only_names)
 
     # default to keeping all names if no filter was encountered
-    kept_names = kept_names if kept_names is not None else all_names
+    kept_names = (
+        decisions.kept_names if decisions.kept_names is not None else all_names
+    )
     dprint("\nItems to keep", kept_names)
 
     # phase 2: apply filters to statements
     new_statements, replaced_connections = _apply_filters(
-        statements, kept_names, replacement, skip_frames_for_names
+        statements=statements,
+        kept_names=kept_names,
+        replacement=decisions.replacement,
+        skip_frames_for_names=decisions.skip_frames_for_names,
     )
 
     # phase 3: deduplicate connections created by replacements
