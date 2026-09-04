@@ -2,7 +2,7 @@
 
 Date: 2026-09-04
 
-Status: ONGOING
+Status: DONE
 
 ## Requirement
 
@@ -168,3 +168,29 @@ enforce the Type safety conventions (#73)."
 
 Each step is mechanical; the user chose unattended mode for #71 and will
 be asked again per step here. NR goldens are the safety net throughout.
+
+## Outcome
+
+Implemented 2026-09-04 in seven commits on PR #74 (docs; `kw_only`
+dataclasses; style registry and parser table types; two record
+helpers; keyword-only signatures; wrap-up). All 66 pytest and 83 NR
+fixtures pass unchanged at every commit; `make black` and `make lint`
+clean.
+
+Deviations from the plan:
+
+- Tests already used keyword constructors: the "16 positional test
+  call sites" of the audit did not exist. Only 19 call sites in `src/`
+  needed keywords.
+- `kw_only=True` is applied to the whole `Statement` hierarchy, not only
+  to classes with four or more fields: inherited fields keep the
+  `kw_only` setting of the class that declares them, so a keyword-only
+  `Item` requires keyword-only `Statement` and `Drawable`. `Style` and
+  `Attrib` (three fields, two adjacent `str`) follow for uniformity.
+- `model.repr()` takes `Base` instead of `Any` with a boundary comment:
+  its only callers pass `SourceLine` and `Statement`.
+- `StyleSpec.value` narrowing: `dataclasses.Field.default` is typed
+  `Any | MISSING`; an `assert isinstance` narrows it and validates the
+  declaration at import.
+- `tools/doc-renumber-md-titles.py` has one four-parameter function
+  (`renumber_title`) left as is: the scope was `src/` and tests.
