@@ -34,7 +34,7 @@ turned into a standard task (GH ticket, PR, devlog).
    Replaced relative image paths in README.md with absolute GitHub raw
    URLs so images render on both GitHub and PyPI.
 
-3. Include TestPyPI in a full testing cycle
+3. ~~Include TestPyPI in a full testing cycle~~ — DONE (#77)
 
    Extend the release testing cycle to upload to TestPyPI
    (`twine upload -r testpypi`) and install from there in a clean venv,
