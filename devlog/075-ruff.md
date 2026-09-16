@@ -2,7 +2,7 @@
 
 Date: 2026-09-16
 
-Status: ONGOING
+Status: DONE
 
 ## Requirement
 
@@ -69,3 +69,13 @@ Steps:
    CHANGES.md 1.17.3.
 5. Verify (`make format`, `make lint`, `make test`), self-review against
    Type safety, mark PR ready.
+
+## Outcome
+
+- ruff 0.16.8 adopted: `make format` (`black` alias), `make lint` runs
+  `ruff check`, `ruff format --check`, then mypy; `ruff` in `make require`
+  and tox deps.
+- Unplanned: ruff 0.16 also formats Python code blocks in Markdown;
+  `include` restricted to Python files so hand-aligned doc examples stay.
+- 32 Python files format-clean, 0 ruff findings, mypy clean, 66 pytest +
+  83 NR green. No behavior change; version 1.17.3.
