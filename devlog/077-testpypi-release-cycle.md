@@ -1,7 +1,7 @@
 # 077 — TestPyPI Release Cycle
 
 Date: 2026-09-16
-Status: ONGOING
+Status: DONE
 
 Issue: https://github.com/pbauermeister/dfd/issues/77
 
@@ -66,5 +66,21 @@ Steps:
 3. `make publish-to-testpypi`: `twine upload -r testpypi` with
    `.token-test`, then run the script in testpypi mode.
 4. Chain into `publish-to-pypi.sh`: build, wheel smoke test, TestPyPI
-   upload + smoke test, real PyPI upload, GitHub release.
+   upload + smoke test, real PyPI upload. (The GitHub release stays
+   un-chained, as decided in 1.16.7.post1.)
 5. Bump to 1.17.4, `CHANGES.md` entry, note in the publish script header.
+
+## Outcome
+
+- `tools/smoke-test-install.sh wheel|testpypi`, `make smoke-test-wheel`
+  (also a CI job), `tools/publish-to-testpypi.sh` + `make
+  publish-to-testpypi`, `publish-to-pypi.sh` now runs the rehearsal
+  first. `.token-test` gitignored. Version 1.17.4.
+- Mutation checks: renamed console entry point and altered rendering
+  template both fail the wheel smoke test; a version absent from
+  TestPyPI fails the testpypi mode after its retries.
+- Rehearsal run with throwaway `1.17.4.dev1`: all stages passed, the
+  TestPyPI install succeeded on the first try.
+- Side findings, out of scope: twine's `--password` is echoed by the
+  `set -x` trace of the publish scripts (pre-existing); the dev wrapper's
+  `--version` reports whatever copy is installed in `~/.local`.

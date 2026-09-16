@@ -130,3 +130,4 @@ dmypy.json
 
 # DFD
 .token
+.token-test

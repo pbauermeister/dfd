@@ -10,12 +10,14 @@
 #   https://pypi.org/manage/account/token/
 #
 # Version info: please update the file
-#   setup.py
+#   CHANGES.md
 #
+# The TestPyPI rehearsal (build, wheel smoke test, TestPyPI upload and
+# install smoke test) runs first; any failure stops before the real upload.
 
 . ./set-ex.sh
 
-./tools/build.sh
+./tools/publish-to-testpypi.sh
 
 
 banner2 "Publishing to Pypi"
@@ -25,6 +27,5 @@ if [ ! -f .token ]; then
     exit 1
 fi
 
-python3 setup.py sdist bdist_wheel
 python3 -m twine upload --username __token__ dist/* \
 	--password $(cat .token) --verbose

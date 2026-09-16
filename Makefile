@@ -104,7 +104,11 @@ smoke-test-wheel: venv clean ## build wheel, install in a fresh venv, check
 	python3 setup.py sdist bdist_wheel && \
 	./tools/smoke-test-install.sh wheel
 
-publish-to-pypi: venv clean ## publish to Pypi and create GitHub Release
+publish-to-testpypi: venv clean ## release rehearsal: upload to TestPyPI, install, check
+	. $(VENV)/bin/activate && \
+	./tools/publish-to-testpypi.sh
+
+publish-to-pypi: venv clean ## rehearse on TestPyPI, then publish to Pypi
 	. $(VENV)/bin/activate && \
 	./tools/publish-to-pypi.sh
 

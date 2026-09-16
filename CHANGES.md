@@ -1,3 +1,13 @@
+## Version 1.17.4:
+
+- Test #77: release rehearsal on TestPyPI. `tools/smoke-test-install.sh`
+  installs the package into a fresh venv and checks `--version` and a
+  `-f dot` render against an NR golden file; `make smoke-test-wheel`
+  runs it on the built wheel (also in CI). `make publish-to-testpypi`
+  uploads to TestPyPI and smoke-tests the install from there;
+  `make publish-to-pypi` runs that rehearsal before the real upload.
+  No behavior change.
+
 ## Version 1.17.3:
 
 - Refactor #75: replace Black with `ruff format` and add `ruff check`
