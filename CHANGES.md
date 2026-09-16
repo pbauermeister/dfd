@@ -1,3 +1,10 @@
+## Version 1.17.3:
+
+- Refactor #75: replace Black with `ruff format` and add `ruff check`
+  (default rules plus ANN401, FBT and PLR0917, enforcing the type-safety
+  conventions). `make black` becomes `make format` (alias kept);
+  `make lint` runs ruff before mypy. No behavior change.
+
 ## Version 1.17.2:
 
 - Refactor #73: codify the type-safety conventions (new "Type safety"

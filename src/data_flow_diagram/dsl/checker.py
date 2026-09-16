@@ -28,7 +28,7 @@ def _check_items(statements: model.Statements) -> dict[str, model.Item]:
         other_text = model.pack(other.source.text)
         raise exception.DfdException(
             f'Name "{name}" already exists '
-            f"at line {other.source.line_nr+1}: {other_text}",
+            f"at line {other.source.line_nr + 1}: {other_text}",
             source=statement.source,
         )
     return items_by_name
@@ -92,12 +92,12 @@ def _check_frames(
         for name in frame.items:
             if name not in items_by_name:
                 raise exception.DfdException(
-                    f'Frame includes "{name}", ' f"which is not defined",
+                    f'Frame includes "{name}", which is not defined',
                     source=statement.source,
                 )
             if name in framed_items:
                 raise exception.DfdException(
-                    f'Item "{name}", ' f"is in multiple frames",
+                    f'Item "{name}", is in multiple frames',
                     source=statement.source,
                 )
             framed_items.add(name)

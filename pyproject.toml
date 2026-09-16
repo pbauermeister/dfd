@@ -9,3 +9,21 @@ build-backend = "setuptools.build_meta"
 pythonpath = ["src"]
 # Discover tests in the tests/ directory
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 80
+# Python files only: keep hand-aligned code blocks in Markdown as they are
+include = ["*.py", "*.pyi", "**/pyproject.toml"]
+
+[tool.ruff.format]
+# Keep the quote style as written (was Black's --skip-string-normalization)
+quote-style = "preserve"
+
+[tool.ruff.lint]
+# Enforce the Type safety section of doc/CONVENTIONS.md on top of the
+# default rule set: no Any in annotations, booleans by keyword, at most
+# three positional parameters
+extend-select = ["ANN401", "FBT", "PLR0917"]
+
+[tool.ruff.lint.pylint]
+max-positional-args = 3

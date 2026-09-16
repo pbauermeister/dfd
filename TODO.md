@@ -23,16 +23,11 @@ turned into a standard task (GH ticket, PR, devlog).
 
 ## TODO Items
 
-1. Replace Black and add ruff
+1. ~~Replace Black and add ruff~~ — DONE (#75)
 
-   Replace `black` with `ruff format` (drop-in compatible, ~100x faster
-   locally) and add `ruff check` for style/import linting that mypy
-   doesn't cover (unused imports, style issues). mypy stays for type
-   checking. Consolidates formatting and linting into one tool.
-
-   Enable ANN401 (no `Any` in annotations), PLR0913 (max positional
-   arguments, threshold 3) and the FBT boolean-trap rules to enforce
-   the Type safety conventions of `doc/CONVENTIONS.md` (#73).
+   `ruff format` replaces Black; `ruff check` runs before mypy in
+   `make lint`, with ANN401, FBT and PLR0917 (not PLR0913, which also
+   counts keyword-only parameters) enforcing `doc/CONVENTIONS.md`.
 
 2. ~~Fix README images on PyPI~~ — DONE (ea4c197+)
 

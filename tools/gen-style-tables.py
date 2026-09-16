@@ -15,7 +15,7 @@ from typing import assert_never
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "src"))
 
-from data_flow_diagram import model  # noqa: E402
+from data_flow_diagram import model
 
 
 def format_table(header: list[str], rows: list[list[str]]) -> str:

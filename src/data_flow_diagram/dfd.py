@@ -5,8 +5,8 @@ from typing import assert_never
 from . import config, exception, model
 from .console import dprint
 from .dsl import checker, dependency_checker, filters, parser, scanner
-from .rendering.dot import Generator, generate_dot
 from .rendering import templates as TMPL
+from .rendering.dot import Generator, generate_dot
 
 
 def build(

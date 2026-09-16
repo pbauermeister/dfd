@@ -7,7 +7,7 @@ import json
 import typing
 from dataclasses import dataclass
 from enum import Enum, StrEnum, auto
-from typing import TypeVar, assert_never
+from typing import TypeVar
 
 from . import config
 

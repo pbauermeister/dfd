@@ -28,7 +28,7 @@ def extract_snippets(text: str) -> model.Snippets:
         r"data-flow-diagram\s+"
         r"(?P<output>.*?)\s*"
         r"^(?P<src>.*?)^\s*```",
-        re.DOTALL | re.M,
+        re.DOTALL | re.MULTILINE,
     )
 
     return [

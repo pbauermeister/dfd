@@ -4,8 +4,9 @@ See:
 https://packaging.python.org/guides/distributing-packages-using-setuptools/
 """
 
-from setuptools import setup, find_packages
 import pathlib
+
+from setuptools import find_packages, setup
 
 changes = """
 

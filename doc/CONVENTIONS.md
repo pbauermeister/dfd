@@ -179,8 +179,10 @@ Parameters:
   keyword at the call site (judgment, not enforced).
 - Dataclasses with four or more fields use `kw_only=True`.
 
-Tooling: mypy runs in strict mode. Ruff rules ANN401, PLR0913 and FBT
-enforce the `Any` and parameter rules once ruff is adopted (TODO.md).
+Tooling: mypy runs in strict mode. Ruff rules ANN401, FBT and PLR0917
+(`max-positional-args = 3`) enforce the `Any` and parameter rules.
+PLR0917 counts positional parameters only, so keyword-only signatures
+of any length pass.
 
 ## Terminology
 

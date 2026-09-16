@@ -160,7 +160,7 @@ class Generator:
     ) -> re.Pattern[str] | None:
         if not attribs:
             return None
-        names = ["\\b" + re.escape(k) + "\\b" for k in attribs.keys()]
+        names = ["\\b" + re.escape(k) + "\\b" for k in attribs]
         pattern = "|".join(names)
         return re.compile(pattern)
 

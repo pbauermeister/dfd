@@ -2,7 +2,7 @@
 
 import os.path
 import re
-from typing import Callable
+from collections.abc import Callable
 
 from .. import config, exception, model
 from ..console import dprint
@@ -67,7 +67,7 @@ def parse(
 
 
 def _split_args(
-    dfd_line: str, n: int, last_is_optional: bool = False
+    dfd_line: str, n: int, *, last_is_optional: bool = False
 ) -> list[str]:
     """Split DFD line into n (possibly n-1) tokens"""
 
@@ -79,7 +79,7 @@ def _split_args(
         if not last_is_optional:
             raise exception.DfdException(f"Expected {n} argument(s)")
         else:
-            raise exception.DfdException(f"Expected {n-1} or {n} argument")
+            raise exception.DfdException(f"Expected {n - 1} or {n} argument")
 
     return terms[1:]
 
@@ -105,18 +105,17 @@ def _parse_attrib(source: model.SourceLine) -> model.Statement:
 
 
 RX_FILTER_ARG = re.compile(
-    r"""(
+    rf"""(
       # either a neighbor specification
       (?P<neighbors><>|<|>|\[|])    # direction
       (?P<flags>[a-zA-Z]*)              # flags
-      (?: (?P<all>[%s]) | (?P<num>[0-9]+) )  # "all" distance, or decimal number
+      (?: (?P<all>[{re.escape(model.ALL_NEIGHBORS)}]) | (?P<num>[0-9]+) )  # "all" distance, or decimal number
       |
       # or a replacer specification
       =                             # indicates replacer
       (?P<replacer>.*)              # name if item replacing the others
-    )"""
-    % re.escape(model.ALL_NEIGHBORS),
-    re.X,
+    )""",
+    re.VERBOSE,
 )
 
 
@@ -179,7 +178,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
-        raise exception.DfdException(f"One or more arguments are expected")
+        raise exception.DfdException("One or more arguments are expected")
 
     # initialize a base filter with no neighbors
     f = model.Filter(
@@ -230,7 +229,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
             args = args[1:]
 
     if len(args) == 0:
-        raise exception.DfdException(f"One or more names are expected")
+        raise exception.DfdException("One or more names are expected")
 
     # remaining args are anchor names
     f.names = args
@@ -314,11 +313,15 @@ def _apply_syntactic_sugars(src_line: str) -> str:
     """Rewrite arrow operators and filter shorthands to canonical keyword form."""
 
     # insert space after filter mnemonic (e.g. "!A B" → "! A B")
-    if src_line and src_line[0] in (Keyword.ONLY, Keyword.WITHOUT):
-        if len(src_line) > 1 and src_line[1] != " ":
-            # insert a space after the filter, so that it is recognized as a filter
-            new_line = src_line[0] + " " + src_line[1:]
-            return new_line
+    if (
+        src_line
+        and src_line[0] in (Keyword.ONLY, Keyword.WITHOUT)
+        and len(src_line) > 1
+        and src_line[1] != " "
+    ):
+        # insert a space after the filter, so that it is recognized as a filter
+        new_line = src_line[0] + " " + src_line[1:]
+        return new_line
 
     # rewrite arrow operators (e.g. "A --> B label" → "flow A B label")
     terms = src_line.split()

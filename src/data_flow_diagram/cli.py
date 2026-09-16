@@ -15,13 +15,12 @@ import argparse
 import os
 import sys
 import tempfile
+from importlib.metadata import PackageNotFoundError, version
 from typing import TextIO
 
 from . import dfd, exception, markdown, model
 from .console import dprint, print_error, set_debug
 from .rendering import graphviz
-
-from importlib.metadata import PackageNotFoundError, version
 
 try:
     VERSION = version("data-flow-diagram")
@@ -40,7 +39,7 @@ def parse_args() -> argparse.Namespace:
         action="store",
         default=None,
         nargs="?",
-        help="DFD input file; " "if omitted, stdin is used",
+        help="DFD input file; if omitted, stdin is used",
     )
 
     parser.add_argument(
@@ -210,7 +209,9 @@ def run(args: argparse.Namespace) -> None:
         input_fp = sys.stdin
         provenance = "<stdin>"
     else:
-        input_fp = open(args.INPUT_FILE)
+        # The handle is read once downstream, alongside stdin, and lives
+        # until process exit; a context manager would not fit either source.
+        input_fp = open(args.INPUT_FILE)  # noqa: SIM115
         provenance = f"<file:{args.INPUT_FILE}>"
 
     options = model.Options(

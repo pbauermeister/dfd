@@ -23,7 +23,6 @@ from data_flow_diagram.dsl import (
 )
 from data_flow_diagram.rendering.dot import Generator, generate_dot
 
-
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 
@@ -44,13 +43,13 @@ def _parse(dfd_text: str) -> model.Statements:
 
 def _default_options(**overrides: object) -> model.Options:
     """Create Options with sensible defaults for testing."""
-    defaults = dict(
-        format="dot",
-        background_color=None,
-        no_graph_title=False,
-        no_check_dependencies=True,
-        debug=False,
-    )
+    defaults: dict[str, object] = {
+        "format": "dot",
+        "background_color": None,
+        "no_graph_title": False,
+        "no_check_dependencies": True,
+        "debug": False,
+    }
     defaults.update(overrides)
     return model.Options(**defaults)  # type: ignore[arg-type]
 
@@ -63,7 +62,7 @@ class TestBuild:
         # build() must return a string containing valid DOT preamble
         provenance = _src("<test>")
         options = _default_options()
-        dot_text, graph_options = dfd.build(
+        dot_text, _ = dfd.build(
             provenance=provenance,
             dfd_src="process P Process",
             title="TestTitle",
@@ -154,7 +153,7 @@ class TestBuild:
         assert "bgcolor=red" in dot_text
 
     def test_multiple_items_and_connections(self) -> None:
-        dfd_src = "process P proc\n" "entity E ent\n" "P --> E data\n"
+        dfd_src = "process P proc\nentity E ent\nP --> E data\n"
         provenance = _src("<test>")
         options = _default_options()
         dot_text, _ = dfd.build(
