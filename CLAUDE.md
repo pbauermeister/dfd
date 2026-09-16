@@ -188,8 +188,8 @@ Full rules are in **`doc/COMMENTING.md`**. Key points:
 
 ## Formatting
 
-- After generating or modifying Python code, run `make black` to apply the project's standard formatting (Black with `--skip-string-normalization --line-length 80`).
-- After generating or modifying Python code, run `make lint` to catch type errors. Fix all mypy errors before committing.
+- After generating or modifying Python code, run `make format` to apply the project's standard formatting (`ruff format`, configured in `pyproject.toml`).
+- After generating or modifying Python code, run `make lint` to catch lint and type errors (`ruff check`, `ruff format --check`, then mypy). Fix all errors before committing.
 
 ## Versioning convention
 
