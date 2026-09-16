@@ -1,7 +1,7 @@
 # 077 — TestPyPI Release Cycle
 
 Date: 2026-09-16
-Status: PENDING
+Status: ONGOING
 
 Issue: https://github.com/pbauermeister/dfd/issues/77
 
@@ -34,4 +34,37 @@ Open points:
 
 ## Design
 
-(to be agreed)
+Facts:
+
+- `--format dot` renders without Graphviz, so the smoke test can diff an
+  NR fixture against its golden file.
+- `--version` uses `importlib.metadata`, so in a fresh venv it proves the
+  installed distribution's version.
+- twine is in the venv; real PyPI uses a `.token` file; no `~/.pypirc`.
+- No runtime dependencies, so TestPyPI installs can use `--no-deps`.
+
+Decisions:
+
+- Chain the TestPyPI stage into `publish-to-pypi.sh`; any failure stops
+  before the real upload. Each attempt consumes the version on TestPyPI,
+  which is fine since a failed attempt needs a bump anyway.
+- No `--skip-existing` on the TestPyPI upload (it would silently test a
+  stale upload). Dev-time validation uses a throwaway `1.17.4.dev1`
+  heading in an uncommitted `CHANGES.md` edit.
+- TestPyPI token in a gitignored `.token-test` file, mirroring `.token`.
+- No NR fixtures: diagram behavior is untouched.
+
+Steps:
+
+1. `tools/smoke-test-install.sh wheel|testpypi`: fresh venv in a temp
+   dir; install the local wheel from `dist/` or
+   `data-flow-diagram==<version>` from TestPyPI (with retries, the index
+   lags after upload); check `--version`; render an NR fixture with
+   `-f dot` and diff against its golden file; delete the venv.
+2. `make smoke-test-wheel`: build sdist + wheel, run the script in wheel
+   mode. Add to the CI workflow.
+3. `make publish-to-testpypi`: `twine upload -r testpypi` with
+   `.token-test`, then run the script in testpypi mode.
+4. Chain into `publish-to-pypi.sh`: build, wheel smoke test, TestPyPI
+   upload + smoke test, real PyPI upload, GitHub release.
+5. Bump to 1.17.4, `CHANGES.md` entry, note in the publish script header.
