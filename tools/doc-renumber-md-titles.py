@@ -79,10 +79,9 @@ def find_out_min_level(path: str) -> int:
     # determine level from which we emit numbering
     levels = sorted(titles_by_level.keys())
     min_level = 0
-    if len(levels) > 0:
-        if titles_by_level[levels[0]] == 1:
-            # there is only one top-level, so find out next level if any
-            min_level = levels[1] if len(levels) > 1 else levels[0] + 1
+    if len(levels) > 0 and titles_by_level[levels[0]] == 1:
+        # there is only one top-level, so find out next level if any
+        min_level = levels[1] if len(levels) > 1 else levels[0] + 1
     return min_level
 
 
@@ -99,6 +98,7 @@ def strip_numbering(text: str) -> str:
 
 def renumber_title(
     t: Title,
+    *,
     index_by_level: dict[int, int],
     min_level: int,
     last_depth: int | None,

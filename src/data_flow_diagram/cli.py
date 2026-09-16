@@ -209,7 +209,9 @@ def run(args: argparse.Namespace) -> None:
         input_fp = sys.stdin
         provenance = "<stdin>"
     else:
-        input_fp = open(args.INPUT_FILE)
+        # The handle is read once downstream, alongside stdin, and lives
+        # until process exit; a context manager would not fit either source.
+        input_fp = open(args.INPUT_FILE)  # noqa: SIM115
         provenance = f"<file:{args.INPUT_FILE}>"
 
     options = model.Options(

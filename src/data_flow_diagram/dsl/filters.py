@@ -153,6 +153,7 @@ class _FilterDecisions:
 def _collect_kept_names(
     statements: model.Statements,
     all_names: set[str],
+    *,
     debug: bool,
 ) -> _FilterDecisions:
     """Process filter statements to determine which names to keep."""
@@ -372,10 +373,10 @@ def _deduplicate_connections(
 
 
 def handle_filters(
-    statements: model.Statements, debug: bool = False
+    statements: model.Statements, *, debug: bool = False
 ) -> model.Statements:
     """Apply only/without filters to a statement list."""
-    all_names = set([s.name for s in statements if isinstance(s, model.Item)])
+    all_names = {s.name for s in statements if isinstance(s, model.Item)}
 
     # phase 1: collect filtered names
     decisions = _collect_kept_names(statements, all_names, debug=debug)

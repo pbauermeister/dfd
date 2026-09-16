@@ -31,7 +31,8 @@ def generate_image(
 def check_installed() -> None:
     cmd = ["dot", "-V"]
     try:
-        subprocess.run(cmd, stderr=subprocess.DEVNULL)
+        # probe only: a nonzero exit status is not an error here
+        subprocess.run(cmd, stderr=subprocess.DEVNULL, check=False)
     except FileNotFoundError as e:
         print('ERROR: "Graphviz" seems not installed:', e, file=sys.stderr)
         sys.exit(2)

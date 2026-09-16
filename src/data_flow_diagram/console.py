@@ -13,7 +13,7 @@ def print_error(text: str) -> None:
 debug = False
 
 
-def set_debug(value: bool) -> None:
+def set_debug(*, value: bool) -> None:
     global debug
     debug = value
 
