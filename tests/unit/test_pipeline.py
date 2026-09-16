@@ -23,7 +23,6 @@ from data_flow_diagram.dsl import (
 )
 from data_flow_diagram.rendering.dot import Generator, generate_dot
 
-
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 
@@ -154,7 +153,7 @@ class TestBuild:
         assert "bgcolor=red" in dot_text
 
     def test_multiple_items_and_connections(self) -> None:
-        dfd_src = "process P proc\n" "entity E ent\n" "P --> E data\n"
+        dfd_src = "process P proc\nentity E ent\nP --> E data\n"
         provenance = _src("<test>")
         options = _default_options()
         dot_text, _ = dfd.build(

@@ -15,13 +15,12 @@ import argparse
 import os
 import sys
 import tempfile
+from importlib.metadata import PackageNotFoundError, version
 from typing import TextIO
 
 from . import dfd, exception, markdown, model
 from .console import dprint, print_error, set_debug
 from .rendering import graphviz
-
-from importlib.metadata import PackageNotFoundError, version
 
 try:
     VERSION = version("data-flow-diagram")
@@ -40,7 +39,7 @@ def parse_args() -> argparse.Namespace:
         action="store",
         default=None,
         nargs="?",
-        help="DFD input file; " "if omitted, stdin is used",
+        help="DFD input file; if omitted, stdin is used",
     )
 
     parser.add_argument(

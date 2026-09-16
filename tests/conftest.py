@@ -8,7 +8,6 @@ import pytest
 
 from data_flow_diagram import model
 
-
 # ── Markdown fixtures ─────────────────────────────────────────────────────────
 
 # A markdown document containing two data-flow-diagram code blocks (and one

@@ -12,6 +12,8 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 80
+# Python files only: keep hand-aligned code blocks in Markdown as they are
+include = ["*.py", "*.pyi", "**/pyproject.toml"]
 
 [tool.ruff.format]
 # Keep the quote style as written (was Black's --skip-string-normalization)

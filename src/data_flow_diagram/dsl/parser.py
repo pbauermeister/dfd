@@ -2,7 +2,7 @@
 
 import os.path
 import re
-from typing import Callable
+from collections.abc import Callable
 
 from .. import config, exception, model
 from ..console import dprint
@@ -79,7 +79,7 @@ def _split_args(
         if not last_is_optional:
             raise exception.DfdException(f"Expected {n} argument(s)")
         else:
-            raise exception.DfdException(f"Expected {n-1} or {n} argument")
+            raise exception.DfdException(f"Expected {n - 1} or {n} argument")
 
     return terms[1:]
 
@@ -116,7 +116,7 @@ RX_FILTER_ARG = re.compile(
       (?P<replacer>.*)              # name if item replacing the others
     )"""
     % re.escape(model.ALL_NEIGHBORS),
-    re.X,
+    re.VERBOSE,
 )
 
 
@@ -179,7 +179,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
-        raise exception.DfdException(f"One or more arguments are expected")
+        raise exception.DfdException("One or more arguments are expected")
 
     # initialize a base filter with no neighbors
     f = model.Filter(
@@ -230,7 +230,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
             args = args[1:]
 
     if len(args) == 0:
-        raise exception.DfdException(f"One or more names are expected")
+        raise exception.DfdException("One or more names are expected")
 
     # remaining args are anchor names
     f.names = args

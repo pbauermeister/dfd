@@ -107,7 +107,7 @@ def include(
         # include from MD snippet
         if not snippet_by_name:
             raise exception.DfdException(
-                f"source is not markdown, " f'cannot include snippet "{name}".',
+                f'source is not markdown, cannot include snippet "{name}".',
                 source=parent,
             )
         name0 = name

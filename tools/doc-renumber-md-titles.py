@@ -6,11 +6,11 @@ If there is only one top-level title, it is considered as the document
 title, and numbering affects only the titles of lower level.
 
 """
-import argparse
-from dataclasses import dataclass
-from typing import Generator
-import re
 
+import argparse
+import re
+from collections.abc import Generator
+from dataclasses import dataclass
 
 RX_TITLE = re.compile(
     '^(?P<hashes>#+) +(?P<number>[0-9]+(?:[.][0-9]+)*[.] +)?(?P<title>.*)'

@@ -18,7 +18,6 @@ def _collect_connected_names(
     for statement in statements:
         match statement:
             case model.Connection() as conn:
-
                 # constraints do not define neighborhood
                 if conn.type == model.Keyword.CONSTRAINT:
                     continue
@@ -72,10 +71,10 @@ def _expand_neighbors_in_dir(
         if not names:
             break
         dprint(f"  - {i} {down} {fn}")
-        dprint(f"     :", neighbor_names)
-        dprint(f"   + :", names)
+        dprint("     :", neighbor_names)
+        dprint("   + :", names)
         neighbor_names.update(names)
-        dprint(f"   = :", neighbor_names)
+        dprint("   = :", neighbor_names)
     return neighbor_names
 
 
