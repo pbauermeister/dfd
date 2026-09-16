@@ -8,5 +8,8 @@ MYPY_OPTS+=" --warn-return-any"
 MYPY_OPTS+=" --strict-equality"
 MYPY_OPTS+=" --strict --namespace-packages"
 
+ruff check .
+ruff format --check .
+
 SRCS=$(find src tests -name "*.py")
 mypy --ignore-missing-imports --pretty $MYPY_OPTS --no-strict-optional $SRCS

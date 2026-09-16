@@ -47,17 +47,19 @@ require-system: ## install system packages (graphviz, python3-venv, npm)
 
 require: ## install needed dev+install tools, in venv
 	. $(VENV)/bin/activate && \
-	pip install setuptools twine pytest mypy
+	pip install setuptools twine pytest mypy ruff
 	npm install --prefix $(VENV) --no-audit --no-fund prettier@3
 
-all: require-system venv require black lint test doc clean ## make all, except publish
+all: require-system venv require format lint test doc clean ## make all, except publish
 
 ################################################################################
 # Quality:: ##
 
-black: ## run black (changes shall be committed)
+format: ## format source files (changes shall be committed)
 	. $(VENV)/bin/activate && \
-	black --skip-string-normalization --line-length 80 .
+	ruff format .
+
+black: format ## alias of format
 
 lint: ## lint source files
 	. $(VENV)/bin/activate && \
