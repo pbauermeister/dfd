@@ -2,7 +2,7 @@
 
 Date: 2026-09-16
 
-Status: PENDING
+Status: ONGOING
 
 ## Requirement
 
@@ -45,4 +45,27 @@ Baseline measured with ruff 0.16.8 on main at 7fe82f9:
 
 ## Design
 
-To be agreed.
+No NR fixtures: no behavior change; the existing NR fixtures guard the
+lint-driven code edits.
+
+Steps:
+
+1. Tooling config. `[tool.ruff]` in `pyproject.toml`: line length 80,
+   quote style preserve, extra rules ANN401, FBT, PLR0917 with
+   `max-positional-args = 3`. Makefile: `format` target, `black` kept
+   as alias, `ruff` added to `make require`, `all` uses `format`.
+   `tools/lint.sh` runs `ruff check` and `ruff format --check` before
+   mypy. `tox.ini` deps gain `ruff`.
+2. Mechanical pass: `ruff format`, `ruff check --fix` (safe fixes).
+   Hand-fix the merged string in `dsl/scanner.py` where ruff emits
+   escaped double quotes.
+3. Judgment fixes: FBT (four signatures, boolean made keyword-only,
+   including single-parameter `set_debug`), PLR0917 (`renumber_title`
+   keyword-only), SIM115 in `cli.py` (`noqa`, handle flows out on
+   purpose), PLW1510 (`check=False` explicit), plus one-liners (SIM102,
+   SIM118, UP031, C403, C408, RUF059, F541, F401).
+4. Docs and version: `doc/CONVENTIONS.md` tooling paragraph (PLR0917),
+   `CLAUDE.md` Formatting section (`make format`), TODO.md item 1 DONE,
+   CHANGES.md 1.17.3.
+5. Verify (`make format`, `make lint`, `make test`), self-review against
+   Type safety, mark PR ready.
