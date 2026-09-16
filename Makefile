@@ -99,6 +99,11 @@ doc: readme ## remake doc
 	. $(VENV)/bin/activate && \
 	./tools/make-doc.sh
 
+smoke-test-wheel: venv clean ## build wheel, install in a fresh venv, check
+	. $(VENV)/bin/activate && \
+	python3 setup.py sdist bdist_wheel && \
+	./tools/smoke-test-install.sh wheel
+
 publish-to-pypi: venv clean ## publish to Pypi and create GitHub Release
 	. $(VENV)/bin/activate && \
 	./tools/publish-to-pypi.sh
