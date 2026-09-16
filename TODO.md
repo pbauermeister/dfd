@@ -30,6 +30,10 @@ turned into a standard task (GH ticket, PR, devlog).
    doesn't cover (unused imports, style issues). mypy stays for type
    checking. Consolidates formatting and linting into one tool.
 
+   Enable ANN401 (no `Any` in annotations), PLR0913 (max positional
+   arguments, threshold 3) and the FBT boolean-trap rules to enforce
+   the Type safety conventions of `doc/CONVENTIONS.md` (#73).
+
 2. ~~Fix README images on PyPI~~ — DONE (ea4c197+)
 
    Replaced relative image paths in README.md with absolute GitHub raw

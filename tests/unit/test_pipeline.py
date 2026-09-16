@@ -36,7 +36,7 @@ def _src(text: str = "", line_nr: int = 0) -> model.SourceLine:
 
 def _parse(dfd_text: str) -> model.Statements:
     """Scan, parse, and check a DFD snippet, returning its statements."""
-    tokens = scanner.scan(None, dfd_text)
+    tokens = scanner.scan(provenance=None, source_text=dfd_text)
     statements, _, _ = parser.parse(tokens)
     checker.check(statements)
     return statements
@@ -64,7 +64,10 @@ class TestBuild:
         provenance = _src("<test>")
         options = _default_options()
         dot_text, graph_options = dfd.build(
-            provenance, "process P Process", "TestTitle", options
+            provenance=provenance,
+            dfd_src="process P Process",
+            title="TestTitle",
+            options=options,
         )
         assert "digraph" in dot_text
         assert '"P"' in dot_text
@@ -73,7 +76,10 @@ class TestBuild:
         provenance = _src("<test>")
         options = _default_options()
         dot_text, _ = dfd.build(
-            provenance, "process P Process", "My Diagram", options
+            provenance=provenance,
+            dfd_src="process P Process",
+            title="My Diagram",
+            options=options,
         )
         assert "My Diagram" in dot_text
 
@@ -81,7 +87,10 @@ class TestBuild:
         provenance = _src("<test>")
         options = _default_options(no_graph_title=True)
         dot_text, _ = dfd.build(
-            provenance, "process P Process", "ShouldNotAppear", options
+            provenance=provenance,
+            dfd_src="process P Process",
+            title="ShouldNotAppear",
+            options=options,
         )
         assert "ShouldNotAppear" not in dot_text
 
@@ -90,7 +99,10 @@ class TestBuild:
         provenance = _src("<test>")
         options = _default_options()
         dot_text, _ = dfd.build(
-            provenance, "process P Process", 'My "Diagram"', options
+            provenance=provenance,
+            dfd_src="process P Process",
+            title='My "Diagram"',
+            options=options,
         )
         assert 'My \\"Diagram\\"' in dot_text
 
@@ -99,7 +111,10 @@ class TestBuild:
         provenance = _src("<test>")
         options = _default_options()
         dot_text, _ = dfd.build(
-            provenance, r"process P Dir C:\\hello\nnext", "", options
+            provenance=provenance,
+            dfd_src=r"process P Dir C:\\hello\nnext",
+            title="",
+            options=options,
         )
         assert r'label="Dir C:\\hello\nnext"' in dot_text
 
@@ -108,26 +123,46 @@ class TestBuild:
         provenance = _src("<test>")
         options = _default_options()
         with pytest.raises(exception.DfdException, match="Stray backslash"):
-            dfd.build(provenance, r"process P Dir C:\hello", "", options)
+            dfd.build(
+                provenance=provenance,
+                dfd_src=r"process P Dir C:\hello",
+                title="",
+                options=options,
+            )
 
     def test_empty_title(self) -> None:
         # Empty title (e.g. stdout output) should not crash
         provenance = _src("<test>")
         options = _default_options()
-        dot_text, _ = dfd.build(provenance, "process P Process", "", options)
+        dot_text, _ = dfd.build(
+            provenance=provenance,
+            dfd_src="process P Process",
+            title="",
+            options=options,
+        )
         assert "digraph" in dot_text
 
     def test_background_color_from_options(self) -> None:
         provenance = _src("<test>")
         options = _default_options(background_color="red")
-        dot_text, _ = dfd.build(provenance, "process P Process", "", options)
+        dot_text, _ = dfd.build(
+            provenance=provenance,
+            dfd_src="process P Process",
+            title="",
+            options=options,
+        )
         assert "bgcolor=red" in dot_text
 
     def test_multiple_items_and_connections(self) -> None:
         dfd_src = "process P proc\n" "entity E ent\n" "P --> E data\n"
         provenance = _src("<test>")
         options = _default_options()
-        dot_text, _ = dfd.build(provenance, dfd_src, "Test", options)
+        dot_text, _ = dfd.build(
+            provenance=provenance,
+            dfd_src=dfd_src,
+            title="Test",
+            options=options,
+        )
         assert '"P"' in dot_text
         assert '"E"' in dot_text
         assert '"P" -> "E"' in dot_text
@@ -273,7 +308,11 @@ class TestGenerateDot:
         ]
         items_by_name = {"P": statements[0]}
         dot = generate_dot(
-            gen, "Title", None, statements, items_by_name  # type: ignore[arg-type]
+            gen=gen,
+            title="Title",
+            bg_color=None,
+            statements=statements,
+            items_by_name=items_by_name,  # type: ignore[arg-type]
         )
         assert "digraph" in dot
         assert '"P"' in dot
@@ -309,7 +348,13 @@ class TestGenerateDot:
         )
         statements: model.Statements = [item_p, item_e, conn]
         items_by_name = {"P": item_p, "E": item_e}
-        dot = generate_dot(gen, "", None, statements, items_by_name)
+        dot = generate_dot(
+            gen=gen,
+            title="",
+            bg_color=None,
+            statements=statements,
+            items_by_name=items_by_name,
+        )
         assert '"P" -> "E"' in dot
 
     def test_frame_produces_subgraph(self) -> None:
@@ -333,7 +378,13 @@ class TestGenerateDot:
         )
         statements: model.Statements = [item_p, frame]
         items_by_name = {"P": item_p}
-        dot = generate_dot(gen, "", None, statements, items_by_name)
+        dot = generate_dot(
+            gen=gen,
+            title="",
+            bg_color=None,
+            statements=statements,
+            items_by_name=items_by_name,
+        )
         assert "subgraph cluster_" in dot
         assert "My Frame" in dot
 
@@ -383,7 +434,12 @@ class TestDependencyChecker:
         options = _default_options(no_check_dependencies=False)
         file_texts = {"other.dfd": "process P proc"}
         # should not raise
-        dependency_checker.check([dep], None, options, file_texts=file_texts)
+        dependency_checker.check(
+            dependencies=[dep],
+            snippet_by_name=None,
+            options=options,
+            file_texts=file_texts,
+        )
 
     def test_missing_file(self) -> None:
         # Dependency to a file not in file_texts should raise
@@ -398,7 +454,10 @@ class TestDependencyChecker:
         file_texts: dict[str, str] = {}
         with pytest.raises(exception.DfdException, match="No such file"):
             dependency_checker.check(
-                [dep], None, options, file_texts=file_texts
+                dependencies=[dep],
+                snippet_by_name=None,
+                options=options,
+                file_texts=file_texts,
             )
 
     def test_wrong_item_type(self) -> None:
@@ -414,7 +473,10 @@ class TestDependencyChecker:
         file_texts = {"other.dfd": "process P proc"}
         with pytest.raises(exception.DfdException, match="type"):
             dependency_checker.check(
-                [dep], None, options, file_texts=file_texts
+                dependencies=[dep],
+                snippet_by_name=None,
+                options=options,
+                file_texts=file_texts,
             )
 
     def test_unknown_item_name(self) -> None:
@@ -430,7 +492,10 @@ class TestDependencyChecker:
         file_texts = {"other.dfd": "process P proc"}
         with pytest.raises(exception.DfdException, match="unknown item"):
             dependency_checker.check(
-                [dep], None, options, file_texts=file_texts
+                dependencies=[dep],
+                snippet_by_name=None,
+                options=options,
+                file_texts=file_texts,
             )
 
     def test_whole_graph_with_none_type(self) -> None:
@@ -444,7 +509,12 @@ class TestDependencyChecker:
         )
         options = _default_options(no_check_dependencies=False)
         file_texts = {"other.dfd": "process P proc"}
-        dependency_checker.check([dep], None, options, file_texts=file_texts)
+        dependency_checker.check(
+            dependencies=[dep],
+            snippet_by_name=None,
+            options=options,
+            file_texts=file_texts,
+        )
 
     def test_whole_graph_wrong_type(self) -> None:
         # Whole-graph dependency with non-"none" type should raise
@@ -459,5 +529,8 @@ class TestDependencyChecker:
         file_texts = {"other.dfd": "process P proc"}
         with pytest.raises(exception.DfdException, match="none"):
             dependency_checker.check(
-                [dep], None, options, file_texts=file_texts
+                dependencies=[dep],
+                snippet_by_name=None,
+                options=options,
+                file_texts=file_texts,
             )

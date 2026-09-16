@@ -12,7 +12,7 @@ from data_flow_diagram.dsl import checker, filters, parser, scanner
 
 def _parse(dfd_text: str) -> model.Statements:
     """Scan, parse, and check a DFD snippet, returning its statements."""
-    tokens = scanner.scan(None, dfd_text)
+    tokens = scanner.scan(provenance=None, source_text=dfd_text)
     statements, _, _ = parser.parse(tokens)
     checker.check(statements)
     return statements

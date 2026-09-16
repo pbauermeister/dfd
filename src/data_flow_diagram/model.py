@@ -7,12 +7,12 @@ import json
 import typing
 from dataclasses import dataclass
 from enum import Enum, StrEnum, auto
-from typing import Any, TypeVar, assert_never
+from typing import TypeVar, assert_never
 
 from . import config
 
 
-def repr(o: Any) -> str:
+def repr(o: Base) -> str:
     name: str = o.__class__.__name__
     val: str = json.dumps(dataclasses.asdict(o), indent="  ")
     return f"{name} {val}"
@@ -35,7 +35,7 @@ class Base:
 # Source text
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Snippet(Base):
     text: str
     name: str
@@ -43,7 +43,7 @@ class Snippet(Base):
     line_nr: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SourceLine(Base):
     text: str  # after pre-processor
     raw_text: str | None
@@ -53,7 +53,7 @@ class SourceLine(Base):
 
 
 # Statements
-@dataclass
+@dataclass(kw_only=True)
 class Statement(Base):
     source: SourceLine
 
@@ -63,10 +63,17 @@ class Statement(Base):
 
 T = TypeVar("T")
 
+
 # Declarations attached to GraphOptions fields as dataclass metadata: which
 # `style` keyword(s) set the field and how it is documented. Everything else
 # (registry, parsing, doc tables) is derived from these declarations.
-StyleFlags = dict[str, tuple[bool, str]]  # keyword -> (value, doc)
+@dataclass(frozen=True)
+class StyleFlag:
+    value: bool  # the value the keyword sets
+    doc: str
+
+
+StyleFlags = dict[str, StyleFlag]  # DSL keyword -> flag
 STYLE_METADATA = "style"  # the single dataclass metadata key
 
 
@@ -111,23 +118,31 @@ class GraphOptions:
     is_vertical: bool = declare_style_as_flags(
         default=False,
         flags={
-            "horizontal": (
-                False,
-                "Layouts flows in the horizontal direction (the default).",
+            "horizontal": StyleFlag(
+                value=False,
+                doc="Layouts flows in the horizontal direction (the default).",
             ),
-            "vertical": (True, "Layouts flows in the vertical direction."),
+            "vertical": StyleFlag(
+                value=True, doc="Layouts flows in the vertical direction."
+            ),
         },
     )
     is_rotated: bool = declare_style_as_flags(
         default=False,
         flags={
-            "rotated": (True, "Rotates the diagram by 90°."),
-            "unrotated": (False, "Reverts the diagram rotation, if any."),
+            "rotated": StyleFlag(value=True, doc="Rotates the diagram by 90°."),
+            "unrotated": StyleFlag(
+                value=False, doc="Reverts the diagram rotation, if any."
+            ),
         },
     )
     is_context: bool = declare_style_as_flags(
         default=False,
-        flags={"context": (True, "Makes the diagram a context diagram.")},
+        flags={
+            "context": StyleFlag(
+                value=True, doc="Makes the diagram a context diagram."
+            )
+        },
     )
 
     # text
@@ -163,9 +178,9 @@ class GraphOptions:
     no_graph_title: bool = declare_style_as_flags(
         default=False,
         flags={
-            "no-graph-title": (
-                True,
-                "Suppress graph title containing the image file path "
+            "no-graph-title": StyleFlag(
+                value=True,
+                doc="Suppress graph title containing the image file path "
                 "(without extension).",
             ),
         },
@@ -183,13 +198,13 @@ class StyleKind(Enum):
     STR = auto()  # keyword takes a string value
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class StyleSpec:
     """One `style` keyword: the GraphOptions field it sets, and how."""
 
     field: str
     kind: StyleKind
-    value: Any  # fixed value for flags; default value otherwise
+    value: bool | int | str | None  # fixed value for flags; default otherwise
     doc: str
     placeholder: str  # value placeholder word in docs (valued options only)
 
@@ -201,14 +216,25 @@ def _build_style_specs() -> dict[str, StyleSpec]:
     for f in dataclasses.fields(GraphOptions):
         match f.metadata[STYLE_METADATA]:
             case StyleFlagsDecl(flags):
-                for keyword, (value, doc) in flags.items():
+                for keyword, flag in flags.items():
                     specs[keyword] = StyleSpec(
-                        f.name, StyleKind.FLAG, value, doc, ""
+                        field=f.name,
+                        kind=StyleKind.FLAG,
+                        value=flag.value,
+                        doc=flag.doc,
+                        placeholder="",
                     )
             case StyleValueDecl(name, doc, placeholder):
                 kind = StyleKind.INT if hints[f.name] is int else StyleKind.STR
+                # narrow the dataclasses.Field default (typed Any | MISSING)
+                default = f.default
+                assert default is None or isinstance(default, (int, str)), name
                 specs[name] = StyleSpec(
-                    f.name, kind, f.default, doc, placeholder
+                    field=f.name,
+                    kind=kind,
+                    value=default,
+                    doc=doc,
+                    placeholder=placeholder,
                 )
             case decl:
                 raise TypeError(f"unexpected style declaration {decl!r}")
@@ -218,13 +244,13 @@ def _build_style_specs() -> dict[str, StyleSpec]:
 STYLE_SPECS = _build_style_specs()  # keyword -> spec, in doc order
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Style(Statement):
     style: str
     value: str = ""
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Attrib(Statement):
     alias: str
     text: str
@@ -234,20 +260,20 @@ Attribs = dict[str, Attrib]
 
 
 # Statements: elements
-@dataclass
+@dataclass(kw_only=True)
 class Drawable(Statement):
     type: Keyword
     text: str
     attrs: str
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Item(Drawable):
     name: str
     hidable: bool
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Connection(Drawable):
     src: str
     dst: str
@@ -260,12 +286,12 @@ class Connection(Drawable):
         return json.dumps(d, sort_keys=True)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Frame(Drawable):
     items: list[str]
 
 
-@dataclass
+@dataclass(kw_only=True)
 class FilterNeighbors:
     distance: int  # span: how many levels of neighbors (-1 = unlimited)
     suppress_anchors: bool  # "x" flag: select only neighbors, not anchors
@@ -275,19 +301,19 @@ class FilterNeighbors:
     suppress_frames: bool  # "f" flag: suppress frames involving selected items
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Filter(Statement):
     names: list[str]
     neighbors_up: FilterNeighbors
     neighbors_down: FilterNeighbors
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Only(Filter):
     pass
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Without(Filter):
     replaced_by: str
 
@@ -361,7 +387,7 @@ Statements = list[Statement]
 SnippetByName = dict[str, Snippet]
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Options:
     """These options can be specified as commandline args."""
 
@@ -372,7 +398,7 @@ class Options:
     debug: bool
 
 
-@dataclass
+@dataclass(kw_only=True)
 class GraphDependency:
     to_graph: str
     to_item: str | None

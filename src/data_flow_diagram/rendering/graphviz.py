@@ -9,7 +9,7 @@ from . import templates as TMPL
 
 
 def generate_image(
-    graph_options: model.GraphOptions, text: str, output_path: str, fmt: str
+    *, graph_options: model.GraphOptions, text: str, output_path: str, fmt: str
 ) -> None:
     # choose Graphviz engine based on diagram mode
     if graph_options.is_context:

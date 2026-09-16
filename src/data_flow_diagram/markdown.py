@@ -10,7 +10,7 @@ from typing import TextIO
 from . import exception, model
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SnippetContext:
     root: model.SourceLine
     input_fp: TextIO
@@ -59,10 +59,21 @@ def make_snippets_params(
         input_fp = io.StringIO(snippet.text)
         snippet_provenance = f"{provenance}<snippet:{snippet.output}>"
         root = model.SourceLine(
-            "", snippet_provenance, None, snippet.line_nr, is_container=True
+            text="",
+            raw_text=snippet_provenance,
+            parent=None,
+            line_nr=snippet.line_nr,
+            is_container=True,
         )
         file_name = input_fp.name = snippet.output
-        res.append(SnippetContext(root, input_fp, file_name, snippet_by_name))
+        res.append(
+            SnippetContext(
+                root=root,
+                input_fp=input_fp,
+                file_name=file_name,
+                snippet_by_name=snippet_by_name,
+            )
+        )
 
     return res
 
@@ -72,7 +83,9 @@ def check_snippets_unicity(provenance: str, snippets: model.Snippets) -> None:
     counts = Counter(snippet_names)
     multiples = {k: n for k, n in counts.items() if n > 1}
     if multiples:
-        root = model.SourceLine("", provenance, None, 0)
+        root = model.SourceLine(
+            text="", raw_text=provenance, parent=None, line_nr=0
+        )
         raise exception.DfdException(
             f"Snippets defined multiple times: {multiples}", source=root
         )
