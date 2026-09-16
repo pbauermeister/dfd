@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# Release rehearsal: build, smoke-test the wheel, upload to TestPyPI,
+# install from there into a fresh venv and smoke-test again.
+#
+# Getting a token:
+#   https://test.pypi.org/manage/account/token/
+#
+# TestPyPI refuses re-uploads of a version: a failed rehearsal needs a
+# version bump before retrying.
+
+. ./set-ex.sh
+
+./tools/build.sh
+
+
+banner2 "Building distributions"
+
+python3 setup.py sdist bdist_wheel
+
+
+banner2 "Smoke-testing the wheel"
+
+./tools/smoke-test-install.sh wheel
+
+
+banner2 "Publishing to TestPyPI"
+
+if [ ! -f .token-test ]; then
+    echo "ERROR: please have a file named '.token-test' containing your TestPyPI token"
+    exit 1
+fi
+
+python3 -m twine upload --repository-url https://test.pypi.org/legacy/ \
+	--username __token__ dist/* --password $(cat .token-test) --verbose
+
+
+banner2 "Smoke-testing the TestPyPI install"
+
+./tools/smoke-test-install.sh testpypi
