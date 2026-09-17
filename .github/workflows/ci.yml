@@ -5,6 +5,8 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  # called as the gate of release.yml
+  workflow_call:
 
 jobs:
   test:

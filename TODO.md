@@ -67,7 +67,7 @@ turned into a standard task (GH ticket, PR, devlog).
    `setup.py` or a version file kept in sync would remain. No change to
    the published packages; tooling hygiene only.
 
-6. Harmonize GitHub and PyPI releases — task #80
+6. ~~Harmonize GitHub and PyPI releases~~ — DONE (#80)
 
    Single manually triggered GitHub Actions workflow, gated on the full
    test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted

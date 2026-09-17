@@ -2,14 +2,19 @@
 """Publish a GitHub Release for the current version.
 
 Reads the version and changelog from CHANGES.md, tags the repo,
-and creates a GitHub Release with dist artifacts attached.
+and creates a GitHub Release with the dist/ artifacts attached.
+
+This is the local fallback of the release workflow (release.yml):
+run it right after `make publish-to-pypi`, so that the files just
+uploaded to PyPI are the ones attached (no rebuild here).
 """
 
 import argparse
-import re
 import subprocess
 import sys
 from pathlib import Path
+
+from changelog import extract_notes, extract_version
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,26 +30,6 @@ def run_output(cmd: list[str]) -> str:
     return subprocess.run(
         cmd, check=True, capture_output=True, text=True, cwd=ROOT_DIR
     ).stdout.strip()
-
-
-def extract_version() -> str:
-    """Extract the latest version from CHANGES.md."""
-    changes = (ROOT_DIR / "CHANGES.md").read_text()
-    m = re.search(r"^## Version\s+(\S+?):", changes, re.MULTILINE)
-    if not m:
-        sys.exit("ERROR: could not extract version from CHANGES.md")
-    return m.group(1)
-
-
-def extract_changelog(version: str) -> str:
-    """Extract the changelog entry for a given version."""
-    changes = (ROOT_DIR / "CHANGES.md").read_text()
-    # find the section for this version
-    pattern = rf"^## Version\s+{re.escape(version)}:\s*\n(.*?)(?=^## |\Z)"
-    m = re.search(pattern, changes, re.MULTILINE | re.DOTALL)
-    if not m:
-        return f"Release {version}"
-    return m.group(1).strip()
 
 
 def check_branch():
@@ -64,17 +49,11 @@ def check_branch():
         )
 
 
-def build():
-    """Build sdist and wheel."""
-    print("\n--- Building dist artifacts ---")
-    run(["uv", "build"])
-
-
 def find_dist_files() -> list[str]:
     """Find dist artifacts to attach to the release."""
     dist_dir = ROOT_DIR / "dist"
     if not dist_dir.exists():
-        sys.exit("ERROR: dist/ directory not found.")
+        sys.exit("ERROR: dist/ directory not found (run `uv build` first).")
     # only the distributions: uv build also drops a .gitignore in dist/
     files = sorted(
         str(p)
@@ -132,7 +111,7 @@ def main():
 
     # extract version and changelog
     version = extract_version()
-    changelog = extract_changelog(version)
+    changelog = extract_notes(version)
     print(f"Version: {version}")
     print(f"Changelog:\n{changelog}\n")
 
@@ -141,9 +120,6 @@ def main():
         check_branch()
     else:
         print("(branch check skipped)")
-
-    # build
-    build()
 
     # find dist files
     dist_files = find_dist_files()

@@ -129,6 +129,10 @@ After the PR is merged:
 3. Update `MEMORY.md` with anything noteworthy from the task: completed
    milestones, architectural decisions, new conventions, or design
    preferences that emerged from discussion.
+4. List the PRs merged since the last release tag
+   (`gh pr list --state merged --search "merged:>$(git log -1 --format=%cI $(git describe --tags --abbrev=0))"`)
+   and ask whether to release now (`make release`, see
+   `doc/RELEASING.md`).
 
 ## Implementation workflow
 
