@@ -72,3 +72,12 @@ turned into a standard task (GH ticket, PR, devlog).
    Single manually triggered GitHub Actions workflow, gated on the full
    test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted
    publishing, GitHub release with the same files.
+
+8. Rewrite `tools/update-docs.sh` in Python
+
+   It replaces `<!-- AUTO:* -->` sections of Markdown files with awk/sed
+   and generates the CLI help and doc TOC: string manipulation and
+   Markdown section handling, which the "Tooling scripts" convention
+   (`doc/CONVENTIONS.md`) assigns to Python. Keep the same sections,
+   markers and prettier pass; `tests/test_doc_sync.py` guards the
+   output. Rewrite when it next needs to grow, not before.
