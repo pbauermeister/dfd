@@ -1,0 +1,160 @@
+name: Release
+
+# Manual release to PyPI and GitHub from one build, gated on CI.
+# See doc/RELEASING.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Stop after the TestPyPI rehearsal (any branch allowed)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  PACKAGE: data-flow-diagram
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  preflight:
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the ref is main
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error::releases are made from main, not $GITHUB_REF"
+            exit 1
+          fi
+
+      - name: Read the version from CHANGES.md
+        id: version
+        run: echo "version=$(python3 tools/changelog.py version)" >> "$GITHUB_OUTPUT"
+
+      - name: Check the tag does not exist
+        run: |
+          tag="v${{ steps.version.outputs.version }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "::error::tag $tag already exists"
+            exit 1
+          fi
+
+      - name: Check the version is on neither PyPI nor TestPyPI
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          for index in pypi.org test.pypi.org; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' \
+                   "https://$index/pypi/$PACKAGE/$version/json")
+            if [ "$code" != 404 ]; then
+              echo "::error::$PACKAGE $version on $index: HTTP $code (expected 404)"
+              exit 1
+            fi
+          done
+
+  build:
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Build sdist and wheel
+        run: uv build
+
+      - name: Smoke-test the wheel in a fresh venv
+        run: ./tools/smoke-test-install.sh wheel
+
+      - name: Upload the distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error
+
+  testpypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Download the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish to TestPyPI
+        run: >
+          uv publish --trusted-publishing always
+          --publish-url https://test.pypi.org/legacy/ dist/*
+
+      - name: Smoke-test the TestPyPI install in a fresh venv
+        run: ./tools/smoke-test-install.sh testpypi
+
+  pypi:
+    needs: testpypi
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Download the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish to PyPI
+        run: uv publish --trusted-publishing always dist/*
+
+  github-release:
+    needs: [preflight, pypi]
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Create the GitHub release (and its tag)
+        run: |
+          tag="v${{ needs.preflight.outputs.version }}"
+          python3 tools/changelog.py notes > notes.md
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" \
+            --notes-file notes.md dist/*.whl dist/*.tar.gz
