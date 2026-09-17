@@ -1,3 +1,8 @@
+## Version 1.17.6:
+
+- Doc: `doc/CONVENTIONS.md` gains a "Tooling scripts" section (Python
+  vs bash for scripts in `tools/` and `tests/`).
+
 ## Version 1.17.5:
 
 - Refactor #79: migrate the project tooling to uv. Package metadata

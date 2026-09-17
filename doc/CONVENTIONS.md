@@ -186,6 +186,26 @@ Tooling: mypy runs in strict mode. Ruff rules ANN401, FBT and PLR0917
 PLR0917 counts positional parameters only, so keyword-only signatures
 of any length pass.
 
+## Tooling scripts
+
+Scripts in `tools/` and `tests/` are written in Python or bash. Choose
+by what the script mostly does:
+
+- **Python** when there is string manipulation, non-trivial argument or
+  option handling, or data encoding/decoding (YAML, JSON, TOML,
+  Markdown sections). Use `argparse` and a real parser (e.g. pyyaml,
+  from the `dev` dependency group), never regexes over structured
+  formats. Type it as application code.
+- **bash** when there is none of the above (or a few trivial regexes),
+  and the script is about filesystem manipulation, process pipelines,
+  or sequencing commands (`make`, `uv`, `gh`, `diff`).
+
+This is more an art than a science: a script that starts as a command
+sequence and grows string handling should be rewritten in Python rather
+than accumulating `sed`/`awk`. A consistency check takes its expected
+values as arguments (e.g. from the Makefile) rather than re-parsing
+their source, and fails on a discrepancy without resolving it.
+
 ## Terminology
 
 All identifiers, comments, and documentation must use the official
