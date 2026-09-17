@@ -5,15 +5,12 @@ Status: PENDING
 
 Issue: https://github.com/pbauermeister/dfd/issues/80
 
-Depends on #79 (branch created from `refactor/79-python-m-build`;
-rebase on `main` once PR #81 is merged).
-
 ## Requirement
 
 Today `make publish-to-pypi` and `make publish-to-gh` are independent:
 each builds its own sdist/wheel, only the GH path checks branch and tree
 cleanliness and tags, only the PyPI path runs tests and the TestPyPI
-rehearsal, and tokens live on disk (echoed by `set -x`).
+rehearsal, and tokens live on disk.
 
 Goal: one manually triggered GitHub Actions workflow that releases to
 PyPI and GitHub from a single build, after the full test suite passes.
@@ -23,11 +20,11 @@ PyPI and GitHub from a single build, after the full test suite passes.
   decision to release is manual; a release typically gathers several
   merged PRs.
 - Gate: `ci.yml` made reusable (`workflow_call`) and called as the first
-  job, so the release runs the same tox matrix, lint and wheel smoke
+  job, so the release runs the same Python matrix, lint and wheel smoke
   test as CI on the released commit. All later jobs depend on it.
 - Preflight: ref is `main`; version from CHANGES.md has no tag yet and
-  is not on PyPI.
-- Build once (`python -m build`), pass the artifact to all later jobs.
+  is on neither PyPI nor TestPyPI.
+- Build once (`uv build`), pass the artifact to all later jobs.
 - Order: TestPyPI upload + install smoke test → tag `vX.Y.Z` → PyPI
   upload → GitHub release (changelog section as notes, same files
   attached).
@@ -40,12 +37,103 @@ PyPI and GitHub from a single build, after the full test suite passes.
 
 Prerequisites:
 
-- #79 (python -m build).
+- #79 (uv build/publish): merged.
 - One-time manual setup by the maintainer: register the workflow as a
   trusted publisher on pypi.org and test.pypi.org.
 
-PATCH bump.
+PATCH bump (goes into the pending 1.17.6 entry).
 
 ## Design
 
-To be agreed.
+### Workflow `.github/workflows/release.yml`
+
+`on: workflow_dispatch`, with one boolean input `dry_run` (default
+false): stop after the TestPyPI rehearsal, and accept any ref. This is
+the only way to exercise the workflow before it lands on `main`.
+`concurrency: release` forbids two runs at once. Jobs, each `needs` the
+previous one:
+
+1. `ci` — `uses: ./.github/workflows/ci.yml` (`ci.yml` gets an extra
+   `workflow_call:` trigger; nothing else changes).
+2. `preflight` — ref is `refs/heads/main` (unless `dry_run`); version
+   read from CHANGES.md; `git ls-remote` finds no tag `vX.Y.Z`; the
+   JSON API of PyPI and of TestPyPI both 404 for that version. Outputs
+   `version`.
+3. `build` — `uv build`, `tools/smoke-test-install.sh wheel`, upload
+   `dist/` as artifact `dist`.
+4. `testpypi` — environment `testpypi`, `id-token: write`; download
+   `dist`; `uv publish --trusted-publishing always --publish-url
+   https://test.pypi.org/legacy/`; `tools/smoke-test-install.sh
+   testpypi`.
+5. `tag` — `contents: write`; `git tag vX.Y.Z && git push origin
+   vX.Y.Z` as `github-actions[bot]` (lightweight tag, like the existing
+   ones; no `--force`). Skipped on `dry_run`.
+6. `pypi` — environment `pypi`, `id-token: write`; `uv publish
+   --trusted-publishing always`. Skipped on `dry_run`.
+7. `github-release` — `contents: write`; `gh release create vX.Y.Z
+   --title vX.Y.Z --notes-file` with the changelog section, attaching
+   `dist/*.whl dist/*.tar.gz`. Skipped on `dry_run`.
+
+Top-level `permissions: contents: read`; each job raises only what it
+needs.
+
+### Scripts and Makefile
+
+- `tools/changelog.py version|notes` (Python: CHANGES.md parsing) prints
+  the latest version, or its changelog section. Used by the workflow
+  (preflight, release notes) and by `publish-to-github.py`, which
+  imports it instead of carrying its own regexes.
+- `tools/release.sh` (bash: `gh` sequencing), behind `make release`:
+  checks the checkout is `main`, clean and equal to `origin/main`,
+  runs `gh workflow run release.yml --ref main`, then `gh run watch
+  --exit-status` on the new run.
+- Local fallback, in workflow order: `make publish-to-pypi` (unchanged:
+  build, wheel smoke, TestPyPI, TestPyPI smoke, PyPI) then
+  `make publish-to-gh`, which no longer cleans and rebuilds but tags
+  and attaches the `dist/` just published. `--no-check` and the forced
+  tag stay for backfilling.
+
+### Setup, docs, process
+
+- GitHub environments `testpypi` and `pypi` (created with `gh api`).
+  Trusted publishers registered by Pascal on test.pypi.org and pypi.org
+  for `pbauermeister/dfd`, workflow `release.yml`, matching environment
+  name.
+- New `doc/RELEASING.md`: how to release (`make release`), what the
+  workflow checks, recovery after a failed run (version already on
+  TestPyPI → `.postN` bump; tag pushed but PyPI failed → delete the
+  tag), dry run from a branch, local fallback, one-time trusted
+  publisher setup. Linked from the README development section.
+- CLAUDE.md "Task closing": step 4, list PRs merged since the last
+  release tag and ask whether to release.
+- CHANGES.md: bullet in 1.17.6. TODO.md item 6 → DONE.
+
+### Decisions to confirm
+
+1. Version already on TestPyPI (failed earlier run) → preflight refuses;
+   recovery is a `.postN` bump, as with the local rehearsal (#77).
+2. Tag before PyPI upload, as specified. A PyPI failure leaves a tag to
+   delete by hand before re-running; the alternative (tag after PyPI)
+   leaves a PyPI release without tag, which cannot be re-run at all.
+3. `dry_run` input: worth its few lines to test the workflow from the
+   PR branch, if `gh workflow run` accepts a workflow file that is not
+   yet on `main` (to be verified at step 3; otherwise the first real
+   release is the test, and 1.17.6 gets a `.post1` if it fails).
+4. Preflight checks live inline in the workflow, not in a script: the
+   local fallback keeps its own checks (`publish-to-github.py`).
+
+### Implementation steps
+
+1. `ci.yml`: add `workflow_call`; `tools/changelog.py`;
+   `publish-to-github.py` imports it and stops building; Makefile
+   `publish-to-gh` drops `clean`. Verify `make publish-to-gh --dry`-style
+   locally by running the script functions on a scratch build.
+2. `release.yml` (all jobs), GitHub environments. Push; try a dry run
+   from the branch with a throwaway `1.17.6.dev1` heading in
+   CHANGES.md. **Checkpoint:** Pascal registers the trusted publishers
+   before the dry run (TestPyPI) and before the first release (PyPI).
+3. `tools/release.sh` + `make release`; `doc/RELEASING.md`; README link;
+   CLAUDE.md step; CHANGES.md; TODO.md.
+4. Self-review, `make format lint test`, PR ready.
+5. After merge: `make release` publishes 1.17.6, the first release
+   through the workflow.
