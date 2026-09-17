@@ -1,3 +1,15 @@
+## Version 1.17.5:
+
+- Refactor #79: migrate the project tooling to uv. Package metadata
+  moves to a PEP 621 `[project]` table (`setup.py` only supplies the
+  version parsed from `CHANGES.md`; wheels and sdists now ship the
+  license). `uv sync`/`uv run` replace venv handling in the Makefile
+  and scripts, `uv build`/`uv publish` replace `setup.py` commands and
+  twine, `make install` becomes a user-wide `uv tool install` (with a
+  matching `make uninstall`), and a uv-driven Python matrix replaces
+  tox (CI on `setup-uv`). README install instructions use
+  `uv tool install`. No behavior change.
+
 ## Version 1.17.4:
 
 - Test #77: release rehearsal on TestPyPI. `tools/smoke-test-install.sh`

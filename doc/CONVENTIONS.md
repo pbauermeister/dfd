@@ -123,14 +123,16 @@ Rationale:
 
 The package structure must work in all installation modes:
 
-- **pip install** (`make install`, `make publish-to-pypi`): the
+- **Installed package** (`make install`, `make publish-to-pypi`): the
   console script entry point `data_flow_diagram:main` must resolve.
   After moving `main()` to `cli.py`, re-export it from `__init__.py`.
 - **Local development** (`./data-flow-diagram`): the wrapper script
   imports `src.data_flow_diagram` and calls `main()`. Same re-export
   ensures this works.
-- `setup.py` uses `find_packages(where="src")`, which auto-discovers
-  sub-packages with `__init__.py` files.
+- Package discovery is configured in `pyproject.toml`
+  (`[tool.setuptools.packages.find]`, `where = ["src"]`), which
+  auto-discovers sub-packages with `__init__.py` files. `setup.py` only
+  supplies the version parsed from `CHANGES.md`.
 
 ## Constants
 

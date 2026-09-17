@@ -24,21 +24,21 @@ banner2 "Smoke test: install $VERSION from $MODE"
 # create a throwaway venv, removed on exit
 SMOKE_VENV=$(mktemp -d)
 trap 'rm -rf "$SMOKE_VENV" "$FIXTURE.tmp"' EXIT
-python3 -m venv "$SMOKE_VENV"
-PIP="$SMOKE_VENV/bin/pip"
+uv venv --quiet "$SMOKE_VENV"
+PIP=(uv pip install --quiet --python "$SMOKE_VENV/bin/python")
 DFD="$SMOKE_VENV/bin/data-flow-diagram"
 
 step "install"
 case "$MODE" in
     wheel)
-        "$PIP" install --quiet dist/data_flow_diagram-"$VERSION"-*.whl
+        "${PIP[@]}" dist/data_flow_diagram-"$VERSION"-*.whl
         ;;
     testpypi)
         # No --extra-index-url: the package has no dependencies, and
         # --no-deps guards against a stray declaration resolving there.
         for i in $(seq "$RETRIES"); do
-            "$PIP" install --quiet --no-deps --no-cache-dir \
-                --index-url "$TESTPYPI_INDEX" \
+            "${PIP[@]}" --no-deps --no-cache \
+                --default-index "$TESTPYPI_INDEX" \
                 "data-flow-diagram==$VERSION" && break
             [ "$i" -lt "$RETRIES" ] || exit 1
             echo "not yet available, retrying in ${DELAY}s ($i/$RETRIES)"

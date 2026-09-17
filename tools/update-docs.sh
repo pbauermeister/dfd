@@ -27,12 +27,6 @@ DOC_SYNTAX="$ROOT_DIR/doc/SYNTAX.md"
 # ── section generators ───────────────────────────────────────────────
 
 generate_cli_help() {
-    # activate venv if present, so the local entry point works
-    if [[ -f "$VENV/bin/activate" ]]; then
-        # shellcheck disable=SC1091
-        source "$VENV/bin/activate"
-    fi
-
     echo '````'
     "$ROOT_DIR/data-flow-diagram" --help 2>&1
     echo '````'

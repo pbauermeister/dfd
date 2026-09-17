@@ -27,5 +27,6 @@ if [ ! -f .token ]; then
     exit 1
 fi
 
-python3 -m twine upload --username __token__ dist/* \
-	--password $(cat .token) --verbose
+# read the token without tracing it
+{ set +x; UV_PUBLISH_TOKEN=$(cat .token); export UV_PUBLISH_TOKEN; set -x; } 2>/dev/null
+uv publish dist/*

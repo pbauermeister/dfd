@@ -17,19 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install system packages
         run: make require-system
 
-      - name: Install tox
-        run: pip install tox
-
-      - name: Run tests and lint via tox
-        run: tox -e py
+      - name: Run tests and lint
+        run: make test lint
 
   smoke-test-wheel:
     runs-on: ubuntu-latest
@@ -37,13 +34,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install system packages
         run: make require-system
 
       - name: Build wheel and install it in a fresh venv
-        run: make venv require smoke-test-wheel
+        run: make smoke-test-wheel

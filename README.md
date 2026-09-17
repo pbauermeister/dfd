@@ -54,7 +54,7 @@ Compute   -->  API        records
 ## Quick start
 
 ```bash
-pip install data-flow-diagram
+uv tool install data-flow-diagram
 ```
 
 Create a file `hello.dfd`:
@@ -94,28 +94,30 @@ User --> App  request' | data-flow-diagram -o quick.svg --no-graph-title
 
 ### For users
 
-Requires Python 3.11+ and [Graphviz](https://graphviz.org/download/).
+Requires [Graphviz](https://graphviz.org/download/) and
+[uv](https://docs.astral.sh/uv/getting-started/installation/), which
+installs the tool user-wide in its own environment, with a suitable
+Python (3.11+) if none is present. No sudo, no system-wide Python
+packages.
 
 **Linux (Debian/Ubuntu):**
 
 ```bash
 sudo apt install graphviz
-pip install data-flow-diagram
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool install data-flow-diagram
 ```
 
 **macOS (Homebrew):**
 
 ```bash
-brew install graphviz python3
-pip install data-flow-diagram
+brew install graphviz uv
+uv tool install data-flow-diagram
 ```
 
-If you get a `ModuleNotFoundError: No module named 'reportlab.graphics._renderPM'`
-error at runtime, reinstall reportlab:
-
-```bash
-pip install --upgrade --force-reinstall reportlab
-```
+[pipx](https://pipx.pypa.io/) users can equivalently run
+`pipx install data-flow-diagram`. To upgrade: `uv tool upgrade
+data-flow-diagram`.
 
 ### For developers
 
@@ -125,11 +127,13 @@ the Xcode Command Line Tools if not already present: `xcode-select --install`).
 ```bash
 git clone https://github.com/pbauermeister/dfd.git
 cd dfd
-make all    # creates venv, installs deps, formats, lints, tests, builds docs
+make all    # installs deps, formats, lints, tests, builds docs
 ```
 
 `make all` auto-detects your OS and installs the required system packages
-(Debian `apt` or macOS `brew`). Run `make help` for all available targets.
+(Debian `apt` or macOS `brew`) and uv, which then manages the local `.venv`
+and the supported Python versions. Run `make help` for all available
+targets.
 
 ## Documentation
 
