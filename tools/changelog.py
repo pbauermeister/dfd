@@ -11,7 +11,9 @@ Used by the release workflow and by publish-to-github.py.
 import argparse
 import re
 import sys
+from enum import StrEnum
 from pathlib import Path
+from typing import assert_never
 
 CHANGES_PATH = Path(__file__).resolve().parent.parent / "CHANGES.md"
 
@@ -35,20 +37,30 @@ def extract_notes(version: str) -> str:
     return m.group(1).strip()
 
 
+class What(StrEnum):
+    VERSION = "version"
+    NOTES = "notes"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
         "what",
-        choices=["version", "notes"],
+        type=What,
+        choices=list(What),
         help="print the latest version, or its changelog section",
     )
     args = parser.parse_args()
+    what: What = args.what  # argparse boundary
 
     version = extract_version()
-    if args.what == "version":
-        print(version)
-    else:
-        print(extract_notes(version))
+    match what:
+        case What.VERSION:
+            print(version)
+        case What.NOTES:
+            print(extract_notes(version))
+        case _:
+            assert_never(what)
 
 
 if __name__ == "__main__":
