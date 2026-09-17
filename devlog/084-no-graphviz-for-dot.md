@@ -1,7 +1,7 @@
 # 084 — Make `--version`, `--help` and `-f dot` work without Graphviz
 
 Date: 2026-09-17
-Status: PENDING
+Status: ONGOING
 
 Issue: https://github.com/pbauermeister/dfd/issues/84
 

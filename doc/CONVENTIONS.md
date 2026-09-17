@@ -14,7 +14,7 @@ handle_filters(statements)
 generate_dot(gen, title, bg_color, statements)
 extract_snippets(text)
 find_neighbors(filter, statements, max_neighbors)
-check_installed()
+resolve_star_endpoints(statements)
 
 # Avoid — topic-first
 filters_handle(statements)

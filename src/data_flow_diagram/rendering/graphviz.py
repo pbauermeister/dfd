@@ -21,18 +21,13 @@ def generate_image(
     cmd = [engine, f"-T{fmt}", f"-o{output_path}"]
     try:
         subprocess.run(cmd, input=text, encoding="utf-8", check=True)
+    except FileNotFoundError as e:
+        # Only here does the tool need Graphviz: --version, --help and
+        # -f dot work without it.
+        print_error(f'ERROR: "Graphviz" seems not installed: {e}')
+        sys.exit(2)
     except subprocess.CalledProcessError as e:
         for n, line in enumerate(text.splitlines()):
             print(f"{n + 1:2}: {line}", file=sys.stderr)
         print_error(f"ERROR: {e}")
         sys.exit(1)
-
-
-def check_installed() -> None:
-    cmd = ["dot", "-V"]
-    try:
-        # probe only: a nonzero exit status is not an error here
-        subprocess.run(cmd, stderr=subprocess.DEVNULL, check=False)
-    except FileNotFoundError as e:
-        print('ERROR: "Graphviz" seems not installed:', e, file=sys.stderr)
-        sys.exit(2)

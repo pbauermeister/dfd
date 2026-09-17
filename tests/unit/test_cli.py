@@ -1,6 +1,7 @@
 """Tests for the CLI argument parser and entry points."""
 
 import importlib
+import io
 import sys
 
 import pytest
@@ -73,3 +74,41 @@ def test_help_text_contains_dfd_not_uml(
     output = capsys.readouterr().out
     assert 'DFD input file' in output
     assert 'UML sequence' not in output
+
+
+# ── Graphviz is needed only to render a non-DOT format (#84) ─────────────────
+
+
+def test_version_works_without_graphviz(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv('PATH', '')
+    monkeypatch.setattr(sys, 'argv', ['prog', '--version'])
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 0
+    assert capsys.readouterr().out.startswith('data-flow-diagram ')
+
+
+def test_dot_format_works_without_graphviz(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv('PATH', '')
+    monkeypatch.setattr(sys, 'stdin', io.StringIO("process P Process"))
+    monkeypatch.setattr(sys, 'argv', ['prog', '-f', 'dot'])
+    main()
+    output = capsys.readouterr().out.strip()
+    assert output.startswith('digraph')
+    assert 'Process' in output
+
+
+def test_rendering_without_graphviz_exits_2(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv('PATH', '')
+    monkeypatch.setattr(sys, 'stdin', io.StringIO("process P Process"))
+    monkeypatch.setattr(sys, 'argv', ['prog', '-f', 'svg'])
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 2
+    assert '"Graphviz" seems not installed' in capsys.readouterr().err
