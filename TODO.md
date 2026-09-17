@@ -78,9 +78,14 @@ turned into a standard task (GH ticket, PR, devlog).
    Once #80 is in place: make CHANGES.md a generated product instead of
    the version source. On the manual decision to release (on `main`,
    gathering several merged PRs), the release workflow bumps a static
-   version in `pyproject.toml` (patch or minor chosen at trigger time,
-   or later from PR labels), generates the changelog entry from the
-   titles and summaries of the PRs merged since the last tag, commits
-   both on `main`, then tags and publishes. Changelog texts come from
-   PRs, not from commit messages; no conventional-commits automation.
+   version in `pyproject.toml` with `uv version --bump patch|minor`
+   (bump chosen at trigger time; later possibly from PR labels),
+   generates the changelog entry from the titles and summaries of the
+   PRs merged since the last tag, commits both on `main`, then tags and
+   publishes. Changelog texts come from PRs, not from commit messages.
    Raises the quality bar on PR titles and bodies.
+
+   The decision to release stays manual. Conventional commits would be
+   a further step that automates the bump type and the changelog
+   grouping; whether to also release on every merge is a separate
+   policy choice.
