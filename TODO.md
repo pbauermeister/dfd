@@ -85,7 +85,6 @@ turned into a standard task (GH ticket, PR, devlog).
    publishes. Changelog texts come from PRs, not from commit messages.
    Raises the quality bar on PR titles and bodies.
 
-   The decision to release stays manual. Conventional commits would be
-   a further step that automates the bump type and the changelog
-   grouping; whether to also release on every merge is a separate
-   policy choice.
+   The decision to release stays manual. Out of scope: conventional
+   commits (automated bump type and changelog grouping from commit
+   prefixes) are explicitly not adopted for now, and not planned.
