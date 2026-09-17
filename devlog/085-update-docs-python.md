@@ -1,7 +1,7 @@
 # 085 — Rewrite `tools/update-docs.sh` in Python
 
 Date: 2026-09-17
-Status: PENDING
+Status: DONE
 
 Issue: https://github.com/pbauermeister/dfd/issues/85
 

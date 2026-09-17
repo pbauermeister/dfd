@@ -73,7 +73,7 @@ turned into a standard task (GH ticket, PR, devlog).
    test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted
    publishing, GitHub release with the same files.
 
-8. Rewrite `tools/update-docs.sh` in Python
+8. ~~Rewrite `tools/update-docs.sh` in Python~~ — DONE (#85)
 
    It replaces `<!-- AUTO:* -->` sections of Markdown files with awk/sed
    and generates the CLI help and doc TOC: string manipulation and

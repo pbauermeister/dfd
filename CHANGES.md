@@ -4,6 +4,10 @@
   The missing-`dot` error (exit status 2) is reported when a rendered
   format is requested, not before argument parsing. The smoke-test jobs
   of `release.yml` and `ci.yml` no longer install Graphviz.
+- Refactor #85: `tools/update-docs.sh` rewritten as
+  `tools/update-docs.py` (same sections, markers and prettier pass;
+  the CLI help is generated at a pinned width of 80 columns). No
+  behavior change.
 
 ## Version 1.17.6:
 
