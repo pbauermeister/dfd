@@ -81,3 +81,22 @@ turned into a standard task (GH ticket, PR, devlog).
    (`doc/CONVENTIONS.md`) assigns to Python. Keep the same sections,
    markers and prettier pass; `tests/test_doc_sync.py` guards the
    output. Rewrite when it next needs to grow, not before.
+
+9. Make `--version`, `--help` and `-f dot` work without Graphviz
+
+   `cli.main()` calls `graphviz.check_installed()` before parsing the
+   arguments, so every invocation needs `dot`, including the install
+   smoke test (`tools/smoke-test-install.sh`, which only checks
+   `--version` and a `-f dot` render). Move the probe to where Graphviz
+   is actually invoked (rendering a non-DOT format); then drop the
+   `make require-system` steps from the `build` and `testpypi` jobs of
+   `release.yml` (added in PR #83).
+
+10. Conventional commits and generated CHANGES.md
+
+    Adopt conventional commits (reconsidered 2026-09-17; was out of
+    scope for #80) and generate the `CHANGES.md` entry at release time
+    from the commits since the last tag, instead of writing it by hand.
+    Decide at the same time when to publish: keep the manual
+    `make release`, or release automatically on merge to `main` once
+    the version bump and changelog are derived from the commits.
