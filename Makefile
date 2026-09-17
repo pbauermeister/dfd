@@ -89,6 +89,9 @@ nr-test: ## NR tests: verify fixtures still match their golden files
 install: ## install user-wide as a uv tool (isolated venv, no sudo)
 	uv tool install --reinstall .
 
+uninstall: ## remove the user-wide uv tool install
+	uv tool uninstall data-flow-diagram
+
 ################################################################################
 # Release:: ##
 

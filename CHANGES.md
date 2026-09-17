@@ -5,7 +5,8 @@
   version parsed from `CHANGES.md`; wheels and sdists now ship the
   license). `uv sync`/`uv run` replace venv handling in the Makefile
   and scripts, `uv build`/`uv publish` replace `setup.py` commands and
-  twine, `make install` becomes a user-wide `uv tool install`, and a
+  twine, `make install` becomes a user-wide `uv tool install` (with a
+  matching `make uninstall`), and a
   uv-driven Python matrix replaces tox (CI on `setup-uv`). README
   install instructions use `uv tool install`. No behavior change.
 
