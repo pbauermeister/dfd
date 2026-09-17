@@ -59,7 +59,7 @@ turned into a standard task (GH ticket, PR, devlog).
    ********************************************************************************
    ```
 
-5. ~~Migrate package metadata to PEP 621~~ — absorbed into #79
+5. Migrate package metadata to PEP 621
 
    Move the `setup()` arguments of `setup.py` into a `[project]` table
    in `pyproject.toml` and drop `setup.cfg`. The version is parsed from
@@ -72,19 +72,3 @@ turned into a standard task (GH ticket, PR, devlog).
    Single manually triggered GitHub Actions workflow, gated on the full
    test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted
    publishing, GitHub release with the same files.
-
-7. Generate CHANGES.md at release time
-
-   Once #80 is in place: make CHANGES.md a generated product instead of
-   the version source. On the manual decision to release (on `main`,
-   gathering several merged PRs), the release workflow bumps a static
-   version in `pyproject.toml` with `uv version --bump patch|minor`
-   (bump chosen at trigger time; later possibly from PR labels),
-   generates the changelog entry from the titles and summaries of the
-   PRs merged since the last tag, commits both on `main`, then tags and
-   publishes. Changelog texts come from PRs, not from commit messages.
-   Raises the quality bar on PR titles and bodies.
-
-   The decision to release stays manual. Out of scope: conventional
-   commits (automated bump type and changelog grouping from commit
-   prefixes) are explicitly not adopted for now, and not planned.
