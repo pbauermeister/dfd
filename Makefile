@@ -96,7 +96,7 @@ uninstall: ## remove the user-wide uv tool install
 # Release:: ##
 
 readme: ## regenerate auto-updatable sections of README.md and doc/*.md
-	VENV=$(VENV) uv run ./tools/update-docs.sh
+	VENV=$(VENV) uv run ./tools/update-docs.py
 
 doc: readme ## remake doc
 	uv run ./tools/make-doc.sh
