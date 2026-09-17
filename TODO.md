@@ -43,3 +43,32 @@ turned into a standard task (GH ticket, PR, devlog).
    dependency) is invisible to the dev-venv test suite; the clean-venv
    wheel smoke test covers the artifact, TestPyPI would also cover the
    transport/publishing path.
+
+4. ~~Build improvement~~ — task #79
+
+   During the build, the below warning was seen. We shall update the
+   build accordingly.
+
+   ```
+   ********************************************************************************
+   Please avoid running ``setup.py`` directly.
+   Instead, use pypa/build, pypa/installer or other
+   standards-based tools.
+
+   See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+   ********************************************************************************
+   ```
+
+5. Migrate package metadata to PEP 621
+
+   Move the `setup()` arguments of `setup.py` into a `[project]` table
+   in `pyproject.toml` and drop `setup.cfg`. The version is parsed from
+   `CHANGES.md`, which the table cannot express directly; a minimal
+   `setup.py` or a version file kept in sync would remain. No change to
+   the published packages; tooling hygiene only.
+
+6. Harmonize GitHub and PyPI releases — task #80
+
+   Single manually triggered GitHub Actions workflow, gated on the full
+   test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted
+   publishing, GitHub release with the same files.
