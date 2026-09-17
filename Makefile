@@ -111,7 +111,7 @@ publish-to-testpypi: clean ## release rehearsal: upload to TestPyPI, install, ch
 publish-to-pypi: clean ## rehearse on TestPyPI, then publish to Pypi
 	./tools/publish-to-pypi.sh
 
-publish-to-gh: clean ## create GitHub Release (standalone)
+publish-to-gh: ## create GitHub Release, attaching dist/ (run after publish-to-pypi)
 	uv run ./tools/publish-to-github.py
 
 ################################################################################
