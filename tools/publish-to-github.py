@@ -75,7 +75,12 @@ def find_dist_files() -> list[str]:
     dist_dir = ROOT_DIR / "dist"
     if not dist_dir.exists():
         sys.exit("ERROR: dist/ directory not found.")
-    files = sorted(str(p) for p in dist_dir.iterdir() if p.is_file())
+    # only the distributions: uv build also drops a .gitignore in dist/
+    files = sorted(
+        str(p)
+        for p in dist_dir.iterdir()
+        if p.is_file() and p.suffix in (".whl", ".gz")
+    )
     if not files:
         sys.exit("ERROR: no files found in dist/.")
     return files
