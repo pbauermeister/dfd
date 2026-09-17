@@ -23,6 +23,7 @@ CI_JOB = "test"
 
 def read_ci_versions() -> list[str]:
     """Return the Python versions of the CI job matrix."""
+    # YAML boundary: untyped until the matrix entries are checked below
     workflow = yaml.safe_load(CI_WORKFLOW.read_text())
     try:
         versions = workflow["jobs"][CI_JOB]["strategy"]["matrix"][
@@ -38,7 +39,7 @@ def read_ci_versions() -> list[str]:
         sys.exit(
             f"ERROR: python-version entries must be quoted in {CI_WORKFLOW}"
         )
-    return versions
+    return [str(v) for v in versions]
 
 
 def main() -> None:

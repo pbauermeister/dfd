@@ -1,7 +1,7 @@
 # 079 — Migrate to uv
 
 Date: 2026-09-17
-Status: ONGOING
+Status: DONE
 
 Issue: https://github.com/pbauermeister/dfd/issues/79
 
@@ -101,3 +101,19 @@ Steps:
    mentioned; `make readme`. TODO.md item 5 marked absorbed.
 5. **Close.** Bump to 1.17.5 in CHANGES.md, devlog DONE, self-review,
    PR ready.
+
+## Outcome
+
+- Version 1.17.5. PR #81 (branch `refactor/79-python-m-build`, named
+  before the retitle; renaming a branch with an open PR closes the PR).
+- The `cache-keys` setting works: after the CHANGES.md bump alone,
+  `uv run data-flow-diagram --version` reports the new version.
+- `uv sync` reused the existing `.venv` in place; prettier under
+  `.venv/node_modules` survived.
+- The README's reportlab troubleshooting note was stale (no such
+  dependency) and is gone.
+- `tools/publish-to-github.py` has pre-existing untyped functions
+  (not covered by `make lint`, which checks `src` and `tests` only);
+  untouched beyond the `uv build` call.
+- Publish scripts not exercised (tokens); the TestPyPI install flags of
+  the smoke test were validated against 1.17.4.dev1.
