@@ -16,7 +16,7 @@
 
 banner2 "Building distributions"
 
-python3 setup.py sdist bdist_wheel
+uv build
 
 
 banner2 "Smoke-testing the wheel"
@@ -31,8 +31,9 @@ if [ ! -f .token-test ]; then
     exit 1
 fi
 
-python3 -m twine upload --repository-url https://test.pypi.org/legacy/ \
-	--username __token__ dist/* --password $(cat .token-test) --verbose
+# read the token without tracing it
+{ set +x; UV_PUBLISH_TOKEN=$(cat .token-test); export UV_PUBLISH_TOKEN; set -x; } 2>/dev/null
+uv publish --publish-url https://test.pypi.org/legacy/ dist/*
 
 
 banner2 "Smoke-testing the TestPyPI install"

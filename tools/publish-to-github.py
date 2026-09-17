@@ -67,7 +67,7 @@ def check_branch():
 def build():
     """Build sdist and wheel."""
     print("\n--- Building dist artifacts ---")
-    run(["python3", "setup.py", "sdist", "bdist_wheel"])
+    run(["uv", "build"])
 
 
 def find_dist_files() -> list[str]:
