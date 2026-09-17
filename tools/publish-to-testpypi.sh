@@ -31,7 +31,9 @@ if [ ! -f .token-test ]; then
     exit 1
 fi
 
-# read the token without tracing it
+# read the token without tracing it; the token is the only credential
+# (a UV_PUBLISH_USERNAME inherited from the shell would conflict with it)
+unset UV_PUBLISH_USERNAME UV_PUBLISH_PASSWORD
 { set +x; UV_PUBLISH_TOKEN=$(cat .token-test); export UV_PUBLISH_TOKEN; set -x; } 2>/dev/null
 uv publish --publish-url https://test.pypi.org/legacy/ dist/*
 
