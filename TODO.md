@@ -72,3 +72,15 @@ turned into a standard task (GH ticket, PR, devlog).
    Single manually triggered GitHub Actions workflow, gated on the full
    test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted
    publishing, GitHub release with the same files.
+
+7. Generate CHANGES.md at release time
+
+   Once #80 is in place: make CHANGES.md a generated product instead of
+   the version source. On the manual decision to release (on `main`,
+   gathering several merged PRs), the release workflow bumps a static
+   version in `pyproject.toml` (patch or minor chosen at trigger time,
+   or later from PR labels), generates the changelog entry from the
+   titles and summaries of the PRs merged since the last tag, commits
+   both on `main`, then tags and publishes. Changelog texts come from
+   PRs, not from commit messages; no conventional-commits automation.
+   Raises the quality bar on PR titles and bodies.
