@@ -2,6 +2,12 @@
 
 - Doc: `doc/CONVENTIONS.md` gains a "Tooling scripts" section (Python
   vs bash for scripts in `tools/` and `tests/`).
+- Tooling #80: release from GitHub Actions. `make release` dispatches
+  `release.yml` on `main`, which runs CI, builds once, rehearses on
+  TestPyPI, publishes to PyPI with trusted publishing (no tokens) and
+  creates the GitHub release and tag from the same files. Procedure and
+  recovery in `doc/RELEASING.md`; `make publish-to-pypi` then
+  `make publish-to-gh` remain as a local fallback. No behavior change.
 
 ## Version 1.17.5:
 

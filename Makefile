@@ -105,13 +105,16 @@ smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
 	uv build
 	./tools/smoke-test-install.sh wheel
 
+release: ## release to PyPI and GitHub via GitHub Actions (see doc/RELEASING.md)
+	./tools/release.sh
+
 publish-to-testpypi: clean ## release rehearsal: upload to TestPyPI, install, check
 	./tools/publish-to-testpypi.sh
 
-publish-to-pypi: clean ## rehearse on TestPyPI, then publish to Pypi
+publish-to-pypi: clean ## fallback: rehearse on TestPyPI, then publish to PyPI
 	./tools/publish-to-pypi.sh
 
-publish-to-gh: ## create GitHub Release, attaching dist/ (run after publish-to-pypi)
+publish-to-gh: ## fallback: GitHub Release from dist/ (after publish-to-pypi)
 	uv run ./tools/publish-to-github.py
 
 ################################################################################
