@@ -82,7 +82,7 @@ turned into a standard task (GH ticket, PR, devlog).
    markers and prettier pass; `tests/test_doc_sync.py` guards the
    output. Rewrite when it next needs to grow, not before.
 
-9. Make `--version`, `--help` and `-f dot` work without Graphviz
+9. ~~Make `--version`, `--help` and `-f dot` work without Graphviz~~ — DONE (#84)
 
    `cli.main()` calls `graphviz.check_installed()` before parsing the
    arguments, so every invocation needs `dot`, including the install
