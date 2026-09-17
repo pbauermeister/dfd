@@ -34,7 +34,12 @@ Source = "https://github.com/pbauermeister/dfd"
 data-flow-diagram = "data_flow_diagram:main"
 
 [dependency-groups]
-dev = ["pytest", "mypy", "ruff"]
+dev = [
+    "pytest",
+    "mypy",
+    "ruff",
+    "pyyaml>=6.0.3",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

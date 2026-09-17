@@ -3,6 +3,8 @@
 SHELL := /bin/bash
 # Created by `uv sync`; also hosts prettier, installed there by `make require`
 VENV := .venv
+# Supported Python versions, checked by test-matrix and CI
+PYTHONS := 3.11 3.12 3.13
 
 # Special targets:
 .PHONY:  * # In this makefile, targets are not built artifacts.
@@ -58,12 +60,19 @@ format: ## format source files (changes shall be committed)
 
 black: format ## alias of format
 
-lint: ## lint source files
+lint: ## lint source files, check CI lists the same Python versions
 	uv run ./tools/lint.sh
+	uv run ./tools/check-python-versions.py $(PYTHONS)
 
 test: ## run unit tests and non-regression tests
 	uv run pytest
 	$(MAKE) nr-test
+
+test-matrix: ## run test and lint on every supported Python (uv-managed)
+	for py in $(PYTHONS); do \
+	  UV_PYTHON=$$py UV_PROJECT_ENVIRONMENT=$(VENV)-$$py $(MAKE) test lint \
+	  || exit 1; \
+	done
 
 nr-review: ## gen. pre-goldens (SVG + error msg) for review before regen.
 	uv run ./tests/nr-review.sh

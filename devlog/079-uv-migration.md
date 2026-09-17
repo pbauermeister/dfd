@@ -89,8 +89,12 @@ Steps:
    Verify: `make all`; `make smoke-test-wheel`.
 3. **Test matrix and CI.** Delete `tox.ini`; add `make test-matrix`
    looping over `PYTHONS = 3.11 3.12 3.13`; `ci.yml` uses
-   `astral-sh/setup-uv` and calls the Makefile targets. Verify: CI green
-   on the three versions plus lint and wheel smoke test. **Checkpoint.**
+   `astral-sh/setup-uv` and calls the Makefile targets, one parallel
+   job per version (GitHub's own matrix, not `test-matrix`). The version
+   list is thus duplicated: `make lint` passes `PYTHONS` to
+   `tools/check-python-versions.py`, which parses `ci.yml` (pyyaml, dev
+   group) and fails if the job matrix lists different versions. Verify: CI green on the three versions plus
+   lint and wheel smoke test. **Checkpoint.**
 4. **Docs.** README: user install via `uv tool install` (pipx
    equivalent), developer section; `doc/CONVENTIONS.md` packaging note;
    `tests/README.md` and CLAUDE.md wherever venv activation or tox is
