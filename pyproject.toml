@@ -1,8 +1,52 @@
 [build-system]
-# These are the assumed default build requirements from pip:
-# https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
-requires = ["setuptools>=43.0.0", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "data-flow-diagram"
+description = "Commandline tool to generate data flow diagrams from text"
+readme = "README.md"
+requires-python = ">=3.11, <4"
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Pascal Bauermeister", email = "pascal.bauermeister@gmail.com" },
+]
+keywords = ["diagram-generator", "development", "tool"]
+classifiers = [
+    # https://pypi.org/classifiers/ :
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Documentation",
+    "Programming Language :: Python :: 3",
+]
+dependencies = []
+# The version is the latest one listed in CHANGES.md, supplied by setup.py
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/pbauermeister/dfd"
+Source = "https://github.com/pbauermeister/dfd"
+"Bug Reports" = "https://github.com/pbauermeister/dfd/issues"
+
+[project.scripts]
+data-flow-diagram = "data_flow_diagram:main"
+
+[dependency-groups]
+dev = ["pytest", "mypy", "ruff"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv]
+# The version comes from CHANGES.md: re-evaluate the project metadata
+# when it changes, not only on pyproject.toml / setup.py changes
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "setup.py" },
+    { file = "CHANGES.md" },
+]
 
 [tool.pytest.ini_options]
 # Add src/ to the Python path so tests can import the package without install

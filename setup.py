@@ -1,69 +1,19 @@
-"""A setuptools based setup module.
+"""Supply the dynamic project version to setuptools.
 
-See:
-https://packaging.python.org/guides/distributing-packages-using-setuptools/
+All static metadata lives in pyproject.toml. The version is the latest
+one listed in CHANGES.md, which is the single source of truth for both
+version numbers and changelog texts.
 """
 
 import pathlib
 
-from setuptools import find_packages, setup
-
-changes = """
-
-"""
+from setuptools import setup
 
 here = pathlib.Path(__file__).parent.resolve()
-long_description = (here / "README.md").read_text(encoding="utf-8")
 changes = (here / "CHANGES.md").read_text(encoding="utf-8")
 
-# extract version
-lines = changes.splitlines()
-lines = [l[2:] for l in lines if l.startswith('##')]
-version = lines[0].strip().split(':', 1)[0].split()[-1].strip()
+# extract the version from the first "## Version X.Y.Z:" heading
+headings = [line[2:] for line in changes.splitlines() if line.startswith('##')]
+version = headings[0].strip().split(':', 1)[0].split()[-1].strip()
 
-setup(
-    name="data-flow-diagram",
-    version=version,
-    description="Commandline tool to generate data flow diagrams from text",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/pbauermeister/dfd",
-    author="Pascal Bauermeister",
-    author_email="pascal.bauermeister@gmail.com",
-    classifiers=[
-        # https://pypi.org/classifiers/ :
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Information Technology",
-        "Topic :: Software Development",
-        "Topic :: Software Development :: Documentation",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-        "Programming Language :: Python :: 3",
-    ],
-    keywords="diagram-generator, development, tool",
-    license="GNU General Public License v3 (GPLv3)",
-    package_dir={"": "src"},
-    packages=find_packages(where="src"),
-    python_requires=">=3.11, <4",
-    install_requires=[],
-    extras_require={
-        "dev": ["check-manifest"],
-        "test": ["coverage"],
-    },
-    package_data={
-        #        "data_flow_diagram": ["tbdpackage__data.dat"],
-    },
-    #    data_files=[('data_flow_diagram', ["VERSION"])],
-    # The following would provide a command called `data-flow-diagram` which
-    # executes the function `main` from this package when invoked:
-    entry_points={
-        "console_scripts": [
-            "data-flow-diagram=data_flow_diagram:main",
-        ],
-    },
-    project_urls={
-        "Bug Reports": "https://github.com/pbauermeister/dfd/issues",
-        #        "Funding": "https://donate.pypi.org",
-        #        "Say Thanks!": "http://saythanks.io/to/example",
-        "Source": "https://github.com/pbauermeister/dfd",
-    },
-)
+setup(version=version)
