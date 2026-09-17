@@ -39,8 +39,5 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install system packages
-        run: make require-system
-
       - name: Build wheel and install it in a fresh venv
         run: make smoke-test-wheel

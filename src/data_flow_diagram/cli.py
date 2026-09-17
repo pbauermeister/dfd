@@ -251,8 +251,6 @@ def run(args: argparse.Namespace) -> None:
 def main() -> None:
     """Entry point for the application script."""
 
-    graphviz.check_installed()
-
     args = parse_args()
     if args.version:
         print("data-flow-diagram", VERSION)
