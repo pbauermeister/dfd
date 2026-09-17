@@ -202,9 +202,12 @@ by what the script mostly does:
 
 This is more an art than a science: a script that starts as a command
 sequence and grows string handling should be rewritten in Python rather
-than accumulating `sed`/`awk`. A consistency check takes its expected
-values as arguments (e.g. from the Makefile) rather than re-parsing
-their source, and fails on a discrepancy without resolving it.
+than accumulating `sed`/`awk`. When the choice is not obvious, or when
+a script is about to switch language, the agent raises it and the
+language is decided in discussion with the maintainer before writing
+the script. A consistency check takes its expected values as arguments
+(e.g. from the Makefile) rather than re-parsing their source, and fails
+on a discrepancy without resolving it.
 
 ## Terminology
 
