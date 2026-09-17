@@ -1,7 +1,7 @@
 # 080 — Release from GitHub Actions
 
 Date: 2026-09-17
-Status: PENDING
+Status: ONGOING
 
 Issue: https://github.com/pbauermeister/dfd/issues/80
 
