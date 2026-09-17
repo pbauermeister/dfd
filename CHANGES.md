@@ -1,4 +1,4 @@
-## Version 1.17.6:
+## Version 1.17.6.dev1:
 
 - Doc: `doc/CONVENTIONS.md` gains a "Tooling scripts" section (Python
   vs bash for scripts in `tools/` and `tests/`).
