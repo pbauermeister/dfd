@@ -59,13 +59,15 @@ turned into a standard task (GH ticket, PR, devlog).
    ********************************************************************************
    ```
 
-5. Migrate package metadata to PEP 621
+5. ~~Migrate package metadata to PEP 621~~ — DONE (#79)
 
    Move the `setup()` arguments of `setup.py` into a `[project]` table
    in `pyproject.toml` and drop `setup.cfg`. The version is parsed from
    `CHANGES.md`, which the table cannot express directly; a minimal
    `setup.py` or a version file kept in sync would remain. No change to
-   the published packages; tooling hygiene only.
+   the published packages; tooling hygiene only. Residue: `setup.py`
+   stays as the version shim until item 10 changes where the version
+   comes from.
 
 6. ~~Harmonize GitHub and PyPI releases~~ — DONE (#80)
 
@@ -100,3 +102,5 @@ turned into a standard task (GH ticket, PR, devlog).
     Decide at the same time when to publish: keep the manual
     `make release`, or release automatically on merge to `main` once
     the version bump and changelog are derived from the commits.
+    Once the version no longer comes from `CHANGES.md`, drop the
+    `setup.py` version shim left by item 5.
