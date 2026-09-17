@@ -59,7 +59,7 @@ turned into a standard task (GH ticket, PR, devlog).
    ********************************************************************************
    ```
 
-5. Migrate package metadata to PEP 621
+5. ~~Migrate package metadata to PEP 621~~ — absorbed into #79
 
    Move the `setup()` arguments of `setup.py` into a `[project]` table
    in `pyproject.toml` and drop `setup.cfg`. The version is parsed from
