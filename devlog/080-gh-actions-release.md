@@ -25,9 +25,9 @@ PyPI and GitHub from a single build, after the full test suite passes.
 - Preflight: ref is `main`; version from CHANGES.md has no tag yet and
   is on neither PyPI nor TestPyPI.
 - Build once (`uv build`), pass the artifact to all later jobs.
-- Order: TestPyPI upload + install smoke test → tag `vX.Y.Z` → PyPI
-  upload → GitHub release (changelog section as notes, same files
-  attached).
+- Order: TestPyPI upload + install smoke test → PyPI upload → GitHub
+  release, which creates the tag `vX.Y.Z` on the released commit
+  (changelog section as notes, same files attached).
 - Uploads use PyPI trusted publishing (OIDC), no API tokens.
 - Local `make publish-to-*` targets kept as a documented emergency
   fallback, reordered to match the workflow.
@@ -65,14 +65,13 @@ previous one:
    `dist`; `uv publish --trusted-publishing always --publish-url
    https://test.pypi.org/legacy/`; `tools/smoke-test-install.sh
    testpypi`.
-5. `tag` — `contents: write`; `git tag vX.Y.Z && git push origin
-   vX.Y.Z` as `github-actions[bot]` (lightweight tag, like the existing
-   ones; no `--force`). Skipped on `dry_run`.
-6. `pypi` — environment `pypi`, `id-token: write`; `uv publish
+5. `pypi` — environment `pypi`, `id-token: write`; `uv publish
    --trusted-publishing always`. Skipped on `dry_run`.
-7. `github-release` — `contents: write`; `gh release create vX.Y.Z
-   --title vX.Y.Z --notes-file` with the changelog section, attaching
-   `dist/*.whl dist/*.tar.gz`. Skipped on `dry_run`.
+6. `github-release` — `contents: write`; `gh release create vX.Y.Z
+   --target $GITHUB_SHA --title vX.Y.Z --notes-file` with the changelog
+   section, attaching `dist/*.whl dist/*.tar.gz`. `gh` creates the
+   (lightweight) tag on that commit, so there is no separate tag job.
+   Skipped on `dry_run`.
 
 Top-level `permissions: contents: read`; each job raises only what it
 needs.
@@ -101,9 +100,10 @@ needs.
   name.
 - New `doc/RELEASING.md`: how to release (`make release`), what the
   workflow checks, recovery after a failed run (version already on
-  TestPyPI → `.postN` bump; tag pushed but PyPI failed → delete the
-  tag), dry run from a branch, local fallback, one-time trusted
-  publisher setup. Linked from the README development section.
+  TestPyPI → `.postN` bump; on PyPI but no GitHub release → "Re-run
+  failed jobs" in the Actions UI, which reuses the run's artifact, else
+  `make publish-to-gh`), dry run from a branch, local fallback,
+  one-time trusted publisher setup. Linked from the README development section.
 - CLAUDE.md "Task closing": step 4, list PRs merged since the last
   release tag and ask whether to release.
 - CHANGES.md: bullet in 1.17.6. TODO.md item 6 → DONE.
@@ -112,9 +112,9 @@ needs.
 
 1. Version already on TestPyPI (failed earlier run) → preflight refuses;
    recovery is a `.postN` bump, as with the local rehearsal (#77).
-2. Tag before PyPI upload, as specified. A PyPI failure leaves a tag to
-   delete by hand before re-running; the alternative (tag after PyPI)
-   leaves a PyPI release without tag, which cannot be re-run at all.
+2. No tag job: the GitHub release creates the tag (decided 2026-09-17,
+   replacing "tag before PyPI upload" from the issue). PyPI is the only
+   irreversible step; a failed later job is re-run in place.
 3. `dry_run` input: worth its few lines to test the workflow from the
    PR branch, if `gh workflow run` accepts a workflow file that is not
    yet on `main` (to be verified at step 3; otherwise the first real
