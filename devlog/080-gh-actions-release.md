@@ -115,10 +115,13 @@ needs.
 2. No tag job: the GitHub release creates the tag (decided 2026-09-17,
    replacing "tag before PyPI upload" from the issue). PyPI is the only
    irreversible step; a failed later job is re-run in place.
-3. `dry_run` input: worth its few lines to test the workflow from the
-   PR branch, if `gh workflow run` accepts a workflow file that is not
-   yet on `main` (to be verified at step 3; otherwise the first real
-   release is the test, and 1.17.6 gets a `.post1` if it fails).
+3. `dry_run` input: kept, but it cannot test this PR. GitHub registers
+   a `workflow_dispatch` workflow only once it exists on the default
+   branch (dispatch from the branch → HTTP 404, verified). The first
+   real release is the test: everything irreversible comes after CI,
+   preflight, build and the TestPyPI rehearsal, and 1.17.6 gets a
+   `.post1` if that rehearsal leaves it on TestPyPI. Dry runs from a
+   branch (with a `.devN` version) become possible for later changes.
 4. Preflight checks live inline in the workflow, not in a script: the
    local fallback keeps its own checks (`publish-to-github.py`).
 
@@ -128,12 +131,13 @@ needs.
    `publish-to-github.py` imports it and stops building; Makefile
    `publish-to-gh` drops `clean`. Verify `make publish-to-gh --dry`-style
    locally by running the script functions on a scratch build.
-2. `release.yml` (all jobs), GitHub environments. Push; try a dry run
-   from the branch with a throwaway `1.17.6.dev1` heading in
-   CHANGES.md. **Checkpoint:** Pascal registers the trusted publishers
-   before the dry run (TestPyPI) and before the first release (PyPI).
+2. `release.yml` (all jobs), GitHub environments. Push; dry run from
+   the branch impossible (see decision 3); preflight snippets, YAML
+   syntax and the reusable `ci.yml` checked locally / on the PR's CI.
 3. `tools/release.sh` + `make release`; `doc/RELEASING.md`; README link;
    CLAUDE.md step; CHANGES.md; TODO.md.
 4. Self-review, `make format lint test`, PR ready.
-5. After merge: `make release` publishes 1.17.6, the first release
-   through the workflow.
+5. **Checkpoint:** Pascal registers the trusted publishers on
+   test.pypi.org (environment `testpypi`) and pypi.org (environment
+   `pypi`). After merge: `make release` publishes 1.17.6, the first
+   release through the workflow.
