@@ -152,6 +152,18 @@ When implementing an approved plan:
 
 **YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
 
+**Established tool vs bespoke script — measure, don't estimate**: When
+a choice is between using an established tool for a fraction of what it
+does and writing a small script, settle it with a quick trial rather
+than opinions: try the tool in a throwaway clone (under the job scratch
+directory, never the real repo) with a draft configuration and fake
+inputs; show the configuration and the produced artifact verbatim, and
+note what the tool dropped or warned about. Then state the balance in
+numbers: lines of configuration against lines of code plus tests,
+upgrade churn against ownership. The default leans to the established
+tool, but a configuration heading toward ~60 lines reopens the debate.
+The balance is questioned every time, not applied by reflex.
+
 ## Import compatibility
 
 All internal imports must work in **every** calling context:
