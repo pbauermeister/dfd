@@ -104,3 +104,16 @@ turned into a standard task (GH ticket, PR, devlog).
     the version bump and changelog are derived from the commits.
     Once the version no longer comes from `CHANGES.md`, drop the
     `setup.py` version shim left by item 5.
+
+11. Naming rules for tool scripts and Makefile targets
+
+    Codify in `doc/CONVENTIONS.md` when a name is verb-first
+    (`update-docs.py`: a single action, read as a command), topic-first
+    (`nr-test`, `require-system`: a family of two or more, grouped in
+    listings and completion), or a noun with subcommands
+    (`changelog.py notes`, `conventional-commits.py table`: a Python
+    family in one program). Object-first with no family behind it is
+    the case to avoid. Then apply: the doc scripts (`make-doc.sh`,
+    `update-docs.py`, `gen-style-tables.py`,
+    `doc-renumber-md-titles.py`) become a `doc-` family or fold into
+    one program; audit the Makefile targets. Discussed in #88.
