@@ -1,0 +1,42 @@
+# Unreleased changes on main never span two levels: a PR whose type
+# would raise the pending level of main is blocked until the pending
+# changes are released. The tool and its configuration come from the
+# PR checkout, the history from a worktree of main. See doc/RELEASING.md.
+name: Merge gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # whole history and tags: the last release tag
+          fetch-tags: true
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Check out main in a worktree
+        run: git worktree add -B main ../main origin/main
+
+      - name: Gate the PR against the pending level of main
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          pr="$GITHUB_WORKSPACE"
+          cd ../main
+          current=$(uv run --project "$pr" semantic-release -c "$pr/pyproject.toml" \
+                    --noop version --print-last-released 2>/dev/null)
+          next=$(uv run --project "$pr" semantic-release -c "$pr/pyproject.toml" \
+                 --noop version --print 2>/dev/null)
+          printf '%s\n\n%s\n' "$PR_TITLE" "$PR_BODY" \
+            | uv run --project "$pr" "$pr/tools/conventional-commits.py" gate \
+                --current "$current" --next "$next"

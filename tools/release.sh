@@ -29,6 +29,29 @@ NEXT=$(uv run semantic-release --noop version --print 2>/dev/null)
 [ "$NEXT" != "$CURRENT" ] \
     || { echo "ERROR: nothing to release since v$CURRENT"; exit 1; }
 
+step "list the commits since v$CURRENT with their levels"
+# A lower level before a higher one means the merge gate was bypassed:
+# warn, the operator decides at the confirmation.
+rank() {
+    case "$1" in
+        patch) echo 1;; minor) echo 2;; major) echo 3;; *) echo 0;;
+    esac
+}
+MAX=0
+WARN=
+for SHA in $(git rev-list --reverse "v$CURRENT..HEAD"); do
+    LEVEL=$(git log -1 --format=%B "$SHA" \
+            | uv run ./tools/conventional-commits.py level 2>/dev/null \
+            || printf none)
+    R=$(rank "$LEVEL")
+    if [ "$R" -gt "$MAX" ]; then
+        [ "$MAX" -eq 0 ] || WARN=1
+        MAX=$R
+    fi
+    echo "  $(git log -1 --format='%h %s' "$SHA")  [$LEVEL]"
+done
+[ -z "$WARN" ] || echo "WARNING: a lower level precedes a higher one: v$NEXT closes both"
+
 step "make the release commit and the tag v$NEXT, locally"
 uv run semantic-release version --no-push --no-vcs-release
 git --no-pager show --stat HEAD
