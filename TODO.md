@@ -140,3 +140,41 @@ turned into a standard task (GH ticket, PR, devlog).
       `banner2`, `step`.
     - Codified tersely in `doc/CONVENTIONS.md`, "Tooling scripts", by
       #88; item 11 executes the folder split and the renames.
+
+12. Exercise the release and merge-gate paths of #88
+
+    Each case is ticked when it occurs naturally or is provoked on
+    purpose; the first live release (1.17.8, 2026-09-19) covered
+    "merge followed by a release right away".
+
+    Release path (`make release`, `release.yml`):
+
+    - [ ] Dry run from a branch: `.devN` version in `pyproject.toml`,
+          `gh workflow run release.yml --ref <branch>`; stops after
+          TestPyPI, no tag checks.
+    - [ ] Nothing to release: only `chore`/`ci`/`style` or
+          non-conventional commits since the last tag; the plan exits 1
+          and the script stops before any commit.
+    - [ ] Abort at the prompt: local release commit and tag removed,
+          tree equal to `origin/main`.
+    - [ ] A minor release (first `feat:` PR) and, when it comes, a
+          major one (`!` or `BREAKING CHANGE:` footer in the PR body,
+          which the squash setting carries into the commit).
+    - [ ] Preflight refusal, provoked: a `v*` tag pushed on a commit
+          that is not on `main` (delete the tag afterwards).
+    - [ ] Recovery forward after a failed run past TestPyPI, when it
+          happens: next patch, the failed tag left or deleted.
+
+    Merge gate (`merge-gate.yml`, ruleset on `main`):
+
+    - [ ] Merge not followed by a release: two patch PRs merged, then
+          one release whose changelog lists both.
+    - [ ] Blocked: a `feat:` PR while `main` has unreleased patch
+          commits ("release X first"); release, then the check passes
+          on the next PR event.
+    - [ ] Allowed at or below: a `fix:` PR on a pending minor.
+    - [ ] None-level pending counts as empty: a `chore:` commit on
+          `main`, then a `feat:` PR passes.
+    - [ ] A title edit re-runs `conventional` and `gate`; a
+          non-conventional title blocks the merge button.
+    - [ ] PR behind `main`: BEHIND state, "Update branch", checks rerun.
