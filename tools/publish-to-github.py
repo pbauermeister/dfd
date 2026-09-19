@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Publish a GitHub Release for the current version.
 
-Reads the version and changelog from CHANGES.md, tags the repo,
-and creates a GitHub Release with the dist/ artifacts attached.
+Reads the version from pyproject.toml and its notes from CHANGES.md,
+tags the repo, and creates a GitHub Release with the dist/ artifacts
+attached.
 
 This is the local fallback of the release workflow (release.yml):
 run it right after `make publish-to-pypi`, so that the files just

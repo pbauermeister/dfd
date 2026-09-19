@@ -79,7 +79,9 @@ version_toml = ["pyproject.toml:project.version"]
 tag_format = "v{version}"
 commit_message = "chore(release): {version}"
 commit_parser = "conventional"
-build_command = ""
+# uv.lock records the project version: refresh it and commit it too
+build_command = "uv lock"
+assets = ["uv.lock"]
 
 # Any branch: `make show-version` works on a task branch too. Real
 # releases are restricted to main by tools/release.sh.

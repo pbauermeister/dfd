@@ -1,40 +1,68 @@
 # Releasing
 
-Releases are made by the `Release` GitHub Actions workflow
-(`.github/workflows/release.yml`), triggered by hand. It publishes the
-version found in `CHANGES.md` to PyPI and GitHub from a single build,
-after the full CI suite passes on the released commit.
+The version, the `CHANGES.md` entry, the release commit and the tag are
+derived from the conventional commits merged since the last release.
+`make release` makes them locally and pushes the tag, which triggers the
+`Release` GitHub Actions workflow (`.github/workflows/release.yml`). The
+workflow publishes to PyPI and GitHub from a single build, after the
+full CI suite passes on the tagged commit.
+
+## Conventional commits
+
+Every commit message and every PR title has the form
+`<type>[(scope)]!: <description>`. The `commit-msg` hook installed by
+`make require` checks commits; the `PR title` workflow checks PR
+titles. Since PRs are squash-merged with the PR title as the commit
+subject, the PR title is the line that reaches `main`: it is the
+changelog entry of the PR and it decides the version bump.
+
+| Type                                               | Bump  |
+| -------------------------------------------------- | ----- |
+| `feat`                                             | minor |
+| `fix`, `perf`, `refactor`, `docs`, `test`, `build` | patch |
+| `chore`, `ci`, `style`                             | none  |
+| any type with `!`, or a `BREAKING CHANGE:` footer  | major |
+
+`make help-cc` prints this table from `pyproject.toml`
+(`[tool.semantic_release]`), the single source of truth. Types that
+bump nothing change nothing the user installs; such commits wait for
+the next release and appear in its changelog entry.
+
+A PR's type must be at the highest bump level among its commits and
+name the PR's purpose: review the title before merging.
 
 ## Procedure
 
-1. Merge the PRs of the release into `main`. The top entry of
-   `CHANGES.md` (`## Version X.Y.Z:`) is the version to release; it
-   must have no tag yet and be on neither PyPI nor TestPyPI.
+1. Merge the PRs of the release into `main`. `make show-version`
+   prints the version they add up to; when it equals the current
+   version there is nothing to release.
 2. On a clean checkout of `main`, up to date with `origin/main`:
 
    ```
    make release
    ```
 
-   This dispatches the workflow and watches it. The Actions tab of the
-   repository offers the same "Run workflow" button.
+   This makes the release commit (version in `pyproject.toml` and
+   `uv.lock`, generated `CHANGES.md` entry) and the tag `vX.Y.Z`
+   locally, shows both, and asks before pushing. Answering no removes
+   them again. Answering yes pushes `main` and the tag, then watches
+   the workflow run the tag triggers.
 
-3. When the run is green: `vX.Y.Z` is tagged, the GitHub release is
-   created with the changelog entry as notes, and the wheel and sdist
-   are on PyPI.
+3. When the run is green: the GitHub release exists on the tag with
+   the changelog entry as notes, and the wheel and sdist are on PyPI.
 
 ## What the workflow does
 
 Jobs run in sequence; each one needs the previous one.
 
-| Job              | What                                                                                                  |
-| ---------------- | ----------------------------------------------------------------------------------------------------- |
-| `ci`             | Calls `ci.yml`: tests and lint on every supported Python, wheel smoke test                            |
-| `preflight`      | Ref is `main`; version read from `CHANGES.md`; no tag `vX.Y.Z`; version absent from PyPI and TestPyPI |
-| `build`          | `uv build`, wheel smoke test in a fresh venv, upload `dist/` as a run artifact                        |
-| `testpypi`       | Upload to TestPyPI, install from there in a fresh venv, smoke test                                    |
-| `pypi`           | Upload to PyPI                                                                                        |
-| `github-release` | `gh release create` with the changelog notes and the same files; this creates the tag                 |
+| Job              | What                                                                                               |
+| ---------------- | -------------------------------------------------------------------------------------------------- |
+| `ci`             | Calls `ci.yml`: tests and lint on every supported Python, wheel smoke test                         |
+| `preflight`      | The tag names the `pyproject.toml` version and is on `main`; version absent from PyPI and TestPyPI |
+| `build`          | `uv build`, wheel smoke test in a fresh venv, upload `dist/` as a run artifact                     |
+| `testpypi`       | Upload to TestPyPI, install from there in a fresh venv, smoke test                                 |
+| `pypi`           | Upload to PyPI                                                                                     |
+| `github-release` | `gh release create` on the tag with the changelog notes and the same files                         |
 
 Uploads use PyPI trusted publishing (OpenID Connect): the workflow
 proves its identity to the index, and no API token exists anywhere.
@@ -43,34 +71,33 @@ names, which the trusted publisher registrations are pinned to.
 
 ## When a run fails
 
-Nothing irreversible happens before the `pypi` job. Recovery depends
-on where the run stopped:
+The tag and the release commit are on `origin` once `make release` has
+pushed, and a version is never reused. Recovery is always forward: fix
+on a branch, merge, `make release` again for the next version. A tag
+without a GitHub release marks a failed attempt; it does no harm and
+may be deleted (`git push origin --delete vX.Y.Z`, then locally).
 
-- **Before the TestPyPI upload** (CI, preflight, build): fix, merge,
-  run `make release` again.
-- **At or after the TestPyPI smoke test, before PyPI:** the version is
-  now on TestPyPI, which refuses re-uploads, so preflight will refuse
-  it. Fix, bump to `X.Y.Z.post1` in `CHANGES.md`, release again.
 - **At `pypi` or `github-release`, for a transient reason** (network,
   index lag): use "Re-run failed jobs" on the run's page. It reuses the
   run's commit and `dist/` artifact, so the same files get published.
 - **At `github-release`, for a real reason:** PyPI already has the
-  files. Finish locally: `uv build` on the released commit, then
+  files. Finish locally: `uv build` on the tagged commit, then
   `make publish-to-gh`.
 
 ## Testing a change to the workflow
 
 Once a change to `release.yml` is on `main`, it can be rehearsed from a
-branch: give `CHANGES.md` a throwaway `X.Y.Z.devN` heading on the
-branch, and dispatch with the `dry_run` input checked:
+branch: set a throwaway `X.Y.Z.devN` version in `pyproject.toml` on the
+branch, push, and dispatch the workflow by hand:
 
 ```
-gh workflow run release.yml --ref <branch> -f dry_run=true
+gh workflow run release.yml --ref <branch>
 ```
 
-A dry run accepts any ref and stops after the TestPyPI rehearsal
-(`.devN` versions on TestPyPI are harmless). Before the workflow file
-is on `main`, GitHub does not let it be dispatched at all.
+A manual dispatch is always a dry run: any ref, no tag checks, and it
+stops after the TestPyPI rehearsal (`.devN` versions on TestPyPI are
+harmless). Before the workflow file is on `main`, GitHub does not let it
+be dispatched at all.
 
 ## Local fallback
 
@@ -78,8 +105,10 @@ If GitHub Actions is unavailable, the same steps run locally, in the
 same order, with API tokens in `.token-test` and `.token` (gitignored):
 
 ```
-make publish-to-pypi   # build, wheel smoke, TestPyPI, its smoke, PyPI
-make publish-to-gh     # tag and GitHub release, attaching that dist/
+uv run semantic-release version --no-push --no-vcs-release
+git push origin main vX.Y.Z   # the workflow will fail or be skipped
+make publish-to-pypi          # build, wheel smoke, TestPyPI, its smoke, PyPI
+make publish-to-gh            # GitHub release on the tag, attaching that dist/
 ```
 
 `make publish-to-gh` attaches what `make publish-to-pypi` just built
