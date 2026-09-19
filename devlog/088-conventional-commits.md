@@ -1,7 +1,7 @@
 # 088 — Conventional commits and python-semantic-release
 
 Date: 2026-09-18
-Status: ONGOING
+Status: DONE
 
 Issue: https://github.com/pbauermeister/dfd/issues/88
 
@@ -89,7 +89,7 @@ Ordered steps:
    `doc/RELEASING.md` rewritten. `publish-to-github.py` adapted.
 4. **Merge gate.** `merge-gate.yml` on `pull_request`, using
    `tools/conventional-commits.py`; the same assertion in release preflight.
-4b. **Review fixes** (PR review of 2026-09-19): descriptive subcommand
+   4b. **Review fixes** (PR review of 2026-09-19): descriptive subcommand
    names, `release.sh` reduced to orchestration by two scripts.
 5. **Conventions.** `CLAUDE.md` versioning and branching sections,
    the PR-type review before merge (agent reminds, asks before merging
@@ -140,7 +140,7 @@ Files:
 - `.pre-commit-config.yaml` (new): `compilerla/conventional-pre-commit`
   v4.4.0 on the `commit-msg` stage, explicit type list.
 - `Makefile` `require`: `uv run pre-commit install --hook-type
-  commit-msg` (no `core.hooksPath` in play).
+commit-msg` (no `core.hooksPath` in play).
 - `.github/workflows/pr-title.yml` (new):
   `amannn/action-semantic-pull-request` v6.1.1, explicit type list,
   scope optional.
@@ -156,7 +156,7 @@ Files:
   Reversible, outward-facing.
 - PR #89 retitled in CC form now rather than in step 5, since the new
   workflow checks it: `build: adopt conventional commits and
-  python-semantic-release`.
+python-semantic-release`.
 
 Commands: `uv sync`, hook install, hook trial (a non-conforming commit
 message must be rejected, a conforming one accepted), `make lint`,
@@ -175,7 +175,7 @@ Files:
 - `tools/release.sh`: same preconditions (main, clean, equal to
   `origin/main`); refuses when `show-version` equals the current
   version (nothing to release); runs `semantic-release version
-  --no-push --no-vcs-release` (release commit + tag, local); shows
+--no-push --no-vcs-release` (release commit + tag, local); shows
   the version and the new `CHANGES.md` section; asks `[y/N]` before the
   point of no return; on no, removes the local tag and resets to
   `origin/main`; on yes, pushes `main` and the tag, then watches the run
@@ -224,7 +224,7 @@ Files:
 - `.github/workflows/merge-gate.yml`: on `pull_request` (opened,
   edited, synchronize, reopened). Checks out `origin/main` with the
   whole history and tags, `uv sync`, `semantic-release --noop version
-  --print` for the next version, `changelog.py version` for the
+--print` for the next version, `changelog.py version` for the
   current one, then `gate` with the PR title and body passed through
   environment variables (never interpolated into the shell).
 - `tools/release.sh`: before the confirmation, lists the pending
@@ -294,3 +294,79 @@ Second review round (2026-09-19): `release-plan.py` is
 output in its docstring; `smoke-test-install.sh` is
 `test-installation.sh from-wheel|from-testpypi` ("test" the verb,
 "installation" the noun, the source read as a sentence at call sites).
+
+### Step 5
+
+Files:
+
+- `CLAUDE.md`:
+  - Task start, phase 2: the draft PR is titled in conventional form
+    from the start (`<type>: <description>`), since the `PR title`
+    check runs on drafts too.
+  - Branching and PR workflow: before marking ready and before any
+    merge, review the PR title's type: at the highest bump level among
+    the PR's commits, naming the PR's purpose; the agent reminds it
+    before suggesting a merge and asks before merging itself, with the
+    rationale (devlog in the PR, squash merge, title as the single
+    conventional subject). Merge requires the `conventional` and
+    `gate` checks and an up-to-date branch (ruleset). Direct commits
+    to `main` are housekeeping (TODO status, `CLAUDE.md`), in
+    conventional form like every commit (hook).
+  - Task closing, step 4: `make show-version` and
+    `uv run ./tools/print-release-plan.py` replace the PR listing;
+    ask whether to release.
+  - Versioning convention: derived from the commit types through the
+    bump map (`make help-cc`): `feat` minor, breaking major,
+    `fix`/`perf`/`refactor`/`docs`/`test`/`build` patch,
+    `chore`/`ci`/`style` none, with the tool-versus-service rationale;
+    `.postN` gone.
+- `doc/CONVENTIONS.md`, "Tooling scripts": the script levels paragraph
+  (entry points, orchestrators as runbooks, tools with verb-first
+  subcommands, preludes; porcelain and plumbing), with the `runbooks/`
+  and `tools/` folders named as the intent for item 11.
+- `TODO.md`: item 10 struck through, DONE (#88).
+- Devlog: an Outcome section (deviations and findings of the trials),
+  status DONE.
+- PR: body brought to its final state, self-review of the diff against
+  the Type safety section of `doc/CONVENTIONS.md`, `gh pr ready`.
+
+Commands: prettier on `CLAUDE.md` and `doc/CONVENTIONS.md` (not on
+`TODO.md`), `make lint`, `make test`. One commit at the end; then the
+title review reminder and the merge is the user's.
+
+## Outcome
+
+All five steps and a review-fixes step landed on PR #89, one commit per
+step after the branch squash of 2026-09-19. Decisions taken on the way,
+beyond the Requirement:
+
+- Manual release kept (`make release`); the tool makes the release
+  commit and tag locally, shown and confirmed before the push; the tag
+  push triggers `release.yml`; a manual dispatch is the dry run.
+- The changelog is the tool's default output (grouped by type, PR
+  linked); no hand-written entry anymore; `.postN` gone.
+- Merge gate as a merge-time invariant (never raise a non-empty pending
+  level), enforced by a ruleset on `main` with an admin bypass, since
+  the ruleset also blocks the release script's own push to `main`.
+- Scripts by level (`doc/CONVENTIONS.md`), from the PR review.
+
+Findings of the throwaway-clone trials, each fixed before its commit:
+
+- `match = "main"` refuses a task branch, and a detached HEAD refuses
+  too: `match = ".*"` (real releases confined to `main` by the script),
+  and the gate works on a worktree with a real `main` branch.
+- A squash body concatenating the branch commits yields extra changelog
+  entries: `parse_squash_commits = false`, and the repository squash
+  settings switched to PR title and PR body.
+- `uv.lock` records the project version: `build_command = "uv lock"`
+  and `assets = ["uv.lock"]` keep the tree clean after a release.
+- The release commit's author defaults to "semantic-release":
+  `GIT_COMMIT_AUTHOR` from the git identity in `release.sh`.
+- The `echo` alias of the tracing prelude breaks a `||` fallback inside
+  a command substitution: `printf` there.
+- Until this PR merges, commits on `main` need
+  `PRE_COMMIT_ALLOW_NO_CONFIG=1` (hook installed, config not yet on
+  `main`).
+
+Not verifiable before merge: `release.yml` on a tag, exercised by the
+first release (1.17.8), then a dry-run dispatch from a branch.

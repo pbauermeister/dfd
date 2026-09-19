@@ -109,7 +109,11 @@ def test_level_between_rejects_dev_version() -> None:
         pytest.param("patch", "none", True, id="none-on-patch"),
     ],
 )
-def test_gate_verdict(pending: str, incoming: str, allowed: bool) -> None:  # noqa: FBT001
+def test_gate_verdict(
+    pending: str,
+    incoming: str,
+    allowed: bool,  # noqa: FBT001  pytest passes parameters by keyword
+) -> None:
     verdict = cc.gate_verdict(
         pending=cc.Bump(pending), incoming=cc.Bump(incoming), next_="1.17.8"
     )

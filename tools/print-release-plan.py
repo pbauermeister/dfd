@@ -50,7 +50,9 @@ cc = load_conventional_commits()
 class PendingCommit:
     sha: str
     subject: str
-    level: str  # a cc.Bump value, or "?" when not conventional
+    # a Bump value of conventional-commits.py (loaded dynamically, so no
+    # static type here); None when the message is not conventional
+    level: str | None
 
 
 def run(cmd: list[str]) -> str:
@@ -73,9 +75,9 @@ def pending_commits(current: str) -> list[PendingCommit]:
     ).split():
         message = run(["git", "log", "-1", "--format=%B", sha])
         try:
-            level = str(cc.parse_level(message, bump_map))
+            level: str | None = str(cc.parse_level(message, bump_map))
         except ValueError:
-            level = "?"
+            level = None
         subject = message.split("\n", 1)[0]
         commits.append(PendingCommit(sha=sha[:7], subject=subject, level=level))
     return commits
@@ -86,7 +88,7 @@ def level_order_broken(commits: list[PendingCommit]) -> bool:
     rank = {str(bump): i for i, bump in enumerate(cc.BUMP_LEVELS)}
     highest = 0
     for commit in commits:
-        r = rank.get(commit.level, 0)
+        r = rank[commit.level] if commit.level else 0
         if r > highest:
             if highest > 0:
                 return True
@@ -103,7 +105,7 @@ def main() -> None:
     print(f"next version:    {next_}")
     print(f"commits since v{current}:")
     for commit in commits:
-        print(f"  {commit.sha} {commit.subject}  [{commit.level}]")
+        print(f"  {commit.sha} {commit.subject}  [{commit.level or '?'}]")
     if level_order_broken(commits):
         print(
             "WARNING: a lower level precedes a higher one (the merge gate "

@@ -107,8 +107,8 @@ smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
 	uv build
 	./tools/test-installation.sh from-wheel
 
-show-version: ## print the next version derived from the commits since the last tag
-	@uv run semantic-release --noop version --print 2>/dev/null
+show-release-plan: ## print the next version and the commits since the last release with their bump levels
+	@uv run ./tools/print-release-plan.py
 
 help-cc: ## print the conventional commit type to version bump map
 	@uv run ./tools/conventional-commits.py print-bump-table

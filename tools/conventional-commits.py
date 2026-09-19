@@ -144,22 +144,29 @@ def parse_level(message: str, bump_map: BumpMap) -> Bump:
     return bump_map.bump_of(tag)
 
 
-def parse_version(version: str) -> tuple[int, int, int]:
-    parts = version.split(".")
-    if len(parts) != 3 or not all(part.isdigit() for part in parts):
-        raise ValueError(f"not a MAJOR.MINOR.PATCH version: {version!r}")
-    major, minor, patch = (int(part) for part in parts)
-    return major, minor, patch
+@dataclass(frozen=True)
+class Version:
+    major: int
+    minor: int
+    patch: int
+
+    @classmethod
+    def parse(cls, version: str) -> "Version":
+        parts = version.split(".")
+        if len(parts) != 3 or not all(part.isdigit() for part in parts):
+            raise ValueError(f"not a MAJOR.MINOR.PATCH version: {version!r}")
+        major, minor, patch = (int(part) for part in parts)
+        return cls(major, minor, patch)
 
 
 def level_between(current: str, next_: str) -> Bump:
     """Bump level from one version to the next (none when equal)."""
-    c, n = parse_version(current), parse_version(next_)
+    c, n = Version.parse(current), Version.parse(next_)
     if n == c:
         return Bump.NONE
-    if n[0] != c[0]:
+    if n.major != c.major:
         return Bump.MAJOR
-    if n[1] != c[1]:
+    if n.minor != c.minor:
         return Bump.MINOR
     return Bump.PATCH
 

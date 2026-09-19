@@ -209,6 +209,20 @@ the script. A consistency check takes its expected values as arguments
 (e.g. from the Makefile) rather than re-parsing their source, and fails
 on a discrepancy without resolving it.
 
+**Script levels.** Git's porcelain and plumbing is the model. Makefile
+targets are the entry points. Orchestrators (`tools/release.sh`,
+`tools/publish-to-*.sh`) are runbooks in code: named steps, one command
+each, guards only, no loops or computation. Tools
+(`tools/conventional-commits.py`, `tools/wait-for.sh`) do one concern
+with verb-first subcommands and explicit arguments, so that every call
+site is self-explanatory; one tool per noun, subcommands for the verbs
+sharing its data; a single-action tool is named verb first
+(`print-release-plan.py`, `test-installation.sh from-wheel`). Preludes
+(`init-tracing.sh`) hold sourced mechanics only. Logic that appears in
+an orchestrator moves down into a tool. Intent (TODO item 11): the
+orchestrators move to `runbooks/` and the tools stay in `tools/`, so
+that the level is an address.
+
 ## Terminology
 
 All identifiers, comments, and documentation must use the official

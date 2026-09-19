@@ -45,9 +45,9 @@ commits with their levels and warns if the order was broken.
 
 ## Procedure
 
-1. Merge the PRs of the release into `main`. `make show-version`
-   prints the version they add up to; when it equals the current
-   version there is nothing to release.
+1. Merge the PRs of the release into `main`. `make show-release-plan`
+   prints the version they add up to and the commits with their bump
+   levels; it fails when nothing bumps.
 2. On a clean checkout of `main`, up to date with `origin/main`:
 
    ```

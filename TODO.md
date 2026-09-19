@@ -94,7 +94,7 @@ turned into a standard task (GH ticket, PR, devlog).
    `make require-system` steps from the `build` and `testpypi` jobs of
    `release.yml` (added in PR #83).
 
-10. Conventional commits and generated CHANGES.md
+10. ~~Conventional commits and generated CHANGES.md~~ — DONE (#88)
 
     Adopt conventional commits (reconsidered 2026-09-17; was out of
     scope for #80) and generate the `CHANGES.md` entry at release time
