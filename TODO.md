@@ -117,3 +117,26 @@ turned into a standard task (GH ticket, PR, devlog).
     `update-docs.py`, `gen-style-tables.py`,
     `doc-renumber-md-titles.py`) become a `doc-` family or fold into
     one program; audit the Makefile targets. Discussed in #88.
+
+    Conclusions of #88 (2026-09-19) to apply at the same time:
+
+    - Script levels, git's porcelain and plumbing as the model: Makefile
+      targets are the entry points; orchestrators are runbooks in code
+      (named steps, one command each, guards only, no loops or
+      computation); tools do one concern with verb-first subcommands
+      and explicit arguments so that every call site is
+      self-explanatory (one tool per noun, subcommands for verbs
+      sharing its data); preludes hold sourced mechanics only. Logic
+      appearing in an orchestrator moves down into a tool.
+    - Two folders make the levels an address: `runbooks/` for the
+      orchestrators (`release.sh`, `publish-to-*.sh`, `build.sh`,
+      `lint.sh`, `clean.sh`, `make-doc.sh`), `tools/` for the tools
+      (the Python scripts, `wait-for.sh`; `smoke-test-install.sh` is
+      the shell tool with a mode argument). `doc/RELEASING.md` is the
+      prose runbook of `runbooks/release.sh`: same word on purpose.
+      Path churn: Makefile, both workflows, sourcing lines.
+    - The prelude `init-tracing.sh` (ex `set-ex.sh`, renamed in #88)
+      keeps only what needs the tracing hack: `echo`, `banner`,
+      `banner2`, `step`.
+    - Codified tersely in `doc/CONVENTIONS.md`, "Tooling scripts", by
+      #88; item 11 executes the folder split and the renames.
