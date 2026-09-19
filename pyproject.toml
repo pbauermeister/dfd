@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = []
 # Bumped by `semantic-release version` (make release), never by hand
-version = "1.17.7"
+version = "1.17.8"
 
 [project.urls]
 Homepage = "https://github.com/pbauermeister/dfd"

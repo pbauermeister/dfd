@@ -1,5 +1,22 @@
 <!-- semantic-release -->
 
+## v1.17.8 (2026-09-19)
+
+### Build System
+
+- Adopt conventional commits and python-semantic-release
+  ([#89](https://github.com/pbauermeister/dfd/pull/89),
+  [`0b4050b`](https://github.com/pbauermeister/dfd/commit/0b4050bdeef387a62346fda57a895d891f99df16))
+
+### Documentation
+
+- CLAUDE.md, one pushed commit per design step
+  ([`edbcf5a`](https://github.com/pbauermeister/dfd/commit/edbcf5aa66c8ffc474fa0e38393a82f33dea2f6d))
+
+- TODO item 11, script levels and the tools/runbooks split from #88
+  ([`9d4accc`](https://github.com/pbauermeister/dfd/commit/9d4accc4c4b3ae631c79d3484350903de38def25))
+
+
 ## Version 1.17.7:
 
 - Fix #84: `--version`, `--help` and `-f dot` work without Graphviz.
