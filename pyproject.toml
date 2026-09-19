@@ -92,6 +92,8 @@ minor_tags = ["feat"]
 patch_tags = ["fix", "perf", "refactor", "docs", "test", "build"]
 # chore, ci and style change nothing the user installs: no bump
 default_bump_level = 0
+# one PR is one entry: never split a squash body into commits
+parse_squash_commits = false
 
 [tool.semantic_release.changelog]
 mode = "update"

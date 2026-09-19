@@ -124,3 +124,44 @@ static version). Tag `v0.0.0.dev1` deleted locally and on `origin`
 Two commits: configuration and shim removal; tools and Makefile.
 `release.yml` keeps working until step 3 (`changelog.py version`
 still prints the latest version).
+
+### Step 2
+
+Finding (trial clone): with the repository's current squash setting
+(`COMMIT_MESSAGES`) the squash body concatenates the branch commits,
+and the tool parses conventional lines inside it as separate entries;
+an inner `fix:` of a squashed `feat:` PR got its own bullet. Plain
+body text is ignored. Hence the last two items below.
+
+Files:
+
+- `.pre-commit-config.yaml` (new): `compilerla/conventional-pre-commit`
+  v4.4.0 on the `commit-msg` stage, explicit type list.
+- `Makefile` `require`: `uv run pre-commit install --hook-type
+  commit-msg` (no `core.hooksPath` in play).
+- `.github/workflows/pr-title.yml` (new):
+  `amannn/action-semantic-pull-request` v6.1.1, explicit type list,
+  scope optional.
+- `tools/conventional-commits.py`: `check` subcommand verifying that
+  the type lists of the hook config and the workflow equal
+  `allowed_tags` of `pyproject.toml` (pyyaml, already a dev dep);
+  wired into `make lint` like `check-python-versions.py`.
+- `pyproject.toml`: `parse_squash_commits = false` in
+  `commit_parser_options`, so one PR is one entry whatever the body.
+- Repository settings via `gh api -X PATCH`: squash title from the PR
+  title (`PR_TITLE`), squash body from the PR body (`PR_BODY`, keeps
+  `Closes #N` and lets a `BREAKING CHANGE:` footer in the body work).
+  Reversible, outward-facing.
+- PR #89 retitled in CC form now rather than in step 5, since the new
+  workflow checks it: `build: adopt conventional commits and
+  python-semantic-release`.
+
+Commands: `uv sync`, hook install, hook trial (a non-conforming commit
+message must be rejected, a conforming one accepted), `make lint`,
+push and read the `pr-title` check on PR #89.
+
+From this step on every commit on the branch is conventional, devlog
+commits included (`docs: devlog 088 ...`).
+
+Two commits: hook, Makefile, pyproject option; workflow, `check`
+subcommand, lint wiring.

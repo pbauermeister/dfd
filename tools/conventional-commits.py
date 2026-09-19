@@ -2,7 +2,9 @@
 """Conventional commits helper, driven by the bump map of pyproject.toml.
 
 Usage:
-  conventional-commits.py table   # print the commit type to version bump map
+  conventional-commits.py table   # print the type to version bump map
+  conventional-commits.py check   # the hook and the PR-title workflow
+                                  # accept exactly the types of the map
 
 The map is `[tool.semantic_release.commit_parser_options]`, the same
 section python-semantic-release applies at release time, so the table
@@ -10,13 +12,20 @@ cannot drift from the actual behavior.
 """
 
 import argparse
+import sys
 import tomllib
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import assert_never
 
-PYPROJECT_PATH = Path(__file__).resolve().parent.parent / "pyproject.toml"
+import yaml
+
+ROOT = Path(__file__).resolve().parent.parent
+PYPROJECT_PATH = ROOT / "pyproject.toml"
+HOOK_CONFIG_PATH = ROOT / ".pre-commit-config.yaml"
+PR_TITLE_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "pr-title.yml"
+HOOK_ID = "conventional-pre-commit"
 
 
 class Bump(StrEnum):
@@ -71,8 +80,49 @@ def print_table(bump_map: BumpMap) -> None:
     print("  `<type>!:` or a `BREAKING CHANGE:` footer: major")
 
 
+def load_hook_types() -> list[str]:
+    """Read the type list the commit-msg hook accepts."""
+    with HOOK_CONFIG_PATH.open() as f:
+        config = yaml.safe_load(f)  # yaml boundary
+    for repo in config["repos"]:
+        for hook in repo["hooks"]:
+            if hook["id"] == HOOK_ID:
+                types: list[str] = hook["args"]
+                return types
+    sys.exit(f"ERROR: no hook {HOOK_ID} in {HOOK_CONFIG_PATH.name}")
+
+
+def load_pr_title_types() -> list[str]:
+    """Read the type list the PR-title workflow accepts."""
+    with PR_TITLE_WORKFLOW_PATH.open() as f:
+        workflow = yaml.safe_load(f)  # yaml boundary
+    for job in workflow["jobs"].values():
+        for step in job["steps"]:
+            if "with" in step and "types" in step["with"]:
+                types: str = step["with"]["types"]
+                return types.split()
+    sys.exit(f"ERROR: no types input in {PR_TITLE_WORKFLOW_PATH.name}")
+
+
+def check_types(bump_map: BumpMap) -> None:
+    """Fail unless the hook and the workflow accept exactly the map's types."""
+    expected = bump_map.allowed_tags
+    ok = True
+    for name, types in (
+        (HOOK_CONFIG_PATH.name, load_hook_types()),
+        (PR_TITLE_WORKFLOW_PATH.name, load_pr_title_types()),
+    ):
+        if types != expected:
+            ok = False
+            print(f"ERROR: {name} accepts {types}, expected {expected}")
+    if not ok:
+        sys.exit(1)
+    print(f"Conventional commit types consistent: {' '.join(expected)}")
+
+
 class Command(StrEnum):
     TABLE = "table"
+    CHECK = "check"
 
 
 def main() -> None:
@@ -81,7 +131,8 @@ def main() -> None:
         "command",
         type=Command,
         choices=list(Command),
-        help="table: print the type to bump map",
+        help="table: print the type to bump map; "
+        "check: hook and workflow accept exactly its types",
     )
     args = parser.parse_args()
     command: Command = args.command  # argparse boundary
@@ -90,6 +141,8 @@ def main() -> None:
     match command:
         case Command.TABLE:
             print_table(bump_map)
+        case Command.CHECK:
+            check_types(bump_map)
         case _:
             assert_never(command)
 
