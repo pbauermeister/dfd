@@ -9,13 +9,13 @@
 # Getting a token:
 #   https://pypi.org/manage/account/token/
 #
-# Version info: please update the file
-#   CHANGES.md
+# Version and CHANGES.md entry: made by `semantic-release version`
+#   (see doc/RELEASING.md, Local fallback)
 #
 # The TestPyPI rehearsal (build, wheel smoke test, TestPyPI upload and
 # install smoke test) runs first; any failure stops before the real upload.
 
-. ./set-ex.sh
+. ./init-tracing.sh
 
 ./tools/publish-to-testpypi.sh
 

@@ -6,18 +6,16 @@
 #   ./tools/smoke-test-install.sh wheel      # install the wheel from dist/
 #   ./tools/smoke-test-install.sh testpypi   # install from TestPyPI
 #
-# Checks that `--version` reports the version from CHANGES.md and that
+# Checks that `--version` reports the version from pyproject.toml and that
 # rendering an NR fixture with `-f dot` matches its golden file. No
 # Graphviz needed. Run from the repository root.
 
-. ./set-ex.sh
+. ./init-tracing.sh
 
 MODE=${1:?usage: $0 wheel|testpypi}
-VERSION=$(sed -nE 's/^## Version +([^:]+):.*/\1/p' CHANGES.md | head -1)
+VERSION=$(python3 tools/changelog.py print-version)
 FIXTURE=tests/non-regression/001-items
 TESTPYPI_INDEX=https://test.pypi.org/simple/
-RETRIES=12  # The TestPyPI index lags a few seconds after upload.
-DELAY=5
 
 banner2 "Smoke test: install $VERSION from $MODE"
 
@@ -34,16 +32,13 @@ case "$MODE" in
         "${PIP[@]}" dist/data_flow_diagram-"$VERSION"-*.whl
         ;;
     testpypi)
-        # No --extra-index-url: the package has no dependencies, and
+        # The index lags a few seconds after an upload. No
+        # --extra-index-url: the package has no dependencies, and
         # --no-deps guards against a stray declaration resolving there.
-        for i in $(seq "$RETRIES"); do
-            "${PIP[@]}" --no-deps --no-cache \
-                --default-index "$TESTPYPI_INDEX" \
-                "data-flow-diagram==$VERSION" && break
-            [ "$i" -lt "$RETRIES" ] || exit 1
-            echo "not yet available, retrying in ${DELAY}s ($i/$RETRIES)"
-            sleep "$DELAY"
-        done
+        ./tools/wait-for.sh testpypi-version "$VERSION"
+        "${PIP[@]}" --no-deps --no-cache \
+            --default-index "$TESTPYPI_INDEX" \
+            "data-flow-diagram==$VERSION"
         ;;
     *)
         echo "ERROR: unknown mode '$MODE' (expected wheel|testpypi)"

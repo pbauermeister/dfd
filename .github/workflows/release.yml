@@ -1,15 +1,14 @@
 name: Release
 
-# Manual release to PyPI and GitHub from one build, gated on CI.
+# Release to PyPI and GitHub from one build, gated on CI. The push of a
+# version tag (make release) is the release; a manual dispatch is a dry
+# run from any ref, stopping after the TestPyPI rehearsal.
 # See doc/RELEASING.md.
 
 on:
+  push:
+    tags: ["v*"]
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Stop after the TestPyPI rehearsal (any branch allowed)"
-        type: boolean
-        default: false
 
 concurrency:
   group: release
@@ -32,24 +31,23 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # whole history: the tag must be on main
 
-      - name: Check the ref is main
-        if: ${{ !inputs.dry_run }}
+      - name: Read the version from pyproject.toml
+        id: version
+        run: echo "version=$(python3 tools/changelog.py print-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Check the tag names the version and is on main
+        if: ${{ github.event_name == 'push' }}
         run: |
-          if [ "$GITHUB_REF" != refs/heads/main ]; then
-            echo "::error::releases are made from main, not $GITHUB_REF"
+          version="${{ steps.version.outputs.version }}"
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not name the version $version of pyproject.toml"
             exit 1
           fi
-
-      - name: Read the version from CHANGES.md
-        id: version
-        run: echo "version=$(python3 tools/changelog.py version)" >> "$GITHUB_OUTPUT"
-
-      - name: Check the tag does not exist
-        run: |
-          tag="v${{ steps.version.outputs.version }}"
-          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
-            echo "::error::tag $tag already exists"
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME is not on main"
             exit 1
           fi
 
@@ -117,7 +115,7 @@ jobs:
 
   pypi:
     needs: testpypi
-    if: ${{ !inputs.dry_run }}
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -137,7 +135,7 @@ jobs:
 
   github-release:
     needs: [preflight, pypi]
-    if: ${{ !inputs.dry_run }}
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -152,9 +150,8 @@ jobs:
           name: dist
           path: dist
 
-      - name: Create the GitHub release (and its tag)
+      - name: Create the GitHub release on the tag
         run: |
-          tag="v${{ needs.preflight.outputs.version }}"
-          python3 tools/changelog.py notes > notes.md
-          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" \
+          python3 tools/changelog.py print-notes > notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" \
             --notes-file notes.md dist/*.whl dist/*.tar.gz

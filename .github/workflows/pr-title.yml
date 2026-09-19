@@ -1,0 +1,33 @@
+# The PR title becomes the squash commit subject on main, which drives
+# the version and the CHANGES.md entry: check it is conventional. The
+# type list must equal allowed_tags in pyproject.toml; `make lint`
+# checks it.
+name: PR title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  conventional:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            refactor
+            docs
+            test
+            build
+            chore
+            ci
+            style
+          requireScope: false

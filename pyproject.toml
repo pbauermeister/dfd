@@ -22,8 +22,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = []
-# The version is the latest one listed in CHANGES.md, supplied by setup.py
-dynamic = ["version"]
+# Bumped by `semantic-release version` (make release), never by hand
+version = "1.17.7"
 
 [project.urls]
 Homepage = "https://github.com/pbauermeister/dfd"
@@ -39,19 +39,12 @@ dev = [
     "mypy",
     "ruff",
     "pyyaml>=6.0.3",
+    "python-semantic-release>=10.6,<11",
+    "pre-commit>=4,<5",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.uv]
-# The version comes from CHANGES.md: re-evaluate the project metadata
-# when it changes, not only on pyproject.toml / setup.py changes
-cache-keys = [
-    { file = "pyproject.toml" },
-    { file = "setup.py" },
-    { file = "CHANGES.md" },
-]
 
 [tool.pytest.ini_options]
 # Add src/ to the Python path so tests can import the package without install
@@ -76,3 +69,43 @@ extend-select = ["ANN401", "FBT", "PLR0917"]
 
 [tool.ruff.lint.pylint]
 max-positional-args = 3
+
+# Release automation: version, CHANGES.md entry, release commit and tag
+# are derived from the conventional commits since the last tag, see
+# doc/RELEASING.md. The bump map below is the single source of truth
+# for the versioning convention (`make help-cc` prints it).
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+tag_format = "v{version}"
+commit_message = "chore(release): {version}"
+commit_parser = "conventional"
+# uv.lock records the project version: refresh it and commit it too
+build_command = "uv lock"
+assets = ["uv.lock"]
+
+# Any branch: `make show-version` works on a task branch too. Real
+# releases are restricted to main by tools/release.sh.
+[tool.semantic_release.branches.main]
+match = ".*"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = ["feat", "fix", "perf", "refactor", "docs", "test", "build", "chore", "ci", "style"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "refactor", "docs", "test", "build"]
+# chore, ci and style change nothing the user installs: no bump
+default_bump_level = 0
+# one PR is one entry: never split a squash body into commits
+parse_squash_commits = false
+
+[tool.semantic_release.changelog]
+mode = "update"
+insertion_flag = "<!-- semantic-release -->"
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGES.md"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = false
+
+[tool.semantic_release.remote]
+type = "github"
