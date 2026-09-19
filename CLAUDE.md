@@ -138,7 +138,17 @@ After the PR is merged:
 
 When implementing an approved plan:
 
-- Complete work in **logical units** and commit each one separately, so changes are traceable at medium granularity (not one giant commit, not one commit per file).
+- **One pushed commit per Design step.** During a step, commit freely:
+  these granular commits are the safety net while the work is fluid.
+  At the end of the step, once `make format`, `make lint` and `make test`
+  pass, squash the step's commits into one (`git reset --soft` to the
+  step's base, one commit) whose body carries the step summary and the
+  findings, and push. The requirement and design land as one devlog
+  commit at scaffolding. The PR's commit list then reads as a table of
+  contents of the steps, whether the user reviews step by step or all at
+  once. Squash before pushing, so it is a local rewrite; if save points
+  were pushed mid-step, the step-end squash costs one
+  `git push --force-with-lease` by the user, after a backup ref.
 - **Stop and ask** before continuing when: (a) the next step depends on validating the current result, (b) a decision is needed that was not resolved in the plan, or (c) something unexpected is discovered.
 - Otherwise, proceed autonomously through the remaining steps and commit as you go.
 - **Before each step** (as described in Phase 4), list all actions the step
