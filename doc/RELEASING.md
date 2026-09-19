@@ -31,6 +31,18 @@ the next release and appear in its changelog entry.
 A PR's type must be at the highest bump level among its commits and
 name the PR's purpose: review the title before merging.
 
+### Merge gate
+
+Unreleased changes on `main` never span two levels, so that every
+level is closed before the next one opens: the `Merge gate` check
+(`.github/workflows/merge-gate.yml`) blocks a PR whose type would raise
+the pending level of `main`, with the message "release X.Y.Z first".
+Merges at or below the pending level pass; a `main` whose pending
+commits bump nothing counts as empty. The check reflects `main` at the
+PR's last event; the branch ruleset on `main` requires it to be green
+and the branch to be up to date, and `make release` lists the pending
+commits with their levels and warns if the order was broken.
+
 ## Procedure
 
 1. Merge the PRs of the release into `main`. `make show-version`

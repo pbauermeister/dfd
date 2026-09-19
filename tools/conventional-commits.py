@@ -5,6 +5,11 @@ Usage:
   conventional-commits.py table   # print the type to version bump map
   conventional-commits.py check   # the hook and the PR-title workflow
                                   # accept exactly the types of the map
+  conventional-commits.py level   # bump level of the commit message on
+                                  # stdin (subject, optional body)
+  conventional-commits.py gate --current X.Y.Z --next X.Y.Z
+                                  # fail when the PR message on stdin
+                                  # would raise the pending level of main
 
 The map is `[tool.semantic_release.commit_parser_options]`, the same
 section python-semantic-release applies at release time, so the table
@@ -12,6 +17,7 @@ cannot drift from the actual behavior.
 """
 
 import argparse
+import re
 import sys
 import tomllib
 from dataclasses import dataclass
@@ -26,6 +32,10 @@ PYPROJECT_PATH = ROOT / "pyproject.toml"
 HOOK_CONFIG_PATH = ROOT / ".pre-commit-config.yaml"
 PR_TITLE_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "pr-title.yml"
 HOOK_ID = "conventional-pre-commit"
+
+# `<type>[(scope)][!]: description`
+SUBJECT_RE = re.compile(r"^(?P<type>[a-z]+)(\([^)]*\))?(?P<breaking>!)?: \S")
+BREAKING_FOOTER_RE = re.compile(r"^BREAKING[ -]CHANGE: ", re.MULTILINE)
 
 
 class Bump(StrEnum):
@@ -120,22 +130,110 @@ def check_types(bump_map: BumpMap) -> None:
     print(f"Conventional commit types consistent: {' '.join(expected)}")
 
 
+def parse_level(message: str, bump_map: BumpMap) -> Bump:
+    """Bump level of a conventional commit message (subject, optional body)."""
+    subject = message.strip().split("\n", 1)[0]
+    m = SUBJECT_RE.match(subject)
+    if not m:
+        raise ValueError(f"not a conventional commit subject: {subject!r}")
+    tag = m.group("type")
+    if tag not in bump_map.allowed_tags:
+        raise ValueError(f"unknown type {tag!r} in {subject!r}")
+    if m.group("breaking") or BREAKING_FOOTER_RE.search(message):
+        return Bump.MAJOR
+    return bump_map.bump_of(tag)
+
+
+def parse_version(version: str) -> tuple[int, int, int]:
+    parts = version.split(".")
+    if len(parts) != 3 or not all(part.isdigit() for part in parts):
+        raise ValueError(f"not a MAJOR.MINOR.PATCH version: {version!r}")
+    major, minor, patch = (int(part) for part in parts)
+    return major, minor, patch
+
+
+def level_between(current: str, next_: str) -> Bump:
+    """Bump level from one version to the next (none when equal)."""
+    c, n = parse_version(current), parse_version(next_)
+    if n == c:
+        return Bump.NONE
+    if n[0] != c[0]:
+        return Bump.MAJOR
+    if n[1] != c[1]:
+        return Bump.MINOR
+    return Bump.PATCH
+
+
+@dataclass(frozen=True, kw_only=True)
+class Verdict:
+    allowed: bool
+    reason: str
+
+
+def gate_verdict(*, pending: Bump, incoming: Bump, next_: str) -> Verdict:
+    """Allow a PR unless its level would raise a non-empty pending level.
+
+    Unreleased changes on main never span two levels: a lower level is
+    released before a higher one lands, so every level is closed before
+    the next one opens.
+    """
+    rank = BUMP_LEVELS.index
+    if pending != Bump.NONE and rank(incoming) > rank(pending):
+        return Verdict(
+            allowed=False,
+            reason=f"a {incoming} PR would raise the pending {pending} level "
+            f"of main: release {next_} first",
+        )
+    return Verdict(allowed=True, reason=f"{incoming} on pending {pending}")
+
+
+def run_level(bump_map: BumpMap) -> None:
+    """Print the bump level of the commit message on stdin."""
+    try:
+        print(parse_level(sys.stdin.read(), bump_map))
+    except ValueError as e:
+        sys.exit(f"ERROR: {e}")
+
+
+def run_gate(bump_map: BumpMap, *, current: str, next_: str) -> None:
+    """Gate the PR message on stdin against the pending level of main."""
+    try:
+        pending = level_between(current, next_)
+        incoming = parse_level(sys.stdin.read(), bump_map)
+    except ValueError as e:
+        sys.exit(f"ERROR: {e}")
+    print(f"pending on main: {pending} ({current} -> {next_})")
+    print(f"incoming PR:     {incoming}")
+    verdict = gate_verdict(pending=pending, incoming=incoming, next_=next_)
+    if not verdict.allowed:
+        sys.exit(f"BLOCKED: {verdict.reason}")
+    print(f"allowed: {verdict.reason}")
+
+
 class Command(StrEnum):
     TABLE = "table"
     CHECK = "check"
+    LEVEL = "level"
+    GATE = "gate"
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument(
-        "command",
-        type=Command,
-        choices=list(Command),
-        help="table: print the type to bump map; "
-        "check: hook and workflow accept exactly its types",
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers.add_parser(Command.TABLE, help="print the type to bump map")
+    subparsers.add_parser(
+        Command.CHECK, help="hook and workflow accept exactly the map's types"
     )
+    subparsers.add_parser(
+        Command.LEVEL, help="bump level of the commit message on stdin"
+    )
+    gate = subparsers.add_parser(
+        Command.GATE, help="gate the PR message on stdin against main"
+    )
+    gate.add_argument("--current", required=True, help="version of main")
+    gate.add_argument("--next", required=True, help="next version of main")
     args = parser.parse_args()
-    command: Command = args.command  # argparse boundary
+    command = Command(args.command)  # argparse boundary
 
     bump_map = load_bump_map()
     match command:
@@ -143,6 +241,10 @@ def main() -> None:
             print_table(bump_map)
         case Command.CHECK:
             check_types(bump_map)
+        case Command.LEVEL:
+            run_level(bump_map)
+        case Command.GATE:
+            run_gate(bump_map, current=args.current, next_=args.next)
         case _:
             assert_never(command)
 

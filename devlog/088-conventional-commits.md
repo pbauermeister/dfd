@@ -202,3 +202,43 @@ end-to-end is the first release after merge (1.17.8), then a dry-run
 dispatch from a branch, as with #80.
 
 Two commits: workflow and script; docs and header comments.
+
+### Step 4
+
+Files:
+
+- `tools/conventional-commits.py`: two subcommands. `level` reads a
+  commit message on stdin (subject, optional body) and prints its bump
+  level: type looked up in the map, `!` after the type or scope and a
+  `BREAKING CHANGE:` footer mean major, an unknown type is an error.
+  `gate --current X --next Y` reads the PR message on stdin, derives
+  the pending level of `main` from the two versions, the incoming
+  level from the message, and fails when the incoming level is above
+  a non-empty pending level ("release X first"). Pure logic, no git,
+  no subprocess: the workflow supplies the versions.
+- `tests/unit/test_conventional_commits.py`: parametrized unit tests
+  of `level` and of the gate verdict table (loaded with importlib,
+  the file name has a hyphen). Mutation smoke-test on the comparison.
+- `.github/workflows/merge-gate.yml`: on `pull_request` (opened,
+  edited, synchronize, reopened). Checks out `origin/main` with the
+  whole history and tags, `uv sync`, `semantic-release --noop version
+  --print` for the next version, `changelog.py version` for the
+  current one, then `gate` with the PR title and body passed through
+  environment variables (never interpolated into the shell).
+- `tools/release.sh`: before the confirmation, lists the pending
+  commits with their levels and warns when a lower level precedes a
+  higher one (the gate was bypassed); a warning, not a failure, since
+  the merge cannot be undone and the operator decides at `[y/N]`.
+- `doc/RELEASING.md`: a "Merge gate" paragraph (rule, staleness: the
+  check reflects `main` at the PR's last event; `release.sh` warns).
+- Repository ruleset on `main` via `gh api`, to decide: require the
+  `conventional` and `gate` checks, and branches up to date before
+  merging, so a stale gate cannot be merged past. Without it both
+  checks are advisory. Reversible.
+
+Trial: in the throwaway clone, the workflow's command sequence on a
+detached `origin/main` (the tool must accept a detached HEAD under
+`match = ".*"`); `level` on titles with `!` and a breaking footer;
+`gate` on the four rows of the verdict table.
+
+One commit at the end of the step, per the new rule.
