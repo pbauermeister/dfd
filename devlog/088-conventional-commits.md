@@ -165,3 +165,40 @@ commits included (`docs: devlog 088 ...`).
 
 Two commits: hook, Makefile, pyproject option; workflow, `check`
 subcommand, lint wiring.
+
+### Step 3
+
+Files:
+
+- `tools/release.sh`: same preconditions (main, clean, equal to
+  `origin/main`); refuses when `show-version` equals the current
+  version (nothing to release); runs `semantic-release version
+  --no-push --no-vcs-release` (release commit + tag, local); shows
+  the version and the new `CHANGES.md` section; asks `[y/N]` before the
+  point of no return; on no, removes the local tag and resets to
+  `origin/main`; on yes, pushes `main` and the tag, then watches the run
+  the tag triggers.
+- `.github/workflows/release.yml`: `on: push: tags: ["v*"]` is the
+  release; `workflow_dispatch` (no inputs) is the dry run, any ref,
+  stopping after TestPyPI. Preflight on a tag: the tagged commit is on
+  `origin/main`, the tag equals `v` + `project.version`; PyPI/TestPyPI
+  absence kept; the "tag does not exist" check goes. `github-release`
+  creates the release on the existing tag (no `--target`).
+- `doc/RELEASING.md` rewritten: procedure, workflow table, conventional
+  commits (types via `make help-cc`, PR title = changelog line, hook),
+  failure recovery by fixing forward (a tag without a release marks a
+  failed attempt), dry run of a workflow change (`.devN` version in
+  `pyproject.toml` on a branch, dispatch), local fallback (release
+  commit and tag by `semantic-release version`, then the publish
+  scripts).
+- `tools/publish-to-github.py` and `tools/publish-to-pypi.sh`: header
+  comments (version source), no logic change.
+
+Trial: `tools/release.sh` end to end in the throwaway clone with a bare
+repository as `origin` (the watch step fails there, expectedly); the
+bare repository must receive the release commit on `main` and the tag.
+`release.yml` parsed with pyyaml; `bash -n` on the script. The real
+end-to-end is the first release after merge (1.17.8), then a dry-run
+dispatch from a branch, as with #80.
+
+Two commits: workflow and script; docs and header comments.
