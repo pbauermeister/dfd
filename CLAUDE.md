@@ -27,7 +27,9 @@ The agent performs these steps in sequence:
    populated from the issue description.
 4. Commit the devlog file on the branch.
 5. Open a **draft** PR against `main` (`gh pr create --draft`) with a minimal
-   body (link to the devlog file).
+   body (link to the devlog file, `Closes #NNN`) and a title in conventional
+   form (`<type>: <description>`, see "Versioning convention"): the `PR title`
+   check runs on drafts too, and the title becomes the squash commit subject.
 
 ### Phase 3 — Specification refinement
 
@@ -115,10 +117,31 @@ file), the branch and draft PR are created during the task start process
    on that branch.
 4. When implementation is complete, mark the PR as ready for review
    (`gh pr ready`).
-5. Merge (or ask the user to merge) only after the PR is approved and CI passes.
+5. **Review the PR title's type before any merge.** The title is squashed
+   into the one commit that reaches `main`: it is the PR's changelog line and
+   it decides the version bump. Its type must be at the highest bump level
+   among the PR's commits and name the PR's purpose (a feature that needed
+   two fixes on the way is `feat`). The purpose often drifts during the
+   work; after the merge only a history rewrite could correct it. The agent
+   reminds this review before suggesting a merge, and asks the user before
+   merging a PR itself.
+6. Merge (or ask the user to merge) only after the PR is approved, CI passes,
+   and the `conventional` and `gate` checks are green on an up-to-date branch
+   (the ruleset on `main` requires them; see the merge gate in
+   `doc/RELEASING.md`).
 
-Direct commits to `main` are reserved for trivial changes (`.postN`-level) that
-do not warrant a PR.
+Devlog in the PR, squash merge and the PR title as the single conventional
+subject hold each other up: the devlog commits vanish at squash and stay out
+of the changelog, so the title is the only place where the PR's type is
+decided.
+
+Direct commits to `main` are reserved for housekeeping (TODO status flips,
+`CLAUDE.md` edits) that does not warrant a PR. A `TODO.md` item that arises
+during a task is committed on the task branch, not on `main`: it shows the
+context it originated in and how the pressure on the task was released, and
+while the branch is being worked on it serves as a reservation. Every commit
+message, everywhere, is in conventional form: the `commit-msg` hook installed
+by `make require` enforces it.
 
 ## Task closing
 
@@ -129,10 +152,9 @@ After the PR is merged:
 3. Update `MEMORY.md` with anything noteworthy from the task: completed
    milestones, architectural decisions, new conventions, or design
    preferences that emerged from discussion.
-4. List the PRs merged since the last release tag
-   (`gh pr list --state merged --search "merged:>$(git log -1 --format=%cI $(git describe --tags --abbrev=0))"`)
-   and ask whether to release now (`make release`, see
-   `doc/RELEASING.md`).
+4. Show the release plan (`make show-release-plan`: next version and the
+   commits since the last release with their bump levels) and ask whether
+   to release now (`make release`, see `doc/RELEASING.md`).
 
 ## Implementation workflow
 
@@ -206,9 +228,9 @@ Full rules are in **`doc/CONVENTIONS.md`**. Key points:
 
 Full rules are in **`doc/COMMENTING.md`**. Key points:
 
-- **Chunk comments** (lowercase verb phrases): state *what* a block does. Target ~1 per 5–10 lines.
+- **Chunk comments** (lowercase verb phrases): state _what_ a block does. Target ~1 per 5–10 lines.
 - **Phase headers** (`# phase N:`): mark major sections of long functions.
-- **Intent comments** (capitalized sentences): explain *why*, used sparingly.
+- **Intent comments** (capitalized sentences): explain _why_, used sparingly.
 - Use official terminology from the glossary in `doc/SYNTAX.md`.
 - Do not comment well-named functions, debug lines, or obvious code.
 
@@ -219,15 +241,24 @@ Full rules are in **`doc/COMMENTING.md`**. Key points:
 
 ## Versioning convention
 
-Versions follow `MAJOR.MINOR.PATCH` with an optional `.postN` suffix:
+Versions follow `MAJOR.MINOR.PATCH`. The version is never edited by hand:
+`make release` derives it from the conventional commits merged since the
+last release (`doc/RELEASING.md`), through the bump map of `pyproject.toml`
+(`make help-cc` prints it):
 
-- Bump `MINOR` for new features (even minor ones), as long as they are
-  non-breaking.
-- Bump `PATCH` for bug fixes, refactorings, doc additions, build and
-  tooling changes, tests, and deployment changes.
-- Use `.postN` only for publishing/packaging fixes and trivial wording corrections
-  (e.g. fixing a typo in `README.md`, a broken PyPI upload, a CI script tweak)
-  that do not affect the tool's behaviour or documentation content.
+- `feat` bumps `MINOR`: a new feature, even a minor one, non-breaking.
+- A type with `!`, or a `BREAKING CHANGE:` footer, bumps `MAJOR`.
+- `fix`, `perf`, `refactor`, `docs`, `test`, `build` bump `PATCH`: bug
+  fixes, refactorings, documentation, tests, build and packaging changes.
+- `chore`, `ci`, `style` bump nothing: they change nothing the user
+  installs or reads, so they wait for the next release and appear in its
+  changelog entry. This holds because the project is a tool installed on
+  the user's computer; for a service, CI changes can have real if invisible
+  effects that deserve a release.
+
+Unreleased changes on `main` never span two levels: a PR whose type would
+raise the pending level is blocked by the merge gate until the pending
+changes are released, so every level is closed before the next one opens.
 
 ## Markdown formatting
 

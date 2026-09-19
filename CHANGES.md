@@ -1,3 +1,5 @@
+<!-- semantic-release -->
+
 ## Version 1.17.7:
 
 - Fix #84: `--version`, `--help` and `-f dot` work without Graphviz.

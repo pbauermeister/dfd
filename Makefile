@@ -46,9 +46,10 @@ require-system: ## install system packages (graphviz, npm) and uv
 	esac
 	@which uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
 
-require: ## install dev tools: Python ones in .venv (uv sync), prettier (npm)
+require: ## install dev tools: Python ones in .venv (uv sync), prettier (npm), git hook
 	uv sync
 	npm install --prefix $(VENV) --no-audit --no-fund prettier@3
+	uv run pre-commit install --hook-type commit-msg
 
 all: require-system require format lint test doc clean ## make all, except publish
 
@@ -60,9 +61,10 @@ format: ## format source files (changes shall be committed)
 
 black: format ## alias of format
 
-lint: ## lint source files, check CI lists the same Python versions
+lint: ## lint source files, check CI and hooks agree with pyproject.toml
 	uv run ./tools/lint.sh
 	uv run ./tools/check-python-versions.py $(PYTHONS)
+	uv run ./tools/conventional-commits.py check-type-lists
 
 test: ## run unit tests and non-regression tests
 	uv run pytest
@@ -103,7 +105,13 @@ doc: readme ## remake doc
 
 smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
 	uv build
-	./tools/smoke-test-install.sh wheel
+	./tools/test-installation.sh from-wheel
+
+show-release-plan: ## print the next version and the commits since the last release with their bump levels
+	@uv run ./tools/print-release-plan.py
+
+help-cc: ## print the conventional commit type to version bump map
+	@uv run ./tools/conventional-commits.py print-bump-table
 
 release: ## release to PyPI and GitHub via GitHub Actions (see doc/RELEASING.md)
 	./tools/release.sh
