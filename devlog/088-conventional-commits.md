@@ -55,7 +55,7 @@ Decisions (2026-09-18):
 - Gate: the pending level is `semantic-release --noop version --print`
   compared with the version in `pyproject.toml`; the incoming level is
   the PR title's type looked up in the bump map of `pyproject.toml`.
-  `tools/cc.py` reads that map for both the gate and `make help-cc`.
+  `tools/conventional-commits.py` reads that map for both the gate and `make help-cc`.
 - No NR fixtures: no code path of the tool changes.
 - PR type review before merge (2026-09-19): the PR title's type must
   be at the highest bump level among the PR's commits and name the
@@ -77,7 +77,7 @@ Ordered steps:
    `pyproject.toml`, `setup.py` removed, `[tool.semantic_release]`
    section (21 lines, as trialed), marker line in `CHANGES.md`,
    python-semantic-release and pre-commit in the `dev` dependency
-   group, `make version-show`, `make help-cc` via `tools/cc.py`.
+   group, `make show-version`, `make help-cc` via `tools/conventional-commits.py`.
    `tools/changelog.py` adapted to the heading form `## vX.Y.Z (date)`
    (GitHub release notes). Stray tag `v0.0.0.dev1` deleted.
 2. **Enforcement.** `.pre-commit-config.yaml` with the commit-msg hook,
@@ -88,7 +88,7 @@ Ordered steps:
    preflight checks the tag is on `main` and matches `pyproject.toml`.
    `doc/RELEASING.md` rewritten. `publish-to-github.py` adapted.
 4. **Merge gate.** `merge-gate.yml` on `pull_request`, using
-   `tools/cc.py`; the same assertion in release preflight.
+   `tools/conventional-commits.py`; the same assertion in release preflight.
 5. **Conventions.** `CLAUDE.md` versioning and branching sections,
    the PR-type review before merge (agent reminds, asks before merging
    itself), TODO item 10 done. The PR retitle in CC form moved to
@@ -112,12 +112,12 @@ Files:
   accepts both heading forms. `publish-to-github.py` unchanged (uses
   those two functions).
 - `tools/smoke-test-install.sh`: version from `pyproject.toml`.
-- `tools/cc.py` (new): `table` subcommand rendering the bump map.
-  `Makefile`: `help-cc`, `version-show`.
+- `tools/conventional-commits.py` (new): `table` subcommand rendering the bump map.
+  `Makefile`: `help-cc`, `show-version`.
 - `uv.lock` updated by `uv sync`.
 
 Commands: `uv sync`, `make format`, `make lint`, `make test`,
-`make version-show`, `make help-cc`, `uv build` (wheel takes the
+`make show-version`, `make help-cc`, `uv build` (wheel takes the
 static version). Tag `v0.0.0.dev1` deleted locally and on `origin`
 (irreversible; April leftover, referenced by no release).
 

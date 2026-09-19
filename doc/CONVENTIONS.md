@@ -131,8 +131,8 @@ The package structure must work in all installation modes:
   ensures this works.
 - Package discovery is configured in `pyproject.toml`
   (`[tool.setuptools.packages.find]`, `where = ["src"]`), which
-  auto-discovers sub-packages with `__init__.py` files. `setup.py` only
-  supplies the version parsed from `CHANGES.md`.
+  auto-discovers sub-packages with `__init__.py` files. The version
+  is a static `project.version`, bumped by `make release`.
 
 ## Constants
 

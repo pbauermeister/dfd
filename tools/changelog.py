@@ -1,36 +1,40 @@
 #!/usr/bin/env python3
-"""Read the latest version, or its changelog section, from CHANGES.md.
+"""Read the project version, or its changelog section from CHANGES.md.
 
 Usage:
-  changelog.py version   # e.g. 1.17.6
-  changelog.py notes     # the bullet list under "## Version 1.17.6:"
+  changelog.py version   # e.g. 1.17.6, from pyproject.toml
+  changelog.py notes     # the section under "## v1.17.6 (date)"
 
 Used by the release workflow and by publish-to-github.py.
 """
 
 import argparse
 import re
-import sys
+import tomllib
 from enum import StrEnum
 from pathlib import Path
 from typing import assert_never
 
-CHANGES_PATH = Path(__file__).resolve().parent.parent / "CHANGES.md"
+ROOT = Path(__file__).resolve().parent.parent
+CHANGES_PATH = ROOT / "CHANGES.md"
+PYPROJECT_PATH = ROOT / "pyproject.toml"
 
 
 def extract_version() -> str:
-    """Extract the latest version from CHANGES.md."""
-    changes = CHANGES_PATH.read_text()
-    m = re.search(r"^## Version\s+(\S+?):", changes, re.MULTILINE)
-    if not m:
-        sys.exit("ERROR: could not extract version from CHANGES.md")
-    return m.group(1)
+    """Extract the project version from pyproject.toml."""
+    with PYPROJECT_PATH.open("rb") as f:
+        version: str = tomllib.load(f)["project"]["version"]
+    return version
 
 
 def extract_notes(version: str) -> str:
     """Extract the changelog section of a given version."""
     changes = CHANGES_PATH.read_text()
-    pattern = rf"^## Version\s+{re.escape(version)}:\s*\n(.*?)(?=^## |\Z)"
+    # match the generated heading "## vX.Y.Z (date)" and the former
+    # hand-written "## Version X.Y.Z:"
+    v = re.escape(version)
+    heading = rf"^## (?:v{v} \(\d{{4}}-\d{{2}}-\d{{2}}\)|Version\s+{v}:)"
+    pattern = rf"{heading}\s*\n(.*?)(?=^## |\Z)"
     m = re.search(pattern, changes, re.MULTILINE | re.DOTALL)
     if not m:
         return f"Release {version}"
