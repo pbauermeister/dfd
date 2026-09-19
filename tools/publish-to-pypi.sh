@@ -15,7 +15,7 @@
 # The TestPyPI rehearsal (build, wheel smoke test, TestPyPI upload and
 # install smoke test) runs first; any failure stops before the real upload.
 
-. ./set-ex.sh
+. ./init-tracing.sh
 
 ./tools/publish-to-testpypi.sh
 

@@ -2,14 +2,14 @@
 """Conventional commits helper, driven by the bump map of pyproject.toml.
 
 Usage:
-  conventional-commits.py table   # print the type to version bump map
-  conventional-commits.py check   # the hook and the PR-title workflow
-                                  # accept exactly the types of the map
-  conventional-commits.py level   # bump level of the commit message on
-                                  # stdin (subject, optional body)
-  conventional-commits.py gate --current X.Y.Z --next X.Y.Z
-                                  # fail when the PR message on stdin
-                                  # would raise the pending level of main
+  conventional-commits.py print-bump-table
+      # the commit type to version bump map
+  conventional-commits.py check-type-lists
+      # the hook and the PR-title workflow accept exactly the map's types
+  conventional-commits.py print-level-of-message
+      # bump level of the commit message on stdin (subject, optional body)
+  conventional-commits.py gate-pr-against-main --current X.Y.Z --next X.Y.Z
+      # fail when the PR message on stdin would raise the pending level
 
 The map is `[tool.semantic_release.commit_parser_options]`, the same
 section python-semantic-release applies at release time, so the table
@@ -211,24 +211,29 @@ def run_gate(bump_map: BumpMap, *, current: str, next_: str) -> None:
 
 
 class Command(StrEnum):
-    TABLE = "table"
-    CHECK = "check"
-    LEVEL = "level"
-    GATE = "gate"
+    PRINT_BUMP_TABLE = "print-bump-table"
+    CHECK_TYPE_LISTS = "check-type-lists"
+    PRINT_LEVEL_OF_MESSAGE = "print-level-of-message"
+    GATE_PR_AGAINST_MAIN = "gate-pr-against-main"
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser(Command.TABLE, help="print the type to bump map")
     subparsers.add_parser(
-        Command.CHECK, help="hook and workflow accept exactly the map's types"
+        Command.PRINT_BUMP_TABLE, help="print the type to bump map"
     )
     subparsers.add_parser(
-        Command.LEVEL, help="bump level of the commit message on stdin"
+        Command.CHECK_TYPE_LISTS,
+        help="hook and workflow accept exactly the map's types",
+    )
+    subparsers.add_parser(
+        Command.PRINT_LEVEL_OF_MESSAGE,
+        help="bump level of the commit message on stdin",
     )
     gate = subparsers.add_parser(
-        Command.GATE, help="gate the PR message on stdin against main"
+        Command.GATE_PR_AGAINST_MAIN,
+        help="gate the PR message on stdin against main",
     )
     gate.add_argument("--current", required=True, help="version of main")
     gate.add_argument("--next", required=True, help="next version of main")
@@ -237,13 +242,13 @@ def main() -> None:
 
     bump_map = load_bump_map()
     match command:
-        case Command.TABLE:
+        case Command.PRINT_BUMP_TABLE:
             print_table(bump_map)
-        case Command.CHECK:
+        case Command.CHECK_TYPE_LISTS:
             check_types(bump_map)
-        case Command.LEVEL:
+        case Command.PRINT_LEVEL_OF_MESSAGE:
             run_level(bump_map)
-        case Command.GATE:
+        case Command.GATE_PR_AGAINST_MAIN:
             run_gate(bump_map, current=args.current, next_=args.next)
         case _:
             assert_never(command)

@@ -9,7 +9,7 @@
 # TestPyPI refuses re-uploads of a version: a failed rehearsal needs a
 # version bump before retrying.
 
-. ./set-ex.sh
+. ./init-tracing.sh
 
 ./tools/build.sh
 

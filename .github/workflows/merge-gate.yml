@@ -38,5 +38,5 @@ jobs:
           next=$(uv run --project "$pr" semantic-release -c "$pr/pyproject.toml" \
                  --noop version --print 2>/dev/null)
           printf '%s\n\n%s\n' "$PR_TITLE" "$PR_BODY" \
-            | uv run --project "$pr" "$pr/tools/conventional-commits.py" gate \
+            | uv run --project "$pr" "$pr/tools/conventional-commits.py" gate-pr-against-main \
                 --current "$current" --next "$next"
