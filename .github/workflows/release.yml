@@ -36,7 +36,7 @@ jobs:
 
       - name: Read the version from pyproject.toml
         id: version
-        run: echo "version=$(python3 tools/changelog.py version)" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(python3 tools/changelog.py print-version)" >> "$GITHUB_OUTPUT"
 
       - name: Check the tag names the version and is on main
         if: ${{ github.event_name == 'push' }}
@@ -152,6 +152,6 @@ jobs:
 
       - name: Create the GitHub release on the tag
         run: |
-          python3 tools/changelog.py notes > notes.md
+          python3 tools/changelog.py print-notes > notes.md
           gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" \
             --notes-file notes.md dist/*.whl dist/*.tar.gz

@@ -89,6 +89,8 @@ Ordered steps:
    `doc/RELEASING.md` rewritten. `publish-to-github.py` adapted.
 4. **Merge gate.** `merge-gate.yml` on `pull_request`, using
    `tools/conventional-commits.py`; the same assertion in release preflight.
+4b. **Review fixes** (PR review of 2026-09-19): descriptive subcommand
+   names, `release.sh` reduced to orchestration by two scripts.
 5. **Conventions.** `CLAUDE.md` versioning and branching sections,
    the PR-type review before merge (agent reminds, asks before merging
    itself), TODO item 10 done. The PR retitle in CC form moved to
@@ -242,3 +244,47 @@ detached `origin/main` (the tool must accept a detached HEAD under
 `gate` on the four rows of the verdict table.
 
 One commit at the end of the step, per the new rule.
+
+### Step 4b, review fixes
+
+Review comments: subcommand names of `conventional-commits.py` must be
+descriptive at call sites; the pending-commits loop and the run-watch
+loop of `release.sh` deserve their own scripts, so the shell script
+stays high-level. The same applies to `changelog.py` (`version`,
+`notes`) and to the TestPyPI retry loop of `smoke-test-install.sh`.
+
+Files:
+
+- `tools/conventional-commits.py`: subcommands renamed
+  `print-bump-table`, `check-type-lists`, `print-level-of-message`,
+  `gate-pr-against-main`. `tools/changelog.py`: `print-version`,
+  `print-notes`. Call sites: `Makefile` (2), `merge-gate.yml`,
+  `release.yml` (2), `smoke-test-install.sh`, `release.sh`, docstrings.
+  The unit tests call functions, unchanged.
+- `tools/release-plan.py` (new): prints the current version, the next
+  one (`semantic-release --noop version --print`), the commits since
+  the last tag with their levels (the tool's `parse_level`, loaded
+  with importlib as the tests do) and the level-order warning; exits
+  non-zero when nothing bumps. Replaces the "compute" and "list" steps
+  of `release.sh`.
+- `tools/wait-for.sh <condition> <args>` (new): explicit waiting for
+  a condition, one function per condition, one shared polling loop.
+  `workflow-run <workflow> <ref>` prints the run id once the run
+  exists; `testpypi-version <version>` returns once the index serves
+  it (JSON endpoint), so `smoke-test-install.sh` installs once instead
+  of retrying the install. Replaces both retry loops.
+- `set-ex.sh` renamed `init-tracing.sh` (same place, sourced by every
+  tool script): `set -o pipefail` added, `set -u` tried and kept if the
+  trials pass. It keeps only what needs the tracing hack: `echo`,
+  `banner`, `banner2`, `step`. No retry helper there.
+- `tools/release.sh`: preconditions, `release-plan.py`,
+  `semantic-release version`, show, confirm, push, wait for the run,
+  `gh run watch`.
+
+Trial: `release.sh` abort path in the throwaway clone (plan and
+warning shown, tree restored); `wait-for.sh workflow-run` against the
+CI run that the step's push triggers, then `gh run watch`;
+`wait-for.sh testpypi-version` on a published version;
+`make smoke-test-wheel`; `make lint`, `make test`.
+
+One commit at the end of the step.

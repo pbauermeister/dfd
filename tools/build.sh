@@ -1,4 +1,4 @@
 #!/bin/bash
-. ./set-ex.sh
+. ./init-tracing.sh
 
 make require clean lint test doc

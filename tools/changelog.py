@@ -2,8 +2,8 @@
 """Read the project version, or its changelog section from CHANGES.md.
 
 Usage:
-  changelog.py version   # e.g. 1.17.6, from pyproject.toml
-  changelog.py notes     # the section under "## v1.17.6 (date)"
+  changelog.py print-version   # e.g. 1.17.6, from pyproject.toml
+  changelog.py print-notes     # the CHANGES.md section of that version
 
 Used by the release workflow and by publish-to-github.py.
 """
@@ -41,30 +41,30 @@ def extract_notes(version: str) -> str:
     return m.group(1).strip()
 
 
-class What(StrEnum):
-    VERSION = "version"
-    NOTES = "notes"
+class Command(StrEnum):
+    PRINT_VERSION = "print-version"
+    PRINT_NOTES = "print-notes"
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
-        "what",
-        type=What,
-        choices=list(What),
-        help="print the latest version, or its changelog section",
+        "command",
+        type=Command,
+        choices=list(Command),
+        help="print the project version, or its CHANGES.md section",
     )
     args = parser.parse_args()
-    what: What = args.what  # argparse boundary
+    command: Command = args.command  # argparse boundary
 
     version = extract_version()
-    match what:
-        case What.VERSION:
+    match command:
+        case Command.PRINT_VERSION:
             print(version)
-        case What.NOTES:
+        case Command.PRINT_NOTES:
             print(extract_notes(version))
         case _:
-            assert_never(what)
+            assert_never(command)
 
 
 if __name__ == "__main__":

@@ -64,7 +64,7 @@ black: format ## alias of format
 lint: ## lint source files, check CI and hooks agree with pyproject.toml
 	uv run ./tools/lint.sh
 	uv run ./tools/check-python-versions.py $(PYTHONS)
-	uv run ./tools/conventional-commits.py check
+	uv run ./tools/conventional-commits.py check-type-lists
 
 test: ## run unit tests and non-regression tests
 	uv run pytest
@@ -111,7 +111,7 @@ show-version: ## print the next version derived from the commits since the last 
 	@uv run semantic-release --noop version --print 2>/dev/null
 
 help-cc: ## print the conventional commit type to version bump map
-	@uv run ./tools/conventional-commits.py table
+	@uv run ./tools/conventional-commits.py print-bump-table
 
 release: ## release to PyPI and GitHub via GitHub Actions (see doc/RELEASING.md)
 	./tools/release.sh
