@@ -6,14 +6,14 @@
 #   ./tools/smoke-test-install.sh wheel      # install the wheel from dist/
 #   ./tools/smoke-test-install.sh testpypi   # install from TestPyPI
 #
-# Checks that `--version` reports the version from CHANGES.md and that
+# Checks that `--version` reports the version from pyproject.toml and that
 # rendering an NR fixture with `-f dot` matches its golden file. No
 # Graphviz needed. Run from the repository root.
 
 . ./set-ex.sh
 
 MODE=${1:?usage: $0 wheel|testpypi}
-VERSION=$(sed -nE 's/^## Version +([^:]+):.*/\1/p' CHANGES.md | head -1)
+VERSION=$(python3 tools/changelog.py version)
 FIXTURE=tests/non-regression/001-items
 TESTPYPI_INDEX=https://test.pypi.org/simple/
 RETRIES=12  # The TestPyPI index lags a few seconds after upload.
