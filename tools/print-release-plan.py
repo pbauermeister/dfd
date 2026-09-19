@@ -2,13 +2,21 @@
 """Print the release plan: versions and the pending commits with levels.
 
 Usage:
-  release-plan.py   # exits 1 when nothing bumps since the last release
+  print-release-plan.py   # exits 1 when nothing bumps since the last release
 
 Current version from pyproject.toml, next one from
 `semantic-release --noop version --print`, commits since the current
 version's tag from git, their levels from conventional-commits.py.
 Warns when a lower level precedes a higher one: the merge gate was
-bypassed, and the next version closes both levels.
+bypassed, and the next version closes both levels. Example:
+
+  current version: 1.17.7
+  next version:    1.18.0
+  commits since v1.17.7:
+    9cffd9e docs: CLAUDE.md, one pushed commit per design step  [patch]
+    7d3ff3f ci: conventional commit hook, PR title check  [none]
+    178cb0f feat: add the graph-title-color style option (#100)  [minor]
+  WARNING: a lower level precedes a higher one (the merge gate was bypassed): v1.18.0 closes both
 """
 
 import importlib.util

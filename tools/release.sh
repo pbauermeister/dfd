@@ -22,7 +22,7 @@ git fetch origin main
     || { echo "ERROR: local main differs from origin/main"; exit 1; }
 
 step "show the release plan"
-uv run ./tools/release-plan.py
+uv run ./tools/print-release-plan.py
 
 step "make the release commit and the tag, locally"
 # the release commit is authored by the operator, not by the tool

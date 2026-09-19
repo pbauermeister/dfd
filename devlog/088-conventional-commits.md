@@ -288,3 +288,9 @@ CI run that the step's push triggers, then `gh run watch`;
 `make smoke-test-wheel`; `make lint`, `make test`.
 
 One commit at the end of the step.
+
+Second review round (2026-09-19): `release-plan.py` is
+`print-release-plan.py` (single action, verb first) with an example
+output in its docstring; `smoke-test-install.sh` is
+`test-installation.sh from-wheel|from-testpypi` ("test" the verb,
+"installation" the noun, the source read as a sentence at call sites).

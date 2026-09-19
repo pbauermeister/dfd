@@ -76,7 +76,7 @@ jobs:
         run: uv build
 
       - name: Smoke-test the wheel in a fresh venv
-        run: ./tools/smoke-test-install.sh wheel
+        run: ./tools/test-installation.sh from-wheel
 
       - name: Upload the distributions
         uses: actions/upload-artifact@v4
@@ -111,7 +111,7 @@ jobs:
           --publish-url https://test.pypi.org/legacy/ dist/*
 
       - name: Smoke-test the TestPyPI install in a fresh venv
-        run: ./tools/smoke-test-install.sh testpypi
+        run: ./tools/test-installation.sh from-testpypi
 
   pypi:
     needs: testpypi

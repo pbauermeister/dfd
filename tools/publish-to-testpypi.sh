@@ -21,7 +21,7 @@ uv build
 
 banner2 "Smoke-testing the wheel"
 
-./tools/smoke-test-install.sh wheel
+./tools/test-installation.sh from-wheel
 
 
 banner2 "Publishing to TestPyPI"
@@ -40,4 +40,4 @@ uv publish --publish-url https://test.pypi.org/legacy/ dist/*
 
 banner2 "Smoke-testing the TestPyPI install"
 
-./tools/smoke-test-install.sh testpypi
+./tools/test-installation.sh from-testpypi

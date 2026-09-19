@@ -105,7 +105,7 @@ doc: readme ## remake doc
 
 smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
 	uv build
-	./tools/smoke-test-install.sh wheel
+	./tools/test-installation.sh from-wheel
 
 show-version: ## print the next version derived from the commits since the last tag
 	@uv run semantic-release --noop version --print 2>/dev/null
