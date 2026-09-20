@@ -1,7 +1,7 @@
 # 090 — Script levels: naming rule, `runbooks/` and `tools/`
 
 Date: 2026-09-19
-Status: ONGOING
+Status: DONE
 
 ## Requirement
 
@@ -258,3 +258,24 @@ Files: `tools/init-tracing.sh`, `TODO.md`, this devlog.
 
 PR title stays `refactor: ...` (highest level among the commits:
 `refactor`, patch).
+
+## Outcome
+
+Four steps, four commits, run unattended in one pass (2026-09-20).
+Findings:
+
+- The plan held: no step needed a decision. The one thing the churn
+  table missed, two `make readme` mentions inside
+  `tests/test_doc_sync.py` (docstring and assertion message), was
+  caught by the step 3 sweep, as intended.
+- `set -u` in the prelude passed all trials (`build.sh`,
+  `make-doc.sh`, `smoke-test-wheel`); the three publishing runbooks
+  assign every variable before use (static audit) and are exercised
+  by the next release.
+- Both GitHub workflows untouched: the two tools they call stayed in
+  `tools/`.
+- `ruff format` rewrapped one assertion in `tests/test_doc_sync.py`
+  whose message grew with the target name; otherwise the renames are
+  content-free.
+- Measured cost of the split, for TODO item 15 and future moves: 6
+  sourcing lines, 2 cross-calls, 8 Makefile lines, 1 comment.

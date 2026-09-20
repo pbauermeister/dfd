@@ -105,7 +105,7 @@ turned into a standard task (GH ticket, PR, devlog).
     Once the version no longer comes from `CHANGES.md`, drop the
     `setup.py` version shim left by item 5.
 
-11. Naming rules for tool scripts and Makefile targets
+11. ~~Naming rules for tool scripts and Makefile targets~~ — DONE (#90)
 
     Codify in `doc/CONVENTIONS.md` when a name is verb-first
     (`update-docs.py`: a single action, read as a command), topic-first
