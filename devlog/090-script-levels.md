@@ -1,0 +1,260 @@
+# 090 — Script levels: naming rule, `runbooks/` and `tools/`
+
+Date: 2026-09-19
+Status: PENDING
+
+## Requirement
+
+From TODO item 11 (conclusions of #88). Issue #90.
+
+Codify in `doc/CONVENTIONS.md` the naming rule for scripts and Makefile
+targets:
+
+- verb-first for a single action read as a command (`update-docs.py`);
+- topic-first for a family of two or more, grouped in listings and
+  completion (`nr-test`, `require-system`);
+- a noun with verb-first subcommands for a Python family in one program
+  (`changelog.py print-notes`);
+- object-first with no family behind it is the case to avoid.
+
+Then apply the rule and the script levels of #88 (entry points /
+runbooks / tools / prelude):
+
+- Split the folders so that the level is an address: `runbooks/` for the
+  orchestrators, `tools/` for the tools. Update every path.
+- Doc scripts: become a `doc-` family or fold into one noun program.
+- Audit the Makefile targets against the rule.
+- Prelude `init-tracing.sh`: sourced mechanics only; decide its folder
+  and whether it gains `set -u`.
+
+Decided in discussion (2026-09-20):
+
+- **Calling directory.** Every script is called from the project's
+  home (the repository root): paths inside scripts are relative to it,
+  the Makefile is the normal caller. Codified in `doc/CONVENTIONS.md`.
+- **The renumberer stays a distinct script.** Measured against the
+  existing tools, none fits (2026-09-20); it will become a standalone
+  project: `discussions/md-titles-renumberer-tool.md`, TODO item 13.
+
+Every rename is mechanical and inventory-driven: this file holds the
+tables so the implementation can run unattended.
+
+## Design
+
+### Inventory and target
+
+| Current                            | Level   | Target                              |
+| ---------------------------------- | ------- | ----------------------------------- |
+| `tools/release.sh`                 | runbook | `runbooks/release.sh`               |
+| `tools/publish-to-pypi.sh`         | runbook | `runbooks/publish-to-pypi.sh`       |
+| `tools/publish-to-testpypi.sh`     | runbook | `runbooks/publish-to-testpypi.sh`   |
+| `tools/build.sh`                   | runbook | `runbooks/build.sh`                 |
+| `tools/lint.sh`                    | runbook | `runbooks/lint.sh`                  |
+| `tools/clean.sh`                   | runbook | `runbooks/clean.sh`                 |
+| `tools/make-doc.sh`                | runbook | `runbooks/make-doc.sh`              |
+| `init-tracing.sh` (repo root)      | prelude | `tools/init-tracing.sh`             |
+| `tools/changelog.py`               | tool    | unchanged                           |
+| `tools/conventional-commits.py`    | tool    | unchanged                           |
+| `tools/check-python-versions.py`   | tool    | unchanged                           |
+| `tools/print-release-plan.py`      | tool    | unchanged                           |
+| `tools/publish-to-github.py`       | tool    | unchanged                           |
+| `tools/test-installation.sh`       | tool    | unchanged                           |
+| `tools/wait-for.sh`                | tool    | unchanged                           |
+| `tools/update-docs.py`             | tool    | `tools/doc-update-sections.py`      |
+| `tools/gen-style-tables.py`        | tool    | `tools/doc-print-style-table.py`    |
+| `tools/doc-renumber-md-titles.py`  | tool    | unchanged (already `doc-` family)   |
+
+Decisions behind the table:
+
+- **Prelude in `tools/`.** It is sourced by five runbooks and one tool
+  (`test-installation.sh`), so it belongs to neither level's folder by
+  use; it is mechanics below the tools, like plumbing, and the root
+  stays uncluttered. Sourcing line becomes `. ./tools/init-tracing.sh`
+  (scripts run from the repository root; no change there).
+- **A `doc-` family of distinct tools**, topic-first, since the
+  renumberer stays its own script (Pascal, 2026-09-20): `doc-` is the
+  family, then the verb: `doc-update-sections.py` (the `<!-- AUTO -->`
+  markers + prettier), `doc-print-style-table.py readme|syntax`,
+  `doc-renumber-md-titles.py` (name kept). `make-doc.sh` stays a
+  runbook (sequence of commands, no logic).
+- **Runbook contents unchanged** except the sourcing path. `lint.sh`
+  and `clean.sh` do not source the prelude today; left as they are.
+
+### Makefile audit
+
+Names, against the rule. One rename:
+
+| Target                     | Rule                    | Verdict                          |
+| -------------------------- | ----------------------- | -------------------------------- |
+| `venv`, `venv-activate`    | family, topic-first     | unchanged                        |
+| `require`, `require-system`| family, topic-first     | unchanged                        |
+| `test`, `test-matrix`      | family, topic-first     | unchanged                        |
+| `nr-review/regenerate/test`| family, topic-first     | unchanged                        |
+| `publish-to-*`             | family, topic-first     | unchanged (`-gh` vs `-github.py`: kept) |
+| `help`, `help-cc`          | family, topic-first     | unchanged                        |
+| `doc`, `readme`            | family, one member off  | **`readme` → `doc-sections`**    |
+| single actions             | verb-first              | unchanged (`format`, `lint`, `clean`, `install`, `uninstall`, `release`, `smoke-test-wheel`, `show-release-plan`, `black` alias, `all`) |
+
+`readme` is stale since #71: it regenerates sections of `README.md`,
+`doc/README.md` and `doc/SYNTAX.md`. Mentions to update: `Makefile`,
+`tests/README.md`; `CHANGES.md` and old devlogs are history, untouched.
+
+Recipes, from the folder split and the `doc-` family. Ten lines change;
+the five recipes calling tools that stay in `tools/` do not:
+
+| Target                 | Line                          | Change                                   |
+| ---------------------- | ----------------------------- | ---------------------------------------- |
+| `lint`                 | `uv run ./tools/lint.sh`      | `./runbooks/lint.sh`                     |
+| `readme`               | target name                   | `doc-sections`                           |
+| `readme`               | `uv run ./tools/update-docs.py` | `./tools/doc-update-sections.py`       |
+| `doc`                  | `doc: readme`                 | `doc: doc-sections`                      |
+| `doc`                  | `uv run ./tools/make-doc.sh`  | `./runbooks/make-doc.sh`                 |
+| `release`              | `./tools/release.sh`          | `./runbooks/release.sh`                  |
+| `publish-to-testpypi`  | `./tools/publish-to-testpypi.sh` | `./runbooks/publish-to-testpypi.sh`   |
+| `publish-to-pypi`      | `./tools/publish-to-pypi.sh`  | `./runbooks/publish-to-pypi.sh`          |
+| `clean`                | `./tools/clean.sh`            | `./runbooks/clean.sh`                    |
+| `help`                 | none                          | the help text follows the target names   |
+
+Unchanged recipes: `lint` (`check-python-versions.py`,
+`conventional-commits.py`), `smoke-test-wheel` (`test-installation.sh`),
+`show-release-plan`, `help-cc`, `publish-to-gh`.
+
+### Path churn (exhaustive, from grep)
+
+| File                              | Change                                          |
+| --------------------------------- | ----------------------------------------------- |
+| `Makefile`                        | 10 lines, listed in the Makefile audit          |
+| `.github/workflows/release.yml`   | none (`changelog.py`, `test-installation.sh` stay in `tools/`) |
+| `.github/workflows/merge-gate.yml`| none (`conventional-commits.py` stays)          |
+| `pyproject.toml`                  | 1 comment: `runbooks/release.sh`                |
+| `runbooks/*.sh` (5 files)         | sourcing line `. ./tools/init-tracing.sh`       |
+| `tools/test-installation.sh`      | sourcing line                                   |
+| `runbooks/release.sh`             | calls `tools/print-release-plan.py`, `changelog.py`, `wait-for.sh`: unchanged paths |
+| `runbooks/publish-to-pypi.sh`     | `./runbooks/publish-to-testpypi.sh`             |
+| `runbooks/publish-to-testpypi.sh` | `./runbooks/build.sh`                           |
+| `tools/doc-update-sections.py`    | subprocess path of `doc-print-style-table.py`   |
+| `tools/init-tracing.sh`           | header comment; drop unused `_here_`; `set -u`  |
+| `tests/test_doc_sync.py`          | generator path, docstring                       |
+| `tests/unit/test_conventional_commits.py` | none                                    |
+| `doc/CONVENTIONS.md`              | "Tooling scripts" section rewritten             |
+| `doc/RELEASING.md`                | one line naming `runbooks/release.sh` as its code twin |
+| `TODO.md`                         | item 11 → DONE (#90)                            |
+| old devlogs, `CHANGES.md`         | history, untouched                              |
+
+### Prelude and `set -u`
+
+#88 planned `set -u` "kept if the trials pass"; it was not added. Audit
+of the sourcing scripts: every `$VAR` is assigned before use
+(`${1:?usage}` guards the positional ones; `ANSWER` comes from `read`).
+Trials: run `build.sh`, `make-doc.sh`, `test-installation.sh
+from-wheel`; `release.sh` and `publish-to-*.sh` cannot be trial-run
+(they publish), so they get `bash -n` and the static audit only.
+
+## Action plan
+
+Four steps, one pushed commit each, `make format lint test` before each
+commit. Steps 1–2 and 3–4 share one attended/unattended gate each. No
+irreversible action: every rename is a `git mv`, no publishing script
+is run.
+
+**Step 1 — Conventions** (`docs:`)
+
+Files: `doc/CONVENTIONS.md`, `doc/RELEASING.md`.
+
+1. In "Tooling scripts", replace the first sentence's `tools/` and
+   `tests/` by `runbooks/`, `tools/` and `tests/`.
+2. Replace the "Script levels" paragraph by three paragraphs:
+
+   > **Script levels.** Git's porcelain and plumbing is the model.
+   > Makefile targets are the entry points. Runbooks (`runbooks/`:
+   > `release.sh`, `publish-to-*.sh`, `build.sh`, `lint.sh`, `clean.sh`,
+   > `make-doc.sh`) are orchestrators: named steps, one command each,
+   > guards only, no loops or computation; `doc/RELEASING.md` is the
+   > prose twin of `runbooks/release.sh`. Tools (`tools/`) do one
+   > concern with explicit arguments, so that every call site is
+   > self-explanatory. The prelude (`tools/init-tracing.sh`) holds
+   > sourced mechanics only. Logic that appears in a runbook moves
+   > down into a tool. The folder is the level's address.
+   >
+   > **Naming.** A single action is verb-first, read as a command
+   > (`tools/print-release-plan.py`, `tools/test-installation.sh
+   > from-wheel`, `make smoke-test-wheel`). A family of two or more is
+   > topic-first, so that listings and completion group it (`nr-test`,
+   > `require-system`, `tools/doc-update-sections.py`). A Python family
+   > sharing its data is one program, a noun with verb-first
+   > subcommands (`changelog.py print-notes`, `conventional-commits.py
+   > gate-pr-against-main`). Object-first with no family behind it is
+   > the case to avoid.
+   >
+   > **Calling directory.** Every script is called from the project's
+   > home, the repository root: paths inside scripts are relative to
+   > it, the prelude is sourced as `. ./tools/init-tracing.sh`, and
+   > the Makefile is the normal caller. A script never `cd`s to find
+   > itself.
+
+3. `doc/RELEASING.md`, first paragraph, after the `make release`
+   sentence: "`runbooks/release.sh` is the code twin of this page."
+4. Commit: `docs: CONVENTIONS, script levels, naming and calling
+   directory`.
+
+**Step 2 — Folder split** (`refactor:`)
+
+Files: the 7 runbooks and the prelude (inventory table), `Makefile`
+(recipe table, the 7 `runbooks/` lines), `pyproject.toml`,
+`tools/test-installation.sh`, `runbooks/publish-to-pypi.sh`,
+`runbooks/publish-to-testpypi.sh`, `tools/init-tracing.sh` header.
+
+1. `mkdir runbooks`; `git mv` per the inventory table (7 runbooks,
+   prelude to `tools/`).
+2. Sourcing lines (6 files): `. ./init-tracing.sh` →
+   `. ./tools/init-tracing.sh`.
+3. Cross-calls: `publish-to-pypi.sh` → `./runbooks/publish-to-testpypi.sh`;
+   `publish-to-testpypi.sh` → `./runbooks/build.sh`.
+4. `Makefile`: the 7 `runbooks/` lines of the recipe table.
+5. `pyproject.toml` comment: `runbooks/release.sh`.
+6. Prelude header: "Shell prelude for the runbooks and tools ...
+   `. ./tools/init-tracing.sh`".
+7. Verify: `for f in runbooks/*.sh tools/*.sh; do bash -n $f; done`;
+   `make lint test doc clean`; `make smoke-test-wheel`;
+   `grep -rn 'tools/\(release\|publish-to-[pt]\|build\|lint\|clean\|make-doc\)\.sh\|\./init-tracing' --exclude-dir=devlog --exclude-dir=.venv --exclude=CHANGES.md .`
+   is empty.
+8. Commit: `refactor: split runbooks/ from tools/, prelude in tools/`.
+
+**Step 3 — `doc-` family** (`refactor:`)
+
+Files: `tools/update-docs.py` → `tools/doc-update-sections.py`,
+`tools/gen-style-tables.py` → `tools/doc-print-style-table.py`,
+`Makefile` (recipe table, the 3 `doc` lines), `tests/test_doc_sync.py`,
+`tests/README.md`.
+
+1. `git mv` the two tools.
+2. `doc-update-sections.py`: docstring of `generate_style_table` and the
+   subprocess path → `doc-print-style-table.py`.
+3. `doc-print-style-table.py`: usage line in the docstring.
+4. `Makefile`: `readme` → `doc-sections` (name and help text),
+   `doc: doc-sections`, the `doc-update-sections.py` call.
+5. `tests/test_doc_sync.py`: `GENERATOR` path and the docstring;
+   `tests/README.md`: `make readme` → `make doc-sections`.
+6. Verify: `make doc` then `git status` shows no change under `doc/`
+   or `README.md`; `make test`;
+   `grep -rn 'readme\|update-docs\|gen-style' Makefile tools tests`
+   shows only `README.md` file names and the `readme|syntax` argument.
+7. Commit: `refactor: doc- family of tools, target readme → doc-sections`.
+
+**Step 4 — Prelude, closing** (`refactor:`)
+
+Files: `tools/init-tracing.sh`, `TODO.md`, this devlog.
+
+1. Prelude: drop `_here_=$(pwd)`; `set +x -e -u -o pipefail` on the
+   first `set` line.
+2. Trials (Prelude and `set -u`): `./runbooks/build.sh`,
+   `./runbooks/make-doc.sh`, `make smoke-test-wheel`; `bash -n` on the
+   three publishing runbooks and re-read them for unguarded `$VAR`.
+3. `TODO.md` item 11: strike through, `— DONE (#90)`, keep the body.
+4. Devlog status DONE, Outcome section (findings, if any).
+5. Commit: `refactor: prelude with set -u; TODO item 11 done`.
+6. `gh pr ready 91`; update the PR body with the four steps as a
+   checklist (`gh api ... -X PATCH -f body=`, not `gh pr edit`).
+
+PR title stays `refactor: ...` (highest level among the commits:
+`refactor`, patch).

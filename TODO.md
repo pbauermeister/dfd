@@ -178,3 +178,36 @@ turned into a standard task (GH ticket, PR, devlog).
     - [ ] A title edit re-runs `conventional` and `gate`; a
           non-conventional title blocks the merge button.
     - [ ] PR behind `main`: BEHIND state, "Update branch", checks rerun.
+
+13. Extract the Markdown titles renumberer into its own tool
+
+    `tools/doc-renumber-md-titles.py` becomes a standalone repository
+    and PyPI package, usable from several projects; then dfd consumes
+    it as a dev dependency from `make-doc.sh`. Brief, measured survey
+    of existing tools and requirements in
+    `discussions/md-titles-renumberer-tool.md` (from #90).
+
+14. Devlog templates
+
+    The devlogs are not uniform: over 34 files, `Requirement` and
+    `Design` appear in 31 and 29, `Outcome` in 10, and the rest is
+    one-off section names (`Analysis`, `Action plan`, `Verification`,
+    `Progress`, `Lessons learned`, numbered variants, ...), because
+    the project has no template. Define one, with mandatory and
+    optional sections, in variants fitting the major kinds of tasks
+    (feature or fix from an issue; refactoring with an inventory and a
+    mechanical plan, as in #90; analysis or discussion, as in
+    `discussions/`; summary or report, as in #55). Codify in
+    `CLAUDE.md` "devlog/NNN-short-description.md files" and provide
+    the templates as files the scaffolding phase copies.
+
+15. Offload `CLAUDE.md`
+
+    `CLAUDE.md` grows with every task (265 lines, 15 sections)
+    and is loaded whole into every session, whatever the task. Offload
+    it: per-folder `CLAUDE.md` files that Claude Code loads when it
+    works in that folder (`tests/`, `tools/`, `runbooks/`, `devlog/`),
+    or dedicated documents that the root file refers to by context
+    (task start process, NR tests, release, conventions), keeping the
+    root to the rules that apply everywhere. Measure the line counts
+    before and after; keep the append-only rule for the root file.
