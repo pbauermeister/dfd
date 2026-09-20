@@ -63,9 +63,9 @@ def generate_doc_toc() -> str:
 
 
 def generate_style_table(table: str) -> str:
-    """Style options table (readme|syntax), from gen-style-tables.py."""
+    """Style options table (readme|syntax), from doc-print-style-table.py."""
     result = subprocess.run(
-        [sys.executable, TOOLS_DIR / "gen-style-tables.py", table],
+        [sys.executable, TOOLS_DIR / "doc-print-style-table.py", table],
         check=True,
         capture_output=True,
         text=True,

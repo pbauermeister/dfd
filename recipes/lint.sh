@@ -1,4 +1,6 @@
 #!/bin/bash
+# Lint the Python sources: ruff check and format check, then mypy in
+# strict mode with the options below.
 set -ex
 
 MYPY_OPTS=""

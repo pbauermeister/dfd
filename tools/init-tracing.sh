@@ -1,12 +1,15 @@
-# Shell prelude for the tool scripts: exit on error, trace commands,
-# and echo/banner/banner2/step helpers that print without the trace
-# noise (https://superuser.com/a/1141026). Source it from the repository
-# root: `. ./init-tracing.sh`.
-set +x -e -o pipefail
+# Shell prelude for the recipes and tools: exit on error, trace
+# commands, and echo/banner/banner2/step helpers that print without the
+# trace noise (https://superuser.com/a/1141026). Source it from the
+# repository root: `. ./tools/init-tracing.sh`.
+#
+# The helpers are aliases carrying a `;`: never use them as an operand of
+# `&&` or `||`, nor inside `$(...)`; there, use printf (the fallback would
+# run unconditionally, and `set -u` then fails on save_flags).
+set +x -e -u -o pipefail
 
 shopt -s expand_aliases 2>/dev/null || true  # for bash
 
-_here_=$(pwd)
 
 alias echo='{ save_flags="$-"; set +x; } 2>/dev/null; _echo_';
 _echo_() { \echo "$*"; case "$save_flags" in *x*)  set -x;; esac }

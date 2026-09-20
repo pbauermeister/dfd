@@ -8,7 +8,7 @@
 # runs CI, rehearses on TestPyPI, publishes to PyPI and creates the
 # GitHub release. See doc/RELEASING.md.
 
-. ./init-tracing.sh
+. ./tools/init-tracing.sh
 
 WORKFLOW=release.yml
 

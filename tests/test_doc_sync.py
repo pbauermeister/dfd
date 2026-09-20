@@ -1,8 +1,8 @@
 """Documentation sync tests.
 
 The style option tables in doc/README.md and doc/SYNTAX.md are generated
-from the GraphOptions declarations (see tools/gen-style-tables.py). These
-tests fail when the docs drift from the code; run `make readme` to refresh.
+from the GraphOptions declarations (see tools/doc-print-style-table.py). These
+tests fail when the docs drift from the code; run `make doc-sections` to refresh.
 """
 
 import pathlib
@@ -12,7 +12,7 @@ import sys
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-GENERATOR = ROOT / "tools" / "gen-style-tables.py"
+GENERATOR = ROOT / "tools" / "doc-print-style-table.py"
 
 
 def extract_auto_section(text: str, name: str) -> str:
@@ -41,4 +41,6 @@ def test_style_table_in_sync(doc: str, table: str) -> None:
     )
     expected = result.stdout.strip()
     actual = extract_auto_section((ROOT / doc).read_text(), "style-table")
-    assert actual == expected, f"{doc} style table is stale: run 'make readme'"
+    assert actual == expected, (
+        f"{doc} style table is stale: run 'make doc-sections'"
+    )

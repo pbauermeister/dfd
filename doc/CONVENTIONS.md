@@ -188,7 +188,8 @@ of any length pass.
 
 ## Tooling scripts
 
-Scripts in `tools/` and `tests/` are written in Python or bash. Choose
+Scripts in `recipes/`, `tools/` and `tests/` are written in Python or
+bash. Choose
 by what the script mostly does:
 
 - **Python** when there is string manipulation, non-trivial argument or
@@ -209,19 +210,35 @@ the script. A consistency check takes its expected values as arguments
 (e.g. from the Makefile) rather than re-parsing their source, and fails
 on a discrepancy without resolving it.
 
-**Script levels.** Git's porcelain and plumbing is the model. Makefile
-targets are the entry points. Orchestrators (`tools/release.sh`,
-`tools/publish-to-*.sh`) are runbooks in code: named steps, one command
-each, guards only, no loops or computation. Tools
-(`tools/conventional-commits.py`, `tools/wait-for.sh`) do one concern
-with verb-first subcommands and explicit arguments, so that every call
-site is self-explanatory; one tool per noun, subcommands for the verbs
-sharing its data; a single-action tool is named verb first
-(`print-release-plan.py`, `test-installation.sh from-wheel`). Preludes
-(`init-tracing.sh`) hold sourced mechanics only. Logic that appears in
-an orchestrator moves down into a tool. Intent (TODO item 11): the
-orchestrators move to `runbooks/` and the tools stay in `tools/`, so
-that the level is an address.
+**Script levels.** Git's porcelain and plumbing is the model, with the
+Makefile as the porcelain. Makefile targets are the entry points, and a
+prerequisite list is how a sequence of targets is written. Recipes
+(`recipes/<target>.sh`) are the bodies of targets that outgrew a few
+one-line commands: one file per target, named after it, called by make
+only, no arguments; a recipe sequences commands, with guards and loops
+applying one command per file, and no computation. Tools (`tools/`) do
+one concern with explicit arguments, so that every call site is
+self-explanatory; they are called from recipes, workflows and tests.
+The prelude (`tools/init-tracing.sh`) holds sourced mechanics only.
+Calls go down only, Makefile to recipes to tools: a recipe never calls
+make nor another recipe, and a target whose body calls make
+(`test-matrix`) stays in the Makefile. Logic that appears in a recipe
+moves down into a tool. Every recipe starts with a comment stating its
+purpose. `doc/RELEASING.md` is the prose of `make release`.
+
+**Naming.** A single action is verb-first, read as a command
+(`tools/print-release-plan.py`, `tools/test-installation.sh from-wheel`,
+`make smoke-test-wheel`). A family of two or more is topic-first, so
+that listings and completion group it (`nr-test`, `require-system`,
+`tools/doc-update-sections.py`). A Python family sharing its data is
+one program, a noun with verb-first subcommands (`changelog.py
+print-notes`, `conventional-commits.py gate-pr-against-main`).
+Object-first with no family behind it is the case to avoid.
+
+**Calling directory.** Every script is called from the project's home,
+the repository root: paths inside scripts are relative to it, the
+prelude is sourced as `. ./tools/init-tracing.sh`, and the Makefile is
+the normal caller. A script never `cd`s to find itself.
 
 ## Terminology
 

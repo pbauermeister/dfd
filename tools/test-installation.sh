@@ -10,7 +10,7 @@
 # rendering an NR fixture with `-f dot` matches its golden file. No
 # Graphviz needed. Run from the repository root.
 
-. ./init-tracing.sh
+. ./tools/init-tracing.sh
 
 SOURCE=${1:?usage: $0 from-wheel|from-testpypi}
 VERSION=$(python3 tools/changelog.py print-version)
