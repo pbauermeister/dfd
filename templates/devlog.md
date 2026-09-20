@@ -22,8 +22,8 @@ the depth the Plan's gates allow. Task nature selects the variant:
   refactor  driven by an inventory and a mechanical plan: as change,
             with § 1.4 Invariants and § 2.2 Inventory mandatory.
   analysis  study, survey or report: § 1.1–1.4, § 1.9, then a Findings
-            chapter replaces Plan and Execution; Closure keeps § 4.2
-            and § 4.4.
+            chapter replaces Plan and Execution; Delivery keeps § 4.3
+            and § 4.4; Closure keeps § 5.2.
 -->
 
 ## 1. Mandate
@@ -76,7 +76,7 @@ among mechanical churn; a decision depending on a tool, a layout or
 data)? Then: Mock-up: yes, <where>, or no, because. Options: none,
 because, or the design question and the two or three options, each in
 a throwaway worktree. The design review picks one and the reason goes
-to § 4.5 as a created rule. -->
+to § 5.3 as a created rule. -->
 
 Triggers: none
 Mock-up: no, because
@@ -85,7 +85,7 @@ Options: none, because
 ### 1.8 Acceptance criteria
 
 <!-- Numbered, each checkable by a command or a diff; ticked in
-§ 4.1. Include the standing ones: make format lint test pass; NR
+§ 4.2. Include the standing ones: make format lint test pass; NR
 fixtures and mutation smoke-test when fixtures change. -->
 
 1.
@@ -141,42 +141,30 @@ Approved: pending
 <!-- Terse. Per step: "as planned", or the notable and unexpected
 things (a sweep that caught a miss, a trial that failed, a decision
 taken on the way and its basis). Findings that become rules go to
-§ 4.5. -->
+§ 5.3. -->
 
-### 3.2 Try it
+## 4. Delivery
+
+<!-- The basis of the ship decision, read in one sitting: what the
+work looks like, what the tests say, what the agent recommends; then
+the discussion in which the user decides. -->
+
+### 4.1 Try it
 
 <!-- How the user uses, demos or sees the work: the commands to run,
 the file to open, the image to look at, the diff to read. Illustrate
 when a picture says it (an SVG, a listing, a before/after). -->
 
-### 3.3 Discussion
-
-<!-- The place to discuss the results before anything is judged: the
-demo, what surfaced unexpectedly, what remains an issue. One row per
-point, with the decision: complement now (a step added to § 2.1, then
-back to § 3.1), postpone (a TODO item, filed on this branch), or
-accept as is. -->
-
-| #   | Point | Decision |
-| --- | ----- | -------- |
-| 1   |       |          |
-
-<!-- Stop 2. The user tries the work and the discussion is settled;
-the agent writes the date. -->
-
-Reviewed: pending
-
-## 4. Closure
-
-### 4.1 Gate check
+### 4.2 Test report
 
 <!-- The acceptance criteria of § 1.8, ticked, with the command output
-that proves each; CI status of the PR. -->
+that proves each; make format lint test; CI status of the PR; tests
+that bit during the task, if any. -->
 
-### 4.2 Verdict
+### 4.3 Verdict
 
 <!-- The agent's self-assessment, not the decision: written before the
-user reads § 4.3, it is the valve against overclaiming. A criterion
+user reads § 4.4, it is the valve against overclaiming. A criterion
 not proven is a reservation, not a tick. A reservation that outlives
 the task becomes a TODO item. -->
 
@@ -192,7 +180,27 @@ Reservations (for "with reservations"; for "reject", what must change):
 
 Rounds: <design rounds before stop 1>; rework after stop 1: none | <what>
 
-### 4.3 Retrospective
+### 4.4 Discussion
+
+<!-- Where the results are discussed and the ship decision is taken:
+the demo, what surfaced unexpectedly, what remains an issue. One row
+per point, with the decision: complement now (a step added to § 2.1,
+then back to § 3.1 and a new § 4), postpone (a TODO item, filed on
+this branch), or accept as is. -->
+
+| #   | Point | Decision |
+| --- | ----- | -------- |
+| 1   |       |          |
+
+<!-- Stop 2. The user has tried the work, read the test report and the
+verdict, and the discussion is settled; the agent writes the date.
+Then the PR is marked ready. -->
+
+Reviewed: pending
+
+## 5. Closure
+
+### 5.1 Retrospective
 
 <!-- One row per point worth remembering; the agent gives its verdict,
 the user gives theirs: well, not well, surprise, tension, don't care. -->
@@ -201,17 +209,16 @@ the user gives theirs: well, not well, surprise, tension, don't care. -->
 | --- | ----- | ----- | ---- |
 | 1   |       |       |      |
 
-<!-- Stop 3. The user fills their column and settles the verdict; the
-agent writes the date. Then the PR is marked ready. -->
+<!-- Stop 3. The user fills their column; the agent writes the date. -->
 
 Reviewed: pending
 
-### 4.4 Forward-looking
+### 5.2 Forward-looking
 
 <!-- Follow-ups filed (TODO items, issues, discussions), and what the
 next tasks can now rely on. -->
 
-### 4.5 Rule trace
+### 5.3 Rule trace
 
 <!-- Conventions applied (cite the section) and conventions created
 by this task (the sentence added, and where). Two verbs only. -->
