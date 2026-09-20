@@ -1,5 +1,5 @@
 #!/bin/bash
-. ./init-tracing.sh
+. ./tools/init-tracing.sh
 
 OPTS=--debug
 OPTS=

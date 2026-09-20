@@ -1,7 +1,7 @@
-# Shell prelude for the tool scripts: exit on error, trace commands,
-# and echo/banner/banner2/step helpers that print without the trace
-# noise (https://superuser.com/a/1141026). Source it from the repository
-# root: `. ./init-tracing.sh`.
+# Shell prelude for the runbooks and tools: exit on error, trace
+# commands, and echo/banner/banner2/step helpers that print without the
+# trace noise (https://superuser.com/a/1141026). Source it from the
+# repository root: `. ./tools/init-tracing.sh`.
 set +x -e -o pipefail
 
 shopt -s expand_aliases 2>/dev/null || true  # for bash

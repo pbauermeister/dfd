@@ -62,7 +62,7 @@ format: ## format source files (changes shall be committed)
 black: format ## alias of format
 
 lint: ## lint source files, check CI and hooks agree with pyproject.toml
-	uv run ./tools/lint.sh
+	uv run ./runbooks/lint.sh
 	uv run ./tools/check-python-versions.py $(PYTHONS)
 	uv run ./tools/conventional-commits.py check-type-lists
 
@@ -101,7 +101,7 @@ readme: ## regenerate auto-updatable sections of README.md and doc/*.md
 	VENV=$(VENV) uv run ./tools/update-docs.py
 
 doc: readme ## remake doc
-	uv run ./tools/make-doc.sh
+	uv run ./runbooks/make-doc.sh
 
 smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
 	uv build
@@ -114,13 +114,13 @@ help-cc: ## print the conventional commit type to version bump map
 	@uv run ./tools/conventional-commits.py print-bump-table
 
 release: ## release to PyPI and GitHub via GitHub Actions (see doc/RELEASING.md)
-	./tools/release.sh
+	./runbooks/release.sh
 
 publish-to-testpypi: clean ## release rehearsal: upload to TestPyPI, install, check
-	./tools/publish-to-testpypi.sh
+	./runbooks/publish-to-testpypi.sh
 
 publish-to-pypi: clean ## fallback: rehearse on TestPyPI, then publish to PyPI
-	./tools/publish-to-pypi.sh
+	./runbooks/publish-to-pypi.sh
 
 publish-to-gh: ## fallback: GitHub Release from dist/ (after publish-to-pypi)
 	uv run ./tools/publish-to-github.py
@@ -128,4 +128,4 @@ publish-to-gh: ## fallback: GitHub Release from dist/ (after publish-to-pypi)
 ################################################################################
 # Cleanup:: ##
 clean: ## clean
-	./tools/clean.sh
+	./runbooks/clean.sh

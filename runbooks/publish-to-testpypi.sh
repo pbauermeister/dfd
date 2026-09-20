@@ -9,9 +9,9 @@
 # TestPyPI refuses re-uploads of a version: a failed rehearsal needs a
 # version bump before retrying.
 
-. ./init-tracing.sh
+. ./tools/init-tracing.sh
 
-./tools/build.sh
+./runbooks/build.sh
 
 
 banner2 "Building distributions"
