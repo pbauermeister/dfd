@@ -23,8 +23,8 @@ The agent performs these steps in sequence:
 1. Fetch the issue title and description (`gh issue view NNN`).
 2. Create a branch named `<prefix>/NNN-short-description` (prefix: `fix`,
    `feature`, `refactor`, `doc`, or `test`).
-3. Create `devlog/NNN-short-description.md` with the **Requirement** section
-   populated from the issue description.
+3. Copy `templates/devlog.md` to `devlog/NNN-short-description.md`; fill the
+   header and § 1.1 Context from the issue.
 4. Commit the devlog file on the branch.
 5. Open a **draft** PR against `main` (`gh pr create --draft`) with a minimal
    body (link to the devlog file, `Closes #NNN`) and a title in conventional
@@ -35,20 +35,37 @@ The agent performs these steps in sequence:
 
 Agent and user discuss until the specs are clear:
 
-- All decisions are recorded in the devlog's **Requirement** section.
+- The agent fills the Mandate (§ 1) and the Plan (§ 2) of the devlog and
+  presents them once, with the mock-up built and the spikes run. Every
+  decision is a row of § 1.8 Design decisions, marked rule or taste; the
+  user reads the taste rows.
+- Set-based design (§ 1.6): when the requirement shows a trigger (a new
+  container name; an inventory classifying existing items; a thing that
+  could live in two places; an intent inherited from a prior task; ambition
+  vocabulary; one conceptual row among mechanical churn), the agent builds
+  a mock-up of the supposed design in a throwaway worktree and pastes the
+  smallest slice that decides into § 1.6. When the mock-up leaves a design
+  question open, the agent builds two or three options in their own
+  worktrees, compares them in § 1.6 and recommends one; the user picks one
+  at stop 1, stating why, and the why is recorded as a rule. Otherwise
+  § 1.6 says "none, because": the skip is a decision. Options are thrown
+  away too; the Plan is written for the chosen one. A decision that
+  depends on a tool, a layout or data is settled by a spike (§ 1.7), not a
+  mock-up.
 - Reflect together on whether new NR test fixtures are needed. If yes, add
-  "create NR fixtures" as the first implementation step.
-- Agree on ordered implementation steps; record them in the devlog's **Design**
-  section. Steps may include intermediate checkpoints where the agent stops
+  "create NR fixtures" as the first step of § 2.1.
+- Steps (§ 2.1) may include intermediate checkpoints where the agent stops
   for user validation or decision.
 - Once specs are agreed, update the PR body to reflect the refined requirements
   (may include checklists).
+- **Stop 1.** The user approves Mandate and Plan; the agent writes the date
+  in `Approved:` and sets the status to `ONGOING`. Nothing runs while
+  `Approved:` is pending.
 
 ### Phase 4 — Implementation
 
-On explicit user confirmation, the agent updates the devlog status from
-`PENDING` to `ONGOING`, commits, and begins implementing per the agreed steps
-and the rules in "Implementation workflow".
+After stop 1, the agent implements per the steps of § 2.1 and the rules in
+"Implementation workflow", accounting for each step in § 3.1.
 
 Before starting each step, the agent:
 
@@ -61,6 +78,19 @@ Before starting each step, the agent:
 
 This way the user can grant autonomy for straightforward steps and keep
 tighter control over sensitive or uncertain ones.
+
+Three more stops follow the execution, each a dated line the agent fills on
+the user's go:
+
+- **Stop 2, `Tried:`** after § 4.1 Try it: the user tries the work and may
+  mandate a loop (steps added to § 2.1, accounted in § 3.1, § 4.1
+  refreshed). Omitted when there is nothing to try.
+- **Stop 3, `Shipped:`** once no loop is requested and § 4.2 Test report and
+  § 4.3 Verdict are written: the discussion of § 4.4 settles what is
+  postponed (a TODO item on the branch) and what is accepted as is. Then
+  the PR is marked ready.
+- **Stop 4, `Closed:`** after § 5.1 Retrospective, where the user fills
+  their column; the status becomes `DONE`.
 
 Claude: if the user starts a task without following this process, briefly
 remind them of it.
@@ -76,16 +106,32 @@ remind them of it.
 
 ## devlog/NNN-short-description.md files
 
-- For each feature or bug fix of non-trivial scope, a file in `devlog/` named
-  `NNN-short-description.md` is created during the task start process (phase 2).
-- **NNN** is the GitHub issue number. If the user provides a short description,
-  use it directly; otherwise, derive a slug from the issue title.
-- The file must start with a title (`# NNN — Short Description`), a date, and
-  a status (`PENDING`, `ONGOING`, `DONE`, or `REJECTED`).
-- Include a **Requirement** section describing what was asked for, and a
-  **Design** section describing the agreed-upon approach (including ordered
-  implementation steps), before implementation begins.
-- Update the status in-place as work progresses.
+- For each task of non-trivial scope, a file in `devlog/` named
+  `NNN-short-description.md` is copied from `templates/devlog.md` during the
+  task start process (phase 2). **NNN** is the GitHub issue number,
+  zero-padded; the slug is the user's short description, else derived from
+  the issue title.
+- Five chapters: Mandate, Plan, Execution, Delivery, Closure; the task nature
+  (`change`, `refactor`, `analysis`) selects the sections, as the template's
+  guidance comments say. Sections are cited by number and title; omitted
+  sections leave no placeholder.
+- Four stops, each a dated line the agent fills on the user's go, never
+  before: `Approved:` (after the Plan), `Tried:` (after Try it), `Shipped:`
+  (the ship decision), `Closed:` (after the Retrospective). Status:
+  `PENDING` until stop 1, `ONGOING` after it, `DONE` at stop 4, `REJECTED`
+  when abandoned.
+- Budget: Mandate and Plan about 120 lines, the whole file about 250 at
+  closure; cite a convention instead of restating its rationale.
+- Illustrations go under `devlog/img/`.
+
+## discussions/ files
+
+- Analysis that outgrew a task and belongs to no devlog (a spin-off brief
+  for another repository, a design kept for a dedicated task, a recorded
+  exchange) goes to `discussions/<topic>.md`, copied from
+  `templates/discussion.md`, written on the branch it originated from so
+  that history retraces it. It ends with an executive summary and the
+  outcomes or measures that follow.
 
 ## Writing or modifying tests
 
@@ -160,12 +206,12 @@ After the PR is merged:
 
 When implementing an approved plan:
 
-- **One pushed commit per Design step.** During a step, commit freely:
+- **One pushed commit per step of § 2.1.** During a step, commit freely:
   these granular commits are the safety net while the work is fluid.
   At the end of the step, once `make format`, `make lint` and `make test`
   pass, squash the step's commits into one (`git reset --soft` to the
   step's base, one commit) whose body carries the step summary and the
-  findings, and push. The requirement and design land as one devlog
+  findings, and push. The Mandate and the Plan land as one devlog
   commit at scaffolding. The PR's commit list then reads as a table of
   contents of the steps, whether the user reviews step by step or all at
   once. Squash before pushing, so it is a local rewrite; if save points

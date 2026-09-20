@@ -187,7 +187,7 @@ turned into a standard task (GH ticket, PR, devlog).
     of existing tools and requirements in
     `discussions/md-titles-renumberer-tool.md` (from #90).
 
-14. Devlog templates
+14. ~~Devlog templates~~ — DONE (#92)
 
     The devlogs are not uniform: over 34 files, `Requirement` and
     `Design` appear in 31 and 29, `Outcome` in 10, and the rest is
