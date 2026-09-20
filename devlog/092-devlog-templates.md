@@ -23,9 +23,10 @@ instance of the template: the mock-up of § 1.7.
 
 `templates/devlog.md` and `templates/discussion.md` exist and are what
 Phase 2 copies. The devlog has five chapters (Mandate, Plan,
-Execution, Delivery, Closure), three user stops (after the Plan; after
-the Delivery, where try-it, test report and verdict are read together
-and the discussion takes the ship decision; at the Retrospective), a task-nature selector (change, refactor, analysis)
+Execution, Delivery, Closure), four user stops (after the Plan; after Try
+it, which may send the work back for another loop; the ship decision,
+once no loop is requested and the test report is in; at the
+Retrospective), a task-nature selector (change, refactor, analysis)
 and a line budget. `CLAUDE.md` codifies the template, the stops and
 the set-based design step of Phase 3. TODO item 14 is done.
 
@@ -54,23 +55,23 @@ the set-based design step of Phase 3. TODO item 14 is done.
 
 ### 1.6 Design decisions
 
-| #   | Decision                                                                                                                                                              | Basis                                        | Alternative                                            |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------ |
-| 1   | Top-level `templates/`: `devlog.md`, `discussion.md`                                                                                                                  | rule: naming, topic-first family             | `devlog/templates/`                                    |
-| 2   | One devlog template with a nature selector                                                                                                                            | taste                                        | three files, drift between them                        |
-| 3   | Chapters `Mandate`, `Plan`, `Execution`, `Delivery`, `Closure`, numbered                                                                                              | user review 2026-09-20                       | `Requirement`, `Design`, `Outcome`                     |
-| 4   | Each stop is a dated line (`Approved:`, `Reviewed:`) the agent writes on the go                                                                                       | taste                                        | a hook; a PR review event                              |
-| 5   | Decisions table with a Basis column, rule or taste                                                                                                                    | rule: set-based design                       | prose bullets (#90)                                    |
-| 6   | § 1.7 holds three lines: Triggers, Mock-up, Options                                                                                                                   | rule: set-based design                       | a Phase 3 checklist only                               |
-| 7   | Rule trace with two verbs, sections cited by name                                                                                                                     | taste                                        | four verbs, clause identifiers                         |
-| 8   | Analysis nature: Findings replaces Plan and Execution; Closure keeps § 4.2, § 4.4                                                                                     | taste                                        | full structure for every nature                        |
-| 9   | Discussion template ends with an executive summary and outcomes                                                                                                       | rule: discussions convention; user review    | none                                                   |
-| 10  | Execution holds a terse account; a Delivery chapter holds Try it, Test report, Verdict and the Discussion where the ship decision is taken, contiguous, before stop 2 | user review 2026-09-20; chapter split: taste | try-it in Execution, verdict and gate check in Closure |
-| 11  | Verdict shape: recommendation, rationale, reservations, a rounds line                                                                                                 | user review; shape inherited                 | free-form verdict                                      |
-| 12  | Titles are the identifiers, numbers local; omitted sections renumber                                                                                                  | inherited rule (numbering-gap incident)      | fixed numbers with gaps                                |
-| 13  | Budget: Mandate + Plan about 120 lines, file about 250 at closure; cite, don't restate                                                                                | inherited rule (leanness miscalibrated)      | no budget                                              |
-| 14  | Natures `change`, `refactor`, `analysis`; header line `Agent:`                                                                                                        | taste                                        | `task` as a name; no provenance                        |
-| 15  | Stop rule "nothing runs while `Approved:` is pending" lives in `CLAUDE.md`                                                                                            | inherited rule (two gate violations)         | the line in the file alone                             |
+| #   | Decision                                                                                                                                                                             | Basis                                        | Alternative                                            |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------- | ------------------------------------------------------ |
+| 1   | Top-level `templates/`: `devlog.md`, `discussion.md`                                                                                                                                 | rule: naming, topic-first family             | `devlog/templates/`                                    |
+| 2   | One devlog template with a nature selector                                                                                                                                           | taste                                        | three files, drift between them                        |
+| 3   | Chapters `Mandate`, `Plan`, `Execution`, `Delivery`, `Closure`, numbered                                                                                                             | user review 2026-09-20                       | `Requirement`, `Design`, `Outcome`                     |
+| 4   | Each stop is a dated line (`Approved:`, `Reviewed:`) the agent writes on the go                                                                                                      | taste                                        | a hook; a PR review event                              |
+| 5   | Decisions table with a Basis column, rule or taste                                                                                                                                   | rule: set-based design                       | prose bullets (#90)                                    |
+| 6   | § 1.7 holds three lines: Triggers, Mock-up, Options                                                                                                                                  | rule: set-based design                       | a Phase 3 checklist only                               |
+| 7   | Rule trace with two verbs, sections cited by name                                                                                                                                    | taste                                        | four verbs, clause identifiers                         |
+| 8   | Analysis nature: Findings replaces Plan and Execution; Closure keeps § 4.2, § 4.4                                                                                                    | taste                                        | full structure for every nature                        |
+| 9   | Discussion template ends with an executive summary and outcomes                                                                                                                      | rule: discussions convention; user review    | none                                                   |
+| 10  | Execution holds a terse account; a Delivery chapter holds Try it, Test report, Verdict and the Discussion where the ship decision is taken, contiguous, before stop 2                | user review 2026-09-20; chapter split: taste | try-it in Execution, verdict and gate check in Closure |
+| 11  | Verdict shape: recommendation, rationale, reservations, a rounds line                                                                                                                | user review; shape inherited                 | free-form verdict                                      |
+| 12  | Titles are the identifiers, numbers local; omitted sections renumber                                                                                                                 | inherited rule (numbering-gap incident)      | fixed numbers with gaps                                |
+| 13  | Four stops, each a dated line: `Approved:` (Plan), `Tried:` (may loop back; omitted when nothing to try), `Shipped:` (test report, verdict, discussion), `Reviewed:` (Retrospective) | user review 2026-09-20                       | one approval at the Mandate (first mock-up)            |
+| 14  | Natures `change`, `refactor`, `analysis`; header line `Agent:`                                                                                                                       | taste                                        | `task` as a name; no provenance                        |
+| 15  | Stop rule "nothing runs while `Approved:` is pending" lives in `CLAUDE.md`                                                                                                           | inherited rule (two gate violations)         | the line in the file alone                             |
 
 ### 1.7 Set-based design
 
@@ -111,13 +112,13 @@ templates`.
 "devlog/NNN-short-description.md files"; Phase 2 step 3 → copy the
 template; Phase 3 → Mandate and Plan, the set-based design paragraph
 parked in `discussions/set-based-design.md`, stop 1 and the stop rule;
-Phase 4 → stops 2 (end of Delivery) and 3, the budget; a `discussions/` bullet; TODO
+Phase 4 → stops 2 to 4 (Tried, Shipped, Reviewed), the budget; a `discussions/` bullet; TODO
 item 14 done. Verify `make lint test`, `grep -n 'Requirement\|Design\b'
 CLAUDE.md` shows only intended mentions. Commit `docs: CLAUDE.md,
 devlog template, stops, set-based design in Phase 3`.
 
 **Step 3 — Execution, Delivery, Closure** (`docs:`): § 3 to § 5
-filled, stops 2 and 3, status DONE, PR ready. Commit `docs: devlog 092
+filled, stops 2 to 4, status DONE, PR ready. Commit `docs: devlog 092
 execution and closure`.
 
 One attended/unattended gate for the three steps: docs only.
@@ -144,6 +145,8 @@ Approved: pending
 
 ### 4.1 Try it
 
+Tried: pending
+
 ### 4.2 Test report
 
 ### 4.3 Verdict
@@ -162,7 +165,7 @@ Rounds: ; rework after stop 1:
 | --- | ----- | -------- |
 | 1   |       |          |
 
-Reviewed: pending
+Shipped: pending
 
 ## 5. Closure
 

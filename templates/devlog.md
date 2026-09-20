@@ -13,11 +13,17 @@ every guidance comment. Omitted sections are not left as placeholders:
 renumber, and cite a section by number and title ("§ 1.6 Design
 decisions"), the title being the stable identifier. Budget: Mandate
 and Plan about 120 lines, the whole file about 250 at closure; cite a
-convention instead of restating its rationale. Four chapters, three stops for user approval: after the
-Plan (before any execution), after the Execution (the user tries the
-work, and the discussion settles what is complemented now and what is
-postponed), and at the Retrospective (after the agent's verdict). Between the stops the agent writes and runs autonomously to
-the depth the Plan's gates allow. Task nature selects the variant:
+convention instead of restating its rationale.
+
+Five chapters, four stops for the user: after the Plan (before any
+execution); after Try it (the user tries the work and may mandate
+another execution loop; omitted when there is nothing to try); the
+ship decision, once no loop is requested and the test report is in
+(test report, verdict, discussion); and at the Retrospective. Between
+the stops the agent writes and runs autonomously to the depth the
+Plan's gates allow.
+
+Task nature selects the variant:
   change    feature or fix from an issue: all of Mandate and Plan.
   refactor  driven by an inventory and a mechanical plan: as change,
             with § 1.4 Invariants and § 2.2 Inventory mandatory.
@@ -145,8 +151,9 @@ taken on the way and its basis). Findings that become rules go to
 
 ## 4. Delivery
 
-<!-- The basis of the ship decision, read in one sitting: what the
-work looks like, what the tests say, what the agent recommends; then
+<!-- The basis of the ship decision: what the work looks like (and a
+stop to try it, which may send the work back to § 3), then, once no
+loop is requested, what the tests say, what the agent recommends, and
 the discussion in which the user decides. -->
 
 ### 4.1 Try it
@@ -154,6 +161,13 @@ the discussion in which the user decides. -->
 <!-- How the user uses, demos or sees the work: the commands to run,
 the file to open, the image to look at, the diff to read. Illustrate
 when a picture says it (an SVG, a listing, a before/after). -->
+
+<!-- Stop 2. The user tries the work. Either "another loop": the
+mandated changes are added as steps to § 2.1, executed and accounted
+in § 3.1, and § 4.1 is refreshed; or the date is written and the
+delivery proceeds. Omit the line when there is nothing to try. -->
+
+Tried: pending
 
 ### 4.2 Test report
 
@@ -182,21 +196,21 @@ Rounds: <design rounds before stop 1>; rework after stop 1: none | <what>
 
 ### 4.4 Discussion
 
-<!-- Where the results are discussed and the ship decision is taken:
-the demo, what surfaced unexpectedly, what remains an issue. One row
-per point, with the decision: complement now (a step added to § 2.1,
-then back to § 3.1 and a new § 4), postpone (a TODO item, filed on
-this branch), or accept as is. -->
+<!-- Where the ship decision is taken, once no more loops are
+requested and the test report is in: what surfaced unexpectedly, what
+remains an issue. One row per point, with the decision: postpone (a
+TODO item, filed on this branch) or accept as is; a "complement now"
+here is another loop, back to § 2.1 and § 4.1. -->
 
 | #   | Point | Decision |
 | --- | ----- | -------- |
 | 1   |       |          |
 
-<!-- Stop 2. The user has tried the work, read the test report and the
-verdict, and the discussion is settled; the agent writes the date.
+<!-- Stop 3, the ship decision. The user has read the test report and
+the verdict, and the discussion is settled; the agent writes the date.
 Then the PR is marked ready. -->
 
-Reviewed: pending
+Shipped: pending
 
 ## 5. Closure
 
@@ -209,7 +223,7 @@ the user gives theirs: well, not well, surprise, tension, don't care. -->
 | --- | ----- | ----- | ---- |
 | 1   |       |       |      |
 
-<!-- Stop 3. The user fills their column; the agent writes the date. -->
+<!-- Stop 4. The user fills their column; the agent writes the date. -->
 
 Reviewed: pending
 
