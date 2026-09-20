@@ -211,3 +211,12 @@ turned into a standard task (GH ticket, PR, devlog).
     (task start process, NR tests, release, conventions), keeping the
     root to the rules that apply everywhere. Measure the line counts
     before and after; keep the append-only rule for the root file.
+
+16. Tracing prelude without aliases
+
+    Replace the alias trick of `tools/init-tracing.sh` (its `;` makes
+    `a || echo msg` print unconditionally; bit #88 in `$(...)` and #90
+    in `||` fallbacks, CI run 35513228401) by a DEBUG trap that turns
+    tracing off before a helper runs: plain functions, usable anywhere
+    a command is. Candidate prelude, trials and migration steps in
+    `discussions/tracing-prelude-debug-trap.md` (from #90).

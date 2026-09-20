@@ -347,3 +347,6 @@ Findings:
   and a Docker-with-root context this project never had. The recipe is
   gone; `clean` is three one-line commands in the Makefile, within the
   recipe rule. Six recipes remain.
+- The alias limitation has a real fix, a DEBUG trap turning tracing
+  off before a helper runs (plain functions, no `;`): trialed, kept for
+  its own task, `discussions/tracing-prelude-debug-trap.md`, TODO item 16.
