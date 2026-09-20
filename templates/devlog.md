@@ -15,8 +15,8 @@ decisions"), the title being the stable identifier. Budget: Mandate
 and Plan about 120 lines, the whole file about 250 at closure; cite a
 convention instead of restating its rationale. Four chapters, three stops for user approval: after the
 Plan (before any execution), after the Execution (the user tries the
-work or sees the demo), and at the Retrospective (after the agent's
-verdict). Between the stops the agent writes and runs autonomously to
+work, and the discussion settles what is complemented now and what is
+postponed), and at the Retrospective (after the agent's verdict). Between the stops the agent writes and runs autonomously to
 the depth the Plan's gates allow. Task nature selects the variant:
   change    feature or fix from an issue: all of Mandate and Plan.
   refactor  driven by an inventory and a mechanical plan: as change,
@@ -149,7 +149,20 @@ taken on the way and its basis). Findings that become rules go to
 the file to open, the image to look at, the diff to read. Illustrate
 when a picture says it (an SVG, a listing, a before/after). -->
 
-<!-- Stop 2. The user tries the work; the agent writes the date. -->
+### 3.3 Discussion
+
+<!-- The place to discuss the results before anything is judged: the
+demo, what surfaced unexpectedly, what remains an issue. One row per
+point, with the decision: complement now (a step added to § 2.1, then
+back to § 3.1), postpone (a TODO item, filed on this branch), or
+accept as is. -->
+
+| #   | Point | Decision |
+| --- | ----- | -------- |
+| 1   |       |          |
+
+<!-- Stop 2. The user tries the work and the discussion is settled;
+the agent writes the date. -->
 
 Reviewed: pending
 
