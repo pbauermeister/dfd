@@ -188,7 +188,8 @@ of any length pass.
 
 ## Tooling scripts
 
-Scripts in `tools/` and `tests/` are written in Python or bash. Choose
+Scripts in `runbooks/`, `tools/` and `tests/` are written in Python or
+bash. Choose
 by what the script mostly does:
 
 - **Python** when there is string manipulation, non-trivial argument or
@@ -210,18 +211,29 @@ the script. A consistency check takes its expected values as arguments
 on a discrepancy without resolving it.
 
 **Script levels.** Git's porcelain and plumbing is the model. Makefile
-targets are the entry points. Orchestrators (`tools/release.sh`,
-`tools/publish-to-*.sh`) are runbooks in code: named steps, one command
-each, guards only, no loops or computation. Tools
-(`tools/conventional-commits.py`, `tools/wait-for.sh`) do one concern
-with verb-first subcommands and explicit arguments, so that every call
-site is self-explanatory; one tool per noun, subcommands for the verbs
-sharing its data; a single-action tool is named verb first
-(`print-release-plan.py`, `test-installation.sh from-wheel`). Preludes
-(`init-tracing.sh`) hold sourced mechanics only. Logic that appears in
-an orchestrator moves down into a tool. Intent (TODO item 11): the
-orchestrators move to `runbooks/` and the tools stay in `tools/`, so
-that the level is an address.
+targets are the entry points. Runbooks (`runbooks/`: `release.sh`,
+`publish-to-*.sh`, `build.sh`, `lint.sh`, `clean.sh`, `make-doc.sh`)
+are orchestrators: named steps, one command each, guards only, no loops
+or computation; `doc/RELEASING.md` is the prose twin of
+`runbooks/release.sh`. Tools (`tools/`) do one concern with explicit
+arguments, so that every call site is self-explanatory. The prelude
+(`tools/init-tracing.sh`) holds sourced mechanics only. Logic that
+appears in a runbook moves down into a tool. The folder is the level's
+address.
+
+**Naming.** A single action is verb-first, read as a command
+(`tools/print-release-plan.py`, `tools/test-installation.sh from-wheel`,
+`make smoke-test-wheel`). A family of two or more is topic-first, so
+that listings and completion group it (`nr-test`, `require-system`,
+`tools/doc-update-sections.py`). A Python family sharing its data is
+one program, a noun with verb-first subcommands (`changelog.py
+print-notes`, `conventional-commits.py gate-pr-against-main`).
+Object-first with no family behind it is the case to avoid.
+
+**Calling directory.** Every script is called from the project's home,
+the repository root: paths inside scripts are relative to it, the
+prelude is sourced as `. ./tools/init-tracing.sh`, and the Makefile is
+the normal caller. A script never `cd`s to find itself.
 
 ## Terminology
 
