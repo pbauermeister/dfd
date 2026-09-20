@@ -156,9 +156,27 @@ Approved: 2026-09-20
 
 ### 3.1 Account
 
+- Step 1: no diff. The templates were finalized during the design
+  review (six revisions before stop 1: structure note, fresh-eyes
+  review, terminology, set-based flow); the mock-up devlog was
+  re-aligned at each. Empty commit skipped.
+- Step 2: as planned. `CLAUDE.md` 265 → 311 lines (+46): the Phase 3
+  set-based paragraph and the four stops are the bulk; TODO item 15's
+  concern, noted for § 4.4. `devlog/img/` not created: on first use.
+- Step 3: in progress; stop 2 taken on this devlog itself.
+
 ## 4. Delivery
 
 ### 4.1 Try it
+
+- Read `templates/devlog.md` as the file a scaffolding copy would
+  start from; then this devlog as its filled instance.
+- Read the `CLAUDE.md` diff of step 2: `git diff main -- CLAUDE.md`
+  (Phase 2 step 3, Phase 3, Phase 4, the two sections after the
+  DEVLOG.md one).
+- Dry run of the process: pick any open TODO item and, mentally,
+  check that each stop has a place and each template section an
+  answer.
 
 Tried: pending
 
