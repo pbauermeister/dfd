@@ -10,7 +10,7 @@ Agent: <model name and version>
 Devlog template (see CLAUDE.md "devlog/NNN-short-description.md files").
 Copy, fill, delete the optional sections that do not apply and every
 guidance comment. An omitted section leaves no placeholder: renumber,
-and cite a section by number and title ("§ 1.6 Design decisions"),
+and cite a section by number and title ("§ 1.8 Design decisions"),
 the title being the stable identifier. Budget: Mandate and Plan about
 120 lines, the whole file about 250 at closure; cite a convention
 instead of restating its rationale. Status follows CLAUDE.md: PENDING
@@ -21,9 +21,11 @@ fills on the user's go, never before: Approved (after the Plan, before
 any execution), Tried (after Try it; the user may mandate a loop),
 Shipped (the ship decision, once no loop is requested and the test
 report is in), Closed (after the Retrospective). A loop adds steps to
-§ 2.1, is accounted in § 3.1 and refreshes § 4.1. Between the stops
-the agent writes and runs autonomously, to the depth the step gates
-(attended or unattended, CLAUDE.md Phase 4) allow.
+§ 2.1, is accounted in § 3.1 and refreshes § 4.1. The Mandate is presented once,
+with the mock-up built and the spikes run, so that stop 1 is one
+round. Between the stops the agent writes and runs autonomously, to
+the depth the step gates (attended or unattended, CLAUDE.md Phase 4)
+allow.
 
 Task nature selects the variant:
   change    feature or fix from an issue: all of Mandate and Plan.
@@ -62,51 +64,66 @@ for refactor, optional otherwise. -->
 
 ### 1.5 Taste
 
-<!-- Preferences of the user that are not rules yet: stated before
-they are discovered by contradiction. Optional. -->
+<!-- Preferences of the user that are not rules yet, stated before
+they are discovered by contradiction: what the user says at the
+mandate review, and what the agent recalls from past decisions, marked
+"recalled". Optional. -->
 
-### 1.6 Design decisions
+### 1.6 Set-based design
 
-<!-- One row per decision. Basis is "rule: <name>" when a convention
-decides it, "taste" when the user's preference does. The user reads
-the taste rows; the agent checks each rule row against the convention
-it cites. Alternatives here are considered, not built; built ones are
-the options of § 1.7. -->
+<!-- Done before the decisions are written, so that they are read off
+an artifact and not off prose. Triggers: a new container name; an
+inventory classifying existing items; a thing that could live in two
+places; an intent inherited from a prior task; ambition vocabulary;
+one conceptual row among mechanical churn. Any of them: build the
+mock-up of the supposed design in a throwaway worktree and paste here
+the smallest slice that decides (a listing, the entry-point file as it
+would read, one sample). If the mock-up leaves a design question open:
+name it, build two or three options in their own worktrees, one row
+each below, and recommend one; the Plan is written for the
+recommended option and redone if the user picks another at stop 1.
+The reason the user gives is the rule: written here, promoted to the
+convention by the step that ships it, traced in § 5.3. These lines
+stay even when all say "none": the skip is a decision. Before stop 1
+the agent re-reads the Mandate as a reviewer: does each name describe
+the files, which direction does each call go, which existing file
+violates the new rule. -->
+
+Triggers: none
+Mock-up: no, because
+Design question: none
+Options: none, because
+
+| Option | What differs | For | Against |
+| ------ | ------------ | --- | ------- |
+|        |              |     |         |
+
+### 1.7 Spikes
+
+<!-- A decision that depends on a tool's behavior, a layout engine or
+data is decided by a measured trial, not a mock-up: what is run, in a
+throwaway clone under the job scratch directory, and what number
+decides. Omit when every decision reads off the artifact. -->
+
+### 1.8 Design decisions
+
+<!-- One row per decision, read off the mock-up and the spikes. Basis
+is "rule: <name>" when a convention decides it, "taste" when the
+user's preference does, "option <n>" when § 1.6 decided it. The user
+reads the taste rows; the agent checks each rule row against the
+convention it cites. -->
 
 | #   | Decision | Basis | Alternatives considered |
 | --- | -------- | ----- | ----------------------- |
 | 1   |          |       |                         |
 
-### 1.7 Set-based design
-
-<!-- Triggers present (new container name; inventory classifying
-existing items; a thing that could live in two places; an intent
-inherited from a prior task; ambition vocabulary; one conceptual row
-among mechanical churn; a decision depending on a tool, a layout or
-data)? Then: Mock-up: yes, <where>, or no, because. Options: none,
-because, or the design question and the two or three options, each in
-a throwaway worktree. The user picks one at stop 1 and the reason goes
-to § 5.3 as a created rule. These three lines stay even when all say
-"none": the skip is a decision. -->
-
-Triggers: none
-Mock-up: no, because
-Options: none, because
-
-### 1.8 Acceptance criteria
+### 1.9 Acceptance criteria
 
 <!-- Numbered, each checkable by a command or a diff; ticked in
 § 4.2. Include the standing ones: make format lint test pass; NR
 fixtures and mutation smoke-test when fixtures change. -->
 
 1.
-
-### 1.9 Spikes
-
-<!-- Measured trials that a decision depends on (a tool's behavior, a
-layout, data): what is run, in a throwaway clone under the job scratch
-directory, and what number decides. Omit when every decision is
-decided by how the artifact reads. -->
 
 ## 2. Plan
 
@@ -178,7 +195,7 @@ Tried: pending
 
 ### 4.2 Test report
 
-<!-- The acceptance criteria of § 1.8, ticked, with the command output
+<!-- The acceptance criteria of § 1.9, ticked, with the command output
 that proves each; make format lint test; CI status of the PR; a test
 that caught a real error during the task, if any. -->
 

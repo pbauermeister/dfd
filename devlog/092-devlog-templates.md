@@ -17,7 +17,7 @@ near-universal, `Outcome` in a third, the rest one-off names. #88 and
 saved the `runbooks/` rework. Rules inherited from a formal devlog
 practice elsewhere (titles as identifiers, line budget, verdict shape,
 stop rule) come from its recorded incidents. This devlog is the first
-instance of the template: the mock-up of § 1.7.
+instance of the template: the mock-up of § 1.6.
 
 ### 1.2 Goal
 
@@ -53,37 +53,56 @@ the set-based design step of Phase 3. TODO item 14 is done.
   section reading "none" on most tasks is optional.
 - Sections cited by number and title; terse.
 
-### 1.6 Design decisions
-
-| #   | Decision                                                                                                                                                                      | Basis                                        | Alternative                                            |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------ |
-| 1   | Top-level `templates/`: `devlog.md`, `discussion.md`                                                                                                                          | rule: naming, topic-first family             | `devlog/templates/`                                    |
-| 2   | One devlog template with a nature selector                                                                                                                                    | taste                                        | three files, drift between them                        |
-| 3   | Chapters `Mandate`, `Plan`, `Execution`, `Delivery`, `Closure`, numbered                                                                                                      | user review 2026-09-20                       | `Requirement`, `Design`, `Outcome`                     |
-| 4   | Each stop is a dated line (`Approved:`, `Reviewed:`) the agent writes on the go                                                                                               | taste                                        | a hook; a PR review event                              |
-| 5   | Decisions table with a Basis column, rule or taste                                                                                                                            | rule: set-based design                       | prose bullets (#90)                                    |
-| 6   | § 1.7 holds three lines: Triggers, Mock-up, Options                                                                                                                           | rule: set-based design                       | a Phase 3 checklist only                               |
-| 7   | Rule trace with two verbs, sections cited by name                                                                                                                             | taste                                        | four verbs, clause identifiers                         |
-| 8   | Analysis nature: Findings replaces Plan and Execution; Closure keeps § 4.2, § 4.4                                                                                             | taste                                        | full structure for every nature                        |
-| 9   | Discussion template ends with an executive summary and outcomes                                                                                                               | rule: discussions convention; user review    | none                                                   |
-| 10  | Execution holds a terse account; a Delivery chapter holds Try it, Test report, Verdict and the Discussion where the ship decision is taken, contiguous, before stop 2         | user review 2026-09-20; chapter split: taste | try-it in Execution, verdict and gate check in Closure |
-| 11  | Verdict shape: recommendation, rationale, reservations; the process measures (rounds, loops, rework) as a line of the Retrospective                                           | user review; shape inherited                 | free-form verdict; measures inside the verdict         |
-| 12  | Titles are the identifiers, numbers local; omitted sections renumber                                                                                                          | inherited rule (numbering-gap incident)      | fixed numbers with gaps                                |
-| 13  | Four stops, each a dated line: `Approved:` (Plan), `Tried:` (may loop; omitted when nothing to try), `Shipped:` (test report, verdict, discussion), `Closed:` (Retrospective) | user review 2026-09-20                       | one approval at the Mandate (first mock-up)            |
-| 14  | Natures `change`, `refactor`, `analysis`; header line `Agent:`                                                                                                                | taste                                        | `task` as a name; no provenance                        |
-| 15  | Stop rule "nothing runs while `Approved:` is pending" lives in `CLAUDE.md`                                                                                                    | inherited rule (two gate violations)         | the line in the file alone                             |
-
-### 1.7 Set-based design
+### 1.6 Set-based design
 
 Triggers: new container name (`templates/`); a rule classifying
 existing items (natures); a thing that could live in two places.
 Mock-up: yes, on this branch (docs task, the branch is the throwaway):
-the templates plus this devlog.
-Options: none, because both design questions (where; one file or
-three) read off the mock-up and are rows 1–2; the design review may
-still ask for the three-file option materialized.
+`templates/devlog.md`, and this devlog as its first instance. The
+slice that decides, the outline of the template:
 
-### 1.8 Acceptance criteria
+```
+1. Mandate    Context, Goal, Non-goals, Invariants, Taste,
+              Set-based design, Spikes, Design decisions,
+              Acceptance criteria
+2. Plan       Steps, Inventory, Scope boundary        Approved:
+3. Execution  Account
+4. Delivery   Try it  Tried:   Test report, Verdict, Discussion
+                                                      Shipped:
+5. Closure    Retrospective  Closed:   Forward-looking, Rule trace
+```
+
+Design question: none open after the mock-up; the two the triggers
+named (where the files live; one template or three) read off it and
+are decision rows 1–2.
+Options: none, because both questions are decided by reading; the
+user may still ask for the three-file option materialized.
+
+### 1.7 Spikes
+
+None: every decision reads off the artifact.
+
+### 1.8 Design decisions
+
+| #   | Decision                                                                                                                                                                      | Basis                                        | Alternative                                                          |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------- |
+| 1   | Top-level `templates/`: `devlog.md`, `discussion.md`                                                                                                                          | rule: naming, topic-first family             | `devlog/templates/`                                                  |
+| 2   | One devlog template with a nature selector                                                                                                                                    | taste                                        | three files, drift between them                                      |
+| 3   | Chapters `Mandate`, `Plan`, `Execution`, `Delivery`, `Closure`, numbered                                                                                                      | user review 2026-09-20                       | `Requirement`, `Design`, `Outcome`                                   |
+| 4   | Each stop is a dated line (`Approved:`, `Reviewed:`) the agent writes on the go                                                                                               | taste                                        | a hook; a PR review event                                            |
+| 5   | Decisions table with a Basis column, rule or taste                                                                                                                            | rule: set-based design                       | prose bullets (#90)                                                  |
+| 6   | § 1.6 Set-based design precedes the decisions: triggers, mock-up slice pasted, design question, options table; decisions are read off it                                      | rule: set-based design                       | a Phase 3 checklist only; decisions before the mock-up (first draft) |
+| 7   | Rule trace with two verbs, sections cited by name                                                                                                                             | taste                                        | four verbs, clause identifiers                                       |
+| 8   | Analysis nature: Findings replaces Plan and Execution; Closure keeps § 4.2, § 4.4                                                                                             | taste                                        | full structure for every nature                                      |
+| 9   | Discussion template ends with an executive summary and outcomes                                                                                                               | rule: discussions convention; user review    | none                                                                 |
+| 10  | Execution holds a terse account; a Delivery chapter holds Try it, Test report, Verdict and the Discussion where the ship decision is taken, contiguous, before stop 2         | user review 2026-09-20; chapter split: taste | try-it in Execution, verdict and gate check in Closure               |
+| 11  | Verdict shape: recommendation, rationale, reservations; the process measures (rounds, loops, rework) as a line of the Retrospective                                           | user review; shape inherited                 | free-form verdict; measures inside the verdict                       |
+| 12  | Titles are the identifiers, numbers local; omitted sections renumber                                                                                                          | inherited rule (numbering-gap incident)      | fixed numbers with gaps                                              |
+| 13  | Four stops, each a dated line: `Approved:` (Plan), `Tried:` (may loop; omitted when nothing to try), `Shipped:` (test report, verdict, discussion), `Closed:` (Retrospective) | user review 2026-09-20                       | one approval at the Mandate (first mock-up)                          |
+| 14  | Natures `change`, `refactor`, `analysis`; header line `Agent:`                                                                                                                | taste                                        | `task` as a name; no provenance                                      |
+| 15  | Stop rule "nothing runs while `Approved:` is pending" lives in `CLAUDE.md`                                                                                                    | inherited rule (two gate violations)         | the line in the file alone                                           |
+
+### 1.9 Acceptance criteria
 
 1. Both templates exist, prettier-clean.
 2. This devlog follows `templates/devlog.md` section by section, no
@@ -94,10 +113,6 @@ still ask for the three-file option materialized.
    names stops 2 and 3; one bullet on `discussions/`.
 4. `make lint test` pass.
 5. TODO item 14 `— DONE (#92)`.
-
-### 1.9 Spikes
-
-None: every decision reads off the artifact.
 
 ## 2. Plan
 
