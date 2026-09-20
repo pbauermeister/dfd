@@ -80,7 +80,7 @@ turned into a standard task (GH ticket, PR, devlog).
    It replaces `<!-- AUTO:* -->` sections of Markdown files with awk/sed
    and generates the CLI help and doc TOC: string manipulation and
    Markdown section handling, which the "Tooling scripts" convention
-   (`doc/CONVENTIONS.md`) assigns to Python. Keep the same sections,
+   (`doc/CONVENTIONS.md`) astriggers to Python. Keep the same sections,
    markers and prettier pass; `tests/test_doc_sync.py` guards the
    output. Rewrite when it next needs to grow, not before.
 
@@ -200,6 +200,35 @@ turned into a standard task (GH ticket, PR, devlog).
     `discussions/`; summary or report, as in #55). Codify in
     `CLAUDE.md` "devlog/NNN-short-description.md files" and provide
     the templates as files the scaffolding phase copies.
+
+    Conclusions of `discussions/set-based-design.md` (2026-09-20):
+    import the skeleton of a formal devlog, not its weight. Mandate:
+    context, task nature (the variant selector), goal, non-goals,
+    invariants, taste, design decisions each marked rule-derived or
+    taste, acceptance criteria (definition of done), spikes to run.
+    Plan: steps, inventory, scope boundary. Closure: deviations, gate
+    check ticking the criteria, retrospective (agent / user columns),
+    forward-looking check, rule trace with two verbs (applied,
+    created). The mandate is approved in one round before step 1.
+    Sized per task nature; the checklist is filled by the agent, the
+    human reads one decision table. Invariants and spikes are the two
+    slots #90 lacked most.
+    Adopted 2026-09-20: *set-based design*, gated in Phase 3 (engage
+    when a wrong major direction would cost a rework; else "Options:
+    none, because ..."): the design question, two or three options in
+    throwaway worktrees, the smallest visible slice, one design review,
+    the reason recorded as a rule (design rationale). The Design
+    template carries the slot. The `CLAUDE.md` Phase 3 paragraph for the
+    gate is drafted at the end of `discussions/set-based-design.md`; add
+    it with the templates, not before.
+    Two stages (2026-09-20): a *mock-up* of the supposed design (folder
+    listing, Makefile as it would read, one sample file, in a throwaway
+    worktree) is the cheap default whenever the requirement shows one of
+    the triggers (new container name, inventory classifying existing
+    items, a thing that could live in two places, an intent inherited
+    from a prior task, ambition vocabulary, one conceptual row among
+    mechanical churn); options are the escalation when the mock-up
+    raises a design question. Trigger list in the discussion file.
 
 15. Offload `CLAUDE.md`
 
