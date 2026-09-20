@@ -2,6 +2,10 @@
 # commands, and echo/banner/banner2/step helpers that print without the
 # trace noise (https://superuser.com/a/1141026). Source it from the
 # repository root: `. ./tools/init-tracing.sh`.
+#
+# The helpers are aliases carrying a `;`: never use them as an operand of
+# `&&` or `||`, nor inside `$(...)`; there, use printf (the fallback would
+# run unconditionally, and `set -u` then fails on save_flags).
 set +x -e -u -o pipefail
 
 shopt -s expand_aliases 2>/dev/null || true  # for bash

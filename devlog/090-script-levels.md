@@ -336,3 +336,10 @@ Findings:
   the ambition, the rule now describes the files. Two upward calls
   (`build.sh` → make, `publish-to-pypi.sh` → the TestPyPI script) became
   prerequisites.
+- CI caught what the local trials could not: `make require-system` is
+  run by the test jobs, never by `make build`, and its OS `case` used
+  `echo` as the `||` fallback. In a recipe sourcing the prelude, `echo`
+  is an alias carrying a `;`, so the fallback ran unconditionally and
+  `set -u` failed on `save_flags` (the #88 limitation, seen then inside
+  `$(...)`). Fixed with `printf`; the prelude header now states the
+  rule; both branches trialed with fake `apt`/`sudo` on the PATH.
