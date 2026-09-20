@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Print the `style` options table of doc/README.md or doc/SYNTAX.md.
 
-Usage: gen-style-tables.py readme|syntax
+Usage: doc-print-style-table.py readme|syntax
 
 The tables are derived from data_flow_diagram.model.STYLE_SPECS, so the
 GraphOptions declarations stay the single source of truth. Output is padded

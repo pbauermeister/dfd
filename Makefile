@@ -97,10 +97,10 @@ uninstall: ## remove the user-wide uv tool install
 ################################################################################
 # Release:: ##
 
-readme: ## regenerate auto-updatable sections of README.md and doc/*.md
-	VENV=$(VENV) uv run ./tools/update-docs.py
+doc-sections: ## regenerate auto-updatable sections of README.md and doc/*.md
+	VENV=$(VENV) uv run ./tools/doc-update-sections.py
 
-doc: readme ## remake doc
+doc: doc-sections ## remake doc
 	uv run ./runbooks/make-doc.sh
 
 smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
