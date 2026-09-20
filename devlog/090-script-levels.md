@@ -1,7 +1,7 @@
 # 090 — Script levels: naming rule, `runbooks/` and `tools/`
 
 Date: 2026-09-19
-Status: PENDING
+Status: ONGOING
 
 ## Requirement
 
