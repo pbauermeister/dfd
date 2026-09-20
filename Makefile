@@ -120,5 +120,7 @@ publish-to-gh: ## fallback: GitHub Release from dist/ (after publish-to-pypi)
 
 ################################################################################
 # Cleanup:: ##
-clean: ## clean
-	./recipes/clean.sh
+clean: ## remove build artifacts, caches and generated NR SVGs
+	rm -rf build/ dist/ src/*.egg-info/
+	find . -name __pycache__ -exec rm -rf {} +
+	find tests/non-regression -name '*.svg' -delete

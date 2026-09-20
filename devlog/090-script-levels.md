@@ -343,3 +343,7 @@ Findings:
   `set -u` failed on `save_flags` (the #88 limitation, seen then inside
   `$(...)`). Fixed with `printf`; the prelude header now states the
   rule; both branches trialed with fake `apt`/`sudo` on the PATH.
+- Review (Pascal): the sudo fallback of `clean.sh` dates from 51baf71
+  and a Docker-with-root context this project never had. The recipe is
+  gone; `clean` is three one-line commands in the Makefile, within the
+  recipe rule. Six recipes remain.
