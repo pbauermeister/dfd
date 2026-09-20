@@ -23,3 +23,13 @@ DONE when it is a closed record.
 measured, requirements, sequence. For a recorded exchange: one
 "## Follow-up: ..." heading per question, each with its **Prompt:**
 line and the answer. -->
+
+## Executive summary
+
+<!-- Five lines at most: the question, the answer, the numbers that
+decided it. Written last, placed last. -->
+
+## Outcomes and measures
+
+<!-- What follows from it: TODO items filed, rules to add, a task to
+open, or "none". -->

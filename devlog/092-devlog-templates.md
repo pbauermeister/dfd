@@ -7,8 +7,6 @@ Task nature: task
 
 ## 1. Mandate
 
-Approved: pending
-
 ### 1.1 Context
 
 TODO item 14, with the conclusions of
@@ -31,7 +29,8 @@ approved in one round before step 1, a Plan and a Closure, with the
 sections the discussion concluded on (context, goal, non-goals,
 invariants, taste, decisions marked rule or taste, set-based design
 gate, acceptance criteria, spikes; steps, inventory, scope boundary;
-deviations, gate check, retrospective, forward-looking, rule trace),
+account, try it; gate check, verdict, retrospective, forward-looking,
+rule trace),
 sized by a task nature selector (task, refactor, analysis).
 `CLAUDE.md` codifies the template, the approval gate and the set-based
 design step of Phase 3. TODO item 14 is done.
@@ -102,10 +101,11 @@ materialized.
 2. This devlog follows `templates/devlog.md` section by section, with
    no guidance comment left.
 3. `CLAUDE.md`: the section "devlog/NNN-short-description.md files"
-   describes the template, the task natures and the approval line;
-   Phase 2 step 3 says "copy `templates/devlog.md`"; Phase 3 carries
-   the set-based design paragraph drafted in the discussion file; the
-   `discussions/` folder is described in one bullet.
+   describes the template, the task natures, the four chapters and
+   the three stops; Phase 2 step 3 says "copy `templates/devlog.md`";
+   Phase 3 carries the set-based design paragraph drafted in the
+   discussion file and ends at stop 1; Phase 4 names stops 2 and 3;
+   the `discussions/` folder is described in one bullet.
 4. `make lint test` pass (nothing under test changes; the run proves
    nothing broke by accident).
 5. TODO item 14 struck through, `— DONE (#92)`.
@@ -140,8 +140,10 @@ Files: `CLAUDE.md`, `TODO.md`.
 3. Phase 3: replace "recorded in the devlog's **Requirement** section"
    and "**Design** section" by the Mandate and Plan sections; append
    the set-based design paragraph from the end of
-   `discussions/set-based-design.md`; add "the user approves the
-   Mandate: the agent writes the date in `Approved:`".
+   `discussions/set-based-design.md`; end with stop 1 ("the user
+   approves Mandate and Plan: the agent writes the date in
+   `Approved:`"). Phase 4: add stops 2 (after execution, § 3.2 Try
+   it) and 3 (at the Retrospective, after the agent's verdict).
 4. Add a bullet on `discussions/` after the devlog section.
 5. TODO item 14 to DONE.
 6. Verify: `make lint test`; `grep -n 'Requirement\|Design\b' CLAUDE.md`
@@ -149,12 +151,12 @@ Files: `CLAUDE.md`, `TODO.md`.
 7. Commit: `docs: CLAUDE.md, devlog template, approval gate, set-based
 design in Phase 3`.
 
-**Step 3 — Closure** (`docs:`)
+**Step 3 — Execution and Closure** (`docs:`)
 
 Files: this devlog.
 
-1. § 3 filled; status DONE; PR ready.
-2. Commit: `docs: devlog 092 closure`.
+1. § 3 and § 4 filled, stops 2 and 3 taken; status DONE; PR ready.
+2. Commit: `docs: devlog 092 execution and closure`.
 
 Steps 1–3 share one attended/unattended gate: docs only, reversible.
 
@@ -173,23 +175,38 @@ Steps 1–3 share one attended/unattended gate: docs only, reversible.
 - Existing devlogs and discussions keep their structure.
 - `CLAUDE.md` outside the named sections is untouched; its length is
   TODO item 15's concern.
-- The Phase 4 step gate ("attended or unattended") is unchanged.
+- The Phase 4 step gate ("attended or unattended") is unchanged;
+  stops 2 and 3 are added to it, not in place of it.
 
-## 3. Closure
+Approved: pending
 
-### 3.1 Deviations
+## 3. Execution
 
-### 3.2 Gate check
+### 3.1 Account
 
-### 3.3 Retrospective
+### 3.2 Try it
+
+Reviewed: pending
+
+## 4. Closure
+
+### 4.1 Gate check
+
+### 4.2 Verdict
+
+Recommendation: pending
+
+### 4.3 Retrospective
 
 | #   | Point | Agent | User |
 | --- | ----- | ----- | ---- |
 | 1   |       |       |      |
 
-### 3.4 Forward-looking
+Reviewed: pending
 
-### 3.5 Rule trace
+### 4.4 Forward-looking
+
+### 4.5 Rule trace
 
 | Source | Rule | Verb (applied / created) |
 | ------ | ---- | ------------------------ |

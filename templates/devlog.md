@@ -9,20 +9,23 @@ Task nature: task | refactor | analysis
 Devlog template (see CLAUDE.md "devlog/NNN-short-description.md files").
 Copy, fill, delete the sections marked optional that do not apply and
 every guidance comment. Section numbers stay stable so that reviews can
-cite "§ 1.7". Task nature selects the variant:
+cite "§ 1.7". Four chapters, three stops for user approval: after the
+Plan (before any execution), after the Execution (the user tries the
+work or sees the demo), and at the Retrospective (after the agent's
+verdict). Between the stops the agent writes and runs autonomously to
+the depth the Plan's gates allow. Task nature selects the variant:
   task      feature or fix from an issue: all of Mandate and Plan.
   refactor  driven by an inventory and a mechanical plan: as task, with
             § 1.5 Invariants and § 2.2 Inventory mandatory.
   analysis  study, survey or report: § 1.1–1.4, § 1.9, then a Findings
-            section replaces Plan; Closure keeps § 3.4 only.
+            chapter replaces Plan and Execution; Closure keeps § 4.2
+            and § 4.4.
 -->
 
 ## 1. Mandate
 
-<!-- Approved by the user before step 1 runs; the approval is recorded
-in the line below. Everything the user must read to decide is here. -->
-
-Approved: pending
+<!-- Everything the user must read to approve the work, before any of
+it runs. Approved together with the Plan, at the end of § 2. -->
 
 ### 1.1 Context
 
@@ -69,7 +72,7 @@ among mechanical churn; a decision depending on a tool, a layout or
 data)? Then: Mock-up: yes, <where>, or no, because. Options: none,
 because, or the design question and the two or three options, each in
 a throwaway worktree. The design review picks one and the reason goes
-to § 3.5 as a created rule. -->
+to § 4.5 as a created rule. -->
 
 Triggers: none
 Mock-up: no, because
@@ -78,7 +81,7 @@ Options: none, because
 ### 1.8 Acceptance criteria
 
 <!-- Numbered, each checkable by a command or a diff; ticked in
-§ 3.2. Include the standing ones: make format lint test pass; NR
+§ 4.1. Include the standing ones: make format lint test pass; NR
 fixtures and mutation smoke-test when fixtures change. -->
 
 1.
@@ -122,33 +125,66 @@ cited so that the sweep at each step can repeat it. -->
 <!-- What this branch does not touch even if friction appears, and
 where each such item goes (a TODO item on this branch). -->
 
-## 3. Closure
+<!-- Stop 1. The user approves Mandate and Plan; the agent writes the
+date. Nothing runs before. -->
 
-### 3.1 Deviations
+Approved: pending
 
-<!-- What was done differently from the plan and why. "None" is a
-valid entry. -->
+## 3. Execution
 
-### 3.2 Gate check
+### 3.1 Account
+
+<!-- Terse. Per step: "as planned", or the notable and unexpected
+things (a sweep that caught a miss, a trial that failed, a decision
+taken on the way and its basis). Findings that become rules go to
+§ 4.5. -->
+
+### 3.2 Try it
+
+<!-- How the user uses, demos or sees the work: the commands to run,
+the file to open, the image to look at, the diff to read. Illustrate
+when a picture says it (an SVG, a listing, a before/after). -->
+
+<!-- Stop 2. The user tries the work; the agent writes the date. -->
+
+Reviewed: pending
+
+## 4. Closure
+
+### 4.1 Gate check
 
 <!-- The acceptance criteria of § 1.8, ticked, with the command output
 that proves each; CI status of the PR. -->
 
-### 3.3 Retrospective
+### 4.2 Verdict
 
-<!-- One row per point worth remembering; the agent and the user each
-give a verdict: well, not well, surprise, tension, don't care. -->
+<!-- The agent's recommendation on its own delivery: accept, accept
+with reservations, or reject, with the reasons and the reservations
+named. Written before the user reads § 4.3; it is the valve against
+overclaiming: a criterion not proven is a reservation, not a tick. -->
+
+Recommendation: accept | accept with reservations | reject
+
+### 4.3 Retrospective
+
+<!-- One row per point worth remembering; the agent gives its verdict,
+the user gives theirs: well, not well, surprise, tension, don't care. -->
 
 | #   | Point | Agent | User |
 | --- | ----- | ----- | ---- |
 | 1   |       |       |      |
 
-### 3.4 Forward-looking
+<!-- Stop 3. The user fills their column and settles the verdict; the
+agent writes the date. Then the PR is marked ready. -->
+
+Reviewed: pending
+
+### 4.4 Forward-looking
 
 <!-- Follow-ups filed (TODO items, issues, discussions), and what the
 next tasks can now rely on. -->
 
-### 3.5 Rule trace
+### 4.5 Rule trace
 
 <!-- Conventions applied (cite the section) and conventions created
 by this task (the sentence added, and where). Two verbs only. -->
