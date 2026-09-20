@@ -1,7 +1,7 @@
 # 092 — Devlog templates per task kind, set-based design gate
 
 Date: 2026-09-20
-Status: PENDING
+Status: ONGOING
 Issue: #92 · PR: #93 · Branch: `doc/92-devlog-templates`
 Task nature: change
 Agent: Claude Fable 5.1
@@ -150,7 +150,7 @@ Existing devlogs and discussions untouched; `CLAUDE.md` outside the
 named places untouched (length: TODO item 15); the Phase 4 step gate
 kept, stops added to it.
 
-Approved: pending
+Approved: 2026-09-20
 
 ## 3. Execution
 
