@@ -3,20 +3,24 @@
 Date: YYYY-MM-DD
 Status: PENDING
 Issue: #NNN · PR: #PPP · Branch: `<prefix>/NNN-short-description`
-Task nature: task | refactor | analysis
+Task nature: change | refactor | analysis
+Agent: <model name and version>
 
 <!--
 Devlog template (see CLAUDE.md "devlog/NNN-short-description.md files").
 Copy, fill, delete the sections marked optional that do not apply and
-every guidance comment. Section numbers stay stable so that reviews can
-cite "§ 1.7". Four chapters, three stops for user approval: after the
+every guidance comment. Omitted sections are not left as placeholders:
+renumber, and cite a section by number and title ("§ 1.6 Design
+decisions"), the title being the stable identifier. Budget: Mandate
+and Plan about 120 lines, the whole file about 250 at closure; cite a
+convention instead of restating its rationale. Four chapters, three stops for user approval: after the
 Plan (before any execution), after the Execution (the user tries the
 work or sees the demo), and at the Retrospective (after the agent's
 verdict). Between the stops the agent writes and runs autonomously to
 the depth the Plan's gates allow. Task nature selects the variant:
-  task      feature or fix from an issue: all of Mandate and Plan.
-  refactor  driven by an inventory and a mechanical plan: as task, with
-            § 1.5 Invariants and § 2.2 Inventory mandatory.
+  change    feature or fix from an issue: all of Mandate and Plan.
+  refactor  driven by an inventory and a mechanical plan: as change,
+            with § 1.4 Invariants and § 2.2 Inventory mandatory.
   analysis  study, survey or report: § 1.1–1.4, § 1.9, then a Findings
             chapter replaces Plan and Execution; Closure keeps § 4.2
             and § 4.4.
@@ -158,12 +162,22 @@ that proves each; CI status of the PR. -->
 
 ### 4.2 Verdict
 
-<!-- The agent's recommendation on its own delivery: accept, accept
-with reservations, or reject, with the reasons and the reservations
-named. Written before the user reads § 4.3; it is the valve against
-overclaiming: a criterion not proven is a reservation, not a tick. -->
+<!-- The agent's self-assessment, not the decision: written before the
+user reads § 4.3, it is the valve against overclaiming. A criterion
+not proven is a reservation, not a tick. A reservation that outlives
+the task becomes a TODO item. -->
 
-Recommendation: accept | accept with reservations | reject
+**Recommendation:** accept | accept with reservations | reject
+
+Rationale:
+
+- <criterion met, test green, property achieved>
+
+Reservations (for "with reservations"; for "reject", what must change):
+
+1.
+
+Rounds: <design rounds before stop 1>; rework after stop 1: none | <what>
 
 ### 4.3 Retrospective
 

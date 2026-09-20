@@ -3,7 +3,8 @@
 Date: 2026-09-20
 Status: PENDING
 Issue: #92 · PR: #93 · Branch: `doc/92-devlog-templates`
-Task nature: task
+Task nature: change
+Agent: Claude Fable 5.1
 
 ## 1. Mandate
 
@@ -31,7 +32,10 @@ invariants, taste, decisions marked rule or taste, set-based design
 gate, acceptance criteria, spikes; steps, inventory, scope boundary;
 account, try it; gate check, verdict, retrospective, forward-looking,
 rule trace),
-sized by a task nature selector (task, refactor, analysis).
+sized by a task nature selector (change, refactor, analysis), with
+the rules inherited from a formal devlog practice elsewhere: titles as
+identifiers, a line budget, a fixed verdict shape, the stop rule in
+`CLAUDE.md`.
 `CLAUDE.md` codifies the template, the approval gate and the set-based
 design step of Phase 3. TODO item 14 is done.
 
@@ -69,17 +73,26 @@ design step of Phase 3. TODO item 14 is done.
 
 ### 1.6 Design decisions
 
-| #   | Decision                                                                                  | Basis                               | Alternatives considered                                                                       |
-| --- | ----------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| 1   | Templates live in a top-level `templates/`, named `devlog.md`, `discussion.md`            | rule: naming (family, topic-first)  | `devlog/templates/` next to the numbered files; `devlog/TEMPLATE.md`                          |
-| 2   | One devlog template with a task-nature selector, not one file per variant                 | taste                               | three files `devlog-task.md`, `devlog-refactor.md`, `devlog-analysis.md` (drift between them) |
-| 3   | Top sections renamed `Mandate`, `Plan`, `Closure` (numbered 1–3)                          | taste                               | keep `Requirement`, `Design`, `Outcome` (31 / 29 / 10 files use them)                         |
-| 4   | The approval gate is a line `Approved: <date>` under Mandate, set by the agent on the go  | taste                               | a review hook; a PR review event                                                              |
-| 5   | Decisions are a table with a Basis column, rule or taste                                  | rule: set-based design (discussion) | prose bullets, as in #90                                                                      |
-| 6   | Set-based design is a section of the Mandate with three lines: Triggers, Mock-up, Options | rule: set-based design (discussion) | a Phase 3 checklist only, outside the devlog                                                  |
-| 7   | Rule trace with two verbs, applied and created, citing sections by name                   | taste                               | four verbs and clause identifiers                                                             |
-| 8   | Analysis variant: Findings replaces Plan, Closure keeps forward-looking only              | taste                               | full structure for every nature                                                               |
-| 9   | Discussions get their own short template                                                  | rule: discussions convention (#90)  | no template; discussions as analysis devlogs                                                  |
+| #   | Decision                                                                                                                 | Basis                                                  | Alternatives considered                                                                       |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| 1   | Templates live in a top-level `templates/`, named `devlog.md`, `discussion.md`                                           | rule: naming (family, topic-first)                     | `devlog/templates/` next to the numbered files; `devlog/TEMPLATE.md`                          |
+| 2   | One devlog template with a task-nature selector, not one file per variant                                                | taste                                                  | three files `devlog-task.md`, `devlog-refactor.md`, `devlog-analysis.md` (drift between them) |
+| 3   | Top sections renamed `Mandate`, `Plan`, `Closure` (numbered 1–3)                                                         | taste                                                  | keep `Requirement`, `Design`, `Outcome` (31 / 29 / 10 files use them)                         |
+| 4   | Each stop is a dated line (`Approved:`, `Reviewed:`) the agent writes on the user's go                                   | taste                                                  | a review hook; a PR review event                                                              |
+| 5   | Decisions are a table with a Basis column, rule or taste                                                                 | rule: set-based design (discussion)                    | prose bullets, as in #90                                                                      |
+| 6   | Set-based design is a section of the Mandate with three lines: Triggers, Mock-up, Options                                | rule: set-based design (discussion)                    | a Phase 3 checklist only, outside the devlog                                                  |
+| 7   | Rule trace with two verbs, applied and created, citing sections by name                                                  | taste                                                  | four verbs and clause identifiers                                                             |
+| 8   | Analysis variant: Findings replaces Plan, Closure keeps forward-looking only                                             | taste                                                  | full structure for every nature                                                               |
+| 9   | Discussions get their own short template                                                                                 | rule: discussions convention (#90)                     | no template; discussions as analysis devlogs                                                  |
+| 10  | Four chapters: Mandate, Plan, Execution, Closure; Execution holds a terse account                                        | user review 2026-09-20                                 | deviations inside Closure (first mock-up)                                                     |
+| 11  | "Try it" (use, demo, illustration) closes the Execution chapter, before the second stop                                  | taste, from the user's placement question              | inside Closure                                                                                |
+| 12  | The agent's verdict (accept / with reservations / reject) opens the Closure, before the retrospective                    | user review 2026-09-20                                 | no verdict; the gate check alone                                                              |
+| 13  | Three stops, each a dated line: Plan approved, Execution reviewed, Retrospective reviewed                                | user review 2026-09-20                                 | one approval at the Mandate (first mock-up)                                                   |
+| 14  | Titles are the identifiers, numbers local; omitted sections renumber                                                     | inherited rule (incident elsewhere: numbering gaps)    | fixed numbers with gaps                                                                       |
+| 15  | Line budget: Mandate + Plan about 120, file about 250 at closure; cite conventions, do not restate                       | inherited rule (first-draft leanness is miscalibrated) | no budget                                                                                     |
+| 16  | Verdict shape: recommendation, rationale, reservations; reservations outliving the task become TODO items; a rounds line | inherited rule; the rounds metric from the discussion  | free-form verdict                                                                             |
+| 17  | Natures named `change`, `refactor`, `analysis`; header line `Agent:` for provenance                                      | taste                                                  | `task` as a nature name; no provenance                                                        |
+| 18  | The stop rule ("nothing runs while `Approved:` is pending") is a `CLAUDE.md` rule                                        | inherited rule (two gate violations elsewhere)         | the line in the file alone                                                                    |
 
 ### 1.7 Set-based design
 
@@ -105,7 +118,8 @@ materialized.
    the three stops; Phase 2 step 3 says "copy `templates/devlog.md`";
    Phase 3 carries the set-based design paragraph drafted in the
    discussion file and ends at stop 1; Phase 4 names stops 2 and 3;
-   the `discussions/` folder is described in one bullet.
+   the `discussions/` folder is described in one bullet; the stop
+   rule and the line budget are stated.
 4. `make lint test` pass (nothing under test changes; the run proves
    nothing broke by accident).
 5. TODO item 14 struck through, `— DONE (#92)`.
@@ -142,8 +156,9 @@ Files: `CLAUDE.md`, `TODO.md`.
    the set-based design paragraph from the end of
    `discussions/set-based-design.md`; end with stop 1 ("the user
    approves Mandate and Plan: the agent writes the date in
-   `Approved:`"). Phase 4: add stops 2 (after execution, § 3.2 Try
-   it) and 3 (at the Retrospective, after the agent's verdict).
+   `Approved:`; nothing runs while it is pending"). Phase 4: add
+   stops 2 (after execution, § 3.2 Try it) and 3 (at the
+   Retrospective, after the agent's verdict), and the line budget.
 4. Add a bullet on `discussions/` after the devlog section.
 5. TODO item 14 to DONE.
 6. Verify: `make lint test`; `grep -n 'Requirement\|Design\b' CLAUDE.md`
@@ -194,7 +209,13 @@ Reviewed: pending
 
 ### 4.2 Verdict
 
-Recommendation: pending
+**Recommendation:** pending
+
+Rationale:
+
+Reservations:
+
+Rounds: ; rework after stop 1:
 
 ### 4.3 Retrospective
 
