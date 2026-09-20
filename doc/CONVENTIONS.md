@@ -188,7 +188,7 @@ of any length pass.
 
 ## Tooling scripts
 
-Scripts in `runbooks/`, `tools/` and `tests/` are written in Python or
+Scripts in `recipes/`, `tools/` and `tests/` are written in Python or
 bash. Choose
 by what the script mostly does:
 
@@ -210,16 +210,21 @@ the script. A consistency check takes its expected values as arguments
 (e.g. from the Makefile) rather than re-parsing their source, and fails
 on a discrepancy without resolving it.
 
-**Script levels.** Git's porcelain and plumbing is the model. Makefile
-targets are the entry points. Runbooks (`runbooks/`: `release.sh`,
-`publish-to-*.sh`, `build.sh`, `lint.sh`, `clean.sh`, `make-doc.sh`)
-are orchestrators: named steps, one command each, guards only, no loops
-or computation; `doc/RELEASING.md` is the prose twin of
-`runbooks/release.sh`. Tools (`tools/`) do one concern with explicit
-arguments, so that every call site is self-explanatory. The prelude
-(`tools/init-tracing.sh`) holds sourced mechanics only. Logic that
-appears in a runbook moves down into a tool. The folder is the level's
-address.
+**Script levels.** Git's porcelain and plumbing is the model, with the
+Makefile as the porcelain. Makefile targets are the entry points, and a
+prerequisite list is how a sequence of targets is written. Recipes
+(`recipes/<target>.sh`) are the bodies of targets that outgrew a few
+one-line commands: one file per target, named after it, called by make
+only, no arguments; a recipe sequences commands, with guards and loops
+applying one command per file, and no computation. Tools (`tools/`) do
+one concern with explicit arguments, so that every call site is
+self-explanatory; they are called from recipes, workflows and tests.
+The prelude (`tools/init-tracing.sh`) holds sourced mechanics only.
+Calls go down only, Makefile to recipes to tools: a recipe never calls
+make nor another recipe, and a target whose body calls make
+(`test-matrix`) stays in the Makefile. Logic that appears in a recipe
+moves down into a tool. Every recipe starts with a comment stating its
+purpose. `doc/RELEASING.md` is the prose of `make release`.
 
 **Naming.** A single action is verb-first, read as a command
 (`tools/print-release-plan.py`, `tools/test-installation.sh from-wheel`,

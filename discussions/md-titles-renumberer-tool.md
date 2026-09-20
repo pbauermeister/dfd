@@ -101,7 +101,7 @@ and configurable.
   dfd's `doc/README.md` as a golden (renumbering it is a no-op), a
   CommonMark fence case per rule above; a `--check` case.
 - **Distribution:** PyPI wheel; `.pre-commit-hooks.yaml`; `uv tool
-  install` works.
+install` works.
 - **Repository scaffolding, reused from dfd:** `pyproject.toml` layout
   with uv, ruff and mypy strict config, conventional commits with the
   commit-msg hook, `tools/conventional-commits.py`, the merge gate and
@@ -114,7 +114,7 @@ and configurable.
 ## 5. Consumers and integration
 
 - dfd: replace `tools/doc-renumber-md-titles.py` by the package in
-  the `dev` dependency group and one line in `runbooks/make-doc.sh`;
+  the `dev` dependency group and one line in `recipes/doc.sh`;
   extend `make doc` to the top-level `README.md` once four-backtick
   fences are handled. TODO item 13 of dfd tracks this.
 - Other projects of the maintainer: to be listed when the tool exists.

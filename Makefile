@@ -35,16 +35,7 @@ venv-activate: ## activate .venv and start an interactive shell
 	@bash --rcfile <(echo "unset MAKELEVEL"; cat ~/.bashrc $(VENV)/bin/activate)
 
 require-system: ## install system packages (graphviz, npm) and uv
-	@case "$$(uname -s)" in \
-	  Linux)  which apt >/dev/null 2>&1 && \
-	          sudo apt install -y graphviz npm || \
-	          echo "Non-Debian Linux: install graphviz and npm manually" ;; \
-	  Darwin) which brew >/dev/null 2>&1 && \
-	          brew install graphviz node uv || \
-	          echo "macOS without Homebrew: install graphviz, node and uv manually" ;; \
-	  *)      echo "Unknown OS: install graphviz, node and uv manually" ;; \
-	esac
-	@which uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
+	./recipes/require-system.sh
 
 require: ## install dev tools: Python ones in .venv (uv sync), prettier (npm), git hook
 	uv sync
@@ -62,7 +53,7 @@ format: ## format source files (changes shall be committed)
 black: format ## alias of format
 
 lint: ## lint source files, check CI and hooks agree with pyproject.toml
-	uv run ./runbooks/lint.sh
+	uv run ./recipes/lint.sh
 	uv run ./tools/check-python-versions.py $(PYTHONS)
 	uv run ./tools/conventional-commits.py check-type-lists
 
@@ -88,6 +79,8 @@ nr-test: ## NR tests: verify fixtures still match their golden files
 ################################################################################
 # Local:: ##
 
+build: require clean lint test doc ## full local build, before a local install
+
 install: ## install user-wide as a uv tool (isolated venv, no sudo)
 	uv tool install --reinstall .
 
@@ -101,7 +94,7 @@ doc-sections: ## regenerate auto-updatable sections of README.md and doc/*.md
 	VENV=$(VENV) uv run ./tools/doc-update-sections.py
 
 doc: doc-sections ## remake doc
-	uv run ./runbooks/make-doc.sh
+	uv run ./recipes/doc.sh
 
 smoke-test-wheel: clean ## build wheel, install in a fresh venv, check
 	uv build
@@ -114,13 +107,13 @@ help-cc: ## print the conventional commit type to version bump map
 	@uv run ./tools/conventional-commits.py print-bump-table
 
 release: ## release to PyPI and GitHub via GitHub Actions (see doc/RELEASING.md)
-	./runbooks/release.sh
+	./recipes/release.sh
 
-publish-to-testpypi: clean ## release rehearsal: upload to TestPyPI, install, check
-	./runbooks/publish-to-testpypi.sh
+publish-to-testpypi: build ## release rehearsal: upload to TestPyPI, install, check
+	./recipes/publish-to-testpypi.sh
 
-publish-to-pypi: clean ## fallback: rehearse on TestPyPI, then publish to PyPI
-	./runbooks/publish-to-pypi.sh
+publish-to-pypi: publish-to-testpypi ## fallback: rehearse on TestPyPI, then publish to PyPI
+	./recipes/publish-to-pypi.sh
 
 publish-to-gh: ## fallback: GitHub Release from dist/ (after publish-to-pypi)
 	uv run ./tools/publish-to-github.py
@@ -128,4 +121,4 @@ publish-to-gh: ## fallback: GitHub Release from dist/ (after publish-to-pypi)
 ################################################################################
 # Cleanup:: ##
 clean: ## clean
-	./runbooks/clean.sh
+	./recipes/clean.sh

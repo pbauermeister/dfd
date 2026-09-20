@@ -5,7 +5,7 @@ derived from the conventional commits merged since the last release.
 `make release` makes them locally and pushes the tag, which triggers the
 `Release` GitHub Actions workflow (`.github/workflows/release.yml`). The
 workflow publishes to PyPI and GitHub from a single build, after the
-full CI suite passes on the tagged commit. `runbooks/release.sh` is the
+full CI suite passes on the tagged commit. `recipes/release.sh` is the
 code twin of this page.
 
 ## Conventional commits

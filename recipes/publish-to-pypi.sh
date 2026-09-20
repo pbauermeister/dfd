@@ -12,12 +12,11 @@
 # Version and CHANGES.md entry: made by `semantic-release version`
 #   (see doc/RELEASING.md, Local fallback)
 #
-# The TestPyPI rehearsal (build, wheel smoke test, TestPyPI upload and
-# install smoke test) runs first; any failure stops before the real upload.
+# The TestPyPI rehearsal (`make publish-to-testpypi`: build, wheel smoke
+# test, TestPyPI upload and install smoke test) is a prerequisite in the
+# Makefile; any failure there stops before the real upload.
 
 . ./tools/init-tracing.sh
-
-./runbooks/publish-to-testpypi.sh
 
 
 banner2 "Publishing to Pypi"

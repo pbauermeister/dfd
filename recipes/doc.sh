@@ -1,4 +1,6 @@
 #!/bin/bash
+# Rebuild the documentation: renumber the titles of doc/README.md, then
+# render every diagram of doc/ and README.md with the dev wrapper.
 . ./tools/init-tracing.sh
 
 OPTS=--debug

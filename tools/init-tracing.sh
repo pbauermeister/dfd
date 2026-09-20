@@ -1,4 +1,4 @@
-# Shell prelude for the runbooks and tools: exit on error, trace
+# Shell prelude for the recipes and tools: exit on error, trace
 # commands, and echo/banner/banner2/step helpers that print without the
 # trace noise (https://superuser.com/a/1141026). Source it from the
 # repository root: `. ./tools/init-tracing.sh`.

@@ -1,4 +1,6 @@
 #!/bin/sh
+# Remove build artifacts, caches and generated NR SVGs; retry with sudo
+# when a root-owned artifact is in the way.
 
 set -ex
 

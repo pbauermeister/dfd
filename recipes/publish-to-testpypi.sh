@@ -1,6 +1,7 @@
 #!/bin/sh
 #
-# Release rehearsal: build, smoke-test the wheel, upload to TestPyPI,
+# Release rehearsal, after `make build` (a prerequisite in the Makefile):
+# build the distributions, smoke-test the wheel, upload to TestPyPI,
 # install from there into a fresh venv and smoke-test again.
 #
 # Getting a token:
@@ -10,8 +11,6 @@
 # version bump before retrying.
 
 . ./tools/init-tracing.sh
-
-./runbooks/build.sh
 
 
 banner2 "Building distributions"

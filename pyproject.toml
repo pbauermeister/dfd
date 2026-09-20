@@ -84,7 +84,7 @@ build_command = "uv lock"
 assets = ["uv.lock"]
 
 # Any branch: `make show-release-plan` works on a task branch too. Real
-# releases are restricted to main by runbooks/release.sh.
+# releases are restricted to main by recipes/release.sh.
 [tool.semantic_release.branches.main]
 match = ".*"
 
