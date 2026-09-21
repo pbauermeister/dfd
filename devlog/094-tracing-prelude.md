@@ -101,7 +101,7 @@ and the discussion's status is DONE.
   than a rule.
 - Every recipe parses (`bash -n`) and runs as before;
   `tools/test-installation.sh` runs standalone with the same options
-  and messages; CI (`ci.yml`, `merge-gate.yml`) stays green.
+  and message texts; CI (`ci.yml`, `merge-gate.yml`) stays green.
 
 <!-- Stop 0 (experiment of this task, see § 5.1 Retrospective): the
 user confirms the frame, 1.1 to 1.4, before any mock-up or spike. -->
@@ -117,6 +117,9 @@ Framed: 2026-09-21
 - Stated (2026-09-21, after the mock-up): tracing belongs to `recipes/`,
   the orchestrators; `tools/` may do detailed things where tracing
   floods the output, so they neither source the prelude nor trace.
+- Stated (2026-09-21): tools do print their titles and phases, in a
+  lighter markup than recipes, so that the level of a line is readable
+  in the output.
 
 ### 1.6 Set-based design
 
@@ -189,6 +192,7 @@ All run in the throwaway worktree with option 3, bash 5.2.21:
 | 1   | DEBUG trap owning the tracing state; helpers are plain printing functions; `echo` stays the builtin | option 3                                 | Options 1 and 2 (§ 1.6)                                                              |
 | 2   | Prelude bash only; `#!/bin/bash` on the two `sh` recipes                                             | rule: Makefile `SHELL := /bin/bash`      | Keep `sh` shebangs (they would fail on `trap DEBUG`)                                 |
 | 6   | Prelude sourced by recipes only; `tools/test-installation.sh` sets its own options, prints with `echo`; the rule is one sentence in the Script levels convention | taste: tracing is the orchestrator's view | Keep the tool sourcing it (a tool that traces); a helper-only prelude for tools (YAGNI) |
+| 7   | Tool markup: `--- title ---` for the title, `-- phase` for a phase, a blank line before each, plain `echo`; recipes keep the boxes and `====` | taste: level readable in the output       | Same helpers in tools (levels indistinguishable); a helper file for tools (YAGNI, one tool) |
 | 3   | `printf` back to `echo` in the two fallbacks                                                         | taste: uniformity                        | Keep `printf` (works; leaves a trace of the workaround)                              |
 | 4   | A pytest integration test runs the trial script and compares the full output to an expected text     | taste: guard for a defect that bit twice | Trial in the job scratch folder only (nothing fails when the next prelude regresses) |
 | 5   | The trial's expected output avoids machine-dependent commands (`true`, `false`, `ls` only)           | rule: tests deterministic                | Keep `uv --version` (version drift)                                                  |
@@ -233,11 +237,14 @@ Actions:
 2. `#!/bin/sh` → `#!/bin/bash` in the two publishing recipes.
 3. `printf "%s\n"` → `echo` in the two fallbacks of `require-system.sh`.
 4. `tools/test-installation.sh`: the sourcing line becomes
-   `set -e -u -o pipefail`; its two `banner2` and three `step` lines
-   become `echo` lines with the same text.
+   `set -e -u -o pipefail`; its two `banner2` lines become
+   `echo; echo "--- ... ---"`, its three `step` lines `echo; echo "-- ..."`,
+   same texts.
 5. `doc/CONVENTIONS.md`, Script levels: after the prelude sentence,
    "Recipes source it, and they are bash: tracing is the orchestrator's
-   view. A tool never traces; it prints what it decides to print."
+   view. A tool never traces; it prints its title as `--- title ---`
+   and its phases as `-- phase`, lighter than the recipes' banners, so
+   that the level of a line is readable in the output."
 6. `TODO.md` item 16 → `~~...~~ — DONE (#94)`; discussion status → DONE,
    with a one-line pointer to this devlog under its section 5
    (pipeline finding, option 3 chosen, recipes-only sourcing).
