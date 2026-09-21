@@ -1,8 +1,8 @@
 # 094 — Tracing prelude without aliases (DEBUG trap)
 
 Date: 2026-09-21
-Status: PENDING
-Issue: #94 · PR: #PPP · Branch: `refactor/94-tracing-prelude`
+Status: ONGOING
+Issue: #94 · PR: #95 · Branch: `refactor/94-tracing-prelude`
 Task nature: refactor
 Agent: Claude Fable 5.1
 
@@ -309,7 +309,7 @@ Grep: `grep -rn 'init-tracing\|printf\|#!/bin/sh' --include=*.sh --include=*.md 
 
 <!-- Stop 1: the user approves Mandate and Plan. Nothing runs before. -->
 
-Approved: pending
+Approved: 2026-09-21
 
 ## 3. Execution
 
