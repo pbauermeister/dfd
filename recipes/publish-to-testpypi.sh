@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Release rehearsal, after `make build` (a prerequisite in the Makefile):
 # build the distributions, smoke-test the wheel, upload to TestPyPI,

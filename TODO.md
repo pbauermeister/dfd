@@ -244,7 +244,7 @@ turned into a standard task (GH ticket, PR, devlog).
     (the file was replaced by `TODO.md`); #92 added 21 net lines
     (stops, template pointers).
 
-16. Tracing prelude without aliases
+16. ~~Tracing prelude without aliases~~ — DONE (#94)
 
     Replace the alias trick of `tools/init-tracing.sh` (its `;` makes
     `a || echo msg` print unconditionally; bit #88 in `$(...)` and #90
@@ -252,3 +252,14 @@ turned into a standard task (GH ticket, PR, devlog).
     tracing off before a helper runs: plain functions, usable anywhere
     a command is. Candidate prelude, trials and migration steps in
     `discussions/tracing-prelude-debug-trap.md` (from #90).
+
+17. Stop 0 in the devlog template
+
+    #94 experimented a `Framed:` stop after § 1.4 Invariants: the user
+    confirms Context, Goal, Non-goals and Invariants before any mock-up
+    or spike, so that set-based design starts from an agreed frame.
+    Fold it into `templates/devlog.md` and CLAUDE.md Phase 3:
+    scaffolding fills 1.1 to 1.3 from the issue and its brief; the
+    mock-up may amend the frame (it did twice in #94). Revisit the
+    120-line budget of Mandate and Plan (#94: ~250 with the option
+    table, the trap listing and the inventory).

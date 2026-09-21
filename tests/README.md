@@ -74,6 +74,17 @@ Guards generated documentation sections (`<!-- AUTO:... -->` markers) against
 drifting from the code they are derived from. When it fails, run `make doc-sections`
 and commit the refreshed docs. Extend it when adding a new generated section.
 
+### Tracing prelude test
+
+**File:** `tests/test_tracing_prelude.py`, trial and expected output in
+`tests/tracing-prelude/`
+
+Runs `trial.sh`, which sources `tools/init-tracing.sh` and uses its helpers in
+every context (after `||` and `&&`, inside `$(...)`, in a pipeline, in a condition,
+in a brace group, in a function), and compares the merged output with
+`expected.txt` byte for byte. Extend the trial when a new context bites; regenerate
+`expected.txt` by running the trial from the repository root, and review the diff.
+
 ### Non-regression test — nominal (success)
 
 **Fixtures (inputs):** `tests/non-regression/NNN-name.dfd` (standalone) or
