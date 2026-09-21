@@ -316,10 +316,17 @@ Approved: 2026-09-21
 
 ### 3.1 Account
 
-<!-- Terse. Per step: "as planned", or the notable and unexpected
-things (a sweep that caught a miss, a trial that failed, a decision
-taken on the way and its basis). A rule discovered on the way goes to
-Rule trace. -->
+- Step 1 (16db69a): as planned. The trial output from the scratch
+  worktree is identical to option 3; the sweep found no stale mention
+  beyond the discussion's own history. `make smoke-test-wheel` shows
+  the new tool markup.
+- Step 2 (3f9cdcf): as planned. Mutation smoke-test: the restore
+  branch of the trap dropped, the test fails on the missing `+ cat`;
+  reverted with a file copy, not `git checkout`.
+- Between stop 0 and stop 1: the mock-up's pipeline case led the user
+  to state the rule "recipes trace, tools do not" and the tool markup
+  (decisions 6 and 7); the namespacing question came after stop 1,
+  before any step ran (decision 8).
 
 ## 4. Delivery
 
@@ -329,12 +336,18 @@ which the user decides. -->
 
 ### 4.1 Try it
 
-<!-- How the user uses, demos or sees the work: the commands to run,
-the file to open, the image to look at, the diff to read. Illustrate
-when a picture says it (an SVG under `devlog/img/`, a listing, a
-before/after). A try is something run, opened or read, never
-imagined; a dry run counts only when executed. Omit the section and
-stop 2 when there is nothing to try. -->
+- Read `tools/init-tracing.sh` (30 lines) and the diff of
+  `tools/test-installation.sh`.
+- Run the trial and read its output, the helpers silent and every
+  other command traced:
+  `bash tests/tracing-prelude/trial.sh; echo "exit $?"`
+- See the tool markup under the recipe's trace:
+  `make smoke-test-wheel`
+- See the fallback fire only on failure, with fake commands ahead on
+  the PATH (`sudo` exiting 1, `apt` present):
+  `make require-system` from a shell where `PATH=/path/to/fakes:$PATH`,
+  or `bash tests/tracing-prelude/trial.sh` with a `false ||` line of
+  your own.
 
 <!-- Stop 2: the user tries the work, and either mandates a loop or
 lets the delivery proceed. -->
