@@ -4,6 +4,7 @@ Date: YYYY-MM-DD
 Status: PENDING
 Issue: #NNN · PR: #PPP · Branch: `<prefix>/NNN-short-description`
 Task nature: change | refactor | analysis
+Track: full | fast
 Agent: <model name and version>
 
 <!--
@@ -41,6 +42,19 @@ Task nature selects the variant:
             Acceptance criteria, then a Findings chapter replaces Plan
             and Execution; Delivery keeps Verdict and Discussion;
             Closure keeps Retrospective and Forward-looking.
+
+Track selects the depth. Full is the default. Fast applies when the
+decisions are already recorded (a brief, a prior devlog, a TODO item)
+and the work is small with no design question: the PR is opened
+first, everything is agreed in conversation, the work runs unattended
+after one go, and the devlog is written at closure for the user's
+approval, or earlier if the discussion or the work inflate (then the
+track switches to full and the stops resume where they are). The fast
+devlog keeps: Context (a pointer to the record), Goal, Design
+decisions (rows), Account (one line per commit), Verdict,
+Retrospective, Rule trace when a rule was created; two dated stops,
+Approved (the go) and Closed (the approval of this file). Every other
+section is omitted, renumbered as above.
 -->
 
 ## 1. Mandate

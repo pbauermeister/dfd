@@ -73,6 +73,18 @@ the test report, the verdict and the discussion; then the PR is marked
 ready), `Closed:` (after the Retrospective; status `DONE`). The template's
 guidance comments are the reference for what each stop needs.
 
+### Fast track
+
+When the decisions are already recorded (a brief, a prior devlog, a
+TODO item) and the work is small with no design question, the user may
+call the fast track: issue, branch and PR as in Phase 2 but without
+the devlog; everything agreed in conversation; the work runs
+unattended after one go; the devlog is written at closure in its fast
+form (see the template's "Track") and committed on the branch for the
+user's approval before the merge. If the discussion or the work
+inflate, the agent writes the devlog then and the full track resumes
+at the stop reached.
+
 Claude: if the user starts a task without following this process, briefly
 remind them of it.
 
