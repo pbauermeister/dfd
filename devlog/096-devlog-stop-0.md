@@ -30,12 +30,12 @@ item 17 is done.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                         | Basis                                    | Alternatives considered                                  |
-| --- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------- |
-| 1   | `Framed:` after § 1.4 Invariants: for a refactor the invariants are part of the frame the mock-up must satisfy   | taste (#94, agent's call confirmed)      | After § 1.3 Non-goals                                    |
-| 2   | Budget about 150 lines of prose, tables and listings not counted, about 300 at closure, marked "to revisit"      | measured: 092 (164/25), 094 (267/47)     | Keep 120; drop the budget                                |
-| 3   | Fast track as a `Track:` header line and a guidance paragraph, not a second template file                        | taste: one template, sections omitted    | `templates/devlog-fast.md` (two files to keep aligned)   |
-| 4   | Fast devlog written at closure, for the user's approval; earlier if the task inflates                            | user (this conversation)                 | No devlog for fast tasks (no record); devlog at start    |
+| #   | Decision                                                                                                       | Basis                                 | Alternatives considered                                |
+| --- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------ |
+| 1   | `Framed:` after § 1.4 Invariants: for a refactor the invariants are part of the frame the mock-up must satisfy | taste (#94, agent's call confirmed)   | After § 1.3 Non-goals                                  |
+| 2   | Budget about 150 lines of prose, tables and listings not counted, about 300 at closure, marked "to revisit"    | measured: 092 (164/25), 094 (267/47)  | Keep 120; drop the budget                              |
+| 3   | Fast track as a `Track:` header line and a guidance paragraph, not a second template file                      | taste: one template, sections omitted | `templates/devlog-fast.md` (two files to keep aligned) |
+| 4   | Fast devlog written at closure, for the user's approval; earlier if the task inflates                          | user (this conversation)              | No devlog for fast tasks (no record); devlog at start  |
 
 ## 2. Execution
 
@@ -63,20 +63,20 @@ Approved: 2026-09-22
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                     | Agent | User |
-| --- | ----------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: the fast form was defined and used in the same task              | well  |      |
-| 2   | The fast track was called in conversation, not from a rule: the rule is now written        | well  |      |
+| #   | Point                                                                               | Agent | User |
+| --- | ----------------------------------------------------------------------------------- | ----- | ---- |
+| 1   | Process and template fit: the fast form was defined and used in the same task       | well  | well |
+| 2   | The fast track was called in conversation, not from a rule: the rule is now written | well  | well |
 
 Process: 1 round before the go; the fast track and this file added
 at the review of the diff.
 
-Closed: pending
+Closed: 2026-09-22
 
 ### 4.2 Rule trace
 
-| Source                  | Rule                                                                   | Verb (applied / created) |
-| ----------------------- | ---------------------------------------------------------------------- | ------------------------ |
-| `templates/devlog.md`   | Stop 0, `Framed:` before any mock-up or spike                          | created                  |
-| `templates/devlog.md`   | Track full or fast; the fast form's sections and two stops             | created                  |
-| `CLAUDE.md`, Fast track | when the fast track applies and how it runs                            | created                  |
+| Source                  | Rule                                                       | Verb (applied / created) |
+| ----------------------- | ---------------------------------------------------------- | ------------------------ |
+| `templates/devlog.md`   | Stop 0, `Framed:` before any mock-up or spike              | created                  |
+| `templates/devlog.md`   | Track full or fast; the fast form's sections and two stops | created                  |
+| `CLAUDE.md`, Fast track | when the fast track applies and how it runs                | created                  |
