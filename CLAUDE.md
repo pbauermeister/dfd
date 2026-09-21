@@ -95,6 +95,9 @@ remind them of it.
   number and title.
 - Status: `PENDING` until stop 1, `ONGOING` after it, `DONE` at stop 4,
   `REJECTED` when abandoned.
+- A template fix that a retrospective calls for is committed on the task's
+  branch when it is a comment or a pointer; a structural change becomes a
+  TODO item. The template's history is the process history.
 
 ## discussions/ files
 

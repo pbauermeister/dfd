@@ -88,7 +88,11 @@ convention by the step that ships it, traced in Rule trace. These lines
 stay even when all say "none": the skip is a decision. Before stop 1
 the agent re-reads the Mandate as a reviewer: does each name describe
 the files, which direction does each call go, which existing file
-violates the new rule. -->
+violates the new rule. Set-based design decides where the heavy work
+goes: a short exploration of the alternatives and partial mock-ups,
+before the investment. It pays most when the outcome is complex and
+dependent (many files, forms, generated artifacts). Refining the chosen
+design is not its job: that is the Try it loop. -->
 
 Triggers: none
 Mock-up: no, because
@@ -186,8 +190,9 @@ which the user decides. -->
 <!-- How the user uses, demos or sees the work: the commands to run,
 the file to open, the image to look at, the diff to read. Illustrate
 when a picture says it (an SVG under `devlog/img/`, a listing, a
-before/after). Omit the section and stop 2 when there is nothing to
-try. -->
+before/after). A try is something run, opened or read, never
+imagined; a dry run counts only when executed. Omit the section and
+stop 2 when there is nothing to try. -->
 
 <!-- Stop 2: the user tries the work, and either mandates a loop or
 lets the delivery proceed. -->
@@ -240,12 +245,16 @@ Shipped: pending
 
 <!-- One row per point worth remembering; the agent gives its rating,
 the user gives theirs: well, not well, surprise, tension, don't care.
-The process line carries the measures the discussion of set-based
-design asked for. -->
+The first row is standing: "process and template fit", the friction
+met with this template. A fix that is a guidance comment or a pointer
+is applied on this branch and listed in Forward-looking; a fix that
+changes the structure (a chapter, a stop) becomes a TODO item. The
+process line carries the measures the discussion of set-based design
+asked for. -->
 
-| #   | Point | Agent | User |
-| --- | ----- | ----- | ---- |
-| 1   |       |       |      |
+| #   | Point                    | Agent | User |
+| --- | ------------------------ | ----- | ---- |
+| 1   | Process and template fit |       |      |
 
 Process: <N> rounds before stop 1; <N> loops at stop 2; rework after
 stop 1: none | <what>
@@ -256,8 +265,9 @@ Closed: pending
 
 ### 5.2 Forward-looking
 
-<!-- Follow-ups filed (TODO items, issues, discussions), and what the
-next tasks can now rely on. -->
+<!-- Follow-ups filed (TODO items, issues, discussions), template and
+CLAUDE.md fixes made on this branch, and what the next tasks can now
+rely on. -->
 
 ### 5.3 Rule trace
 

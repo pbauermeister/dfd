@@ -145,6 +145,14 @@ comments refer to sections by title, never by number. Verify: `grep -c
 delta against `main` about +12 lines. Commit `docs: CLAUDE.md points
 to the template's guidance; titles, not numbers`.
 
+**Step 5 — Process fit** (`docs:`, loop mandated at stop 2): the
+Set-based design comment states what the phase is for and that
+refining is the Try it loop's job; a try is never imagined; the
+Retrospective gets a standing "process and template fit" row and the
+two fix paths (comment or pointer on the branch, structure as a TODO
+item); `CLAUDE.md` one bullet for the fix paths. Commit `docs:
+template, process fit row and fix paths`.
+
 One attended/unattended gate for the steps: docs only.
 
 ### 2.2 Inventory
@@ -179,6 +187,12 @@ Approved: 2026-09-20
 - Step 4 (loop): as planned; `CLAUDE.md` back to about +12 against
   `main`, 1 numbered reference left in the template (the citation
   example), 0 in `CLAUDE.md`.
+- Step 5 (loop): as planned. Two observations at stop 2: the loops
+  since stop 1 refine one design, which is the Try it loop's job, not
+  set-based design's (there was nothing to choose between); and
+  "try it mentally" was the prose-and-imagination decision the method
+  argues against, so the template is tested by use and the mechanism
+  to act on the friction is what this task delivers.
 
 ## 4. Delivery
 
@@ -189,9 +203,8 @@ Approved: 2026-09-20
 - Read the `CLAUDE.md` diff after the loop: `git diff main -- CLAUDE.md`
   (Phase 2 step 3, Phase 3, Phase 4, the two sections after the
   DEVLOG.md one; +18 net lines, every pointer to the template).
-- Dry run of the process: pick any open TODO item and, mentally,
-  check that each stop has a place and each template section an
-  answer.
+- The template is tested by the next tasks, not imagined here;
+  friction lands in the standing first row of each Retrospective.
 
 Tried: pending
 
@@ -217,9 +230,9 @@ Shipped: pending
 
 ### 5.1 Retrospective
 
-| #   | Point | Agent | User |
-| --- | ----- | ----- | ---- |
-| 1   |       |       |      |
+| #   | Point                    | Agent | User |
+| --- | ------------------------ | ----- | ---- |
+| 1   | Process and template fit |       |      |
 
 Process: rounds before stop 1; loops at stop 2; rework after stop 1:
 
