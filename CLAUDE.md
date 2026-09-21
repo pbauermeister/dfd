@@ -24,7 +24,8 @@ The agent performs these steps in sequence:
 2. Create a branch named `<prefix>/NNN-short-description` (prefix: `fix`,
    `feature`, `refactor`, `doc`, or `test`).
 3. Copy `templates/devlog.md` to `devlog/NNN-short-description.md`; fill the
-   header and the Context from the issue.
+   header, then Context, Goal and Non-goals (and Invariants for a
+   refactor) from the issue and its brief.
 4. Commit the devlog file on the branch.
 5. Open a **draft** PR against `main` (`gh pr create --draft`) with a minimal
    body (link to the devlog file, `Closes #NNN`) and a title in conventional
@@ -35,9 +36,12 @@ The agent performs these steps in sequence:
 
 Agent and user discuss until the specs are clear:
 
-- The agent fills the Mandate and the Plan per the template's guidance
-  comments (set-based design, spikes, decisions marked rule or taste) and
-  presents them once, with the mock-up built and the spikes run.
+- **Stop 0.** The user confirms the frame (Context, Goal, Non-goals,
+  Invariants); the agent writes the date in `Framed:`. No mock-up or
+  spike runs before. The mock-up may then refine the frame in place.
+- The agent fills the rest of the Mandate and the Plan per the template's
+  guidance comments (set-based design, spikes, decisions marked rule or
+  taste) and presents them once, with the mock-up built and the spikes run.
 - Reflect together on whether new NR test fixtures are needed. If yes, add
   "create NR fixtures" as the first step.
 - Once specs are agreed, update the PR body to reflect the refined requirements
@@ -69,6 +73,18 @@ the test report, the verdict and the discussion; then the PR is marked
 ready), `Closed:` (after the Retrospective; status `DONE`). The template's
 guidance comments are the reference for what each stop needs.
 
+### Fast track
+
+When the decisions are already recorded (a brief, a prior devlog, a
+TODO item) and the work is small with no design question, the user may
+call the fast track: issue, branch and PR as in Phase 2 but without
+the devlog; everything agreed in conversation; the work runs
+unattended after one go; the devlog is written at closure in its fast
+form (see the template's "Track") and committed on the branch for the
+user's approval before the merge. If the discussion or the work
+inflate, the agent writes the devlog then and the full track resumes
+at the stop reached.
+
 Claude: if the user starts a task without following this process, briefly
 remind them of it.
 
@@ -89,8 +105,9 @@ remind them of it.
   zero-padded; the slug is the user's short description, else derived from
   the issue title.
 - The template's guidance comments are the reference for the structure, the
-  task natures, the four stops (`Approved:`, `Tried:`, `Shipped:`,
-  `Closed:`, dated lines the agent fills on the user's go, never before)
+  task natures, the five stops (`Framed:`, `Approved:`, `Tried:`,
+  `Shipped:`, `Closed:`, dated lines the agent fills on the user's go,
+  never before)
   and the budget; the copy replaces them by content. Sections are cited by
   number and title.
 - Status: `PENDING` until stop 1, `ONGOING` after it, `DONE` at stop 4,

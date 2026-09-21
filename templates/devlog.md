@@ -4,6 +4,7 @@ Date: YYYY-MM-DD
 Status: PENDING
 Issue: #NNN · PR: #PPP · Branch: `<prefix>/NNN-short-description`
 Task nature: change | refactor | analysis
+Track: full | fast
 Agent: <model name and version>
 
 <!--
@@ -12,21 +13,26 @@ Copy, fill, delete the optional sections that do not apply and every
 guidance comment. An omitted section leaves no placeholder: renumber,
 and cite a section by number and title ("§ 1.8 Design decisions"),
 the title being the stable identifier; these guidance comments refer
-by title only. Budget: Mandate and Plan about
-120 lines, the whole file about 250 at closure; cite a convention
-instead of restating its rationale. Status follows CLAUDE.md: PENDING
-until stop 1, ONGOING after it, DONE at stop 4.
+by title only. Budget: Mandate and Plan about 150 lines of prose,
+tables, listings and a refactor's inventory not counted; the whole
+file about 300 at closure (a target from two devlogs, 092 and 094,
+to revisit); cite a convention instead of restating its rationale.
+Status follows CLAUDE.md: PENDING until stop 1, ONGOING after it,
+DONE at stop 4.
 
-Five chapters and four stops. A stop is a dated line that the agent
-fills on the user's go, never before: Approved (after the Plan, before
-any execution), Tried (after Try it; the user may mandate a loop),
+Five chapters and five stops. A stop is a dated line that the agent
+fills on the user's go, never before: Framed (after Invariants,
+before any mock-up or spike), Approved (after the Plan, before any
+execution), Tried (after Try it; the user may mandate a loop),
 Shipped (the ship decision, once no loop is requested and the test
 report is in), Closed (after the Retrospective). A loop adds steps to
-Steps, is accounted in Account and refreshes Try it. The Mandate is presented once,
-with the mock-up built and the spikes run, so that stop 1 is one
-round. Between the stops the agent writes and runs autonomously, to
-the depth the step gates (attended or unattended, CLAUDE.md Phase 4)
-allow.
+Steps, is accounted in Account and refreshes Try it. Scaffolding
+fills Context, Goal and Non-goals (and Invariants for a refactor)
+from the issue and its brief, so that stop 0 is one round. The rest
+of the Mandate is presented once, with the mock-up built and the
+spikes run, so that stop 1 is one round. Between the stops the agent
+writes and runs autonomously, to the depth the step gates (attended
+or unattended, CLAUDE.md Phase 4) allow.
 
 Task nature selects the variant:
   change    feature or fix from an issue: all of Mandate and Plan.
@@ -36,6 +42,19 @@ Task nature selects the variant:
             Acceptance criteria, then a Findings chapter replaces Plan
             and Execution; Delivery keeps Verdict and Discussion;
             Closure keeps Retrospective and Forward-looking.
+
+Track selects the depth. Full is the default. Fast applies when the
+decisions are already recorded (a brief, a prior devlog, a TODO item)
+and the work is small with no design question: the PR is opened
+first, everything is agreed in conversation, the work runs unattended
+after one go, and the devlog is written at closure for the user's
+approval, or earlier if the discussion or the work inflate (then the
+track switches to full and the stops resume where they are). The fast
+devlog keeps: Context (a pointer to the record), Goal, Design
+decisions (rows), Account (one line per commit), Verdict,
+Retrospective, Rule trace when a rule was created; two dated stops,
+Approved (the go) and Closed (the approval of this file). Every other
+section is omitted, renumbered as above.
 -->
 
 ## 1. Mandate
@@ -62,6 +81,15 @@ skip is a decision and not an omission. -->
 <!-- Rules that every option must satisfy: call directions, naming
 rules, compatibility. Cite the convention when one exists. Mandatory
 for refactor, optional otherwise. -->
+
+<!-- Stop 0: the user confirms the frame, Context to Invariants, before
+any mock-up or spike, so that the set-based design explores an agreed
+direction and not an assumed one. The mock-up is expected to refine
+the frame: what it surfaces is amended in place, in these sections,
+before stop 1 (in #94 the mock-up added a rule and a markup decision).
+Added after #94, where its necessity was spotted late. -->
+
+Framed: pending
 
 ### 1.5 Taste
 
