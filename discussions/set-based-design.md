@@ -1,7 +1,7 @@
 # Set-based design: agents at the design level
 
 Date: 2026-09-20
-Status: PENDING (input to TODO item 14)
+Status: DONE (consumed by #92, devlog 092)
 Origin: continuation of [vibe-coding-distance.md](vibe-coding-distance.md),
 after #90, on `main`.
 
