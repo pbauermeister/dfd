@@ -6,42 +6,7 @@ Issue: #94 · PR: #95 · Branch: `refactor/94-tracing-prelude`
 Task nature: refactor
 Agent: Claude Fable 5.1
 
-<!--
-Devlog template (see CLAUDE.md "devlog/NNN-short-description.md files").
-Copy, fill, delete the optional sections that do not apply and every
-guidance comment. An omitted section leaves no placeholder: renumber,
-and cite a section by number and title ("§ 1.8 Design decisions"),
-the title being the stable identifier; these guidance comments refer
-by title only. Budget: Mandate and Plan about
-120 lines, the whole file about 250 at closure; cite a convention
-instead of restating its rationale. Status follows CLAUDE.md: PENDING
-until stop 1, ONGOING after it, DONE at stop 4.
-
-Five chapters and four stops. A stop is a dated line that the agent
-fills on the user's go, never before: Approved (after the Plan, before
-any execution), Tried (after Try it; the user may mandate a loop),
-Shipped (the ship decision, once no loop is requested and the test
-report is in), Closed (after the Retrospective). A loop adds steps to
-Steps, is accounted in Account and refreshes Try it. The Mandate is presented once,
-with the mock-up built and the spikes run, so that stop 1 is one
-round. Between the stops the agent writes and runs autonomously, to
-the depth the step gates (attended or unattended, CLAUDE.md Phase 4)
-allow.
-
-Task nature selects the variant:
-  change    feature or fix from an issue: all of Mandate and Plan.
-  refactor  driven by an inventory and a mechanical plan: as change,
-            with Invariants and Inventory mandatory.
-  analysis  study, survey or report: Context, Goal, Non-goals,
-            Acceptance criteria, then a Findings chapter replaces Plan
-            and Execution; Delivery keeps Verdict and Discussion;
-            Closure keeps Retrospective and Forward-looking.
--->
-
 ## 1. Mandate
-
-<!-- Everything the user must read to approve the work, before any of
-it runs. Approved together with the Plan, at the end of the Plan. -->
 
 ### 1.1 Context
 
@@ -102,9 +67,6 @@ and the discussion's status is DONE.
 - Every recipe parses (`bash -n`) and runs as before;
   `tools/test-installation.sh` runs standalone with the same options
   and message texts; CI (`ci.yml`, `merge-gate.yml`) stays green.
-
-<!-- Stop 0 (experiment of this task, see § 5.1 Retrospective): the
-user confirms the frame, 1.1 to 1.4, before any mock-up or spike. -->
 
 Framed: 2026-09-21
 
@@ -308,8 +270,6 @@ Grep: `grep -rn 'init-tracing\|printf\|#!/bin/sh' --include=*.sh --include=*.md 
   the user's decision at Stop 0; a TODO item is filed on this branch
   at § 5.2 if the retrospective confirms it.
 
-<!-- Stop 1: the user approves Mandate and Plan. Nothing runs before. -->
-
 Approved: 2026-09-21
 
 ## 3. Execution
@@ -330,10 +290,6 @@ Approved: 2026-09-21
 
 ## 4. Delivery
 
-<!-- The basis of the ship decision, in order: what the work looks
-like, what the tests say, what the agent recommends, the discussion in
-which the user decides. -->
-
 ### 4.1 Try it
 
 - Read `tools/init-tracing.sh` (30 lines) and the diff of
@@ -348,9 +304,6 @@ which the user decides. -->
   `make require-system` from a shell where `PATH=/path/to/fakes:$PATH`,
   or `bash tests/tracing-prelude/trial.sh` with a `false ||` line of
   your own.
-
-<!-- Stop 2: the user tries the work, and either mandates a loop or
-lets the delivery proceed. -->
 
 Tried: 2026-09-21
 
@@ -407,46 +360,41 @@ Reservations:
 | 2   | Mandate and Plan at ~250 lines against the template's 120                               | accept as is; budget finding for the retrospective and the template |
 | 3   | Stop 0 experiment: frame confirmed before the mock-up, then amended twice by the mock-up | to the retrospective; template change after closure per the user  |
 
-<!-- Stop 3: the ship decision, once the discussion is settled. Then
-the PR is marked ready. -->
-
 Shipped: 2026-09-21
 
 ## 5. Closure
 
 ### 5.1 Retrospective
 
-<!-- One row per point worth remembering; the agent gives its rating,
-the user gives theirs: well, not well, surprise, tension, don't care.
-The first row is standing: "process and template fit", the friction
-met with this template. A fix that is a guidance comment or a pointer
-is applied on this branch and listed in Forward-looking; a fix that
-changes the structure (a chapter, a stop) becomes a TODO item. The
-process line carries the measures the discussion of set-based design
-asked for. -->
+| #   | Point                                                                                                                                                  | Agent    | User |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ---- |
+| 1   | Process and template fit: Stop 0 (`Framed:` after § 1.4) added as an experiment; the frame took one round, then the mock-up amended it twice (rule, markup) | well     |      |
+| 2   | Mandate and Plan at ~250 lines against the 120 budget: the option table, the trap listing and the inventory                                            | tension  |      |
+| 3   | The brief's trial missed the pipeline case; the mock-up's extra cases found it in one run (zero diff on the happy path is not evidence, again)           | surprise |      |
+| 4   | A brief from a prior task as the mandate's seed: Context to Invariants written in one pass                                                             | well     |      |
+| 5   | Namespacing raised by the user after approval and before any step ran: a table row, no rework                                                          | well     |      |
+| 6   | Mutation smoke-test reverted by file copy, never `git checkout`                                                                                        | well     |      |
 
-| #   | Point                    | Agent | User |
-| --- | ------------------------ | ----- | ---- |
-| 1   | Process and template fit |       |      |
-
-Process: <N> rounds before stop 1; <N> loops at stop 2; rework after
-stop 1: none | <what>
-
-<!-- Stop 4: the user fills their column. -->
+Process: 1 round at stop 0, 2 amendments from the mock-up before stop 1,
+1 round at stop 1; 0 loops at stop 2; rework after stop 1: none.
 
 Closed: pending
 
 ### 5.2 Forward-looking
 
-<!-- Follow-ups filed (TODO items, issues, discussions), template and
-CLAUDE.md fixes made on this branch, and what the next tasks can now
-rely on. -->
+- TODO item 17, on this branch: Stop 0 in the devlog template and
+  CLAUDE.md Phase 3, plus the budget revisit (row 2).
+- The next recipes can use the helpers anywhere a command is; the
+  next tool prints `--- title ---` / `-- phase` and never traces.
+- `tests/tracing-prelude/trial.sh` is where a new helper context goes
+  when one bites.
 
 ### 5.3 Rule trace
 
-<!-- Conventions applied (cite the section) and conventions created
-by this task (the sentence added, and where). Two verbs only. -->
-
-| Source | Rule | Verb (applied / created) |
-| ------ | ---- | ------------------------ |
-|        |      |                          |
+| Source                                       | Rule                                                                                       | Verb (applied / created) |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------ |
+| `doc/CONVENTIONS.md`, Script levels          | prelude holds sourced mechanics only; calls go down only                                   | applied                  |
+| `doc/CONVENTIONS.md`, Calling directory      | sourced as `. ./tools/init-tracing.sh` from the repository root                            | applied                  |
+| `CLAUDE.md`, Non-regression tests            | mutation smoke-test after adding a test                                                    | applied                  |
+| `tests/README.md`, § 1                       | classification integration, nominal plus robustness                                        | applied                  |
+| `doc/CONVENTIONS.md`, Script levels          | recipes source the prelude and are bash; a tool never traces, lighter markup for its phases | created                  |
