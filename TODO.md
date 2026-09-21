@@ -244,7 +244,7 @@ turned into a standard task (GH ticket, PR, devlog).
     (the file was replaced by `TODO.md`); #92 added 21 net lines
     (stops, template pointers).
 
-16. Tracing prelude without aliases
+16. ~~Tracing prelude without aliases~~ — DONE (#94)
 
     Replace the alias trick of `tools/init-tracing.sh` (its `;` makes
     `a || echo msg` print unconditionally; bit #88 in `$(...)` and #90

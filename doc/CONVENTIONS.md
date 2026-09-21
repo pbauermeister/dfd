@@ -220,6 +220,10 @@ applying one command per file, and no computation. Tools (`tools/`) do
 one concern with explicit arguments, so that every call site is
 self-explanatory; they are called from recipes, workflows and tests.
 The prelude (`tools/init-tracing.sh`) holds sourced mechanics only.
+Recipes source it, and they are bash: tracing is the orchestrator's
+view. A tool never traces; it prints its title as `--- title ---` and
+its phases as `-- phase`, lighter than the recipes' banners, so that
+the level of a line is readable in the output.
 Calls go down only, Makefile to recipes to tools: a recipe never calls
 make nor another recipe, and a target whose body calls make
 (`test-matrix`) stays in the Makefile. Logic that appears in a recipe

@@ -1,7 +1,7 @@
 # Tracing prelude without aliases: a DEBUG trap
 
 Date: 2026-09-20
-Status: PENDING
+Status: DONE
 Origin: #90 (devlog `devlog/090-script-levels.md`), branch
 `refactor/90-script-levels`; TODO item 16.
 
@@ -180,3 +180,12 @@ Steps:
    command inside `_quiet_` would exit the script; none can fail);
    `trap ... DEBUG` inherited by subshells only with `functrace`
    (needed for `$(...)`, kept).
+
+## 6. Outcome (#94, `devlog/094-tracing-prelude.md`)
+
+The candidate of § 3 loses the trace after a pipeline (`echo x | cat`:
+the trap fires in the parent for each element before the fork, only
+the subshell restores). Shipped instead: the trap owns the state, off
+before a helper and on before the next command outside one; helpers
+only print, `echo` stays the builtin. Sourced by recipes only: a tool
+never traces and marks its phases in a lighter markup.

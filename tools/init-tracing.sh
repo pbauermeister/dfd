@@ -1,49 +1,31 @@
-# Shell prelude for the recipes and tools: exit on error, trace
-# commands, and echo/banner/banner2/step helpers that print without the
-# trace noise (https://superuser.com/a/1141026). Source it from the
-# repository root: `. ./tools/init-tracing.sh`.
-#
-# The helpers are aliases carrying a `;`: never use them as an operand of
-# `&&` or `||`, nor inside `$(...)`; there, use printf (the fallback would
-# run unconditionally, and `set -u` then fails on save_flags).
+# Shell prelude for the recipes: exit on error, trace commands, and
+# echo/banner/banner2/step helpers that print without the trace noise.
+# A DEBUG trap owns the tracing state: it turns tracing off before a
+# helper and back on before the next command outside one, so the helpers
+# are plain functions (echo stays the builtin), usable anywhere a
+# command is: after `||`, inside `$(...)`, in a pipeline.
+# Source it from the repository root: `. ./tools/init-tracing.sh`.
+# bash only (DEBUG trap, BASH_COMMAND, FUNCNAME); recipes only, a tool
+# never traces (doc/CONVENTIONS.md, "Script levels").
 set +x -e -u -o pipefail
 
-shopt -s expand_aliases 2>/dev/null || true  # for bash
+banner()  { _tracing_box_ '######################################################################' "$*"; }
+banner2() { _tracing_box_ '----------------------------------------------------------------------' "$*"; }
+step()    { echo; echo "==== $* ===="; echo; }
+_tracing_box_() { echo; echo "$1"; echo "$2"; echo "$1"; echo; }
 
-
-alias echo='{ save_flags="$-"; set +x; } 2>/dev/null; _echo_';
-_echo_() { \echo "$*"; case "$save_flags" in *x*)  set -x;; esac }
-
-alias banner='{ save_flags="$-"; set +x; } 2>/dev/null; _banner_';
-_banner_() { __banner__ "$*"; case "$save_flags" in *x*)  set -x;; esac }
-
-alias banner2='{ save_flags="$-"; set +x; } 2>/dev/null; _banner2_';
-_banner2_() { __banner2__ "$*"; case "$save_flags" in *x*)  set -x;; esac }
-
-alias step='{ save_flags="$-"; set +x; } 2>/dev/null; _step_';
-_step_() { __step__ "$*"; case "$save_flags" in *x*)  set -x;; esac }
-
-__banner__() {
-    \echo
-    \echo "######################################################################"
-    \echo "$*"
-    \echo "######################################################################"
-    \echo
+_tracing_saved_flags_=""
+export -n _tracing_saved_flags_
+_tracing_quiet_() {  # DEBUG trap, before every command
+    case "$BASH_COMMAND" in
+        echo|echo\ *|banner\ *|banner2\ *|step\ *)  # a helper: tracing off, once
+            case "$-" in *x*) _tracing_saved_flags_="$-"; set +x ;; esac ;;
+        *)  case " ${FUNCNAME[*]} " in  # inside a helper: leave it off
+                *" banner "*|*" banner2 "*|*" step "*) ;;
+                *) case "$_tracing_saved_flags_" in *x*) _tracing_saved_flags_=""; set -x ;; esac ;;
+            esac ;;
+    esac
 }
-
-__banner2__() {
-    \echo
-    \echo "----------------------------------------------------------------------"
-    \echo "$*"
-    \echo "----------------------------------------------------------------------"
-    \echo
-}
-
-__step__() {
-    \echo
-    \echo "==== $* ===="
-    \echo
-}
-
-set -ex
-
+trap '{ _tracing_quiet_; } 2>/dev/null' DEBUG
+set -o functrace  # the trap also fires inside functions, $(...) and pipelines
+set -x
