@@ -253,7 +253,7 @@ turned into a standard task (GH ticket, PR, devlog).
     a command is. Candidate prelude, trials and migration steps in
     `discussions/tracing-prelude-debug-trap.md` (from #90).
 
-17. Stop 0 in the devlog template
+17. ~~Stop 0 in the devlog template~~ — DONE (#96)
 
     #94 experimented a `Framed:` stop after § 1.4 Invariants: the user
     confirms Context, Goal, Non-goals and Invariants before any mock-up
