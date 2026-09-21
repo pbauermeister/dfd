@@ -410,7 +410,7 @@ Reservations:
 <!-- Stop 3: the ship decision, once the discussion is settled. Then
 the PR is marked ready. -->
 
-Shipped: pending
+Shipped: 2026-09-21
 
 ## 5. Closure
 
