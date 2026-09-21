@@ -352,42 +352,60 @@ which the user decides. -->
 <!-- Stop 2: the user tries the work, and either mandates a loop or
 lets the delivery proceed. -->
 
-Tried: pending
+Tried: 2026-09-21
 
 ### 4.2 Test report
 
-<!-- The Acceptance criteria, ticked, with the command output
-that proves each; make format lint test; CI status of the PR; a test
-that caught a real error during the task, if any. -->
+1. [x] Trial output: `tests/test_tracing_prelude.py` passes; the
+   expected file shows no `+ echo`/`+ banner`/`+ step`/`+ set` line,
+   `Y should print` after `false ||`, `Z should print` after `true &&`,
+   `+ cat` and `+ true` after the pipeline, `+ true` inside the user
+   function, `+ exit 3` last; exit code 3 asserted.
+2. [x] `bash -n` on the five recipes, the prelude and
+   `tools/test-installation.sh`: all parse; `grep -l init-tracing
+   tools/*.sh` lists the prelude only.
+3. [x] Fake `apt`/`sudo`/`which`: apt present and succeeding, no
+   fallback; apt hidden, one fallback line; `sudo apt` failing, one
+   fallback line.
+4. [x] `make smoke-test-wheel`: `Installation OK: 1.17.8 from-wheel`
+   under the new markup.
+5. [x] `grep -n 'alias\|shopt\|printf' tools/init-tracing.sh recipes/*.sh`:
+   empty.
+6. [x] `make format lint test`: all checks passed, 97 pytest + 77 NR.
+   CI on PR #95: conventional: pass;gate: pass;smoke-test-wheel: pass;test (3.11): pass;test (3.12): pass;test (3.13): pass;
+7. [x] TODO item 16 struck through with `DONE (#94)`; discussion status
+   DONE, outcome in its § 6.
+
+Caught during the task: the mutation smoke-test (restore branch
+dropped) fails criterion 1 on the missing `+ cat`.
 
 ### 4.3 Verdict
 
-<!-- The agent's self-assessment, not the decision: written before the
-user reads Discussion, it is the valve against overclaiming. A criterion
-not proven is a reservation, not a tick. A reservation that outlives
-the task becomes a TODO item. -->
-
-**Recommendation:** accept | accept with reservations | reject
+**Recommendation:** accept with reservations
 
 Rationale:
 
-- <criterion met, test green, property achieved>
+- Every acceptance criterion is proven by a command above; the
+  defect class that bit #88 and #90 is covered by a test that fails
+  when the trap regresses.
+- The prelude is 31 lines against 49, with no alias, no `shopt`, no
+  rule in a comment.
 
-Reservations (for "with reservations"; for "reject", what must change):
+Reservations:
 
-1.
+1. macOS `/bin/bash` 3.2 not trialed: the four features used date
+   from bash 3.0 per the manual, but no run backs it. Surfaces only
+   for a macOS contributor running a recipe.
+2. `tests/README.md` is not covered by the doc sync test; its new
+   section is prose only.
 
 ### 4.4 Discussion
 
-<!-- Where the ship decision is taken, once no loop is requested and
-the test report is in: what surfaced unexpectedly, what remains an
-issue. One row per point, with the decision: postpone (a TODO item,
-filed on this branch) or accept as is; a "complement now" here is a
-loop. -->
-
-| #   | Point | Decision |
-| --- | ----- | -------- |
-| 1   |       |          |
+| #   | Point                                                                                   | Decision                                                         |
+| --- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 1   | macOS bash 3.2 untrialed (reservation 1)                                                | accept as is; a macOS CI job is a separate decision              |
+| 2   | Mandate and Plan at ~250 lines against the template's 120                               | accept as is; budget finding for the retrospective and the template |
+| 3   | Stop 0 experiment: frame confirmed before the mock-up, then amended twice by the mock-up | to the retrospective; template change after closure per the user  |
 
 <!-- Stop 3: the ship decision, once the discussion is settled. Then
 the PR is marked ready. -->
