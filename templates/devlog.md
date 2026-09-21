@@ -11,7 +11,8 @@ Devlog template (see CLAUDE.md "devlog/NNN-short-description.md files").
 Copy, fill, delete the optional sections that do not apply and every
 guidance comment. An omitted section leaves no placeholder: renumber,
 and cite a section by number and title ("§ 1.8 Design decisions"),
-the title being the stable identifier. Budget: Mandate and Plan about
+the title being the stable identifier; these guidance comments refer
+by title only. Budget: Mandate and Plan about
 120 lines, the whole file about 250 at closure; cite a convention
 instead of restating its rationale. Status follows CLAUDE.md: PENDING
 until stop 1, ONGOING after it, DONE at stop 4.
@@ -21,7 +22,7 @@ fills on the user's go, never before: Approved (after the Plan, before
 any execution), Tried (after Try it; the user may mandate a loop),
 Shipped (the ship decision, once no loop is requested and the test
 report is in), Closed (after the Retrospective). A loop adds steps to
-§ 2.1, is accounted in § 3.1 and refreshes § 4.1. The Mandate is presented once,
+Steps, is accounted in Account and refreshes Try it. The Mandate is presented once,
 with the mock-up built and the spikes run, so that stop 1 is one
 round. Between the stops the agent writes and runs autonomously, to
 the depth the step gates (attended or unattended, CLAUDE.md Phase 4)
@@ -40,7 +41,7 @@ Task nature selects the variant:
 ## 1. Mandate
 
 <!-- Everything the user must read to approve the work, before any of
-it runs. Approved together with the Plan, at the end of § 2. -->
+it runs. Approved together with the Plan, at the end of the Plan. -->
 
 ### 1.1 Context
 
@@ -83,7 +84,7 @@ name it, build two or three options in their own worktrees, one row
 each below, and recommend one; the Plan is written for the
 recommended option and redone if the user picks another at stop 1.
 The reason the user gives is the rule: written here, promoted to the
-convention by the step that ships it, traced in § 5.3. These lines
+convention by the step that ships it, traced in Rule trace. These lines
 stay even when all say "none": the skip is a decision. Before stop 1
 the agent re-reads the Mandate as a reviewer: does each name describe
 the files, which direction does each call go, which existing file
@@ -109,7 +110,7 @@ decides. Omit when every decision reads off the artifact. -->
 
 <!-- One row per decision, read off the mock-up and the spikes. Basis
 is "rule: <name>" when a convention decides it, "taste" when the
-user's preference does, "option <n>" when § 1.6 decided it. The user
+user's preference does, "option <n>" when Set-based design decided it. The user
 reads the taste rows; the agent checks each rule row against the
 convention it cites. -->
 
@@ -120,7 +121,7 @@ convention it cites. -->
 ### 1.9 Acceptance criteria
 
 <!-- Numbered, each checkable by a command or a diff; ticked in
-§ 4.2. Include the standing ones: make format lint test pass; NR
+Test report. Include the standing ones: make format lint test pass; NR
 fixtures and mutation smoke-test when fixtures change. -->
 
 1.
@@ -172,7 +173,7 @@ Approved: pending
 <!-- Terse. Per step: "as planned", or the notable and unexpected
 things (a sweep that caught a miss, a trial that failed, a decision
 taken on the way and its basis). A rule discovered on the way goes to
-§ 5.3. -->
+Rule trace. -->
 
 ## 4. Delivery
 
@@ -195,14 +196,14 @@ Tried: pending
 
 ### 4.2 Test report
 
-<!-- The acceptance criteria of § 1.9, ticked, with the command output
+<!-- The Acceptance criteria, ticked, with the command output
 that proves each; make format lint test; CI status of the PR; a test
 that caught a real error during the task, if any. -->
 
 ### 4.3 Verdict
 
 <!-- The agent's self-assessment, not the decision: written before the
-user reads § 4.4, it is the valve against overclaiming. A criterion
+user reads Discussion, it is the valve against overclaiming. A criterion
 not proven is a reservation, not a tick. A reservation that outlives
 the task becomes a TODO item. -->
 

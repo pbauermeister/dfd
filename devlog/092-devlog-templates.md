@@ -136,7 +136,16 @@ devlog template, stops, set-based design in Phase 3`.
 filled, stops 2 to 4, status DONE, PR ready. Commit `docs: devlog 092
 execution and closure`.
 
-One attended/unattended gate for the three steps: docs only.
+**Step 4 — Deduplicate** (`docs:`, loop mandated at stop 2): the
+template's guidance comments are the reference; `CLAUDE.md` points to
+them instead of repeating them (Phase 3 one bullet plus stop 1; Phase 4
+one paragraph naming stops 2 to 4; devlog section three bullets); the
+comments refer to sections by title, never by number. Verify: `grep -c
+'§ [0-9]' templates/devlog.md CLAUDE.md` gives 1 and 0; `CLAUDE.md`
+delta against `main` about +12 lines. Commit `docs: CLAUDE.md points
+to the template's guidance; titles, not numbers`.
+
+One attended/unattended gate for the steps: docs only.
 
 ### 2.2 Inventory
 
@@ -163,7 +172,13 @@ Approved: 2026-09-20
 - Step 2: as planned. `CLAUDE.md` 265 → 311 lines (+46): the Phase 3
   set-based paragraph and the four stops are the bulk; TODO item 15's
   concern, noted for § 4.4. `devlog/img/` not created: on first use.
-- Step 3: in progress; stop 2 taken on this devlog itself.
+- Step 3: stop 2 taken on this devlog itself; the user mandated a
+  loop: `CLAUDE.md` repeated the template's guidance (+46 lines), a
+  second copy to maintain; and the comments cited sections by number
+  while the header said numbers are local.
+- Step 4 (loop): as planned; `CLAUDE.md` back to about +12 against
+  `main`, 1 numbered reference left in the template (the citation
+  example), 0 in `CLAUDE.md`.
 
 ## 4. Delivery
 
@@ -171,9 +186,9 @@ Approved: 2026-09-20
 
 - Read `templates/devlog.md` as the file a scaffolding copy would
   start from; then this devlog as its filled instance.
-- Read the `CLAUDE.md` diff of step 2: `git diff main -- CLAUDE.md`
+- Read the `CLAUDE.md` diff after the loop: `git diff main -- CLAUDE.md`
   (Phase 2 step 3, Phase 3, Phase 4, the two sections after the
-  DEVLOG.md one).
+  DEVLOG.md one; +18 net lines, every pointer to the template).
 - Dry run of the process: pick any open TODO item and, mentally,
   check that each stop has a place and each template section an
   answer.
