@@ -264,17 +264,25 @@ Reservations:
 | 3   | `CLAUDE.md` +21 lines                                                                   | postponed: TODO item 15                                               |
 | 4   | `CLAUDE.md` "devlog/DEVLOG.md general file" section is stale (file replaced by TODO.md) | postponed: fold into TODO item 15 (out of this task's scope boundary) |
 
-Shipped: pending
+Shipped: 2026-09-21
 
 ## 5. Closure
 
 ### 5.1 Retrospective
 
-| #   | Point                    | Agent | User |
-| --- | ------------------------ | ----- | ---- |
-| 1   | Process and template fit |       |      |
+| #   | Point                                                                                                                                                               | Agent    | User |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: every section answered on the first instance; two loops recorded as steps; stop 2 mandated both of them                                   | well     |      |
+| 2   | The mandate was presented once, but reworked six times before stop 1 (structure, fresh eyes, terminology, set-based flow); each pass improved it, none was a rewind | well     |      |
+| 3   | Redundancy between `CLAUDE.md` and the template was written by the agent and caught by the user at stop 2                                                           | not well |      |
+| 4   | "Try it mentally" written by the agent, the very thing the method rejects                                                                                           | not well |      |
+| 5   | Inherited rules (titles as identifiers, budget, verdict shape, stop rule) came from the other project's incidents at zero cost                                      | well     |      |
+| 6   | Budget: the loop steps and the inline slice broke it on the first instance                                                                                          | surprise |      |
+| 7   | Edits by string replacement on prettier-formatted tables failed silently twice; regex on the row number fixed it                                                    | not well |      |
 
-Process: rounds before stop 1; loops at stop 2; rework after stop 1:
+Process: 7 rounds before stop 1 (1 structure, 4 fresh-eyes and
+terminology, 2 set-based flow); 2 loops at stop 2; rework after stop 1:
+none.
 
 Closed: pending
 
