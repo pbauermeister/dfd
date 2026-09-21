@@ -60,18 +60,46 @@ publishing recipes carry `#!/bin/sh`.
 
 ### 1.2 Goal
 
-<!-- What is true once the task is done, in one paragraph. -->
+`echo`, `banner`, `banner2` and `step` are plain shell functions,
+usable anywhere a command is: after `||` and `&&`, inside `$(...)`,
+in an `if` condition, with a redirection. A `DEBUG` trap turns
+tracing off just before a helper runs and the helper turns it back on
+when it returns, so their trace lines are hidden as today. The "never
+in list context" rule and the `printf` workaround are gone from the
+prelude header, `doc/CONVENTIONS.md` and `recipes/require-system.sh`.
+The trace of every other command is unchanged. TODO item 16 is done
+and the discussion's status is DONE.
 
 ### 1.3 Non-goals
 
-<!-- What is deliberately left out, each with the reason, so that a
-skip is a decision and not an omission. -->
+- POSIX `sh` compatibility: the prelude uses `DEBUG`, `BASH_COMMAND`
+  and `functrace`, so it is bash only; the two `#!/bin/sh` recipes
+  switch to `#!/bin/bash`. The Makefile already runs bash.
+- Changing call sites beyond the two `printf` fallbacks: no sourcing
+  script uses a helper in list context today (grep in #90).
+- The script-level and naming rules of #90: the prelude stays
+  `tools/init-tracing.sh`, sourced mechanics only.
+- Tracing inside the tools called by the recipes: unchanged, the
+  functions are not exported.
 
 ### 1.4 Invariants
 
-<!-- Rules that every option must satisfy: call directions, naming
-rules, compatibility. Cite the convention when one exists. Mandatory
-for refactor, optional otherwise. -->
+- Script levels and calling directory (`doc/CONVENTIONS.md`, "Script
+  levels", "Calling directory"): the prelude holds sourced mechanics
+  only and is sourced as `. ./tools/init-tracing.sh`.
+- `set -e -u -o pipefail` and `set -x` stay in force in every sourcing
+  script; the output of every non-helper command, trace line included,
+  is byte-identical before and after.
+- A helper prints what it printed before (same text, same blank
+  lines) and never leaves tracing in a state other than the one it
+  found.
+- Every recipe and tool that sources the prelude parses (`bash -n`)
+  and runs as before; CI (`ci.yml`, `merge-gate.yml`) stays green.
+
+<!-- Stop 0 (experiment of this task, see § 5.1 Retrospective): the
+user confirms the frame, 1.1 to 1.4, before any mock-up or spike. -->
+
+Framed: 2026-09-21
 
 ### 1.5 Taste
 
