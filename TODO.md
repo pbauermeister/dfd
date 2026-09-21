@@ -235,11 +235,14 @@ turned into a standard task (GH ticket, PR, devlog).
     `CLAUDE.md` grows with every task (265 lines, 15 sections)
     and is loaded whole into every session, whatever the task. Offload
     it: per-folder `CLAUDE.md` files that Claude Code loads when it
-    works in that folder (`tests/`, `tools/`, `runbooks/`, `devlog/`),
+    works in that folder (`tests/`, `tools/`, `recipes/`, `devlog/`),
     or dedicated documents that the root file refers to by context
     (task start process, NR tests, release, conventions), keeping the
     root to the rules that apply everywhere. Measure the line counts
     before and after; keep the append-only rule for the root file.
+    From #92: the "devlog/DEVLOG.md general file" section is stale
+    (the file was replaced by `TODO.md`); #92 added 21 net lines
+    (stops, template pointers).
 
 16. Tracing prelude without aliases
 

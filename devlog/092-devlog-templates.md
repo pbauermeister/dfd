@@ -206,23 +206,63 @@ Approved: 2026-09-20
 - The template is tested by the next tasks, not imagined here;
   friction lands in the standing first row of each Retrospective.
 
-Tried: pending
+Tried: 2026-09-21
 
 ### 4.2 Test report
 
+1. ✅ `templates/devlog.md`, `templates/discussion.md` exist;
+   `prettier --check templates/*.md devlog/092-*.md CLAUDE.md`: clean.
+2. ⚠️ Section list of this devlog equals the template's (`diff` of the
+   heading lists: empty); 0 guidance comments left. Budget: Mandate +
+   Plan 163 lines against about 120; file 247 against about 250. Over
+   on the first, by the inline mock-up slice (14 lines) and the two
+   loop steps (17 lines).
+3. ✅ `CLAUDE.md`: Phase 2 copies the template; Phase 3 one bullet plus
+   stop 1 with the rule; Phase 4 names stops 2 to 4; devlog section
+   points to the template, states the status rule and the fix paths;
+   `## discussions/ files` present. `git diff main --stat`: +43 −22.
+   Numbered references: 0 in `CLAUDE.md`, 1 in the template (the
+   citation example).
+4. ✅ `make lint`: clean; `make test`: 96 passed. CI on PR #93 at
+   098970d: conventional, gate, smoke-test-wheel, test 3.11/3.12/3.13
+   all pass.
+5. ✅ `TODO.md`: `14. ~~Devlog templates~~ — DONE (#92)`.
+
+No test caught an error during the task: nothing under test changed.
+
 ### 4.3 Verdict
 
-**Recommendation:** pending
+**Recommendation:** accept with reservations
 
 Rationale:
 
+- Criteria 1, 3, 4, 5 proven by command output above.
+- The template survived its first instance: every section answered,
+  four stops dated, two loops recorded per the loop rule, and the
+  loops themselves produced two template rules (reference by title,
+  the standing row) through the mechanism the template prescribes.
+
 Reservations:
+
+1. Criterion 2, budget: Mandate + Plan at 163 lines. The overrun is the
+   inline mock-up slice, which the method wants, and the loop steps,
+   which the loop rule wants. Either the budget is too tight for a
+   task with loops, or loop steps should be accounted more tersely.
+   Data from the next tasks decides; the standing row carries it.
+2. One task nature tested (change), no real options, no spike. Fit for
+   refactor and analysis, and the options table, are untested by
+   construction; deferred to use by the user's decision at stop 2.
+3. `CLAUDE.md` grew by 21 net lines; TODO item 15's concern, not this
+   task's.
 
 ### 4.4 Discussion
 
-| #   | Point | Decision |
-| --- | ----- | -------- |
-| 1   |       |          |
+| #   | Point                                                                                   | Decision                                                              |
+| --- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 1   | Budget overrun of Mandate + Plan (reservation 1)                                        | accept as is; revisit the budget after five tasks                     |
+| 2   | Refactor and analysis natures, options table, spikes untested (reservation 2)           | accept as is; tested by use, standing row collects the friction       |
+| 3   | `CLAUDE.md` +21 lines                                                                   | postponed: TODO item 15                                               |
+| 4   | `CLAUDE.md` "devlog/DEVLOG.md general file" section is stale (file replaced by TODO.md) | postponed: fold into TODO item 15 (out of this task's scope boundary) |
 
 Shipped: pending
 
