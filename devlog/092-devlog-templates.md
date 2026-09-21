@@ -1,7 +1,7 @@
 # 092 — Devlog templates per task kind, set-based design gate
 
 Date: 2026-09-20
-Status: ONGOING
+Status: DONE
 Issue: #92 · PR: #93 · Branch: `doc/92-devlog-templates`
 Task nature: change
 Agent: Claude Fable 5.1
@@ -270,26 +270,44 @@ Shipped: 2026-09-21
 
 ### 5.1 Retrospective
 
-| #   | Point                                                                                                                                                               | Agent    | User |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: every section answered on the first instance; two loops recorded as steps; stop 2 mandated both of them                                   | well     |      |
-| 2   | The mandate was presented once, but reworked six times before stop 1 (structure, fresh eyes, terminology, set-based flow); each pass improved it, none was a rewind | well     |      |
-| 3   | Redundancy between `CLAUDE.md` and the template was written by the agent and caught by the user at stop 2                                                           | not well |      |
-| 4   | "Try it mentally" written by the agent, the very thing the method rejects                                                                                           | not well |      |
-| 5   | Inherited rules (titles as identifiers, budget, verdict shape, stop rule) came from the other project's incidents at zero cost                                      | well     |      |
-| 6   | Budget: the loop steps and the inline slice broke it on the first instance                                                                                          | surprise |      |
-| 7   | Edits by string replacement on prettier-formatted tables failed silently twice; regex on the row number fixed it                                                    | not well |      |
+| #   | Point                                                                                                                                                               | Agent    | User       |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: every section answered on the first instance; two loops recorded as steps; stop 2 mandated both of them                                   | well     | well       |
+| 2   | The mandate was presented once, but reworked six times before stop 1 (structure, fresh eyes, terminology, set-based flow); each pass improved it, none was a rewind | well     | well       |
+| 3   | Redundancy between `CLAUDE.md` and the template was written by the agent and caught by the user at stop 2                                                           | not well | ended well |
+| 4   | "Try it mentally" written by the agent, the very thing the method rejects                                                                                           | not well | ended well |
+| 5   | Inherited rules (titles as identifiers, budget, verdict shape, stop rule) came from the other project's incidents at zero cost                                      | well     | well       |
+| 6   | Budget: the loop steps and the inline slice broke it on the first instance                                                                                          | surprise | well       |
+| 7   | Edits by string replacement on prettier-formatted tables failed silently twice; regex on the row number fixed it                                                    | not well | don't care |
 
 Process: 7 rounds before stop 1 (1 structure, 4 fresh-eyes and
 terminology, 2 set-based flow); 2 loops at stop 2; rework after stop 1:
 none.
 
-Closed: pending
+Closed: 2026-09-21
 
 ### 5.2 Forward-looking
 
+- The next tasks copy `templates/devlog.md`; their standing
+  retrospective row is the test of this task. Revisit the budget after
+  five tasks (Discussion row 1).
+- TODO item 15 carries the `CLAUDE.md` growth and the stale
+  "DEVLOG.md general file" section (Discussion rows 3–4).
+- Template and `CLAUDE.md` fixes made on this branch: reference by
+  title in the guidance comments; the standing row and the two fix
+  paths; `CLAUDE.md` points to the template instead of repeating it.
+- The set-based design discussion (`discussions/set-based-design.md`)
+  is consumed; its status can go to DONE with the merge.
+
 ### 5.3 Rule trace
 
-| Source | Rule | Verb (applied / created) |
-| ------ | ---- | ------------------------ |
-|        |      |                          |
+| Source                               | Rule                                                                                                            | Verb    |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ------- |
+| CONVENTIONS, Naming                  | `templates/` topic-first family, `devlog.md`, `discussion.md`                                                   | applied |
+| discussions/set-based-design.md      | mock-up before decisions; options on a design question; the why is the rule                                     | applied |
+| CLAUDE.md, Design philosophy (YAGNI) | no scaffolding tool, no hook                                                                                    | applied |
+| CLAUDE.md, Markdown formatting       | prettier-clean tables in every added file                                                                       | applied |
+| templates/devlog.md, header          | guidance comments refer to sections by title only                                                               | created |
+| templates/devlog.md, Retrospective   | standing "process and template fit" row; fix paths (comment or pointer on the branch, structure as a TODO item) | created |
+| CLAUDE.md, devlog section            | `CLAUDE.md` points to the template's guidance, never repeats it                                                 | created |
+| CLAUDE.md, Phase 3                   | nothing runs while `Approved:` is pending; Mandate presented once                                               | created |
