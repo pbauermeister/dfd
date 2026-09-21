@@ -1,0 +1,38 @@
+
+######################################################################
+Banner
+######################################################################
+
+
+==== a step ====
+
++ true
++ true
++ false
+Y should print
++ true
+Z should print
++ V='inside command substitution'
+
+----------------------------------------------------------------------
+banner2: V=inside command substitution
+----------------------------------------------------------------------
+
+
+to stderr
++ cat
+piped
++ true
+in a condition
++ true
++ ls no-such-file
+in a brace group
++ exit_code=1
++ f
+
+==== in a user function ====
+
++ true
++ '[' '!' -f .no-such-token ']'
+ERROR: guard message, then exit 3
++ exit 3
