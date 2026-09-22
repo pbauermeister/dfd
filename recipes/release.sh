@@ -6,7 +6,7 @@
 # locally; both are shown and confirmed before the push. The tag push
 # triggers the release workflow (.github/workflows/release.yml), which
 # runs CI, rehearses on TestPyPI, publishes to PyPI and creates the
-# GitHub release. See doc/RELEASING.md.
+# GitHub release. See engineering/RELEASING.md.
 
 . ./tools/init-tracing.sh
 

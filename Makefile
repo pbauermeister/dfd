@@ -106,7 +106,7 @@ show-release-plan: ## print the next version and the commits since the last rele
 help-cc: ## print the conventional commit type to version bump map
 	@uv run ./tools/conventional-commits.py print-bump-table
 
-release: ## release to PyPI and GitHub via GitHub Actions (see doc/RELEASING.md)
+release: ## release to PyPI and GitHub via GitHub Actions (see engineering/RELEASING.md)
 	./recipes/release.sh
 
 publish-to-testpypi: build ## release rehearsal: upload to TestPyPI, install, check

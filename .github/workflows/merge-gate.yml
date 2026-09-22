@@ -1,7 +1,7 @@
 # Unreleased changes on main never span two levels: a PR whose type
 # would raise the pending level of main is blocked until the pending
 # changes are released. The tool and its configuration come from the
-# PR checkout, the history from a worktree of main. See doc/RELEASING.md.
+# PR checkout, the history from a worktree of main. See engineering/RELEASING.md.
 name: Merge gate
 
 on:

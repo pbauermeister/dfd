@@ -10,7 +10,7 @@
 #   https://pypi.org/manage/account/token/
 #
 # Version and CHANGES.md entry: made by `semantic-release version`
-#   (see doc/RELEASING.md, Local fallback)
+#   (see engineering/RELEASING.md, Local fallback)
 #
 # The TestPyPI rehearsal (`make publish-to-testpypi`: build, wheel smoke
 # test, TestPyPI upload and install smoke test) is a prerequisite in the

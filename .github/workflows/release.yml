@@ -3,7 +3,7 @@ name: Release
 # Release to PyPI and GitHub from one build, gated on CI. The push of a
 # version tag (make release) is the release; a manual dispatch is a dry
 # run from any ref, stopping after the TestPyPI rehearsal.
-# See doc/RELEASING.md.
+# See engineering/RELEASING.md.
 
 on:
   push:

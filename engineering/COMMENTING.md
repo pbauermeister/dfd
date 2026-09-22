@@ -18,7 +18,7 @@ Three kinds of comments are used, at different granularities:
 ### 1. Chunk comments (primary)
 
 A short `#` line placed before a logical group of lines inside a function
-body, stating *what* that group accomplishes — not *how*. They partition the
+body, stating _what_ that group accomplishes — not _how_. They partition the
 function into scannable blocks.
 
 ```python
@@ -56,7 +56,7 @@ kept_new_statements = []
 
 ### 3. Intent comments (occasional)
 
-One or more `#` lines — or a docstring sentence — explaining *why* a design
+One or more `#` lines — or a docstring sentence — explaining _why_ a design
 decision was made. Use sparingly, only when the reasoning would not be
 recoverable from the code or the surrounding chunk comments.
 
@@ -75,7 +75,7 @@ for statement in statements:
 - **Intent comments**: capitalized full sentences.
   `# An item in the only_names set may lose its connections…`
 
-This visual distinction lets the eye tell *what* from *why* at a glance.
+This visual distinction lets the eye tell _what_ from _why_ at a glance.
 
 ## Density
 
@@ -91,7 +91,7 @@ guideline, not a rigid rule:
 
 ## What to comment
 
-- The *purpose* of a code block — not a restatement of the code.
+- The _purpose_ of a code block — not a restatement of the code.
 - Initialization sections that set up state for later use.
 - Non-obvious defaults or fallbacks.
 - DSL flag references (`"x"`, `"f"`) rather than re-explaining the full
@@ -122,6 +122,6 @@ Examples: use "item" (not "node"), "anchor" (not "listed item"), "kept set"
 - Phase headers: `# phase 1: collect filtered names`
 - Chunk comments: `# add anchor names (suppressed by "x" flag: …)`
 - Intent comment: `# An item in the only_names set may lose its connections
-  and, if it is hidable, vanish…`
+and, if it is hidable, vanish…`
 - Omitted comment: no chunk comment above `_collect_frame_skips` call
   (function name is self-documenting).

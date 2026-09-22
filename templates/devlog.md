@@ -8,7 +8,7 @@ Track: full | fast
 Agent: <model name and version>
 
 <!--
-Devlog template (see CLAUDE.md "devlog/NNN-short-description.md files").
+Devlog template (see engineering/PROCESS.md "devlog/NNN-short-description.md files").
 Copy, fill, delete the optional sections that do not apply and every
 guidance comment. An omitted section leaves no placeholder: renumber,
 and cite a section by number and title ("§ 1.8 Design decisions"),
@@ -17,7 +17,7 @@ by title only. Budget: Mandate and Plan about 150 lines of prose,
 tables, listings and a refactor's inventory not counted; the whole
 file about 300 at closure (a target from two devlogs, 092 and 094,
 to revisit); cite a convention instead of restating its rationale.
-Status follows CLAUDE.md: PENDING until stop 1, ONGOING after it,
+Status follows engineering/PROCESS.md: PENDING until stop 1, ONGOING after it,
 DONE at stop 4.
 
 Five chapters and five stops. A stop is a dated line that the agent
@@ -32,7 +32,7 @@ from the issue and its brief, so that stop 0 is one round. The rest
 of the Mandate is presented once, with the mock-up built and the
 spikes run, so that stop 1 is one round. Between the stops the agent
 writes and runs autonomously, to the depth the step gates (attended
-or unattended, CLAUDE.md Phase 4) allow.
+or unattended, engineering/PROCESS.md Phase 4) allow.
 
 Task nature selects the variant:
   change    feature or fix from an issue: all of Mandate and Plan.
