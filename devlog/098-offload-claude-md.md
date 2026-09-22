@@ -1,7 +1,7 @@
 # 098 — Offload CLAUDE.md into a root file plus on-demand documents
 
 Date: 2026-09-22
-Status: PENDING
+Status: ONGOING
 Issue: #98 · PR: #99 · Branch: `doc/98-offload-claude-md`
 Task nature: refactor
 Track: full
@@ -295,7 +295,7 @@ Produced by `grep -n '^## ' CLAUDE.md` on `main`.
 
 <!-- Stop 1: the user approves Mandate and Plan. Nothing runs before. -->
 
-Approved: pending
+Approved: 2026-09-22
 
 ## 3. Execution
 
