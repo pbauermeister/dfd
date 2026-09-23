@@ -87,7 +87,7 @@ Tried: pending
 
 **Recommendation:** accept
 
-- The issue's example now produces the flows it expected; both
+- The issue's example now produces the flows it expected; the three
   fixtures fail before the fix and pass after; no other golden moved.
 
 The reservation that stood here (the fix drops the self-loop of a
