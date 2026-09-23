@@ -49,6 +49,10 @@ both fail on the code before the fix.
 - `bc349e9` fix: `_apply_filters()` rewrites the ends first, then
   skips when they collapsed to one item. `make format lint test`
   green: 97 pytest, 85 NR fixtures; no existing golden changed.
+- `f60add5` test: labels on the flows of both fixtures, asked at the
+  review; the fail-before trial redone: both fail at `4572f3a`'s
+  code, pass at HEAD. A separate commit rather than a rewrite of
+  `4572f3a`, since the branch was pushed (squash is the user's).
 
 Approved: 2026-09-23
 
@@ -65,8 +69,10 @@ git checkout 4572f3a -- src && make nr-test; git checkout HEAD -- src
                    # the fixtures fail before the fix
 ```
 
-077 renders the issue's expected picture: `AB -> CD`, `AB <- CD`,
-`AB -> E`, `CD -> E`. 078 renders `AB -> CD` and `CD -> AB` only.
+077 renders the issue's expected picture, labels carried: `AB -> CD`,
+`AB <- CD`, `AB -> E`, `CD -> E`. 078 renders `AB -> CD` twice ("same
+label" once, "other label") and `CD -> AB` ("back"); the four
+collapsing flows are gone.
 
 Tried: pending
 
