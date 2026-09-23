@@ -39,7 +39,7 @@ covers pytest; smoke-test the other two by hand).
 | Filling a devlog                                             | `templates/devlog.md` (guidance comments) |
 | Naming, structure, type safety, design, scripts, Markdown    | `engineering/CONVENTIONS.md`              |
 | Commenting code                                              | `engineering/COMMENTING.md`               |
-| Writing or changing a test                                   | `tests/CLAUDE.md`, then `tests/README.md` |
+| Writing or changing a test                                   | `tests/RULES.md`, then `tests/README.md`  |
 | Versioning, commit types, merge gate, releasing              | `engineering/RELEASING.md`                |
 
 Claude: if the user starts a task without following

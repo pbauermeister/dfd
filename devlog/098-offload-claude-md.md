@@ -171,18 +171,18 @@ measurement of the token cost is an acceptance criterion run by the user
 
 ### 1.8 Design decisions
 
-| #   | Decision                                                                                                                                              | Basis                                                                                      | Alternatives considered                                                                                                                      |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Engineering documents in `engineering/`; `doc/` keeps product documentation only; `CONVENTIONS.md`, `COMMENTING.md`, `RELEASING.md` move there        | option A; user (stop 0 review)                                                             | Leave the three in `doc/`; B to E                                                                                                            |
-| 2   | Lifecycle in one file, `engineering/PROCESS.md`: task start, TODO.md, devlog and discussion files, branching, closing, implementation, tool vs script | taste: needed together at task start                                                       | Four files (multiplies the reads)                                                                                                            |
-| 3   | Root = the project's instance: project paragraph, layout, import compatibility, map, reminder, `@engineering/RULES.md`                                | user (second stop 0 review): project specifics in the root, generic text in `engineering/` | Root of 29 lines with the rules and `engineering/PROJECT.md` (second mock-up); a top-level `PROJECT.md` (a second project file for 31 lines) |
-| 4   | The three always-on rules in `engineering/RULES.md`, `@import`ed by the root so that they load at launch                                              | user (second stop 0 review); invariant: `@import` for always-on text                       | At the top of `PROCESS.md` (loaded only when a task starts; misses housekeeping edits)                                                       |
-| 5   | YAGNI + open door and Markdown formatting become sections of `CONVENTIONS.md`                                                                         | taste: conventions, not project facts                                                      | Root always-on rules                                                                                                                         |
-| 6   | The "Key points" summaries of naming and commenting are dropped; the map row is the pointer                                                           | invariant: one place per rule                                                              | Keep them (20 lines of duplicates at launch)                                                                                                 |
-| 7   | Folder rules as `tests/CLAUDE.md` only; none for `tools/` and `recipes/`                                                                              | taste: colocated; YAGNI for the two                                                        | `.claude/rules/*.md` with `paths:` (a second container)                                                                                      |
-| 8   | The stale DEVLOG.md section becomes a four-line "TODO.md" section in `PROCESS.md` (items appended, task items on the branch, no prettier on it)       | stale text rewritten; the prettier rule promoted from memory                               | Delete without replacement                                                                                                                   |
-| 9   | Versioning: the two sentences `RELEASING.md` lacks are added there; the rest was a duplicate                                                          | invariant: one place per rule                                                              | Keep the section in the root                                                                                                                 |
-| 10  | The devlog template's four `CLAUDE.md` citations and the 15 live `doc/` pointers are redirected; history files are not                                | invariant: no live stale pointer; non-goal: records                                        | Rewrite history files too                                                                                                                    |
+| #   | Decision                                                                                                                                                                                         | Basis                                                                                                                        | Alternatives considered                                                                                                                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Engineering documents in `engineering/`; `doc/` keeps product documentation only; `CONVENTIONS.md`, `COMMENTING.md`, `RELEASING.md` move there                                                   | option A; user (stop 0 review)                                                                                               | Leave the three in `doc/`; B to E                                                                                                                                                                                        |
+| 2   | Lifecycle in one file, `engineering/PROCESS.md`: task start, TODO.md, devlog and discussion files, branching, closing, implementation, tool vs script                                            | taste: needed together at task start                                                                                         | Four files (multiplies the reads)                                                                                                                                                                                        |
+| 3   | Root = the project's instance: project paragraph, layout, import compatibility, map, reminder, `@engineering/RULES.md`                                                                           | user (second stop 0 review): project specifics in the root, generic text in `engineering/`                                   | Root of 29 lines with the rules and `engineering/PROJECT.md` (second mock-up); a top-level `PROJECT.md` (a second project file for 31 lines)                                                                             |
+| 4   | The three always-on rules in `engineering/RULES.md`, `@import`ed by the root so that they load at launch                                                                                         | user (second stop 0 review); invariant: `@import` for always-on text                                                         | At the top of `PROCESS.md` (loaded only when a task starts; misses housekeeping edits)                                                                                                                                   |
+| 5   | YAGNI + open door and Markdown formatting become sections of `CONVENTIONS.md`                                                                                                                    | taste: conventions, not project facts                                                                                        | Root always-on rules                                                                                                                                                                                                     |
+| 6   | The "Key points" summaries of naming and commenting are dropped; the map row is the pointer                                                                                                      | invariant: one place per rule                                                                                                | Keep them (20 lines of duplicates at launch)                                                                                                                                                                             |
+| 7   | Folder rules as `tests/RULES.md`, named for what it holds, mapped in the root; no folder `CLAUDE.md`; none for `tools/` and `recipes/`; pattern codified in `CONVENTIONS.md` "Instruction files" | user (stop 2 loop): one mechanism, the map, works in every session mode; the harness's lazy load fires on the Read tool only | `tests/CLAUDE.md` (steps 1 and 2: lazy load, mode-dependent); a one-line `tests/CLAUDE.md` importing `RULES.md` (adapter, deferred until a session misses the rules despite the map); `.claude/rules/*.md` with `paths:` |
+| 8   | The stale DEVLOG.md section becomes a four-line "TODO.md" section in `PROCESS.md` (items appended, task items on the branch, no prettier on it)                                                  | stale text rewritten; the prettier rule promoted from memory                                                                 | Delete without replacement                                                                                                                                                                                               |
+| 9   | Versioning: the two sentences `RELEASING.md` lacks are added there; the rest was a duplicate                                                                                                     | invariant: one place per rule                                                                                                | Keep the section in the root                                                                                                                                                                                             |
+| 10  | The devlog template's four `CLAUDE.md` citations and the 15 live `doc/` pointers are redirected; history files are not                                                                           | invariant: no live stale pointer; non-goal: records                                                                          | Rewrite history files too                                                                                                                                                                                                |
 
 ### 1.9 Acceptance criteria
 
@@ -256,6 +256,17 @@ Commit: `docs: record the context cost before and after #98; TODO item 15 done`
 
 Both steps share one step gate.
 
+**Step 3 — Loop: folder rules file** (`docs:`, added at stop 2)
+
+Files: `tests/CLAUDE.md` → `tests/RULES.md`, `CLAUDE.md` (map row),
+`engineering/CONVENTIONS.md` ("Instruction files").
+
+Actions: rename; map row; the pattern codified; devlog decision 7,
+account, rule trace. Verify: criteria 3, 7. One Read-tool check by the
+user is no longer needed: nothing depends on the lazy load.
+
+Commit: `docs: folder rules as tests/RULES.md, mapped in the root; the pattern codified`
+
 ### 2.2 Inventory
 
 Produced by `grep -n '^## ' CLAUDE.md` on `main`.
@@ -313,8 +324,15 @@ lint test` green, prettier clean. Launch cost: 48 + 10 lines.
   set it to 077+ (kept, a fact corrected); and it reached
   `tests/CLAUDE.md` by `ls` and `cat`, not by the lazy load, which
   never fired because the session used Bash for every file access.
-  Loop: the root's map row now names `tests/CLAUDE.md` before
-  `tests/README.md`, so the folder file is reached by pointer as well.
+  Loop: the root's map row now names the folder file before
+  `tests/README.md`, so it is reached by pointer as well.
+- Step 3 (loop, stop 2): the user asked what a folder `CLAUDE.md` is
+  worth when its lazy load fires on the Read tool only; answer: a net
+  for one session mode, and a second mechanism for 13 lines. Renamed to
+  `tests/RULES.md`, no folder `CLAUDE.md`, the pattern codified in
+  `CONVENTIONS.md` "Instruction files" (root = instance and map,
+  `engineering/RULES.md` imported, `<folder>/RULES.md` mapped, the
+  adapter deferred). Sweep clean, lint green, prettier clean.
 
 ## 4. Delivery
 
@@ -391,9 +409,9 @@ Rationale:
 - Every old section has one destination; no live pointer left stale;
   lint, tests and prettier green.
 
-Reservations: none. Note: the lazy load of `tests/CLAUDE.md` is
-observed with the Read tool; a Bash-first session relies on the map row,
-like for every other on-demand document.
+Reservations: none. Note: the harness's lazy load was observed with
+the Read tool and is not relied on; every on-demand document, folder
+rules included, is reached by the map.
 
 ### 4.4 Discussion
 
@@ -403,12 +421,12 @@ issue. One row per point, with the decision: postpone (a TODO item,
 filed on this branch) or accept as is; a "complement now" here is a
 loop. -->
 
-| #   | Point                                                                                                                  | Decision                                                                                      |
-| --- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 1   | Lazy loading of a folder `CLAUDE.md` fires on the Read tool, not on Bash; `/context` does not list lazily loaded files | Complemented now: the map row names `tests/CLAUDE.md` (the loop); the facts recorded in § 4.2 |
-| 2   | The moved test rules carried a stale "027+"                                                                            | Fixed by the check session, committed in step 2                                               |
-| 3   | `MEMORY.md` at 10.3k tokens is nine times the instructions and over its load limit                                     | Trim at task closing, when `MEMORY.md` is updated anyway                                      |
-| 4   | `RELEASING.md` and `CONVENTIONS.md` in `engineering/` are not generic yet                                              | Postponed to the rules-library task (non-goal)                                                |
+| #   | Point                                                                                                                  | Decision                                                                                                                         |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Lazy loading of a folder `CLAUDE.md` fires on the Read tool, not on Bash; `/context` does not list lazily loaded files | Complemented now (step 3): folder rules as `tests/RULES.md`, reached by the map like every other document; no folder `CLAUDE.md` |
+| 2   | The moved test rules carried a stale "027+"                                                                            | Fixed by the check session, committed in step 2                                                                                  |
+| 3   | `MEMORY.md` at 10.3k tokens is nine times the instructions and over its load limit                                     | Trim at task closing, when `MEMORY.md` is updated anyway                                                                         |
+| 4   | `RELEASING.md` and `CONVENTIONS.md` in `engineering/` are not generic yet                                              | Postponed to the rules-library task (non-goal)                                                                                   |
 
 <!-- Stop 3: the ship decision, once the discussion is settled. Then
 the PR is marked ready. -->
@@ -450,6 +468,8 @@ rely on. -->
 <!-- Conventions applied (cite the section) and conventions created
 by this task (the sentence added, and where). Two verbs only. -->
 
-| Source | Rule | Verb (applied / created) |
-| ------ | ---- | ------------------------ |
-|        |      |                          |
+| Source                                               | Rule                                                                                                                                     | Verb (applied / created) |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `engineering/CONVENTIONS.md` "Instruction files"     | root = instance and map, `engineering/RULES.md` imported, `<folder>/RULES.md` mapped, no folder `CLAUDE.md`, new rules never in the root | created                  |
+| `engineering/RULES.md` (ex CLAUDE.md)                | append to the root only on request                                                                                                       | applied                  |
+| CLAUDE.md "Design philosophy" (now `CONVENTIONS.md`) | YAGNI + open door: the adapter deferred, no files for `tools/` and `recipes/`                                                            | applied                  |
