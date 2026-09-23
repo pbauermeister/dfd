@@ -30,11 +30,13 @@ both fail on the code before the fix.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                           | Basis                            | Alternatives considered                                                   |
-| --- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- | ------------------------------------------------------------------------- |
-| 1   | Rewrite the endpoints first, then skip when `src == dst`: one condition covers same-group and replacer-as-endpoint | rule: simplest correct condition | Compare `replacement.get(src) == replacement.get(dst)` (misses `A -> AB`) |
-| 2   | Fixtures committed before the fix, so that the history shows them failing                                          | user (this conversation)         | Fixtures and fix in one commit                                            |
-| 3   | Two fixtures: 077 the issue's example verbatim, 078 the edge cases (intra-group flows, flow to a replacer)         | taste                            | One fixture with everything (less legible as a repro)                     |
+| #   | Decision                                                                                                           | Basis                                                                                 | Alternatives considered                                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 1   | Rewrite the endpoints first, then skip when `src == dst`: one condition covers same-group and replacer-as-endpoint | rule: simplest correct condition; self-loop avoidance confirmed by the user at Try it | Compare `replacement.get(src) == replacement.get(dst)` (misses `A -> AB`) |
+| 2   | Fixtures committed before the fix, so that the history shows them failing                                          | user (this conversation)                                                              | Fixtures and fix in one commit                                            |
+| 3   | Two fixtures: 077 the issue's example verbatim, 078 the edge cases (intra-group flows, flow to a replacer)         | taste                                                                                 | One fixture with everything (less legible as a repro)                     |
+
+| 5 | Fixture 079 dedicated to the self-loop avoidance: the three collapse cases and a genuine self-loop kept | user (at Try it) | Leave the case inside 078 |
 
 ## 2. Execution
 
@@ -53,6 +55,10 @@ both fail on the code before the fix.
   review; the fail-before trial redone: both fail at `4572f3a`'s
   code, pass at HEAD. A separate commit rather than a rewrite of
   `4572f3a`, since the branch was pushed (squash is the user's).
+- `d1de5f5` test: fixture 079, asked at Try it once the self-loop
+  avoidance was confirmed as desired; fails on the pre-fix code (two
+  `AB -> AB` rendered). `tests/RULES.md` next number 080. 86 NR
+  fixtures green.
 
 Approved: 2026-09-23
 
@@ -64,6 +70,7 @@ Approved: 2026-09-23
 make nr-review     # SVGs next to the fixtures
 xdg-open tests/non-regression/077-filter-replace-two-groups.svg
 xdg-open tests/non-regression/078-filter-replace-two-groups-edge.svg
+xdg-open tests/non-regression/079-filter-replace-self-loop.svg
 git show bc349e9   # the fix, 7 lines changed
 git checkout 4572f3a -- src && make nr-test; git checkout HEAD -- src
                    # the fixtures fail before the fix
@@ -72,25 +79,20 @@ git checkout 4572f3a -- src && make nr-test; git checkout HEAD -- src
 077 renders the issue's expected picture, labels carried: `AB -> CD`,
 `AB <- CD`, `AB -> E`, `CD -> E`. 078 renders `AB -> CD` twice ("same
 label" once, "other label") and `CD -> AB` ("back"); the four
-collapsing flows are gone.
+collapsing flows are gone. 079 renders `E -> E` and `AB -> E` only.
 
 Tried: pending
 
 ### 3.2 Verdict
 
-**Recommendation:** accept with reservations
+**Recommendation:** accept
 
 - The issue's example now produces the flows it expected; both
   fixtures fail before the fix and pass after; no other golden moved.
 
-Reservations:
-
-1. Design decision 1 goes one case beyond the issue: a flow to the
-   replacer itself (`A -> AB`) used to render as an `AB -> AB`
-   self-loop and is now dropped. The old comment named the self-loop
-   as the thing to drop, so this reads as the intent; if the self-loop
-   was wanted, the condition becomes `replacement.get(src) ==
-replacement.get(dst)` and 078's golden changes by one edge.
+The reservation that stood here (the fix drops the self-loop of a
+flow to the replacer, one case beyond the issue) was settled at Try
+it: desired, and locked in by fixture 079.
 
 ## 4. Closure
 
