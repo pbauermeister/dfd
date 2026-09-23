@@ -304,8 +304,6 @@ Produced by `grep -n '^## ' CLAUDE.md` on `main`.
   `CLAUDE.md` citations.
 - `TODO.md` numbering and the items' text: untouched except item 15.
 
-<!-- Stop 1: the user approves Mandate and Plan. Nothing runs before. -->
-
 Approved: 2026-09-22
 
 ## 3. Execution
@@ -336,10 +334,6 @@ lint test` green, prettier clean. Launch cost: 48 + 10 lines.
 
 ## 4. Delivery
 
-<!-- The basis of the ship decision, in order: what the work looks
-like, what the tests say, what the agent recommends, the discussion in
-which the user decides. -->
-
 ### 4.1 Try it
 
 1. Read `CLAUDE.md` on the branch (48 lines) and `engineering/RULES.md`.
@@ -352,9 +346,6 @@ which the user decides. -->
    `tests/` and run `/context`: `tests/CLAUDE.md` listed (criterion 6).
 
 Report the two figures and the two outcomes; they go to § 4.2.
-
-<!-- Stop 2: the user tries the work, and either mandates a loop or
-lets the delivery proceed. -->
 
 Tried: 2026-09-23
 
@@ -395,11 +386,6 @@ messages.
 
 ### 4.3 Verdict
 
-<!-- The agent's self-assessment, not the decision: written before the
-user reads Discussion, it is the valve against overclaiming. A criterion
-not proven is a reservation, not a tick. A reservation that outlives
-the task becomes a TODO item. -->
-
 **Recommendation:** accept
 
 Rationale:
@@ -415,12 +401,6 @@ rules included, is reached by the map.
 
 ### 4.4 Discussion
 
-<!-- Where the ship decision is taken, once no loop is requested and
-the test report is in: what surfaced unexpectedly, what remains an
-issue. One row per point, with the decision: postpone (a TODO item,
-filed on this branch) or accept as is; a "complement now" here is a
-loop. -->
-
 | #   | Point                                                                                                                  | Decision                                                                                                                         |
 | --- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Lazy loading of a folder `CLAUDE.md` fires on the Read tool, not on Bash; `/context` does not list lazily loaded files | Complemented now (step 3): folder rules as `tests/RULES.md`, reached by the map like every other document; no folder `CLAUDE.md` |
@@ -428,23 +408,11 @@ loop. -->
 | 3   | `MEMORY.md` at 10.3k tokens is nine times the instructions and over its load limit                                     | Trim at task closing, when `MEMORY.md` is updated anyway                                                                         |
 | 4   | `RELEASING.md` and `CONVENTIONS.md` in `engineering/` are not generic yet                                              | Postponed to the rules-library task (non-goal)                                                                                   |
 
-<!-- Stop 3: the ship decision, once the discussion is settled. Then
-the PR is marked ready. -->
-
 Shipped: 2026-09-23
 
 ## 5. Closure
 
 ### 5.1 Retrospective
-
-<!-- One row per point worth remembering; the agent gives its rating,
-the user gives theirs: well, not well, surprise, tension, don't care.
-The first row is standing: "process and template fit", the friction
-met with this template. A fix that is a guidance comment or a pointer
-is applied on this branch and listed in Forward-looking; a fix that
-changes the structure (a chapter, a stop) becomes a TODO item. The
-process line carries the measures the discussion of set-based design
-asked for. -->
 
 | #   | Point                                                                                                                                                                              | Agent    | User |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
@@ -458,8 +426,6 @@ asked for. -->
 Process: 3 rounds before stop 1 (two frame amendments read off the
 mock-up); 1 loop at stop 2, plus two clarification rounds on the lazy
 load; rework after stop 1: decision 7 (folder rules file).
-
-<!-- Stop 4: the user fills their column. -->
 
 Closed: pending
 
@@ -480,9 +446,6 @@ Closed: pending
   (observed); `<folder>/RULES.md` mapped in the root for folder rules.
 
 ### 5.3 Rule trace
-
-<!-- Conventions applied (cite the section) and conventions created
-by this task (the sentence added, and where). Two verbs only. -->
 
 | Source                                               | Rule                                                                                                                                     | Verb (applied / created) |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
