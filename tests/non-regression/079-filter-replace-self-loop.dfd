@@ -1,0 +1,18 @@
+# Self-loop avoidance under replacement: a flow whose two ends collapse
+# to one item is dropped. Three ways to collapse: both ends in the
+# group (A -> B), the replacer as target (A -> AB), the replacer as
+# source (AB -> B). A genuine self-loop on an item that is not replaced
+# (E -> E) is untouched. AB -> E shows the replacer still renders.
+
+process A
+process B
+process E
+process AB
+
+A -> B   inside the group
+A -> AB  to my replacer
+AB -> B  from my replacer
+E -> E   genuine self-loop
+A -> E   out of the group
+
+~=AB A B
