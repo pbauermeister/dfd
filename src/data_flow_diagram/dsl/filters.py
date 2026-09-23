@@ -302,14 +302,16 @@ def _apply_filters(
 
             case model.Connection() as conn:
                 if conn.src in replacement or conn.dst in replacement:
-                    # skip if both ends are replaced (would collapse to self-loop)
-                    if conn.src in replacement and conn.dst in replacement:
-                        continue
                     # rewrite replaced endpoint(s)
-                    if conn.src in replacement:
-                        conn.src = replacement[conn.src]
-                    if conn.dst in replacement:
-                        conn.dst = replacement[conn.dst]
+                    conn.src = replacement.get(conn.src, conn.src)
+                    conn.dst = replacement.get(conn.dst, conn.dst)
+                    # skip if both ends collapsed to one item (self-loop):
+                    # both in one group, or one end being the replacer
+                    if conn.src == conn.dst:
+                        dprint(
+                            "=> Skipping connection: collapsed by replacement"
+                        )
+                        continue
                     replaced_connections[conn.signature()] = conn
                 else:
                     # skip if either endpoint was filtered out
