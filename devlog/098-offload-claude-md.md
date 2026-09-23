@@ -301,10 +301,20 @@ Approved: 2026-09-22
 
 ### 3.1 Account
 
-<!-- Terse. Per step: "as planned", or the notable and unexpected
-things (a sweep that caught a miss, a trial that failed, a decision
-taken on the way and its basis). A rule discovered on the way goes to
-Rule trace. -->
+- Step 1: as planned, one commit (`bc85bc5`). The `sed` over live
+  files also redirected five pointers in `TODO.md` item text, which the
+  scope boundary had kept as records; kept redirected, since a future
+  task follows them (a pending item is not history). Sweep: only
+  `devlog/`, `discussions/` and `CHANGES.md` keep `doc/` paths. `make
+lint test` green, prettier clean. Launch cost: 48 + 10 lines.
+- Step 2: TODO item 15 ticked; measurements and checks by the user
+  (§ 4.2). Two things came back with them: the check session found the
+  "next available NR number" stale at 027+ in the moved test rules and
+  set it to 077+ (kept, a fact corrected); and it reached
+  `tests/CLAUDE.md` by `ls` and `cat`, not by the lazy load, which
+  never fired because the session used Bash for every file access.
+  Loop: the root's map row now names `tests/CLAUDE.md` before
+  `tests/README.md`, so the folder file is reached by pointer as well.
 
 ## 4. Delivery
 
@@ -314,23 +324,56 @@ which the user decides. -->
 
 ### 4.1 Try it
 
-<!-- How the user uses, demos or sees the work: the commands to run,
-the file to open, the image to look at, the diff to read. Illustrate
-when a picture says it (an SVG under `devlog/img/`, a listing, a
-before/after). A try is something run, opened or read, never
-imagined; a dry run counts only when executed. Omit the section and
-stop 2 when there is nothing to try. -->
+1. Read `CLAUDE.md` on the branch (48 lines) and `engineering/RULES.md`.
+2. In a fresh session on `main`, run `/context` and note the "Memory
+   files" cost; the same on this branch (criterion 4).
+3. In a fresh session on this branch, say "let us tackle TODO item 14"
+   and watch whether `engineering/PROCESS.md` is read before anything
+   else happens (criterion 5); then stop the session.
+4. In a fresh session on this branch, ask for a trivial edit under
+   `tests/` and run `/context`: `tests/CLAUDE.md` listed (criterion 6).
+
+Report the two figures and the two outcomes; they go to § 4.2.
 
 <!-- Stop 2: the user tries the work, and either mandates a loop or
 lets the delivery proceed. -->
 
-Tried: pending
+Tried: 2026-09-23
 
 ### 4.2 Test report
 
-<!-- The Acceptance criteria, ticked, with the command output
-that proves each; make format lint test; CI status of the PR; a test
-that caught a real error during the task, if any. -->
+Criterion 4, `/context` in fresh sessions (2026-09-23), "Memory files"
+category, which also holds `MEMORY.md` (10.3k tokens, unchanged):
+
+| Loaded at launch        | `main`         | branch                                 |
+| ----------------------- | -------------- | -------------------------------------- |
+| Memory files, total     | 16.4k, 2 files | 11.5k, 3 files                         |
+| of which instructions   | 6.1k           | 1.1k (`CLAUDE.md` 948, `RULES.md` 168) |
+| Whole context at launch | 44.9k          | 40.0k                                  |
+
+Instructions cost divided by 5.5; the byte estimate (6.2k) matched the
+measurement. `MEMORY.md` is now nine times the instructions.
+
+Criteria 1 to 3, 7, 8: `wc -l` 303 before, 48 + 10 after; inventory
+complete (§ 2.2); sweep clean outside history files (§ 3.1); `make lint
+test` green, prettier clean; TODO item 15 ticked.
+
+Criterion 5, fresh session on the branch, "let us tackle TODO item 14":
+first action, `cat engineering/PROCESS.md && cat TODO.md && git status`,
+with the announcement "I'll start by reading the process document".
+Met.
+
+Criterion 6, fresh session on the branch, "Do a trivial edit under
+tests/": the session ran `ls tests/`, saw `tests/CLAUDE.md`, ran `cat`
+on it, then edited with `sed`; `/context` afterwards lists `CLAUDE.md`,
+`engineering/RULES.md` and `MEMORY.md` only. Inconclusive: a session in
+Bash-first mode never calls the tools the lazy load hooks. Second run,
+"Use the Read tool to read tests/README.md": the harness printed
+"Loaded tests/CLAUDE.md" right after the Read, and the session cited
+the file. Met. Two facts settled: the lazy load fires on the Read tool
+(Bash bypasses it, hence the map row of the loop); and `/context` lists
+only the files loaded at launch, a lazily loaded file lands in the
+messages.
 
 ### 4.3 Verdict
 
@@ -339,15 +382,18 @@ user reads Discussion, it is the valve against overclaiming. A criterion
 not proven is a reservation, not a tick. A reservation that outlives
 the task becomes a TODO item. -->
 
-**Recommendation:** accept | accept with reservations | reject
+**Recommendation:** accept
 
 Rationale:
 
-- <criterion met, test green, property achieved>
+- Instructions at launch from 6.1k to 1.1k tokens, measured; the
+  process document is read first when a task starts, observed.
+- Every old section has one destination; no live pointer left stale;
+  lint, tests and prettier green.
 
-Reservations (for "with reservations"; for "reject", what must change):
-
-1.
+Reservations: none. Note: the lazy load of `tests/CLAUDE.md` is
+observed with the Read tool; a Bash-first session relies on the map row,
+like for every other on-demand document.
 
 ### 4.4 Discussion
 
@@ -357,9 +403,12 @@ issue. One row per point, with the decision: postpone (a TODO item,
 filed on this branch) or accept as is; a "complement now" here is a
 loop. -->
 
-| #   | Point | Decision |
-| --- | ----- | -------- |
-| 1   |       |          |
+| #   | Point                                                                                                                  | Decision                                                                                      |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | Lazy loading of a folder `CLAUDE.md` fires on the Read tool, not on Bash; `/context` does not list lazily loaded files | Complemented now: the map row names `tests/CLAUDE.md` (the loop); the facts recorded in § 4.2 |
+| 2   | The moved test rules carried a stale "027+"                                                                            | Fixed by the check session, committed in step 2                                               |
+| 3   | `MEMORY.md` at 10.3k tokens is nine times the instructions and over its load limit                                     | Trim at task closing, when `MEMORY.md` is updated anyway                                      |
+| 4   | `RELEASING.md` and `CONVENTIONS.md` in `engineering/` are not generic yet                                              | Postponed to the rules-library task (non-goal)                                                |
 
 <!-- Stop 3: the ship decision, once the discussion is settled. Then
 the PR is marked ready. -->

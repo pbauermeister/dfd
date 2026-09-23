@@ -230,7 +230,7 @@ turned into a standard task (GH ticket, PR, devlog).
     mechanical churn); options are the escalation when the mock-up
     raises a design question. Trigger list in the discussion file.
 
-15. Offload `CLAUDE.md`
+15. ~~Offload `CLAUDE.md`~~ — task #98
 
     `CLAUDE.md` grows with every task (265 lines, 15 sections)
     and is loaded whole into every session, whatever the task. Offload

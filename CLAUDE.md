@@ -33,14 +33,14 @@ covers pytest; smoke-test the other two by hand).
 
 ## Map: read before acting
 
-| When                                                         | Read first                                         |
-| ------------------------------------------------------------ | -------------------------------------------------- |
-| Starting, continuing or closing a task; branching, PR, merge | `engineering/PROCESS.md`, all of it                |
-| Filling a devlog                                             | `templates/devlog.md` (guidance comments)          |
-| Naming, structure, type safety, design, scripts, Markdown    | `engineering/CONVENTIONS.md`                       |
-| Commenting code                                              | `engineering/COMMENTING.md`                        |
-| Writing or changing a test                                   | `tests/README.md` (`tests/CLAUDE.md` loads itself) |
-| Versioning, commit types, merge gate, releasing              | `engineering/RELEASING.md`                         |
+| When                                                         | Read first                                |
+| ------------------------------------------------------------ | ----------------------------------------- |
+| Starting, continuing or closing a task; branching, PR, merge | `engineering/PROCESS.md`, all of it       |
+| Filling a devlog                                             | `templates/devlog.md` (guidance comments) |
+| Naming, structure, type safety, design, scripts, Markdown    | `engineering/CONVENTIONS.md`              |
+| Commenting code                                              | `engineering/COMMENTING.md`               |
+| Writing or changing a test                                   | `tests/CLAUDE.md`, then `tests/README.md` |
+| Versioning, commit types, merge gate, releasing              | `engineering/RELEASING.md`                |
 
 Claude: if the user starts a task without following
 `engineering/PROCESS.md`, briefly remind them of it.
