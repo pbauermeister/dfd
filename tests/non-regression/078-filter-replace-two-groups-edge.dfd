@@ -1,0 +1,21 @@
+# Edge cases of two replacements: intra-group flows (A -> B, C -> D)
+# and a flow to the replacer itself (A -> AB) collapse to self-loops
+# and are dropped; A -> C and B -> D both become AB -> CD, kept once;
+# D -> B becomes CD -> AB, kept.
+
+process A
+process B
+process C
+process D
+process AB
+process CD
+
+A -> B
+C -> D
+A -> C
+B -> D
+D -> B
+A -> AB
+
+~=AB A B
+~=CD C D

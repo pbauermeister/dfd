@@ -1,0 +1,22 @@
+# Issue #100: flows between two replaced groups must be rewired
+# between their replacers (AB -> CD, AB <- CD), not dropped.
+
+process A
+process B
+
+process C
+process D
+
+process E
+
+A -> C
+A -> E
+
+B <- D
+D -> E
+
+process AB
+~=AB A B
+
+process CD
+~=CD C D
