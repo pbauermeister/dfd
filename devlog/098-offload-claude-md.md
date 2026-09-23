@@ -1,7 +1,7 @@
 # 098 — Offload CLAUDE.md into a root file plus on-demand documents
 
 Date: 2026-09-22
-Status: ONGOING
+Status: DONE
 Issue: #98 · PR: #99 · Branch: `doc/98-offload-claude-md`
 Task nature: refactor
 Track: full
@@ -414,20 +414,20 @@ Shipped: 2026-09-23
 
 ### 5.1 Retrospective
 
-| #   | Point                                                                                                                                                                              | Agent    | User |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: stop 0 confirmed a frame in prose that two mock-up readings then overturned (the root as it would read); the mock-up did the job the prose could not     | well     |      |
-| 2   | Criterion 6 was written against a display (`/context` listing) instead of a behavior; it came back inconclusive twice and cost two extra sessions                                  | not well |      |
-| 3   | The `sed` over live files hit `TODO.md` item text: the invariant (no stale live pointer) and the scope boundary (item text untouched) contradicted each other, unnoticed at stop 1 | surprise |      |
-| 4   | Session mode changes what the harness loads: a Bash-first session bypasses the folder `CLAUDE.md` lazy load; learned by trial, not from the docs                                   | surprise |      |
-| 5   | Prettier re-pads tables, so two scripted devlog edits asserted on stale text and a commit went through with nothing in it; regex on the row's key from then on                     | not well |      |
-| 6   | Devlog at about 430 lines against the 300 target: three mock-ups and a loop, each recorded                                                                                         | tension  |      |
+| #   | Point                                                                                                                                                                              | Agent    | User       |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: stop 0 confirmed a frame in prose that two mock-up readings then overturned (the root as it would read); the mock-up did the job the prose could not     | well     | well       |
+| 2   | Criterion 6 was written against a display (`/context` listing) instead of a behavior; it came back inconclusive twice and cost two extra sessions                                  | not well | don't care |
+| 3   | The `sed` over live files hit `TODO.md` item text: the invariant (no stale live pointer) and the scope boundary (item text untouched) contradicted each other, unnoticed at stop 1 | surprise | ended well |
+| 4   | Session mode changes what the harness loads: a Bash-first session bypasses the folder `CLAUDE.md` lazy load; learned by trial, not from the docs                                   | surprise | ended well |
+| 5   | Prettier re-pads tables, so two scripted devlog edits asserted on stale text and a commit went through with nothing in it; regex on the row's key from then on                     | not well | not well   |
+| 6   | Devlog at about 430 lines against the 300 target: three mock-ups and a loop, each recorded                                                                                         | tension  | don't care |
 
 Process: 3 rounds before stop 1 (two frame amendments read off the
 mock-up); 1 loop at stop 2, plus two clarification rounds on the lazy
 load; rework after stop 1: decision 7 (folder rules file).
 
-Closed: pending
+Closed: 2026-09-23
 
 ### 5.2 Forward-looking
 
