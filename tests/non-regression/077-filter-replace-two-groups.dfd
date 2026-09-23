@@ -1,5 +1,6 @@
 # Issue #100: flows between two replaced groups must be rewired
 # between their replacers (AB -> CD, AB <- CD), not dropped.
+# Labels ride along with the rewired flows.
 
 process A
 process B
@@ -9,11 +10,11 @@ process D
 
 process E
 
-A -> C
-A -> E
+A -> C  a to c
+A -> E  a to e
 
-B <- D
-D -> E
+B <- D  d to b
+D -> E  d to e
 
 process AB
 ~=AB A B

@@ -6,15 +6,18 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 9: process AB */
+  /* 10: process AB */
   "AB" [shape=ellipse label="AB" fillcolor="#eeeeee" style=filled ]
 
-  /* 10: process CD */
+  /* 11: process CD */
   "CD" [shape=ellipse label="CD" fillcolor="#eeeeee" style=filled ]
 
-  /* 14: flow A C */
-  "AB" -> "CD" [label=""]
+  /* 15: flow A C same label */
+  "AB" -> "CD" [label="same label"]
 
-  /* 16: flow D B */
-  "CD" -> "AB" [label=""]
+  /* 17: flow A D other label */
+  "AB" -> "CD" [label="other label"]
+
+  /* 18: flow D B back */
+  "CD" -> "AB" [label="back"]
 }

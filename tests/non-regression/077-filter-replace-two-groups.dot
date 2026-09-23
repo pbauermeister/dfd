@@ -6,24 +6,24 @@ digraph D {
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
 
-  /* 9: process E */
+  /* 10: process E */
   "E" [shape=ellipse label="E" fillcolor="#eeeeee" style=filled ]
 
-  /* 11: flow A C */
-  "AB" -> "CD" [label=""]
+  /* 12: flow A C a to c */
+  "AB" -> "CD" [label="a to c"]
 
-  /* 12: flow A E */
-  "AB" -> "E" [label=""]
+  /* 13: flow A E a to e */
+  "AB" -> "E" [label="a to e"]
 
-  /* 14: flow.r B D */
-  "AB" -> "CD" [label="" dir=back]
+  /* 15: flow.r B D d to b */
+  "AB" -> "CD" [label="d to b" dir=back]
 
-  /* 15: flow D E */
-  "CD" -> "E" [label=""]
+  /* 16: flow D E d to e */
+  "CD" -> "E" [label="d to e"]
 
-  /* 17: process AB */
+  /* 18: process AB */
   "AB" [shape=ellipse label="AB" fillcolor="#eeeeee" style=filled ]
 
-  /* 20: process CD */
+  /* 21: process CD */
   "CD" [shape=ellipse label="CD" fillcolor="#eeeeee" style=filled ]
 }

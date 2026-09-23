@@ -1,7 +1,8 @@
-# Edge cases of two replacements: intra-group flows (A -> B, C -> D)
+# Edge cases of two replacements. Intra-group flows (A -> B, C -> D)
 # and a flow to the replacer itself (A -> AB) collapse to self-loops
-# and are dropped; A -> C and B -> D both become AB -> CD, kept once;
-# D -> B becomes CD -> AB, kept.
+# and are dropped. A -> C and B -> D carry the same label and both
+# become AB -> CD: kept once. A -> D carries another label: a second
+# AB -> CD is kept. D -> B becomes CD -> AB.
 
 process A
 process B
@@ -10,12 +11,13 @@ process D
 process AB
 process CD
 
-A -> B
-C -> D
-A -> C
-B -> D
-D -> B
-A -> AB
+A -> B   inside ab
+C -> D   inside cd
+A -> C   same label
+B -> D   same label
+A -> D   other label
+D -> B   back
+A -> AB  to my replacer
 
 ~=AB A B
 ~=CD C D
