@@ -6,7 +6,7 @@
 # command is: after `||`, inside `$(...)`, in a pipeline.
 # Source it from the repository root: `. ./tools/init-tracing.sh`.
 # bash only (DEBUG trap, BASH_COMMAND, FUNCNAME); recipes only, a tool
-# never traces (doc/CONVENTIONS.md, "Script levels").
+# never traces (engineering/CONVENTIONS.md, "Script levels").
 set +x -e -u -o pipefail
 
 banner()  { _tracing_box_ '######################################################################' "$*"; }

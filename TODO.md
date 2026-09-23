@@ -27,7 +27,7 @@ turned into a standard task (GH ticket, PR, devlog).
 
    `ruff format` replaces Black; `ruff check` runs before mypy in
    `make lint`, with ANN401, FBT and PLR0917 (not PLR0913, which also
-   counts keyword-only parameters) enforcing `doc/CONVENTIONS.md`.
+   counts keyword-only parameters) enforcing `engineering/CONVENTIONS.md`.
 
 2. ~~Fix README images on PyPI~~ — DONE (ea4c197+)
 
@@ -80,7 +80,7 @@ turned into a standard task (GH ticket, PR, devlog).
    It replaces `<!-- AUTO:* -->` sections of Markdown files with awk/sed
    and generates the CLI help and doc TOC: string manipulation and
    Markdown section handling, which the "Tooling scripts" convention
-   (`doc/CONVENTIONS.md`) astriggers to Python. Keep the same sections,
+   (`engineering/CONVENTIONS.md`) astriggers to Python. Keep the same sections,
    markers and prettier pass; `tests/test_doc_sync.py` guards the
    output. Rewrite when it next needs to grow, not before.
 
@@ -107,7 +107,7 @@ turned into a standard task (GH ticket, PR, devlog).
 
 11. ~~Naming rules for tool scripts and Makefile targets~~ — DONE (#90)
 
-    Codify in `doc/CONVENTIONS.md` when a name is verb-first
+    Codify in `engineering/CONVENTIONS.md` when a name is verb-first
     (`update-docs.py`: a single action, read as a command), topic-first
     (`nr-test`, `require-system`: a family of two or more, grouped in
     listings and completion), or a noun with subcommands
@@ -132,13 +132,13 @@ turned into a standard task (GH ticket, PR, devlog).
       orchestrators (`release.sh`, `publish-to-*.sh`, `build.sh`,
       `lint.sh`, `clean.sh`, `make-doc.sh`), `tools/` for the tools
       (the Python scripts, `wait-for.sh`; `smoke-test-install.sh` is
-      the shell tool with a mode argument). `doc/RELEASING.md` is the
+      the shell tool with a mode argument). `engineering/RELEASING.md` is the
       prose runbook of `runbooks/release.sh`: same word on purpose.
       Path churn: Makefile, both workflows, sourcing lines.
     - The prelude `init-tracing.sh` (ex `set-ex.sh`, renamed in #88)
       keeps only what needs the tracing hack: `echo`, `banner`,
       `banner2`, `step`.
-    - Codified tersely in `doc/CONVENTIONS.md`, "Tooling scripts", by
+    - Codified tersely in `engineering/CONVENTIONS.md`, "Tooling scripts", by
       #88; item 11 executes the folder split and the renames.
 
 12. Exercise the release and merge-gate paths of #88
@@ -230,7 +230,7 @@ turned into a standard task (GH ticket, PR, devlog).
     mechanical churn); options are the escalation when the mock-up
     raises a design question. Trigger list in the discussion file.
 
-15. Offload `CLAUDE.md`
+15. ~~Offload `CLAUDE.md`~~ — task #98
 
     `CLAUDE.md` grows with every task (265 lines, 15 sections)
     and is loaded whole into every session, whatever the task. Offload

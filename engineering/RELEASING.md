@@ -25,9 +25,13 @@ changelog entry of the PR and it decides the version bump.
 | any type with `!`, or a `BREAKING CHANGE:` footer  | major |
 
 `make help-cc` prints this table from `pyproject.toml`
-(`[tool.semantic_release]`), the single source of truth. Types that
-bump nothing change nothing the user installs; such commits wait for
-the next release and appear in its changelog entry.
+(`[tool.semantic_release]`), the single source of truth. The version is
+never edited by hand: `make release` derives it from the commits merged
+since the last release. Types that bump nothing change nothing the user
+installs; such commits wait for the next release and appear in its
+changelog entry. This holds because the project is a tool installed on
+the user's computer; for a service, CI changes can have real if
+invisible effects that deserve a release.
 
 A PR's type must be at the highest bump level among its commits and
 name the PR's purpose: review the title before merging.

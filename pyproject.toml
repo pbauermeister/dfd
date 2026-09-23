@@ -62,7 +62,7 @@ include = ["*.py", "*.pyi", "**/pyproject.toml"]
 quote-style = "preserve"
 
 [tool.ruff.lint]
-# Enforce the Type safety section of doc/CONVENTIONS.md on top of the
+# Enforce the Type safety section of engineering/CONVENTIONS.md on top of the
 # default rule set: no Any in annotations, booleans by keyword, at most
 # three positional parameters
 extend-select = ["ANN401", "FBT", "PLR0917"]
@@ -72,7 +72,7 @@ max-positional-args = 3
 
 # Release automation: version, CHANGES.md entry, release commit and tag
 # are derived from the conventional commits since the last tag, see
-# doc/RELEASING.md. The bump map below is the single source of truth
+# engineering/RELEASING.md. The bump map below is the single source of truth
 # for the versioning convention (`make help-cc` prints it).
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]

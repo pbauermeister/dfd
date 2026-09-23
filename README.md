@@ -134,7 +134,7 @@ make all    # installs deps, formats, lints, tests, builds docs
 (Debian `apt` or macOS `brew`) and uv, which then manages the local `.venv`
 and the supported Python versions. Run `make help` for all available
 targets. Releases go through GitHub Actions: see
-[doc/RELEASING.md](doc/RELEASING.md).
+[engineering/RELEASING.md](engineering/RELEASING.md).
 
 ## Documentation
 

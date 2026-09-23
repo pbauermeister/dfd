@@ -228,7 +228,7 @@ Calls go down only, Makefile to recipes to tools: a recipe never calls
 make nor another recipe, and a target whose body calls make
 (`test-matrix`) stays in the Makefile. Logic that appears in a recipe
 moves down into a tool. Every recipe starts with a comment stating its
-purpose. `doc/RELEASING.md` is the prose of `make release`.
+purpose. `engineering/RELEASING.md` is the prose of `make release`.
 
 **Naming.** A single action is verb-first, read as a command
 (`tools/print-release-plan.py`, `tools/test-installation.sh from-wheel`,
@@ -258,8 +258,33 @@ All identifiers, comments, documentation, and commit messages use
 **American English** (e.g. "neighbor", not "neighbour"; "color", not
 "colour").
 
+## Design philosophy
+
+**YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
+
+## Markdown formatting
+
+- Match VSCode's table formatter exactly: pad every table cell so all
+  cells in a column are the same width, and the separator dashes to the
+  same width, so that the user's format-on-save produces no diff. Other
+  elements follow CommonMark.
+
+## Instruction files
+
+The root `CLAUDE.md` is the project's instance: what the project is,
+and a map "When / Read first" naming the document to read before
+acting. It imports (`@`) `engineering/RULES.md`, the rules that apply
+to every edit; everything else loads on demand, when the agent follows
+a map row. A folder whose work has rules of its own holds them in
+`<folder>/RULES.md`, named for what it holds so that humans read it
+too, and the root's map names it; no folder `CLAUDE.md`, since the
+harness's lazy load fires on its Read tool only, never on shell
+commands, and the map row is the one mechanism that works in every
+session mode. A new rule is a map row or a paragraph in the document
+the map names, never a line in the root.
+
 ## Related documents
 
-- **Commenting style**: `doc/COMMENTING.md`
+- **Commenting style**: `engineering/COMMENTING.md`
 - **DSL syntax and glossary**: `doc/SYNTAX.md`
 - **User documentation**: `doc/README.md`
