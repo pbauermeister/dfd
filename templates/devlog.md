@@ -153,7 +153,9 @@ convention it cites. -->
 ### 1.9 Acceptance criteria
 
 <!-- Numbered, each checkable by a command or a diff; ticked in
-Test report. Include the standing ones: make format lint test pass; NR
+Test report. A criterion names a behavior (what is read, what fails),
+not a display that may not show it (#98: a lazily loaded file never
+appears in `/context`). Include the standing ones: make format lint test pass; NR
 fixtures and mutation smoke-test when fixtures change. -->
 
 1.

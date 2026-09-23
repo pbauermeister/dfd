@@ -446,12 +446,18 @@ changes the structure (a chapter, a stop) becomes a TODO item. The
 process line carries the measures the discussion of set-based design
 asked for. -->
 
-| #   | Point                    | Agent | User |
-| --- | ------------------------ | ----- | ---- |
-| 1   | Process and template fit |       |      |
+| #   | Point                                                                                                                                                                              | Agent    | User |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: stop 0 confirmed a frame in prose that two mock-up readings then overturned (the root as it would read); the mock-up did the job the prose could not     | well     |      |
+| 2   | Criterion 6 was written against a display (`/context` listing) instead of a behavior; it came back inconclusive twice and cost two extra sessions                                  | not well |      |
+| 3   | The `sed` over live files hit `TODO.md` item text: the invariant (no stale live pointer) and the scope boundary (item text untouched) contradicted each other, unnoticed at stop 1 | surprise |      |
+| 4   | Session mode changes what the harness loads: a Bash-first session bypasses the folder `CLAUDE.md` lazy load; learned by trial, not from the docs                                   | surprise |      |
+| 5   | Prettier re-pads tables, so two scripted devlog edits asserted on stale text and a commit went through with nothing in it; regex on the row's key from then on                     | not well |      |
+| 6   | Devlog at about 430 lines against the 300 target: three mock-ups and a loop, each recorded                                                                                         | tension  |      |
 
-Process: <N> rounds before stop 1; <N> loops at stop 2; rework after
-stop 1: none | <what>
+Process: 3 rounds before stop 1 (two frame amendments read off the
+mock-up); 1 loop at stop 2, plus two clarification rounds on the lazy
+load; rework after stop 1: decision 7 (folder rules file).
 
 <!-- Stop 4: the user fills their column. -->
 
@@ -459,9 +465,19 @@ Closed: pending
 
 ### 5.2 Forward-looking
 
-<!-- Follow-ups filed (TODO items, issues, discussions), template and
-CLAUDE.md fixes made on this branch, and what the next tasks can now
-rely on. -->
+- Template fix on this branch: the Acceptance criteria guidance says a
+  criterion names a behavior, not a display (row 2).
+- At task closing: trim `MEMORY.md` (10.3k tokens, over its load limit,
+  nine times the instructions); update it with the instruction-files
+  pattern and the session-mode finding.
+- Later task, the rules library: the survey of directive libraries done
+  at task start (vendor mechanisms, AGENTS.md, Ruler and rulesync,
+  spec-kit, plugins) is in this session only; file it as
+  `discussions/directive-libraries.md` when that task opens, or before.
+  `engineering/RELEASING.md` and `CONVENTIONS.md` need a de-projecting
+  pass then.
+- Next tasks rely on: `engineering/PROCESS.md` read at task start
+  (observed); `<folder>/RULES.md` mapped in the root for folder rules.
 
 ### 5.3 Rule trace
 
