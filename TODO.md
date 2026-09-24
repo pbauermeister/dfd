@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 27
+Next number: 28
 
 ## Won't do
 
@@ -180,7 +180,6 @@ selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
 
-
 ### 25. `make install` should stamp the version with the branch and revision
 
 Raised at the delivery of #104. `make install` (`uv tool install
@@ -212,3 +211,13 @@ usage); `Reviewable:` and `Done:` considered. Structural change:
 cite it), `engineering/PROCESS.md` (the five-stops list, Phase 4),
 the memory notes; earlier devlogs keep `Shipped:`, history being
 history.
+
+### 27. Merge gate: a bookkeeping-only PR must not bump
+
+From #107. The `commit-msg` hook checks each commit's staged paths,
+but the PR title is the type that reaches `main`, and a title is
+edited on GitHub without a hook. Extend `merge-gate.yml` (or
+`tools/conventional-commits.py gate-pr-against-main`) with the PR's
+changed files (`gh api .../pulls/N/files` or the `git diff` against
+the merge base): every path in `BOOKKEEPING_PATHS` and a bumping
+title is blocked, same message as the hook.
