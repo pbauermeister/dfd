@@ -157,3 +157,16 @@ anchors work on the current state, connections followed as rewired so
 far (from D the traversal reaches G), and an anchor that names a
 replaced item is an error like "no longer available". Two NR
 fixtures, traversal and explicit anchor.
+
+Design point raised at the Try it of #104: the natural reading is to
+declare the group first and filter around it (`~=Z C G` then
+`!<2 D Z`, block J of `devlog/104-try-it.dfd`), and the language
+cannot express the neighborhood of a group today. A `~` as first
+filter starts from the full set, so the `!` that follows narrows
+nothing; a `!` first cannot anchor on Z, which has no flows before the
+replacement; and `! Z` then `~=Z C G` errors, C and G being outside
+the kept set. Traversal on the current state removes the orphans but
+not the full-set start. Decide with the fix: a replacement as first
+filter that does not fill the set, a `!` after `~` that narrows, or
+another form. The doc's group example (§ 7.4.2.2) writes `!` first
+and stays valid either way.
