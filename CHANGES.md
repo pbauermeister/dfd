@@ -1,5 +1,47 @@
 <!-- semantic-release -->
 
+## v1.17.9 (2026-09-24)
+
+### Bug Fixes
+
+- Drop rewired flows whose other end was removed by a filter
+  ([#103](https://github.com/pbauermeister/dfd/pull/103),
+  [`4c7db69`](https://github.com/pbauermeister/dfd/commit/4c7db6993329d8eea8be2441e2253d73bea2495d))
+
+- Keep and rewire flows between two replaced groups
+  ([#101](https://github.com/pbauermeister/dfd/pull/101),
+  [`db2b973`](https://github.com/pbauermeister/dfd/commit/db2b973b25621f6852d05570b40b428f96815d1e))
+
+### Documentation
+
+- Devlog templates per task kind, set-based design gate
+  ([#93](https://github.com/pbauermeister/dfd/pull/93),
+  [`6677d4b`](https://github.com/pbauermeister/dfd/commit/6677d4b814b56612348e0ceb45ec4813f6f670b7))
+
+- Discussions on vibe coding and set-based design; TODO item 14
+  ([`4859335`](https://github.com/pbauermeister/dfd/commit/4859335636406e0d0ba4d00ccbe6f2da6da409fe))
+
+- Offload CLAUDE.md into a root file plus on-demand documents
+  ([#99](https://github.com/pbauermeister/dfd/pull/99),
+  [`31b4254`](https://github.com/pbauermeister/dfd/commit/31b425482a5416dd2643545f0a7d56e866480fa4))
+
+- Stop 0 in the devlog template, frame confirmed before the mock-up
+  ([#97](https://github.com/pbauermeister/dfd/pull/97),
+  [`e3dc2ac`](https://github.com/pbauermeister/dfd/commit/e3dc2acbb3e2e03eb15e68837e8d8fa39606da55))
+
+- TODO item 12, exercise the release and merge-gate paths of #88
+  ([`481e7b7`](https://github.com/pbauermeister/dfd/commit/481e7b729574a82c0563a9234579dac0ebc50fc4))
+
+### Refactoring
+
+- Name tool scripts by level and split recipes/ from tools/
+  ([#91](https://github.com/pbauermeister/dfd/pull/91),
+  [`bde62e5`](https://github.com/pbauermeister/dfd/commit/bde62e55838142eb7d9b212726592e204c40a9ed))
+
+- Tracing prelude without aliases (DEBUG trap) ([#95](https://github.com/pbauermeister/dfd/pull/95),
+  [`0f465d9`](https://github.com/pbauermeister/dfd/commit/0f465d9d742ae5365c66c2d0fde3e8c8ef7f3106))
+
+
 ## v1.17.8 (2026-09-19)
 
 ### Build System
