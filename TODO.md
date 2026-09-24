@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 24
+Next number: 26
 
 ## Won't do
 
@@ -178,3 +178,36 @@ rule stays as documented, and both orders keep a meaning: `!` first
 selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
+
+### 24. TODO.md commits must not bump the version
+
+Found at the delivery of #104: `main` carried one commit, `docs:
+TODO.md as numbered headings` (80e97b3), which bumps patch, so the
+`feat:` PR #105 was blocked by the merge gate ("release 1.17.10
+first") and 1.17.10 was released with no change to the package. A
+change to `TODO.md`, on any branch, is bookkeeping: it must use a
+type that bumps nothing (`chore`, `ci`, `style`; `make help-cc`).
+Define the rule: `chore:` for `TODO.md` (and, to decide, for the
+devlogs and `engineering/`, which do not ship either), in
+`engineering/RELEASING.md` "Versioning convention" and in the
+`commit-msg` hook if it can tell the paths; sweep the habit into
+`engineering/PROCESS.md` where TODO commits are described. Check
+whether `docs:` should keep bumping patch at all: the shipped doc
+(`doc/`, `README.md`) is part of the package, the rest is not.
+
+### 25. `make install` should stamp the version with the branch and revision
+
+Raised at the delivery of #104. `make install` (`uv tool install
+--reinstall .`) installs the current, unreleased tree, which is its
+purpose: an official release is what `uv tool install
+data-flow-diagram` or `pipx` pull from PyPI. Yet `--version` reports
+the bare `MAJOR.MINOR.PATCH` of `pyproject.toml`, indistinguishable
+from the last release. Stamp a development install with where it
+comes from: the branch and the short hash, as a PEP 440 local version
+label after a `.devN` segment, e.g.
+`1.17.10.dev0+feature.104.keep.involved.flows.g294a988` (the label
+allows letters, digits and dots; `-`, `_` and `/` normalise to dots).
+Decide how: a dynamic version (`hatch-vcs` or `setuptools-scm` style,
+from `git describe`) or a `make install` recipe that rewrites the
+version in a scratch copy before installing. The release path
+(`make release`, `release.yml`) must keep the bare version.
