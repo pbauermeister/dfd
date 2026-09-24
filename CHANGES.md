@@ -1,5 +1,13 @@
 <!-- semantic-release -->
 
+## v1.17.10 (2026-09-24)
+
+### Documentation
+
+- TODO.md as numbered headings with a counter, done items removed
+  ([`80e97b3`](https://github.com/pbauermeister/dfd/commit/80e97b39031d912e2b89921033382809fdcb33f1))
+
+
 ## v1.17.9 (2026-09-24)
 
 ### Bug Fixes
