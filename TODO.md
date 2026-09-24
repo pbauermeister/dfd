@@ -40,9 +40,12 @@ purpose; the first live release (1.17.8, 2026-09-19) covered
 
 Release path (`make release`, `release.yml`):
 
-- [ ] Dry run from a branch: `.devN` version in `pyproject.toml`,
+- [x] Dry run from a branch: `.devN` version in `pyproject.toml`,
       `gh workflow run release.yml --ref <branch>`; stops after
-      TestPyPI, no tag checks.
+      TestPyPI, no tag checks (#113, 2026-09-24: run 36054992654,
+      1.18.1.dev1 on TestPyPI; a first dispatch on a commit still at
+      1.18.0 stopped in CI on an unresolvable action ref, the
+      preflight was not reached).
 - [ ] Nothing to release: only `chore`/`ci`/`style` or
       non-conventional commits since the last tag; the plan exits 1
       and the script stops before any commit.
@@ -80,8 +83,6 @@ and PyPI package, usable from several projects; then dfd consumes
 it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
-
-
 
 ### 20. A bare `=` in a filter statement hangs the parser
 
