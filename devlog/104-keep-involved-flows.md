@@ -333,6 +333,12 @@ Approved: 2026-09-24 ("Go!")
   checked before and after. Lesson: mutate and revert with an exact
   text replacement, never with a checkout of a file carrying
   uncommitted work.
+- Loop 1 after Shipped, `92ef2f4` (`docs:`): a minimal example in
+  § 7.2, asked at the review of the shipped doc: two chains to C and a
+  relaxed flow between them, then `!<1 C` (the neighborhood of C,
+  stray flow included) and `!!<1 C` (what leads to C). Three images;
+  renders verified as DOT (B C D kept in both, `stray flow` only in
+  the plain one) and by eye; `make doc` and `make test` green.
 - Type safety note: `find_neighbors()` returns a three-tuple read in
   two places (`Only`, `Without`), a pre-existing shape extended by
   one element; a dataclass is the convention's answer if it grows
@@ -355,6 +361,11 @@ Approved: 2026-09-24 ("Go!")
 ## 4. Delivery
 
 ### 4.1 Try it
+
+Loop 1 (after Shipped): `doc/README.md` § 7.2 now opens the strict
+filter with a five-item example and its two filtered forms; open
+`doc/img/filter-strict-master.svg`, `filter-strict-plain.svg`,
+`filter-strict.svg`.
 
 The playground `devlog/104-try-it.dfd` (rendered: `104-try-it.svg`):
 a 3 × 3 grid of items laid out top-down, column flows constrained,
@@ -451,10 +462,10 @@ Shipped: 2026-09-24 ("ship")
 | 4   | Two slips in execution, a file checkout over uncommitted work and a render in the wrong directory, both caught by `git status` before a commit; the lesson is in the Account                                          | not well |      |
 | 5   | The merge gate blocked the PR on a `docs:` TODO.md commit: the rule worked as designed, and exposed that bookkeeping commits bump the version (TODO 24)                                                               | surprise |      |
 | 6   | The playground as a committed artifact: a `.dfd` with a menu of blocks, each comment carrying the verified counts, was the fastest way for the user to see the rule; worth keeping as a pattern                       | well     |      |
-| 7   | Devlog length: about 490 lines at closure against the 300 target, the option table and the runs being the bulk; the tables are not counted, the prose is near the budget                                                    | tension  |      |
+| 7   | Devlog length: about 490 lines at closure against the 300 target, the option table and the runs being the bulk; the tables are not counted, the prose is near the budget                                              | tension  |      |
 
 Process: 2 rounds before stop 1 (the stop 0 review reopened the
-design); 3 loops at stop 2 (playground rewritten twice at the user's
+design); 3 loops at stop 2, 1 loop after stop 3 (the doc example) (playground rewritten twice at the user's
 request, blocks added twice); rework after stop 1: none in the code,
 the doc example moved from a new subsection to the neighbor of the
 plain example.
