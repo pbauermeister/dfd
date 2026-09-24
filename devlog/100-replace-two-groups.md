@@ -81,7 +81,7 @@ git checkout 4572f3a -- src && make nr-test; git checkout HEAD -- src
 label" once, "other label") and `CD -> AB` ("back"); the four
 collapsing flows are gone. 079 renders `E -> E` and `AB -> E` only.
 
-Tried: pending
+Tried: 2026-09-24 (the demo and a diagram of the user's own)
 
 ### 3.2 Verdict
 
@@ -98,11 +98,15 @@ it: desired, and locked in by fixture 079.
 
 ### 4.1 Retrospective
 
-| #   | Point                    | Agent | User |
-| --- | ------------------------ | ----- | ---- |
-| 1   | Process and template fit |       |      |
+| #   | Point                                                                                                                                        | Agent   | User |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---- |
+| 1   | Process and template fit: fast track with a Try it stop added, a hybrid the template does not name; it cost nothing and caught two additions | well    |      |
+| 2   | The issue's hypothesis (a single pass) was wrong; reading the code before scaffolding set the frame right in one round                       | well    |      |
+| 3   | Two loops at Try it (labels, fixture 079) grew the tests in conversation, as the fast track intends                                          | well    |      |
+| 4   | Commits pushed as they came, not squashed per step: nine commits for three steps in the PR list                                              | tension |      |
 
-Process:
+Process: 1 round before the go; 2 loops at Try it; rework after the
+go: none.
 
 Closed: pending
 
