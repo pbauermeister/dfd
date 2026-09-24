@@ -1,7 +1,7 @@
 # 102 — Removing a node linked to a replacement group
 
 Date: 2026-09-24
-Status: ONGOING
+Status: DONE
 Issue: #102 · PR: #103 · Branch: `fix/102-remove-node-linked-to-group`
 Task nature: change
 Track: fast
@@ -30,11 +30,11 @@ before the fix.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                          | Basis                                       | Alternatives considered                                           |
-| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- |
-| 1   | Rewrite first, then one kept-set check for every connection; the self-loop skip and the dedup registration stay   | rule: one check, one code path, no branches | Add the check inside the replaced branch (duplicates the check)   |
-| 2   | Fixtures committed before the fix, goldens generated with the fix, so that the history shows them failing         | devlog 100, decision 2                      | Fixtures and fix in one commit                                    |
-| 3   | Two fixtures: 080 the issue's example verbatim, 081 the filter order reversed                                     | taste                                       | One fixture (the order is the natural doubt, worth its own file)  |
+| #   | Decision                                                                                                        | Basis                                       | Alternatives considered                                          |
+| --- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| 1   | Rewrite first, then one kept-set check for every connection; the self-loop skip and the dedup registration stay | rule: one check, one code path, no branches | Add the check inside the replaced branch (duplicates the check)  |
+| 2   | Fixtures committed before the fix, goldens generated with the fix, so that the history shows them failing       | devlog 100, decision 2                      | Fixtures and fix in one commit                                   |
+| 3   | Two fixtures: 080 the issue's example verbatim, 081 the filter order reversed                                   | taste                                       | One fixture (the order is the natural doubt, worth its own file) |
 
 ## 2. Execution
 
@@ -81,14 +81,14 @@ Tried: 2026-09-24 (the two fixtures and a diagram of the user's own)
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                     | Agent | User |
-| --- | --------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Sibling of #100 in the same ten lines; the assessment before the go named cause, fix and fixtures in one   | well  |      |
-| 2   | Fast track, one go, fixtures then fix as in devlog 100; the devlog written at closure as the track says   | well  |      |
+| #   | Point                                                                                                    | Agent | User |
+| --- | -------------------------------------------------------------------------------------------------------- | ----- | ---- |
+| 1   | Sibling of #100 in the same ten lines; the assessment before the go named cause, fix and fixtures in one | well  | well |
+| 2   | Fast track, one go, fixtures then fix as in devlog 100; the devlog written at closure as the track says  | well  | well |
 
 Process: 1 round before the go; loops at Try it: none; rework after the go: none.
 
-Closed:
+Closed: 2026-09-24
 
 ### 4.2 Rule trace
 
