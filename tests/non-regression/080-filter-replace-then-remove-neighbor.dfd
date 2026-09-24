@@ -1,0 +1,15 @@
+# Issue #102: a node removed by "~" must stay removed when it is linked
+# to a replacement group: the rewired flow Group -> P3 must be dropped,
+# not kept (which made Graphviz create an unlabelled P3).
+
+process P1 Process 1
+process P2 Process 2
+process P3 Process 3
+
+P1 -> P2
+P1 -> P3
+
+process Group
+~=Group P1 P2
+
+~ P3
