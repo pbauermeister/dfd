@@ -306,11 +306,10 @@ its own.
 - Two parallel flows between the same pair that collapse into one
   after a replacement, one vetoed and one allowed: the first in
   source order decides, as the dedup does today.
-- The "re-add by traversal" interaction of `~=` followed by `!`
-  (a `!` after a replacement brings the replaced items back through
-  traversal, since traversal reads the original statements):
-  observed in the first mock-up, pre-existing, unchanged; not filed,
-  the doc's own example puts `!` before `~=`.
+- A keep filter after a replacement re-adds the replaced items as
+  orphans, since traversal reads the original connections (TODO item
+  23, a bug of its own, unaffected by strictness: path membership is
+  by connection identity in either order).
 
 Approved: pending
 

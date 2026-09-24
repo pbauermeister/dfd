@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 23
+Next number: 24
 
 ## Won't do
 
@@ -142,3 +142,18 @@ reject a second spec. Leaning: document it, it exists and is harmless.
 Note for the doc: a flag or the `!!` strictness applies to the whole
 filter, whichever spec carries it; different strictness per direction
 is obtained by two filters.
+
+### 23. A keep filter after a replacement re-adds the replaced items as orphans
+
+Found at the stop 1 discussion of #104 (devlog 104). On `A→B→C→D`
+with `~=G B C` then `!<2 D`, the traversal in
+`_collect_connected_names()` (`src/data_flow_diagram/dsl/filters.py`)
+reads the original connections, follows `cd` to C and `bc` to B, and
+re-adds them to the kept set; the replacement map is permanent, so
+their flows still go to G: B and C render as orphan items next to
+G. `~=G B C` then `! B` does the same for an explicit anchor. The
+documented order, `!` before `~=`, is unaffected. Fix: traversal and
+anchors work on the current state, connections followed as rewired so
+far (from D the traversal reaches G), and an anchor that names a
+replaced item is an error like "no longer available". Two NR
+fixtures, traversal and explicit anchor.
