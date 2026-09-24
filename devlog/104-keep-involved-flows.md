@@ -2,7 +2,7 @@
 
 Date: 2026-09-24
 Status: PENDING
-Issue: #104 · PR: #PPP · Branch: `feature/104-keep-involved-flows`
+Issue: #104 · PR: #105 · Branch: `feature/104-keep-involved-flows`
 Task nature: change
 Track: full
 Agent: Claude Fable 5.1
