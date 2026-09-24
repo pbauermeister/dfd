@@ -310,7 +310,7 @@ class Filter(Statement):
 
 @dataclass(kw_only=True)
 class Only(Filter):
-    pass
+    strict: bool  # "!!": selected items show only their path flows
 
 
 @dataclass(kw_only=True)
@@ -344,6 +344,7 @@ class Keyword(StrEnum):
     FRAME = "frame"
 
     ONLY = "!"
+    ONLY_STRICT = "!!"
     WITHOUT = "~"
 
     # Connection variants

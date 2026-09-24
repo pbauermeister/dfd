@@ -1,4 +1,12 @@
-"""Filter engine: only/without, neighbor expansion."""
+"""Filter engine: only/without, neighbor expansion, strict flows.
+
+Items: a kept set built statement by statement ("!" adds, "~" removes).
+Flows: kept when both ends are kept, unless a strict only filter ("!!")
+vetoes them. A strict filter vetoes every flow touching an item it
+selects; a flow shows anyway when it is a path flow (followed by some
+strict filter to reach its neighbors) or joins two items a plain "!"
+selects together. Flows vetoed and allowed by none are the stray flows.
+"""
 
 from dataclasses import dataclass
 
@@ -12,9 +20,13 @@ def _collect_connected_names(
     names: set[str],
     search_downstream: bool,
     use_layout_direction: bool,
-) -> set[str]:
-    """Find items connected to a set of names in one direction."""
+) -> tuple[set[str], list[model.Connection]]:
+    """Find items connected to a set of names in one direction.
+
+    Returns (found_names, connections followed).
+    """
     found_names: set[str] = set()
+    followed: list[model.Connection] = []
     for statement in statements:
         match statement:
             case model.Connection() as conn:
@@ -29,18 +41,22 @@ def _collect_connected_names(
                 if conn.type in (model.Keyword.BFLOW, model.Keyword.UFLOW):
                     if dst in names:
                         found_names.add(src)
+                        followed.append(conn)
                     if src in names:
                         found_names.add(dst)
+                        followed.append(conn)
                 else:
                     if search_downstream:
                         if src in names:
                             found_names.add(dst)
+                            followed.append(conn)
                     else:
                         if dst in names:
                             found_names.add(src)
+                            followed.append(conn)
             case _:
                 continue
-    return found_names
+    return found_names, followed
 
 
 def _resolve_distance(distance: int, max_neighbors: int) -> int:
@@ -57,12 +73,16 @@ def _expand_neighbors_in_dir(
     max_neighbors: int,
     fn: model.FilterNeighbors,
     down: bool,
-) -> set[str]:
-    """Expand neighbors in one direction by successive waves of connections."""
+) -> tuple[set[str], set[int]]:
+    """Expand neighbors in one direction by successive waves of connections.
+
+    Returns (neighbor_names, ids of the connections followed: the path flows).
+    """
     names = set(anchor_names)
     neighbor_names: set[str] = set()
+    path_ids: set[int] = set()
     for i in range(_resolve_distance(fn.distance, max_neighbors)):
-        names = _collect_connected_names(
+        names, followed = _collect_connected_names(
             statements=statements,
             names=names,
             search_downstream=down,
@@ -74,8 +94,9 @@ def _expand_neighbors_in_dir(
         dprint("     :", neighbor_names)
         dprint("   + :", names)
         neighbor_names.update(names)
+        path_ids.update(id(c) for c in followed)
         dprint("   = :", neighbor_names)
-    return neighbor_names
+    return neighbor_names, path_ids
 
 
 def find_neighbors(
@@ -84,21 +105,44 @@ def find_neighbors(
     statements: model.Statements,
     max_neighbors: int,
     debug: bool,
-) -> tuple[set[str], set[str]]:
-    """Collect neighbor names by following connections outward from filter anchors."""
-    return _expand_neighbors_in_dir(
+) -> tuple[set[str], set[str], set[int]]:
+    """Collect neighbor names by following connections outward from filter anchors.
+
+    Returns (downstream names, upstream names, ids of the path flows).
+    """
+    downs, down_ids = _expand_neighbors_in_dir(
         statements=statements,
         anchor_names=filter.names,
         max_neighbors=max_neighbors,
         fn=filter.neighbors_down,
         down=True,
-    ), _expand_neighbors_in_dir(
+    )
+    ups, up_ids = _expand_neighbors_in_dir(
         statements=statements,
         anchor_names=filter.names,
         max_neighbors=max_neighbors,
         fn=filter.neighbors_up,
         down=False,
     )
+    return downs, ups, down_ids | up_ids
+
+
+def _collect_flow_ids(
+    statements: model.Statements, names: set[str], *, touching: bool
+) -> set[int]:
+    """Ids of the flows touching (one end) or joining (both ends) the names."""
+    ids: set[int] = set()
+    for statement in statements:
+        match statement:
+            case model.Connection() as conn:
+                if conn.type == model.Keyword.CONSTRAINT:
+                    continue  # constraints are layout hints, not flows
+                ends_in = (conn.src in names) + (conn.dst in names)
+                if ends_in == 2 or (touching and ends_in == 1):
+                    ids.add(id(conn))
+            case _:
+                continue
+    return ids
 
 
 def _check_filter_names(
@@ -148,6 +192,8 @@ class _FilterDecisions:
     only_names: set[str]  # anchors of "only" filters, made non-hidable
     replacement: dict[str, str]  # removed name -> replacing name
     skip_frames_for_names: set[str]
+    vetoed_ids: set[int]  # flows touching a strict selection
+    allowed_ids: set[int]  # path flows, and flows joining a plain selection
 
 
 def _collect_kept_names(
@@ -161,6 +207,8 @@ def _collect_kept_names(
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
     skip_frames_for_names: set[str] = set()
+    vetoed_ids: set[int] = set()
+    allowed_ids: set[int] = set()
 
     for statement in statements:
         if isinstance(statement, model.Filter):
@@ -192,7 +240,7 @@ def _collect_kept_names(
                     only_names.update(f.names)
 
                 # add upstream/downstream neighbor names
-                downs, ups = find_neighbors(
+                downs, ups, path_ids = find_neighbors(
                     filter=f,
                     statements=statements,
                     max_neighbors=len(all_names),
@@ -201,6 +249,25 @@ def _collect_kept_names(
                 dprint("ONLY: adding neighbors:", downs, ups)
                 kept_names.update(downs)
                 kept_names.update(ups)
+
+                # flows: a strict filter vetoes the flows touching its
+                # selection and allows its path flows; a plain filter
+                # allows the flows joining its selection
+                selection = downs | ups
+                if not (
+                    f.neighbors_up.suppress_anchors
+                    or f.neighbors_down.suppress_anchors
+                ):
+                    selection |= names
+                if f.strict:
+                    vetoed_ids |= _collect_flow_ids(
+                        statements, selection, touching=True
+                    )
+                    allowed_ids |= path_ids
+                else:
+                    allowed_ids |= _collect_flow_ids(
+                        statements, selection, touching=False
+                    )
 
                 _collect_frame_skips(
                     f=f,
@@ -238,7 +305,7 @@ def _collect_kept_names(
                     kept_names.difference_update(names)
 
                 # remove upstream/downstream neighbor names
-                downs, ups = find_neighbors(
+                downs, ups, _ = find_neighbors(
                     filter=f,
                     statements=statements,
                     max_neighbors=len(all_names),
@@ -264,6 +331,8 @@ def _collect_kept_names(
         only_names=only_names,
         replacement=replacement,
         skip_frames_for_names=skip_frames_for_names,
+        vetoed_ids=vetoed_ids,
+        allowed_ids=allowed_ids,
     )
 
 
@@ -284,6 +353,7 @@ def _apply_filters(
     kept_names: set[str],
     replacement: dict[str, str],
     skip_frames_for_names: set[str],
+    hidden_ids: set[int],
 ) -> tuple[list[model.Statement], dict[str, model.Connection]]:
     """Apply kept/replacement/skip decisions to produce filtered statements.
 
@@ -319,6 +389,11 @@ def _apply_filters(
                     dprint(
                         "=> Skipping connection: some end is not in the kept list"
                     )
+                    continue
+
+                # skip stray flows: vetoed by a strict filter, allowed by none
+                if id(conn) in hidden_ids:
+                    dprint("=> Skipping connection: stray flow")
                     continue
 
                 if replaced:
@@ -400,6 +475,7 @@ def handle_filters(
         kept_names=kept_names,
         replacement=decisions.replacement,
         skip_frames_for_names=decisions.skip_frames_for_names,
+        hidden_ids=decisions.vetoed_ids - decisions.allowed_ids,
     )
 
     # phase 3: deduplicate connections created by replacements
