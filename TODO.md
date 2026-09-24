@@ -169,4 +169,11 @@ the kept set. Traversal on the current state removes the orphans but
 not the full-set start. Decide with the fix: a replacement as first
 filter that does not fill the set, a `!` after `~` that narrows, or
 another form. The doc's group example (§ 7.4.2.2) writes `!` first
-and stays valid either way.
+and stays valid either way. Direction agreed at the Try it of #104: a
+replacement is a rewiring, not a removal, so `~=` does not count as
+the first filter that initialises the kept set; the `!` that follows
+starts empty and traverses the rewired flows. The plain `~`-first
+rule stays as documented, and both orders keep a meaning: `!` first
+selects on the original graph and then collapses, `~=` first selects
+on the grouped graph. Statement order carries meaning since filters
+exist; before them it only steered the layout.
