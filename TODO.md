@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 21
+Next number: 22
 
 ## Won't do
 
@@ -116,3 +116,14 @@ group for `None`, not truthiness, and raise "replacer name expected"
 on an empty one; add the robustness case to
 `tests/unit/test_parser.py::test_check_raises` and an `-err-` NR
 fixture.
+
+### 21. Filter flag order: the doc says `<>2xf`, the parser wants `<>xf2`
+
+Found at the stop 0 review of #104 (devlog 104). `doc/README.md`
+§ 7.3.3 gives `DIRECTION[SPAN][FLAGS]`; `RX_FILTER_ARG` in
+`src/data_flow_diagram/dsl/parser.py` and every example (`!<>xf2`)
+put the flags before the span. The documented order is the logical
+one (the span belongs to the direction, the flags qualify the
+selection). Make the parser accept the flags on either side of the
+span, migrate the examples and fixtures to the documented order, and
+say in § 7.3.3 that both are accepted.
