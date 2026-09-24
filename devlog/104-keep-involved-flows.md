@@ -338,7 +338,10 @@ Approved: 2026-09-24 ("Go!")
   relaxed flow between them, then `!<1 C` (the neighborhood of C,
   stray flow included) and `!!<1 C` (what leads to C). Three images;
   renders verified as DOT (B C D kept in both, `stray flow` only in
-  the plain one) and by eye; `make doc` and `make test` green.
+  the plain one) and by eye; `make doc` and `make test` green. Then
+  moved, at the user's request, from § 7.2 to the last Only-filter
+  example, § 7.4.1.12 "Path flows and stray flows": not fundamental
+  enough for the concept section.
 - Type safety note: `find_neighbors()` returns a three-tuple read in
   two places (`Only`, `Without`), a pre-existing shape extended by
   one element; a dataclass is the convention's answer if it grows
@@ -362,8 +365,9 @@ Approved: 2026-09-24 ("Go!")
 
 ### 4.1 Try it
 
-Loop 1 (after Shipped): `doc/README.md` § 7.2 now opens the strict
-filter with a five-item example and its two filtered forms; open
+Loop 1 (after Shipped): `doc/README.md` § 7.4.1.12 closes the
+Only-filter examples with a five-item example and its two filtered
+forms; open
 `doc/img/filter-strict-master.svg`, `filter-strict-plain.svg`,
 `filter-strict.svg`.
 
