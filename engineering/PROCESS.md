@@ -29,7 +29,8 @@ The agent performs these steps in sequence:
 3. Copy `templates/devlog.md` to `devlog/NNN-short-description.md`; fill the
    header, then Context, Goal and Non-goals (and Invariants for a
    refactor) from the issue and its brief.
-4. Commit the devlog file on the branch.
+4. Commit the devlog file on the branch; when the task comes from a
+   `TODO.md` item, remove the item in the same commit (see "TODO.md").
 5. Open a **draft** PR against `main` (`gh pr create --draft`) with a minimal
    body (link to the devlog file, `Closes #NNN`) and a title in conventional
    form (`<type>: <description>`, see "Versioning convention"): the `PR title`
@@ -93,10 +94,16 @@ remind them of it.
 
 ## TODO.md
 
-- `TODO.md` holds the items not yet assigned to a task, numbered, appended,
-  with the context they arose in. An item that arises during a task is
-  committed on the task branch (see "Branching and PR workflow").
-- Do not run prettier on `TODO.md`: it would renumber the items.
+- `TODO.md` holds the items not yet assigned to a task, appended, with
+  the context they arose in. An item is a heading numbered from the
+  file's `Next number:` counter, bumped in the same commit; numbers are
+  unique for the life of the file and never reused. An item that arises
+  during a task is committed on the task branch (see "Branching and PR
+  workflow").
+- An item is removed, not struck through, when its issue is filed
+  (Phase 2, alongside the devlog) or when it is dropped; the commit
+  message names the issue or the reason. The git history of the file and
+  the devlog carry the record.
 
 ## devlog/NNN-short-description.md files
 
@@ -161,7 +168,7 @@ subject hold each other up: the devlog commits vanish at squash and stay out
 of the changelog, so the title is the only place where the PR's type is
 decided.
 
-Direct commits to `main` are reserved for housekeeping (TODO status flips,
+Direct commits to `main` are reserved for housekeeping (TODO item removals,
 `CLAUDE.md` edits) that does not warrant a PR. A `TODO.md` item that arises
 during a task is committed on the task branch, not on `main`: it shows the
 context it originated in and how the pressure on the task was released, and

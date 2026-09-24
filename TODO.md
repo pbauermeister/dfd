@@ -9,257 +9,98 @@ collected here can later be specified as tasks, grouped together, or
 discarded. If a TODO item becomes significant effort, it must be
 turned into a standard task (GH ticket, PR, devlog).
 
+Items are headings numbered from the counter below, unique for the
+life of the file: a new item takes the number and bumps the counter in
+the same commit. An item is removed, not struck through, when its
+issue is filed or when it is dropped; the commit message names the
+issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
+the text. The numbers of removed items are never reused.
+
+Next number: 20
+
 ## Won't do
 
-1. Redesign DSL parser with a formal grammar (lark, PEG, ANTLR)
+### 1. Redesign DSL parser with a formal grammar (lark, PEG, ANTLR)
 
-   The DSL is one-statement-per-line by design — no nesting, no
-   precedence, no multi-line constructs. The current regex-based
-   scanner/parser is the right tool for this grammar. After the
-   refactoring (#34), the pipeline stages are clean and independently
-   modifiable. A formal parser would add a dependency and migration risk
-   for no proportional benefit. Revisit only if a future feature
-   genuinely requires multi-line syntax.
+The DSL is one-statement-per-line by design — no nesting, no
+precedence, no multi-line constructs. The current regex-based
+scanner/parser is the right tool for this grammar. After the
+refactoring (#34), the pipeline stages are clean and independently
+modifiable. A formal parser would add a dependency and migration risk
+for no proportional benefit. Revisit only if a future feature
+genuinely requires multi-line syntax.
 
 ## TODO Items
 
-1. ~~Replace Black and add ruff~~ — DONE (#75)
+### 12. Exercise the release and merge-gate paths of #88
 
-   `ruff format` replaces Black; `ruff check` runs before mypy in
-   `make lint`, with ANN401, FBT and PLR0917 (not PLR0913, which also
-   counts keyword-only parameters) enforcing `engineering/CONVENTIONS.md`.
+Each case is ticked when it occurs naturally or is provoked on
+purpose; the first live release (1.17.8, 2026-09-19) covered
+"merge followed by a release right away".
 
-2. ~~Fix README images on PyPI~~ — DONE (ea4c197+)
+Release path (`make release`, `release.yml`):
 
-   Replaced relative image paths in README.md with absolute GitHub raw
-   URLs so images render on both GitHub and PyPI.
+- [ ] Dry run from a branch: `.devN` version in `pyproject.toml`,
+      `gh workflow run release.yml --ref <branch>`; stops after
+      TestPyPI, no tag checks.
+- [ ] Nothing to release: only `chore`/`ci`/`style` or
+      non-conventional commits since the last tag; the plan exits 1
+      and the script stops before any commit.
+- [ ] Abort at the prompt: local release commit and tag removed,
+      tree equal to `origin/main`.
+- [ ] A minor release (first `feat:` PR) and, when it comes, a
+      major one (`!` or `BREAKING CHANGE:` footer in the PR body,
+      which the squash setting carries into the commit).
+- [ ] Preflight refusal, provoked: a `v*` tag pushed on a commit
+      that is not on `main` (delete the tag afterwards).
+- [ ] Recovery forward after a failed run past TestPyPI, when it
+      happens: next patch, the failed tag left or deleted.
 
-3. ~~Include TestPyPI in a full testing cycle~~ — DONE (#77)
+Merge gate (`merge-gate.yml`, ruleset on `main`):
 
-   Extend the release testing cycle to upload to TestPyPI
-   (`twine upload -r testpypi`) and install from there in a clean venv,
-   as an end-to-end test of the publishing pipeline before the real
-   PyPI upload. Context: #65 showed that install-time breakage (missing
-   dependency) is invisible to the dev-venv test suite; the clean-venv
-   wheel smoke test covers the artifact, TestPyPI would also cover the
-   transport/publishing path.
+- [x] Merge not followed by a release: two patch PRs merged, then
+      one release whose changelog lists both (1.17.9, 2026-09-24:
+      eight PRs and one direct commit since 1.17.8, all listed).
+- [ ] Blocked: a `feat:` PR while `main` has unreleased patch
+      commits ("release X first"); release, then the check passes
+      on the next PR event.
+- [ ] Allowed at or below: a `fix:` PR on a pending minor.
+- [ ] None-level pending counts as empty: a `chore:` commit on
+      `main`, then a `feat:` PR passes.
+- [ ] A title edit re-runs `conventional` and `gate`; a
+      non-conventional title blocks the merge button.
+- [ ] PR behind `main`: BEHIND state, "Update branch", checks rerun.
 
-4. ~~Build improvement~~ — task #79
+### 13. Extract the Markdown titles renumberer into its own tool
 
-   During the build, the below warning was seen. We shall update the
-   build accordingly.
+`tools/doc-renumber-md-titles.py` becomes a standalone repository
+and PyPI package, usable from several projects; then dfd consumes
+it as a dev dependency from `make-doc.sh`. Brief, measured survey
+of existing tools and requirements in
+`discussions/md-titles-renumberer-tool.md` (from #90).
 
-   ```
-   ********************************************************************************
-   Please avoid running ``setup.py`` directly.
-   Instead, use pypa/build, pypa/installer or other
-   standards-based tools.
+### 18. Skip GitHub Actions on commits that do not need them
 
-   See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
-   ********************************************************************************
-   ```
+`ci.yml` runs the full matrix on every push to `main` and every PR
+event, including commits that touch only `devlog/`, `discussions/`,
+`TODO.md` or `engineering/`. Add `paths-ignore` for those to the
+`push` and `pull_request` triggers; `merge-gate.yml` and
+`pr-title.yml` are cheap and must keep running (both are required
+checks of the `main` ruleset, and a path-filtered required check
+never reports, which blocks the merge button). `CI` is not a
+required check, so filtering it is safe; keep `workflow_call`
+unfiltered so `release.yml` still gates on it.
 
-5. ~~Migrate package metadata to PEP 621~~ — DONE (#79)
+### 19. Clear the GitHub Actions deprecation annotations
 
-   Move the `setup()` arguments of `setup.py` into a `[project]` table
-   in `pyproject.toml` and drop `setup.cfg`. The version is parsed from
-   `CHANGES.md`, which the table cannot express directly; a minimal
-   `setup.py` or a version file kept in sync would remain. No change to
-   the published packages; tooling hygiene only. Residue: `setup.py`
-   stays as the version shim until item 10 changes where the version
-   comes from.
-
-6. ~~Harmonize GitHub and PyPI releases~~ — DONE (#80)
-
-   Single manually triggered GitHub Actions workflow, gated on the full
-   test suite, one build, TestPyPI rehearsal, tag, PyPI via trusted
-   publishing, GitHub release with the same files.
-
-8. ~~Rewrite `tools/update-docs.sh` in Python~~ — DONE (#85)
-
-   It replaces `<!-- AUTO:* -->` sections of Markdown files with awk/sed
-   and generates the CLI help and doc TOC: string manipulation and
-   Markdown section handling, which the "Tooling scripts" convention
-   (`engineering/CONVENTIONS.md`) astriggers to Python. Keep the same sections,
-   markers and prettier pass; `tests/test_doc_sync.py` guards the
-   output. Rewrite when it next needs to grow, not before.
-
-9. ~~Make `--version`, `--help` and `-f dot` work without Graphviz~~ — DONE (#84)
-
-   `cli.main()` calls `graphviz.check_installed()` before parsing the
-   arguments, so every invocation needs `dot`, including the install
-   smoke test (`tools/smoke-test-install.sh`, which only checks
-   `--version` and a `-f dot` render). Move the probe to where Graphviz
-   is actually invoked (rendering a non-DOT format); then drop the
-   `make require-system` steps from the `build` and `testpypi` jobs of
-   `release.yml` (added in PR #83).
-
-10. ~~Conventional commits and generated CHANGES.md~~ — DONE (#88)
-
-    Adopt conventional commits (reconsidered 2026-09-17; was out of
-    scope for #80) and generate the `CHANGES.md` entry at release time
-    from the commits since the last tag, instead of writing it by hand.
-    Decide at the same time when to publish: keep the manual
-    `make release`, or release automatically on merge to `main` once
-    the version bump and changelog are derived from the commits.
-    Once the version no longer comes from `CHANGES.md`, drop the
-    `setup.py` version shim left by item 5.
-
-11. ~~Naming rules for tool scripts and Makefile targets~~ — DONE (#90)
-
-    Codify in `engineering/CONVENTIONS.md` when a name is verb-first
-    (`update-docs.py`: a single action, read as a command), topic-first
-    (`nr-test`, `require-system`: a family of two or more, grouped in
-    listings and completion), or a noun with subcommands
-    (`changelog.py notes`, `conventional-commits.py table`: a Python
-    family in one program). Object-first with no family behind it is
-    the case to avoid. Then apply: the doc scripts (`make-doc.sh`,
-    `update-docs.py`, `gen-style-tables.py`,
-    `doc-renumber-md-titles.py`) become a `doc-` family or fold into
-    one program; audit the Makefile targets. Discussed in #88.
-
-    Conclusions of #88 (2026-09-19) to apply at the same time:
-
-    - Script levels, git's porcelain and plumbing as the model: Makefile
-      targets are the entry points; orchestrators are runbooks in code
-      (named steps, one command each, guards only, no loops or
-      computation); tools do one concern with verb-first subcommands
-      and explicit arguments so that every call site is
-      self-explanatory (one tool per noun, subcommands for verbs
-      sharing its data); preludes hold sourced mechanics only. Logic
-      appearing in an orchestrator moves down into a tool.
-    - Two folders make the levels an address: `runbooks/` for the
-      orchestrators (`release.sh`, `publish-to-*.sh`, `build.sh`,
-      `lint.sh`, `clean.sh`, `make-doc.sh`), `tools/` for the tools
-      (the Python scripts, `wait-for.sh`; `smoke-test-install.sh` is
-      the shell tool with a mode argument). `engineering/RELEASING.md` is the
-      prose runbook of `runbooks/release.sh`: same word on purpose.
-      Path churn: Makefile, both workflows, sourcing lines.
-    - The prelude `init-tracing.sh` (ex `set-ex.sh`, renamed in #88)
-      keeps only what needs the tracing hack: `echo`, `banner`,
-      `banner2`, `step`.
-    - Codified tersely in `engineering/CONVENTIONS.md`, "Tooling scripts", by
-      #88; item 11 executes the folder split and the renames.
-
-12. Exercise the release and merge-gate paths of #88
-
-    Each case is ticked when it occurs naturally or is provoked on
-    purpose; the first live release (1.17.8, 2026-09-19) covered
-    "merge followed by a release right away".
-
-    Release path (`make release`, `release.yml`):
-
-    - [ ] Dry run from a branch: `.devN` version in `pyproject.toml`,
-          `gh workflow run release.yml --ref <branch>`; stops after
-          TestPyPI, no tag checks.
-    - [ ] Nothing to release: only `chore`/`ci`/`style` or
-          non-conventional commits since the last tag; the plan exits 1
-          and the script stops before any commit.
-    - [ ] Abort at the prompt: local release commit and tag removed,
-          tree equal to `origin/main`.
-    - [ ] A minor release (first `feat:` PR) and, when it comes, a
-          major one (`!` or `BREAKING CHANGE:` footer in the PR body,
-          which the squash setting carries into the commit).
-    - [ ] Preflight refusal, provoked: a `v*` tag pushed on a commit
-          that is not on `main` (delete the tag afterwards).
-    - [ ] Recovery forward after a failed run past TestPyPI, when it
-          happens: next patch, the failed tag left or deleted.
-
-    Merge gate (`merge-gate.yml`, ruleset on `main`):
-
-    - [ ] Merge not followed by a release: two patch PRs merged, then
-          one release whose changelog lists both.
-    - [ ] Blocked: a `feat:` PR while `main` has unreleased patch
-          commits ("release X first"); release, then the check passes
-          on the next PR event.
-    - [ ] Allowed at or below: a `fix:` PR on a pending minor.
-    - [ ] None-level pending counts as empty: a `chore:` commit on
-          `main`, then a `feat:` PR passes.
-    - [ ] A title edit re-runs `conventional` and `gate`; a
-          non-conventional title blocks the merge button.
-    - [ ] PR behind `main`: BEHIND state, "Update branch", checks rerun.
-
-13. Extract the Markdown titles renumberer into its own tool
-
-    `tools/doc-renumber-md-titles.py` becomes a standalone repository
-    and PyPI package, usable from several projects; then dfd consumes
-    it as a dev dependency from `make-doc.sh`. Brief, measured survey
-    of existing tools and requirements in
-    `discussions/md-titles-renumberer-tool.md` (from #90).
-
-14. ~~Devlog templates~~ — DONE (#92)
-
-    The devlogs are not uniform: over 34 files, `Requirement` and
-    `Design` appear in 31 and 29, `Outcome` in 10, and the rest is
-    one-off section names (`Analysis`, `Action plan`, `Verification`,
-    `Progress`, `Lessons learned`, numbered variants, ...), because
-    the project has no template. Define one, with mandatory and
-    optional sections, in variants fitting the major kinds of tasks
-    (feature or fix from an issue; refactoring with an inventory and a
-    mechanical plan, as in #90; analysis or discussion, as in
-    `discussions/`; summary or report, as in #55). Codify in
-    `CLAUDE.md` "devlog/NNN-short-description.md files" and provide
-    the templates as files the scaffolding phase copies.
-
-    Conclusions of `discussions/set-based-design.md` (2026-09-20):
-    import the skeleton of a formal devlog, not its weight. Mandate:
-    context, task nature (the variant selector), goal, non-goals,
-    invariants, taste, design decisions each marked rule-derived or
-    taste, acceptance criteria (definition of done), spikes to run.
-    Plan: steps, inventory, scope boundary. Closure: deviations, gate
-    check ticking the criteria, retrospective (agent / user columns),
-    forward-looking check, rule trace with two verbs (applied,
-    created). The mandate is approved in one round before step 1.
-    Sized per task nature; the checklist is filled by the agent, the
-    human reads one decision table. Invariants and spikes are the two
-    slots #90 lacked most.
-    Adopted 2026-09-20: *set-based design*, gated in Phase 3 (engage
-    when a wrong major direction would cost a rework; else "Options:
-    none, because ..."): the design question, two or three options in
-    throwaway worktrees, the smallest visible slice, one design review,
-    the reason recorded as a rule (design rationale). The Design
-    template carries the slot. The `CLAUDE.md` Phase 3 paragraph for the
-    gate is drafted at the end of `discussions/set-based-design.md`; add
-    it with the templates, not before.
-    Two stages (2026-09-20): a *mock-up* of the supposed design (folder
-    listing, Makefile as it would read, one sample file, in a throwaway
-    worktree) is the cheap default whenever the requirement shows one of
-    the triggers (new container name, inventory classifying existing
-    items, a thing that could live in two places, an intent inherited
-    from a prior task, ambition vocabulary, one conceptual row among
-    mechanical churn); options are the escalation when the mock-up
-    raises a design question. Trigger list in the discussion file.
-
-15. ~~Offload `CLAUDE.md`~~ — task #98
-
-    `CLAUDE.md` grows with every task (265 lines, 15 sections)
-    and is loaded whole into every session, whatever the task. Offload
-    it: per-folder `CLAUDE.md` files that Claude Code loads when it
-    works in that folder (`tests/`, `tools/`, `recipes/`, `devlog/`),
-    or dedicated documents that the root file refers to by context
-    (task start process, NR tests, release, conventions), keeping the
-    root to the rules that apply everywhere. Measure the line counts
-    before and after; keep the append-only rule for the root file.
-    From #92: the "devlog/DEVLOG.md general file" section is stale
-    (the file was replaced by `TODO.md`); #92 added 21 net lines
-    (stops, template pointers).
-
-16. ~~Tracing prelude without aliases~~ — DONE (#94)
-
-    Replace the alias trick of `tools/init-tracing.sh` (its `;` makes
-    `a || echo msg` print unconditionally; bit #88 in `$(...)` and #90
-    in `||` fallbacks, CI run 35513228401) by a DEBUG trap that turns
-    tracing off before a helper runs: plain functions, usable anywhere
-    a command is. Candidate prelude, trials and migration steps in
-    `discussions/tracing-prelude-debug-trap.md` (from #90).
-
-17. ~~Stop 0 in the devlog template~~ — DONE (#96)
-
-    #94 experimented a `Framed:` stop after § 1.4 Invariants: the user
-    confirms Context, Goal, Non-goals and Invariants before any mock-up
-    or spike, so that set-based design starts from an agreed frame.
-    Fold it into `templates/devlog.md` and CLAUDE.md Phase 3:
-    scaffolding fills 1.1 to 1.3 from the issue and its brief; the
-    mock-up may amend the frame (it did twice in #94). Revisit the
-    120-line budget of Mandate and Plan (#94: ~250 with the option
-    table, the trap listing and the inventory).
+Every run of `release.yml` (1.17.9, 2026-09-24) and `ci.yml` ends
+with two warnings. Node 20 deprecation: `actions/checkout@v4`,
+`actions/upload-artifact@v4`, `actions/download-artifact@v4` and
+`astral-sh/setup-uv@v6` are forced onto Node 24; move to the
+majors that target Node 24 (`checkout@v5`, `upload-artifact@v5`,
+`download-artifact@v5`, latest `setup-uv`) in `release.yml`,
+`ci.yml` and `merge-gate.yml`. Runner image: `ubuntu-latest`
+migrates to Ubuntu 26 on 2026-10-19; pin `ubuntu-24.04` or verify
+the suite on the new image before that date. Rehearse with the
+`release.yml` dry run (`workflow_dispatch`, stops after TestPyPI),
+never exercised so far.
