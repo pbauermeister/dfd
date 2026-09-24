@@ -295,11 +295,15 @@ def read_commit_message(path: Path) -> str:
 
 
 def run_check_bookkeeping(bump_map: BumpMap, *, message_path: Path) -> None:
-    """Fail when the commit is bookkeeping only and its type bumps."""
+    """Fail when the commit is bookkeeping only and its type bumps.
+
+    A message that is not conventional (a merge commit, a typo) is the
+    conventional hook's business: this check lets it through.
+    """
     try:
         level = parse_level(read_commit_message(message_path), bump_map)
-    except ValueError as e:
-        sys.exit(f"ERROR: {e}")
+    except ValueError:
+        return
     verdict = bookkeeping_verdict(level=level, paths=staged_paths())
     if not verdict.allowed:
         sys.exit(f"BLOCKED: {verdict.reason}")

@@ -173,3 +173,11 @@ def test_bookkeeping_globs() -> None:
     assert "TODO.md" in globs
     assert "devlog/**" in globs
     assert not any(g.endswith("/") for g in globs)
+
+
+def test_check_bookkeeping_lets_a_merge_commit_through(
+    tmp_path: Path,
+) -> None:
+    f = tmp_path / "MERGE_MSG"
+    f.write_text("Merge branch 'a' into b\n")
+    cc.run_check_bookkeeping(BUMP_MAP, message_path=f)  # no SystemExit
