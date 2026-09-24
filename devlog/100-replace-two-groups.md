@@ -1,7 +1,7 @@
 # 100 — Replacement flows between two replaced groups
 
 Date: 2026-09-23
-Status: ONGOING
+Status: DONE
 Issue: #100 · PR: #101 · Branch: `fix/100-replace-two-groups`
 Task nature: change
 Track: fast
@@ -98,17 +98,18 @@ it: desired, and locked in by fixture 079.
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                        | Agent   | User |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---- |
-| 1   | Process and template fit: fast track with a Try it stop added, a hybrid the template does not name; it cost nothing and caught two additions | well    |      |
-| 2   | The issue's hypothesis (a single pass) was wrong; reading the code before scaffolding set the frame right in one round                       | well    |      |
-| 3   | Two loops at Try it (labels, fixture 079) grew the tests in conversation, as the fast track intends                                          | well    |      |
-| 4   | Commits pushed as they came, not squashed per step: nine commits for three steps in the PR list                                              | tension |      |
+| #   | Point                                                                                                                                        | Agent   | User       |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------- |
+| 1   | Process and template fit: fast track with a Try it stop added, a hybrid the template does not name; it cost nothing and caught two additions | well    | well       |
+| 2   | The issue's hypothesis (a single pass) was wrong; reading the code before scaffolding set the frame right in one round                       | well    | well       |
+| 3   | Two loops at Try it (labels, fixture 079) grew the tests in conversation, as the fast track intends                                          | well    | well       |
+| 4   | Commits pushed as they came, not squashed per step: nine commits for three steps in the PR list                                              | tension | don't care |
 
-Process: 1 round before the go; 2 loops at Try it; rework after the
-go: none.
+Process: 1 round before the go; 2 loops at Try it; rework after the go: none.
 
-Closed: pending
+Pascal's note: very satisfied how it went. The "try it" scenario and stop place were very proper.
+
+Closed: 2026-09-24
 
 ### 4.2 Rule trace
 
