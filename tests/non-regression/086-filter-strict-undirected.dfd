@@ -1,0 +1,16 @@
+# Issue #104: undirected flows (<-> and --) are followed from either
+# end, as they are for neighbors, so bc and bd are path flows and stay;
+# ca (C -> A) is off the upstream paths from D and is hidden.
+
+process A
+process B
+process C
+process D
+
+A -> B ab
+B <-> C bc
+C -> D cd
+B -- D bd
+C -> A ca
+
+!!<2 D

@@ -74,22 +74,25 @@ documentation, and commit messages.
 
 ### Filters
 
-| Term                     | Definition                                                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| **filter**               | A statement (`!` or `~`) that manipulates the kept set.                                                        |
-| **Only filter** (`!`)    | Additive: adds items to the kept set.                                                                          |
-| **Without filter** (`~`) | Subtractive: removes items from the kept set.                                                                  |
-| **kept set**             | The set of item names retained after all filters have been processed.                                          |
-| **anchor**               | An item explicitly listed in a filter (as opposed to its neighbors). Called "listed items" in `doc/README.md`. |
-| **neighbor**             | An item reachable from an anchor by traversing connections.                                                    |
-| **upstream**             | Toward the source of a flow.                                                                                   |
-| **downstream**           | Toward the destination of a flow.                                                                              |
-| **left** / **right**     | Layout-based direction (as rendered by Graphviz), orthogonal to the flow.                                      |
-| **direction**            | Upstream, downstream, left, or right.                                                                          |
-| **span**                 | How many levels of neighbors to traverse (`*` = unlimited, or integer).                                        |
-| **"x" flag**             | Suppress anchors: select only neighbors, not the listed items themselves.                                      |
-| **"f" flag**             | Suppress frames: remove frames involving the selected items.                                                   |
-| **replacement**          | An item that takes over connections from removed items (`=NAME` in Without).                                   |
+| Term                          | Definition                                                                                                     |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **filter**                    | A statement (`!` or `~`) that manipulates the kept set.                                                        |
+| **Only filter** (`!`)         | Additive: adds items to the kept set.                                                                          |
+| **strict Only filter** (`!!`) | As `!`, but the items it selects show only their path flows.                                                   |
+| **path flow**                 | A flow followed by a filter to reach a neighbor.                                                               |
+| **stray flow**                | A flow between kept items that is on no path of a strict filter: hidden by `!!`.                               |
+| **Without filter** (`~`)      | Subtractive: removes items from the kept set.                                                                  |
+| **kept set**                  | The set of item names retained after all filters have been processed.                                          |
+| **anchor**                    | An item explicitly listed in a filter (as opposed to its neighbors). Called "listed items" in `doc/README.md`. |
+| **neighbor**                  | An item reachable from an anchor by traversing connections.                                                    |
+| **upstream**                  | Toward the source of a flow.                                                                                   |
+| **downstream**                | Toward the destination of a flow.                                                                              |
+| **left** / **right**          | Layout-based direction (as rendered by Graphviz), orthogonal to the flow.                                      |
+| **direction**                 | Upstream, downstream, left, or right.                                                                          |
+| **span**                      | How many levels of neighbors to traverse (`*` = unlimited, or integer).                                        |
+| **"x" flag**                  | Suppress anchors: select only neighbors, not the listed items themselves.                                      |
+| **"f" flag**                  | Suppress frames: remove frames involving the selected items.                                                   |
+| **replacement**               | An item that takes over connections from removed items (`=NAME` in Without).                                   |
 
 ## Overview
 
@@ -253,6 +256,14 @@ Filters manipulate the **kept set** to produce diagram subsets.
 Additive: the first `!` initialises the kept set to empty, then adds the
 anchors (and optionally their neighbors).
 
+```
+!! [NEIGHBOUR_SPEC] ITEM_NAME [ITEM_NAME...]
+```
+
+Strict: as `!`, and the items it selects show only their path flows (see
+§ 7.4). Strictness applies to the whole filter, whatever the neighbour
+specification. There is no `~~`.
+
 ### 7.2. Without filter (`~`)
 
 ```
@@ -293,8 +304,12 @@ Filters are processed **sequentially** in source order:
    and frames are trimmed or dropped.
 5. Connections whose endpoints have a replacement are rewritten; duplicates
    from replacement are deduplicated.
+6. Stray flows are dropped. A flow is a stray flow when it touches an item
+   selected by a `!!` filter, and neither is a path flow of some `!!` filter
+   nor joins two items named together by a `!` filter. Constraints are never
+   stray flows. Without any `!!`, nothing is dropped by this step.
 
 ### 7.5. Syntactic sugar
 
-The `!` or `~` character may be written without a separating space before
-arguments (e.g. `!A B` is equivalent to `! A B`).
+The `!`, `!!` or `~` mnemonic may be written without a separating space
+before arguments (e.g. `!A B` is equivalent to `! A B`).

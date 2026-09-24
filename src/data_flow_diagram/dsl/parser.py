@@ -236,8 +236,8 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
 
     # wrap into the concrete Only or Without subclass
     res: model.Statement
-    if cmd == Keyword.ONLY:
-        res = model.Only(**f.__dict__)
+    if cmd in (Keyword.ONLY, Keyword.ONLY_STRICT):
+        res = model.Only(**f.__dict__, strict=cmd == Keyword.ONLY_STRICT)
     else:  # cmd == Keyword.WITHOUT:
         res = model.Without(
             **f.__dict__, replaced_by=replacer
@@ -313,15 +313,13 @@ def _apply_syntactic_sugars(src_line: str) -> str:
     """Rewrite arrow operators and filter shorthands to canonical keyword form."""
 
     # insert space after filter mnemonic (e.g. "!A B" → "! A B")
-    if (
-        src_line
-        and src_line[0] in (Keyword.ONLY, Keyword.WITHOUT)
-        and len(src_line) > 1
-        and src_line[1] != " "
-    ):
-        # insert a space after the filter, so that it is recognized as a filter
-        new_line = src_line[0] + " " + src_line[1:]
-        return new_line
+    for mnemonic in (Keyword.ONLY_STRICT, Keyword.ONLY, Keyword.WITHOUT):
+        if src_line.startswith(mnemonic):
+            n = len(mnemonic)
+            if len(src_line) > n and src_line[n] != " ":
+                # insert a space after the filter, so that it is recognized as a filter
+                return src_line[:n] + " " + src_line[n:]
+            break  # longest mnemonic first: "!!" must not fall through to "!"
 
     # rewrite arrow operators (e.g. "A --> B label" → "flow A B label")
     terms = src_line.split()
@@ -532,5 +530,6 @@ _PARSERS: dict[Keyword, Callable[[model.SourceLine], model.Statement]] = {
     Keyword.FRAME: _parse_frame,
     # Filters
     Keyword.ONLY: _parse_filter,
+    Keyword.ONLY_STRICT: _parse_filter,
     Keyword.WITHOUT: _parse_filter,
 }

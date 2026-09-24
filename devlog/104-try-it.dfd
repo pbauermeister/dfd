@@ -1,0 +1,134 @@
+# Try-it playground for #104, the strict only filter "!!".
+#
+# A 3 x 3 grid of items, rows A, B, C and columns 1, 2, 3, laid out
+# top-down ("style vertical"). The column flows (A1 -> B1 -> C1, ...)
+# are constrained and give the rows; the row flows (A1 -> A2 -> A3, ...)
+# and the two diagonals are relaxed ("->?", "--?") so that they do not
+# shift the grid. Once a filter applies, the rest is no longer a grid.
+# Flows are labelled "source dest" in lowercase. Z is a spare item for
+# the replacement-group variants.
+#
+# At the end, a menu of filter blocks: exactly one block is active;
+# comment it out, uncomment another one, then render:
+#
+#     ./data-flow-diagram devlog/104-try-it.dfd && xdg-open devlog/104-try-it.svg
+#
+# Vocabulary: a filter's path flows are the flows it followed to reach
+# its neighbors; the stray flows are the other flows between kept items.
+# "!!" keeps the same items as "!" but hides the stray flows at the
+# items it selects. A plain "!" naming both ends of a flow shows it
+# regardless; a path flow of any "!!" is always shown.
+
+style vertical
+
+process A1
+process A2
+process A3
+process B1
+process B2
+process B3
+process C1
+process C2
+process C3
+process Z Group
+
+# columns: vertical flows, they lay out the rows (top to bottom)
+A1 -> B1 a1b1
+B1 -> C1 b1c1
+A2 -> B2 a2b2
+B2 -> C2 b2c2
+A3 -> B3 a3b3
+B3 -> C3 b3c3
+
+# rows: horizontal flows, relaxed so that they do not shift the grid
+A1 ->? A2 a1a2
+A2 ->? A3 a2a3
+B1 ->? B2 b1b2
+B2 ->? B3 b2b3
+C1 ->? C2 c1c2
+C2 ->? C3 c2c3
+
+A1 ->? B2 a1b2
+B1 --? C2 b1c2
+
+####### ############### ###############################
+# Filter menu: one block active at a time
+
+##### A. Plain: A1 and two levels downstream, all flows among them.
+# 8 items (all but C3), 12 flows. Baseline for B and C.
+!>2 A1
+
+##### B. Strict: the same 8 items, only the path flows: 10 flows. The
+# two stray flows a3b3 and c1c2 are hidden: A3, B3, C1, C2 are kept (two
+# flows from A1) but these flows lie on no path from A1 of two flows.
+#!!>2 A1
+
+##### C. Strict, then a plain "!" naming both ends of a stray flow:
+# c1c2 is back (11 flows); a3b3 stays hidden.
+#!!>2 A1
+#! C1 C2
+
+##### D. Two strict filters compose: A1 one flow downstream (A2, B1, B2)
+# and C2 one flow upstream (B2, C1, B1). 6 items, 6 flows: the path
+# flows a1a2, a1b1, a1b2 of the first and b2c2, c1c2, b1c2 of the
+# second. Hidden strays: a2b2, b1c1, b1b2, each touching a strict
+# selection and on no path, although both their ends are kept.
+#!!>1 A1
+#!!<1 C2
+
+##### E. Strict, then a plain "!" with neighbors: the plain neighborhood
+# of B3 (A3, B2, C3) shows all its flows, so a3b3 is back and b3c3 comes
+# in with C3. 9 items, 12 flows; c1c2 stays hidden.
+#!!>2 A1
+#!<>1 B3
+
+##### F. Plain, then a replacement group: row B collapses into Z. Items
+# A1 A2 A3 C1 C2 Z; 10 flows, among them a3b3 rewired to A3 -> Z and
+# c1c2. The filter comes first, as in the doc's group example
+# (§ 7.4.2.2): the selection is made on the original flows, then the
+# group is formed; Z, an anchor without flows at that point, brings
+# nothing but itself. See block J for the reversed order.
+#!>2 A1 Z
+#~=Z B1 B2 B3
+
+##### G. Strict, then the same replacement group: 8 flows. The rewired
+# stray a3b3 (A3 -> Z) and c1c2 are hidden; the rewired path flows
+# stay: path membership survives the rewiring. Compare with F.
+#!!>2 A1 Z
+#~=Z B1 B2 B3
+
+##### H. The crossed pattern: a1a2 and b1b2 wanted, a1b1, a2b2 and a1b2
+# not, all four items kept. A span-less strict filter hides every flow
+# touching the four items, then one plain "!" per wanted pair shows it.
+# 4 items, 2 flows.
+#!! A1 A2 B1 B2
+#! A1 A2
+#! B1 B2
+
+##### I. Strict, then a plain removal: "~" removes A3 and C1 with their
+# flows, as always. 6 items, 8 flows.
+#!!>2 A1
+#~ A3 C1
+
+##### J. The reversed group order, TODO item 23, not a strict-filter
+# case. Declaring the group first reads naturally but does not work
+# today: a "~" as first filter starts from the full set, so the "!" that
+# follows narrows nothing (C3 stays), and the traversal from A1 reads
+# the original flows, so B1, B2, B3 come back as orphans next to Z.
+# 10 items, 12 flows. Expected once fixed: recorded in TODO item 23.
+#~=Z B1 B2 B3
+#!>2 A1 Z
+
+##### K. The crossed pattern by paths, no plain pair: two strict filters
+# with span 1. "!!<1 A2" selects A1 through a1a2; "!!>1 B1" selects B2,
+# C1, C2 through b1b2, b1c1, b1c2. The flows a1b1, a2b2 and a1b2 join
+# kept items but touch a selection and are on no path: hidden. 6 items,
+# 4 flows.
+#!!<1 A2
+#!!>1 B1
+
+##### L. K plus a plain pair: a1b1 is back; a2b2 and a1b2 stay hidden.
+# 5 flows.
+#!!<1 A2
+#!!>1 B1
+#! A1 B1

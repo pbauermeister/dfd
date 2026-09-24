@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 9: ~~ A
+  line 1: <file:tests/non-regression/088-err-filter-double-without.dfd>
+Error:  Name(s) unknown: ~

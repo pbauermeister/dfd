@@ -1,0 +1,17 @@
+# Issue #104: the crossed pattern, not obtainable by neighborhoods
+# alone: a span-less "!!" vetoes every flow touching the four items, then
+# one plain "!" per wanted pair shows ab and cd; ad and cb stay hidden.
+
+process A
+process B
+process C
+process D
+
+A -> B ab
+C -> D cd
+A -> D ad
+C -> B cb
+
+!! A B C D
+! A B
+! C D

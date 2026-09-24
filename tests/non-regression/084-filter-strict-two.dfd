@@ -1,0 +1,26 @@
+# Issue #104: two strict filters compose into a path-only view: 12 and
+# 15 are path flows of the second filter and show; 56 (P5 -> P6) touches
+# the first selection and is on no path, so it is hidden although P5 and
+# P6 are both kept; 26 is hidden as in 082.
+
+process P1 Process 1
+process P2 Process 2
+process P3 Process 3
+process P4 Process 4
+process P5 Process 5
+process P6 Process 6
+process P7 Process 7
+
+P1 -> P2 12
+P2 -> P3 23
+P3 -> P4 34
+
+P5 -> P6 56
+P6 -> P7 67
+P7 -> P4 74
+
+P1 ->? P5 15
+P2 ->? P6 26
+P3 ->? P7 37
+!!<2 P4
+!!>1 P1

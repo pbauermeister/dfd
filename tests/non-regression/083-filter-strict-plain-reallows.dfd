@@ -1,0 +1,24 @@
+# Issue #104: a plain "!" naming both ends of a stray flow shows it
+# again: 26 (P2 -> P6) is back, the other flows as in 082.
+
+process P1 Process 1
+process P2 Process 2
+process P3 Process 3
+process P4 Process 4
+process P5 Process 5
+process P6 Process 6
+process P7 Process 7
+
+P1 -> P2 12
+P2 -> P3 23
+P3 -> P4 34
+
+P5 -> P6 56
+P6 -> P7 67
+P7 -> P4 74
+
+P1 ->? P5 15
+P2 ->? P6 26
+P3 ->? P7 37
+!!<>2 P4
+! P2 P6

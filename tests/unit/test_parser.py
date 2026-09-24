@@ -6,7 +6,7 @@ tests (e.g. for include resolution) belong in test_scanner.py.
 
 import pytest
 
-from data_flow_diagram import exception
+from data_flow_diagram import exception, model
 from data_flow_diagram.dsl import checker, parser, scanner
 
 # ── Valid syntax fixture ──────────────────────────────────────────────────────
@@ -120,6 +120,19 @@ PARSE_ERROR_CASES = [
 ]
 
 
+# ── Filter strictness fixtures ────────────────────────────────────────────────
+
+# Each entry: (filter line, expected Only.strict).  "!!" is the strict only
+# filter, whole-filter, with or without a neighbor spec; "!" is never strict.
+FILTER_STRICTNESS_CASES = [
+    pytest.param("!!<>2 A", True, id="strict-with-neighbors"),
+    pytest.param("!! A", True, id="strict-anchors-only"),
+    pytest.param("!!A", True, id="strict-no-space"),
+    pytest.param("!<>2 A", False, id="plain-with-neighbors"),
+    pytest.param("! A", False, id="plain-anchors-only"),
+]
+
+
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 
@@ -149,6 +162,19 @@ def test_check_raises(dfd_text: str) -> None:
     statements, _, _ = parser.parse(tokens)
     with pytest.raises(exception.DfdException):
         checker.check(statements)
+
+
+@pytest.mark.parametrize(("filter_line", "strict"), FILTER_STRICTNESS_CASES)
+def test_parse_filter_strictness(filter_line: str, *, strict: bool) -> None:
+    # "!!" yields an Only statement flagged strict, "!" one that is not
+    tokens = scanner.scan(
+        provenance=None, source_text=f"process A\n{filter_line}"
+    )
+    statements, _, _ = parser.parse(tokens)
+    only = statements[-1]
+    assert isinstance(only, model.Only)
+    assert only.strict is strict
+    assert only.names == ["A"]
 
 
 @pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)

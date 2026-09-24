@@ -1,0 +1,9 @@
+# Issue #104: "~~" is not a keyword (removed items take their flows
+# away, so a strict "without" has no meaning); it errors as today.
+
+process A
+process B
+
+A -> B ab
+
+~~ A

@@ -1,0 +1,17 @@
+# Issue #104: path membership survives rewiring to a replacement group:
+# cd (rewired G -> D) is a path flow and stays; db (rewired D -> G) is
+# downstream of D, off the upstream paths, and is hidden.
+
+process A
+process B
+process C
+process D
+process G Group
+
+A -> B ab
+B -> C bc
+C -> D cd
+D -> B db
+
+!!<2 D G
+~=G B C
