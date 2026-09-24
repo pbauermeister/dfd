@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 20
+Next number: 21
 
 ## Won't do
 
@@ -104,3 +104,15 @@ migrates to Ubuntu 26 on 2026-10-19; pin `ubuntu-24.04` or verify
 the suite on the new image before that date. Rehearse with the
 `release.yml` dry run (`workflow_dispatch`, stops after TestPyPI),
 never exercised so far.
+
+### 20. A bare `=` in a filter statement hangs the parser
+
+Found while mocking up #104 (devlog 104): `~= G B C` (space after
+the replacer sign) never returns. In `_parse_filter()`
+(`src/data_flow_diagram/dsl/parser.py`) `RX_FILTER_ARG` matches `=`
+with an empty `replacer` group, which is falsy, so neither branch
+consumes the argument and the `while args` loop spins. Fix: test the
+group for `None`, not truthiness, and raise "replacer name expected"
+on an empty one; add the robustness case to
+`tests/unit/test_parser.py::test_check_raises` and an `-err-` NR
+fixture.
