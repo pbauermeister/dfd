@@ -82,19 +82,6 @@ of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
 
-### 19. Clear the GitHub Actions deprecation annotations
-
-Every run of `release.yml` (1.17.9, 2026-09-24) and `ci.yml` ends
-with two warnings. Node 20 deprecation: `actions/checkout@v4`,
-`actions/upload-artifact@v4`, `actions/download-artifact@v4` and
-`astral-sh/setup-uv@v6` are forced onto Node 24; move to the
-majors that target Node 24 (`checkout@v5`, `upload-artifact@v5`,
-`download-artifact@v5`, latest `setup-uv`) in `release.yml`,
-`ci.yml` and `merge-gate.yml`. Runner image: `ubuntu-latest`
-migrates to Ubuntu 26 on 2026-10-19; pin `ubuntu-24.04` or verify
-the suite on the new image before that date. Rehearse with the
-`release.yml` dry run (`workflow_dispatch`, stops after TestPyPI),
-never exercised so far.
 
 ### 20. A bare `=` in a filter statement hangs the parser
 
