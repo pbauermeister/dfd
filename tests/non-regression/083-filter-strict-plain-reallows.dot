@@ -1,0 +1,41 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/083-filter-strict-plain-reallows -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 4: process P2 Process 2 */
+  "P2" [shape=ellipse label="Process 2" fillcolor="#eeeeee" style=filled ]
+
+  /* 5: process P3 Process 3 */
+  "P3" [shape=ellipse label="Process 3" fillcolor="#eeeeee" style=filled ]
+
+  /* 6: process P4 Process 4 */
+  "P4" [shape=ellipse label="Process 4" fillcolor="#eeeeee" style=filled ]
+
+  /* 8: process P6 Process 6 */
+  "P6" [shape=ellipse label="Process 6" fillcolor="#eeeeee" style=filled ]
+
+  /* 9: process P7 Process 7 */
+  "P7" [shape=ellipse label="Process 7" fillcolor="#eeeeee" style=filled ]
+
+  /* 12: flow P2 P3 23 */
+  "P2" -> "P3" [label="23"]
+
+  /* 13: flow P3 P4 34 */
+  "P3" -> "P4" [label="34"]
+
+  /* 16: flow P6 P7 67 */
+  "P6" -> "P7" [label="67"]
+
+  /* 17: flow P7 P4 74 */
+  "P7" -> "P4" [label="74"]
+
+  /* 20: flow? P2 P6 26 */
+  "P2" -> "P6" [label="26" constraint=false]
+
+  /* 21: flow? P3 P7 37 */
+  "P3" -> "P7" [label="37" constraint=false]
+}
