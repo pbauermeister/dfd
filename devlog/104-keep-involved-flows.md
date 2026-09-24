@@ -437,7 +437,7 @@ their lesson.
 | 4   | `~~ A` errors with "Name(s) unknown: ~", the sugar splitting it as `~ ~`; a clearer message would need the sugar to know `~~`                                                                                           | Accept as is (Scope boundary); revisit if TODO 22's doc task touches the sugar                                   |
 | 5   | On a grid, a `<>2` filter from the centre has no stray flow: the strict filter shows its effect from a corner or with a direction. Worth a sentence in the doc?                                                         | Accept as is: the doc example (§ 7.4.1.7) is directional already and names its two stray flows                   |
 
-Shipped: pending
+Shipped: 2026-09-24 ("ship")
 
 ## 5. Closure
 
