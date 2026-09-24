@@ -451,7 +451,7 @@ Shipped: 2026-09-24 ("ship")
 | 4   | Two slips in execution, a file checkout over uncommitted work and a render in the wrong directory, both caught by `git status` before a commit; the lesson is in the Account                                          | not well |      |
 | 5   | The merge gate blocked the PR on a `docs:` TODO.md commit: the rule worked as designed, and exposed that bookkeeping commits bump the version (TODO 24)                                                               | surprise |      |
 | 6   | The playground as a committed artifact: a `.dfd` with a menu of blocks, each comment carrying the verified counts, was the fastest way for the user to see the rule; worth keeping as a pattern                       | well     |      |
-| 7   | Devlog length: 460 lines at closure against the 300 target, the option table and the runs being the bulk; the tables are not counted, the prose is near the budget                                                    | tension  |      |
+| 7   | Devlog length: about 490 lines at closure against the 300 target, the option table and the runs being the bulk; the tables are not counted, the prose is near the budget                                                    | tension  |      |
 
 Process: 2 rounds before stop 1 (the stop 0 review reopened the
 design); 3 loops at stop 2 (playground rewritten twice at the user's
