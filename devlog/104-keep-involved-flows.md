@@ -340,7 +340,7 @@ Approved: 2026-09-24 ("Go!")
   renders verified as DOT (B C D kept in both, `stray flow` only in
   the plain one) and by eye; `make doc` and `make test` green. Then
   moved, at the user's request, from § 7.2 to the last Only-filter
-  example, § 7.4.1.12 "Path flows and stray flows": not fundamental
+  example, § 7.4.1.12 "The strict filter: path flows and stray flows": not fundamental
   enough for the concept section.
 - Type safety note: `find_neighbors()` returns a three-tuple read in
   two places (`Only`, `Without`), a pre-existing shape extended by

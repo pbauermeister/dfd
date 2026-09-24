@@ -1333,7 +1333,7 @@ Here:
 
 ![Filtering](./img/filter-only-right.svg)
 
-##### 7.4.1.12. Path flows and stray flows
+##### 7.4.1.12. The strict filter: path flows and stray flows
 
 Two chains lead to C, and a relaxed flow joins them:
 
