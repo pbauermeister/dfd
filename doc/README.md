@@ -1001,9 +1001,11 @@ With a single DFD source file, filters do not make a lot of sense. But when comb
 
 ### 7.2. Specifying filters
 
-Filters statements are line beginning with `!` or `~`:
+Filters statements are line beginning with `!`, `!!` or `~`:
 
 - `!` is the "only" filter, used to keep items,
+- `!!` is the "strict only" filter, used to keep items and only the
+  flows that lead to them (see below),
 - `~` is the "without" filter, used to remove items.
 
 You shall think of a set of kept items, manipulated sequentially:
@@ -1056,11 +1058,29 @@ You can combine them by sequential statements:
 
   ```
 
+Flows follow the kept items: a flow is shown when both its ends are
+kept. The strict only filter `!!` is the exception. It keeps the same
+items as `!` would, but the items it selects show only their **path
+flows**, the flows the filter followed to reach the neighbors. The
+other flows between kept items, the **stray flows**, are hidden:
+
+- a `!!` filter hides every flow touching an item it selects, unless
+  that flow is a path flow of a `!!` filter (this one or another),
+- a `!` filter that names both ends of a flow shows that flow, whatever
+  a `!!` filter says about it,
+- `~~` does not exist: an item removed by `~` takes its flows away.
+
+Strictness applies to the whole filter: `!!<2 >1 A` is strict in both
+directions. For a strict upstream and a plain downstream, write two
+filters, `!!<2 A` and `!>1 A`.
+
 ### 7.3. Filters syntax
 
 #### 7.3.1. The "Only" filter
 
 `![NEIGHBOURS ][ITEM_NAMES]`
+
+`!![NEIGHBOURS ][ITEM_NAMES]` (strict: only the path flows)
 
 #### 7.3.2. The "Without" filter
 
@@ -1244,7 +1264,24 @@ Here:
 
 ![Filtering](./img/filter-only-two.svg)
 
-##### 7.4.1.7. Same, but not the item itself
+##### 7.4.1.7. Same, but only the path flows
+
+```data-flow-diagram img/filter-only-strict.svg
+#include #img/data-pipeline
+
+# We keep proc_flow and two levels of neighbors in all directions, but
+# only the flows that lead to those neighbors
+!!<>2 proc_flow
+
+# Note the "!!": the strict only filter. Compared to the previous
+# example, the stray flows "horizon" (db_params -> forecast) and
+# interact -> user are hidden: their ends are kept, but they are on no
+# path of two flows from proc_flow.
+```
+
+![Filtering](./img/filter-only-strict.svg)
+
+##### 7.4.1.8. Same, but not the item itself
 
 ```data-flow-diagram img/filter-only-after-two-not-me.svg
 #include #img/data-pipeline
@@ -1257,7 +1294,7 @@ Here:
 
 ![Filtering](./img/filter-only-after-two-not-me.svg)
 
-##### 7.4.1.8. Same, and remove the frames
+##### 7.4.1.9. Same, and remove the frames
 
 ```data-flow-diagram img/filter-only-no-frames.svg
 #include #img/data-pipeline
@@ -1270,7 +1307,7 @@ Here:
 
 ![Filtering](./img/filter-only-no-frames.svg)
 
-##### 7.4.1.9. Keeping an item and those on its left
+##### 7.4.1.10. Keeping an item and those on its left
 
 ```data-flow-diagram img/filter-only-left.svg
 #include #img/data-pipeline
@@ -1283,7 +1320,7 @@ Here:
 
 ![Filtering](./img/filter-only-left.svg)
 
-##### 7.4.1.10. Keeping an item and one level on its right
+##### 7.4.1.11. Keeping an item and one level on its right
 
 ```data-flow-diagram img/filter-only-right.svg
 #include #img/data-pipeline
