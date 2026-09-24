@@ -120,3 +120,49 @@ def test_gate_verdict(
     assert verdict.allowed is allowed
     if not allowed:
         assert "release 1.17.8 first" in verdict.reason
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        pytest.param("TODO.md", True, id="todo"),
+        pytest.param("devlog/107-x.md", True, id="devlog"),
+        pytest.param(".claude/settings.json", True, id="dot-claude"),
+        pytest.param("engineering/PROCESS.md", True, id="engineering"),
+        pytest.param("doc/README.md", False, id="doc-ships"),
+        pytest.param("README.md", False, id="readme-ships"),
+        pytest.param("templates.py", False, id="prefix-not-dir"),
+        pytest.param("src/TODO.md", False, id="nested-name"),
+    ],
+)
+def test_is_bookkeeping(
+    path: str,
+    expected: bool,  # noqa: FBT001  pytest passes parameters by keyword
+) -> None:
+    assert cc.is_bookkeeping(path) is expected
+
+
+@pytest.mark.parametrize(
+    "level, paths, allowed",
+    [
+        pytest.param("patch", ["TODO.md"], False, id="docs-on-todo"),
+        pytest.param("minor", ["devlog/1.md", "TODO.md"], False, id="all"),
+        pytest.param("none", ["TODO.md"], True, id="chore-on-todo"),
+        pytest.param("patch", ["TODO.md", "doc/x.md"], True, id="mixed"),
+        pytest.param("patch", ["src/a.py"], True, id="ships"),
+        pytest.param("patch", [], True, id="empty-commit"),
+    ],
+)
+def test_bookkeeping_verdict(
+    level: str,
+    paths: list[str],
+    allowed: bool,  # noqa: FBT001  pytest passes parameters by keyword
+) -> None:
+    verdict = cc.bookkeeping_verdict(level=cc.Bump(level), paths=paths)
+    assert verdict.allowed is allowed
+
+
+def test_read_commit_message_drops_comments(tmp_path: Path) -> None:
+    f = tmp_path / "COMMIT_EDITMSG"
+    f.write_text("docs: x\n# Please enter the commit message\n#\n")
+    assert cc.read_commit_message(f) == "docs: x\n"
