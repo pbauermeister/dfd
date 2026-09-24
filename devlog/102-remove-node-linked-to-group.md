@@ -68,6 +68,8 @@ git stash push -- src; make nr-test; git stash pop
 080 and 081 both render `Group` alone, as the issue's first example
 minus P3.
 
+Tried: 2026-09-24 (the two fixtures and a diagram of the user's own)
+
 ### 3.2 Verdict
 
 **Recommendation:** accept
@@ -84,7 +86,7 @@ minus P3.
 | 1   | Sibling of #100 in the same ten lines; the assessment before the go named cause, fix and fixtures in one   | well  |      |
 | 2   | Fast track, one go, fixtures then fix as in devlog 100; the devlog written at closure as the track says   | well  |      |
 
-Process: 1 round before the go; loops at Try it: none so far.
+Process: 1 round before the go; loops at Try it: none; rework after the go: none.
 
 Closed:
 
