@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 26
+Next number: 27
 
 ## Won't do
 
@@ -212,3 +212,18 @@ Decide how: a dynamic version (`hatch-vcs` or `setuptools-scm` style,
 from `git describe`) or a `make install` recipe that rewrites the
 version in a scratch copy before installing. The release path
 (`make release`, `release.yml`) must keep the bare version.
+
+### 26. Rename the `Shipped:` stop
+
+Raised at stop 3 of #104. "Ship" means putting the thing in users'
+hands, which is the release, a separate step with its own command;
+"delivered" is as close to "ship" and as confusing. The stop marks
+the point where development is done and the final quality gate is
+entered: the user accepts the delivery, the PR leaves draft, review,
+checks and merge follow. Name it for that: `Ready:` (matches
+`gh pr ready` and GitHub's "ready for review"), or `Reviewable:`, or
+`Done:` (but `DONE` is the status at stop 4). Structural change:
+`templates/devlog.md` (the stop line and the guidance comments that
+cite it), `engineering/PROCESS.md` (the five-stops list, Phase 4),
+the memory notes; earlier devlogs keep `Shipped:`, history being
+history.
