@@ -337,26 +337,78 @@ Approved: 2026-09-24 ("Go!")
   two places (`Only`, `Without`), a pre-existing shape extended by
   one element; a dataclass is the convention's answer if it grows
   again.
+- Step 3, `238866f`: as planned, with one placement change: the
+  example is § 7.4.1.7 "Same, but only the path flows", right after
+  the `!<>2 proc_flow` example it is compared to, so one new image
+  instead of two; `make doc` renumbered the later examples. Two stray
+  flows hidden there, `db_params -> forecast` ("horizon") and
+  `interact -> user`, verified by a DOT diff of a scratch render and
+  by eye on both images. Slip on the way: a DOT-format markdown run
+  inside `doc/` overwrote every `doc/img/*.svg` with DOT text, and a
+  second one from the root wrote 22 files into the top-level `img/`;
+  `make doc` restored the former, `git clean` on the untracked files
+  the latter, `git status` clean but for the intended changes. Lesson:
+  a markdown render writes where the fences say, relative to the
+  working directory; render scratch copies from a scratch directory.
+  `make test` green (doc sync).
 
 ## 4. Delivery
 
 ### 4.1 Try it
 
+```bash
+make nr-review                     # SVGs next to the fixtures
+xdg-open tests/non-regression/082-filter-strict.svg          # the issue's example: 26 gone
+xdg-open tests/non-regression/083-filter-strict-plain-reallows.svg   # 26 back
+xdg-open tests/non-regression/084-filter-strict-two.svg      # two strict filters: 56 gone
+xdg-open tests/non-regression/087-filter-strict-crossed.svg  # ab and cd only
+xdg-open doc/img/filter-only-two.svg doc/img/filter-only-strict.svg  # doc example, before/after
+git show 2dd016e --stat            # the feature commit
+```
+
+The issue's own source with `!<>2 P4` replaced by `!!<>2 P4` renders
+the five flows and not `26`. In the doc example (`doc/README.md`
+§ 7.4.1.7) the "horizon" flow and `handle interactions -> User`
+disappear; the nine items stay.
+
 Tried: pending
 
 ### 4.2 Test report
 
+| #   | Criterion                                            | Proof                                                                                                                            |
+| --- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 082: `23 34 67 74 37`, no `26`                       | golden `082-filter-strict.dot`, five `->` lines, none labelled 26                                                                |
+| 2   | 083: `26` back                                       | golden, `"P2" -> "P6" [label="26"`                                                                                               |
+| 3   | 084: `12`, `15` shown, `56`, `26` hidden, P5 kept    | golden, seven flows, `"P5"` item present                                                                                         |
+| 4   | 085: `G -> D` kept, `D -> G` dropped                 | golden, one flow `"G" -> "D" [label="cd"`                                                                                        |
+| 5   | 086: `ab bc cd bd` kept, `ca` dropped                | golden, four flows                                                                                                               |
+| 6   | 087: `ab`, `cd` only                                 | golden, two flows                                                                                                                |
+| 7   | No existing golden changed                           | `git status` after `make nr-regenerate`: only 082–088 untracked, `tests/RULES.md` modified                                       |
+| 8   | Mutation smoke-test                                  | skip disabled: 082, 084–087 FAIL; plain reallow disabled: 083, 087 FAIL; both reverted                                           |
+| 9   | Parser: `!!` strict, `!` not; `~~` errors            | 5 cases in `test_parse_filter_strictness`; 088 error fixture, `Name(s) unknown: ~`                                               |
+| 10  | Doc: § 7.2, § 7.3.1, § 7.4.1.7 with image; SYNTAX.md | commit `docs:`; `make doc` exit 0; DOT diff of the example: exactly `db_params -> forecast`, `interact -> user`                  |
+| 11  | format, lint, test; CI                               | `38 files left unchanged`, `All checks passed!`, `Success: no issues found in 30 source files`, 102 pytest, 95 NR; CI: see below |
+
+CI on PR #105: pending at the time of writing, checked before stop 3.
+
 ### 4.3 Verdict
 
-**Recommendation:** accept | accept with reservations | reject
+**Recommendation:** accept
 
 Rationale:
 
--
+- Every criterion has a proof in the table; the six nominal fixtures
+  fail under one of two mutations, so each golden exercises the code
+  it locks in.
+- No existing golden or doc image changed: the default behavior is
+  untouched, as the Non-goals require.
+- The doc example is the neighbor of the plain example it extends,
+  and its two hidden flows are named in the source comment.
 
-Reservations:
-
-1.
+Reservations: none. Two slips during execution (a file checkout, a
+render in the wrong directory) were caught by `git status` and
+`git diff --stat` before any commit; both are in the Account with
+their lesson.
 
 ### 4.4 Discussion
 
