@@ -61,10 +61,11 @@ Merge gate (`merge-gate.yml`, ruleset on `main`):
 - [x] Merge not followed by a release: two patch PRs merged, then
       one release whose changelog lists both (1.17.9, 2026-09-24:
       eight PRs and one direct commit since 1.17.8, all listed).
-- [ ] Blocked: a `feat:` PR while `main` has unreleased patch
+- [x] Blocked: a `feat:` PR while `main` has unreleased patch
       commits ("release X first"); release, then the check passes
       on the next PR event. Occurred on #105 (2026-09-24, "release
-      1.17.10 first"); tick when the release lets it pass.
+      1.17.10 first"); passed after the release and a merge of
+      `main` into the branch.
 - [ ] Allowed at or below: a `fix:` PR on a pending minor.
 - [ ] None-level pending counts as empty: a `chore:` commit on
       `main`, then a `feat:` PR passes.

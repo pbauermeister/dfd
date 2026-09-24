@@ -404,8 +404,9 @@ CI on PR #105 at `e880300`: `conventional`, `smoke-test-wheel`,
 the unreleased `docs:` commit `80e97b3` (patch level, 1.17.10
 pending) and a `feat:` PR would raise it to minor. Reproduced locally
 on a `main` worktree: "BLOCKED: a minor PR would raise the pending
-patch level of main: release 1.17.10 first". The ruleset requires a
-green gate, so the merge waits for that release (Discussion 1).
+patch level of main: release 1.17.10 first". 1.17.10 released from
+main (only that commit), `main` merged into the branch (`b581c12`):
+all six checks pass on `8d6f7d3` (Discussion 1).
 
 ### 4.3 Verdict
 
