@@ -443,19 +443,48 @@ Shipped: 2026-09-24 ("ship")
 
 ### 5.1 Retrospective
 
-| #   | Point                    | Agent | User |
-| --- | ------------------------ | ----- | ---- |
-| 1   | Process and template fit |       |      |
+| #   | Point                                                                                                                                                                                                                 | Agent    | User |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: the stops fell where the template puts them; the Try it stop grew into the longest exchange of the task (three playgrounds) and produced two TODO items and the agreed direction of a third | well     |      |
+| 2   | The first mock-up decided the wrong things: syntax and computation were the questions asked, and the composition rule (c) was the one that mattered; the stop 0 review caught it before any code                      | surprise |      |
+| 3   | The composition rule was found by formulating the user's intuition as three predicates and testing them on the mock-up, then on a grid; the "obtainable sets" argument settled c1 against c3                          | well     |      |
+| 4   | Two slips in execution, a file checkout over uncommitted work and a render in the wrong directory, both caught by `git status` before a commit; the lesson is in the Account                                          | not well |      |
+| 5   | The merge gate blocked the PR on a `docs:` TODO.md commit: the rule worked as designed, and exposed that bookkeeping commits bump the version (TODO 24)                                                               | surprise |      |
+| 6   | The playground as a committed artifact: a `.dfd` with a menu of blocks, each comment carrying the verified counts, was the fastest way for the user to see the rule; worth keeping as a pattern                       | well     |      |
+| 7   | Devlog length: 460 lines at closure against the 300 target, the option table and the runs being the bulk; the tables are not counted, the prose is near the budget                                                    | tension  |      |
 
-Process: <N> rounds before stop 1; <N> loops at stop 2; rework after
-stop 1: none | <what>
+Process: 2 rounds before stop 1 (the stop 0 review reopened the
+design); 3 loops at stop 2 (playground rewritten twice at the user's
+request, blocks added twice); rework after stop 1: none in the code,
+the doc example moved from a new subsection to the neighbor of the
+plain example.
+
+<!-- Stop 4: the user fills their column. -->
 
 Closed: pending
 
 ### 5.2 Forward-looking
 
+- TODO items filed on this branch: 20 (bare `=` hangs the parser),
+  21 (flag order, doc against code), 22 (several neighbor specs in
+  one filter), 23 (group before or after the filter: orphans,
+  kept-set initialisation, direction agreed), 24 (TODO.md commits
+  bump nothing), 25 (`make install` version stamp). TODO 12: the
+  "Blocked" gate case ticked, the "title edit re-runs the checks"
+  case observed.
+- The next tasks can rely on: `Only.strict` and `Keyword.ONLY_STRICT`
+  in the model; `find_neighbors()` returning the path flow ids;
+  `_collect_flow_ids()` for touching and joining sets; the vocabulary
+  (strict only filter, path flows, stray flows) in the doc and the
+  glossary; `devlog/104-try-it.dfd` as a filter playground.
+- No template or `CLAUDE.md` change.
+
 ### 5.3 Rule trace
 
-| Source | Rule | Verb (applied / created) |
-| ------ | ---- | ------------------------ |
-|        |      |                          |
+| Source                                   | Rule                                                                   | Verb (applied / created) |
+| ---------------------------------------- | ---------------------------------------------------------------------- | ------------------------ |
+| `engineering/PROCESS.md` Phase 3         | Stop 0 before any mock-up; the mock-up refines the frame in place      | applied                  |
+| `engineering/CONVENTIONS.md` Type safety | Fields on the record, keyword-only signatures, no string modes         | applied                  |
+| `tests/RULES.md`                         | Fixtures before the code; mutation smoke-test after adding NR fixtures | applied                  |
+| `engineering/RELEASING.md` Merge gate    | A PR never raises the pending level of `main`: release first           | applied                  |
+| `engineering/PROCESS.md` TODO.md         | Items that arise during a task are committed on the task branch        | applied                  |
