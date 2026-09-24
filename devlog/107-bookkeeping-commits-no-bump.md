@@ -55,7 +55,7 @@ Approved: 2026-09-24
   (`BOOKKEEPING_PATHS`, `is_bookkeeping()`, `bookkeeping_verdict()`,
   staged paths from `git diff --cached`, comment lines of the message
   file dropped), local hook in `.pre-commit-config.yaml` at the
-  `commit-msg` stage, 14 unit cases. A first live trial passed by
+  `commit-msg` stage, 15 unit cases. A first live trial passed by
   mistake: the staged set held the tool itself, a shipping path, and
   the verdict was right; the trial commit was undone and redone on
   `TODO.md` alone.
@@ -73,7 +73,7 @@ Approved: 2026-09-24
 (TODO.md): use a type that bumps nothing`, exit 1; the hook command
    on `chore: trial` exits 0; the same `docs:` with the tool staged
    passed (criterion 1).
-2. `make test`: 116 pytest (102 + 14), 95 NR fixtures green; `make
+2. `make test`: 117 pytest (102 + 15), 95 NR fixtures green; `make
 format lint` clean (criterion 2).
 3. Sections written (criterion 3); prettier clean.
 
