@@ -68,6 +68,10 @@ Approved: 2026-09-24
   and pre-commit failed the commit ("files were modified by this
   hook"). The entry is now `uv run --no-sync`: the hook never touches
   the environment (`make require` keeps it in sync).
+- Second follow-up, same trigger: a merge commit ("Merge branch …")
+  is not conventional and the hook refused it, while the conventional
+  hook lets merges through. The check now returns on a non-conventional
+  message: that verdict belongs to the other hook.
 
 ## 3. Delivery
 

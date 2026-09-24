@@ -166,3 +166,11 @@ def test_read_commit_message_drops_comments(tmp_path: Path) -> None:
     f = tmp_path / "COMMIT_EDITMSG"
     f.write_text("docs: x\n# Please enter the commit message\n#\n")
     assert cc.read_commit_message(f) == "docs: x\n"
+
+
+def test_check_bookkeeping_lets_a_merge_commit_through(
+    tmp_path: Path,
+) -> None:
+    f = tmp_path / "MERGE_MSG"
+    f.write_text("Merge branch 'a' into b\n")
+    cc.run_check_bookkeeping(BUMP_MAP, message_path=f)  # no SystemExit
