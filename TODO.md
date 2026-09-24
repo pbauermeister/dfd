@@ -81,17 +81,6 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-### 18. Skip GitHub Actions on commits that do not need them
-
-`ci.yml` runs the full matrix on every push to `main` and every PR
-event, including commits that touch only `devlog/`, `discussions/`,
-`TODO.md` or `engineering/`. Add `paths-ignore` for those to the
-`push` and `pull_request` triggers; `merge-gate.yml` and
-`pr-title.yml` are cheap and must keep running (both are required
-checks of the `main` ruleset, and a path-filtered required check
-never reports, which blocks the merge button). `CI` is not a
-required check, so filtering it is safe; keep `workflow_call`
-unfiltered so `release.yml` still gates on it.
 
 ### 19. Clear the GitHub Actions deprecation annotations
 
