@@ -1,7 +1,7 @@
 # 104 — Keep only the flows involved by a "keep" filter
 
 Date: 2026-09-24
-Status: PENDING
+Status: ONGOING
 Issue: #104 · PR: #105 · Branch: `feature/104-keep-involved-flows`
 Task nature: change
 Track: full
@@ -311,7 +311,7 @@ its own.
   23, a bug of its own, unaffected by strictness: path membership is
   by connection identity in either order).
 
-Approved: pending
+Approved: 2026-09-24 ("Go!")
 
 ## 3. Execution
 
