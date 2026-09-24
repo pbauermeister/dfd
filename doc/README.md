@@ -1074,46 +1074,6 @@ Strictness applies to the whole filter: `!!<2 >1 A` is strict in both
 directions. For a strict upstream and a plain downstream, write two
 filters, `!!<2 A` and `!>1 A`.
 
-A minimal example. Two chains lead to C, and a relaxed flow joins them:
-
-```data-flow-diagram img/filter-strict-master.svg
-process A
-process B
-process C
-process D
-process E
-
-A ->  B
-B ->  C  path flow
-E ->  D
-D ->  C  path flow
-B ->? D  stray flow
-```
-
-![Strict filter, master](./img/filter-strict-master.svg)
-
-`!<1 C` keeps C and the items one flow upstream, B and D, with every
-flow among them: the neighborhood of C, stray flow included.
-
-```data-flow-diagram img/filter-strict-plain.svg
-#include #img/filter-strict-master
-
-!<1 C
-```
-
-![Strict filter, plain](./img/filter-strict-plain.svg)
-
-`!!<1 C` keeps the same items and only the path flows: what leads
-to C?
-
-```data-flow-diagram img/filter-strict.svg
-#include #img/filter-strict-master
-
-!!<1 C
-```
-
-![Strict filter](./img/filter-strict.svg)
-
 ### 7.3. Filters syntax
 
 #### 7.3.1. The "Only" filter
@@ -1372,6 +1332,48 @@ Here:
 ```
 
 ![Filtering](./img/filter-only-right.svg)
+
+##### 7.4.1.12. Path flows and stray flows
+
+Two chains lead to C, and a relaxed flow joins them:
+
+```data-flow-diagram img/filter-strict-master.svg
+process A
+process B
+process C
+process D
+process E
+
+A ->  B
+B ->  C  path flow
+E ->  D
+D ->  C  path flow
+B ->? D  stray flow
+```
+
+![Strict filter, master](./img/filter-strict-master.svg)
+
+`!<1 C` keeps C and the items one flow upstream, B and D, with every
+flow among them: the neighborhood of C, stray flow included.
+
+```data-flow-diagram img/filter-strict-plain.svg
+#include #img/filter-strict-master
+
+!<1 C
+```
+
+![Strict filter, plain](./img/filter-strict-plain.svg)
+
+`!!<1 C` keeps the same items and only the path flows: what leads
+to C?
+
+```data-flow-diagram img/filter-strict.svg
+#include #img/filter-strict-master
+
+!!<1 C
+```
+
+![Strict filter](./img/filter-strict.svg)
 
 #### 7.4.2. Using the "Without" filters
 
