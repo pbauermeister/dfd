@@ -356,22 +356,32 @@ Approved: 2026-09-24 ("Go!")
 
 ### 4.1 Try it
 
+The playground `devlog/104-try-it.dfd` (rendered: `104-try-it.svg`):
+a 3 × 3 grid of items laid out top-down, column flows constrained,
+row flows and two diagonals relaxed, plus a spare item Z for the
+group variants. At its end, a menu of twelve filter blocks, A to L,
+one active at a time; each block's comment states the item and flow
+counts and names the flows that appear or vanish, all verified by a
+DOT render. Blocks: plain baseline, strict, strict plus a pair, two
+strict filters, strict plus a plain neighborhood, group after plain
+and after strict, the crossed pattern by a span-less veto and by
+paths, strict then removal, and the reversed group order (the TODO
+item 23 illustration).
+
 ```bash
-make nr-review                     # SVGs next to the fixtures
-xdg-open tests/non-regression/082-filter-strict.svg          # the issue's example: 26 gone
-xdg-open tests/non-regression/083-filter-strict-plain-reallows.svg   # 26 back
-xdg-open tests/non-regression/084-filter-strict-two.svg      # two strict filters: 56 gone
-xdg-open tests/non-regression/087-filter-strict-crossed.svg  # ab and cd only
-xdg-open doc/img/filter-only-two.svg doc/img/filter-only-strict.svg  # doc example, before/after
-git show 2dd016e --stat            # the feature commit
+./data-flow-diagram devlog/104-try-it.dfd && xdg-open devlog/104-try-it.svg
+make nr-review && xdg-open tests/non-regression/082-filter-strict.svg
+xdg-open doc/img/filter-only-two.svg doc/img/filter-only-strict.svg
 ```
 
-The issue's own source with `!<>2 P4` replaced by `!!<>2 P4` renders
-the five flows and not `26`. In the doc example (`doc/README.md`
-§ 7.4.1.7) the "horizon" flow and `handle interactions -> User`
-disappear; the nine items stay.
+A first playground on the doc's data pipeline was replaced at the
+user's request by lettered items and "source dest" flow labels, then
+by the grid: a filter-free base one can read at a glance. On a grid,
+a filter centred on the middle item with `<>2` has no stray flow at
+all, every flow being on some two-flow path through the centre; the
+baseline is therefore `!>2 A1`, from a corner.
 
-Tried: pending
+Tried: 2026-09-24 (the playground, blocks A to L; "very nice!")
 
 ### 4.2 Test report
 
@@ -389,7 +399,13 @@ Tried: pending
 | 10  | Doc: § 7.2, § 7.3.1, § 7.4.1.7 with image; SYNTAX.md | commit `docs:`; `make doc` exit 0; DOT diff of the example: exactly `db_params -> forecast`, `interact -> user`                  |
 | 11  | format, lint, test; CI                               | `38 files left unchanged`, `All checks passed!`, `Success: no issues found in 30 source files`, 102 pytest, 95 NR; CI: see below |
 
-CI on PR #105: pending at the time of writing, checked before stop 3.
+CI on PR #105 at `e880300`: `conventional`, `smoke-test-wheel`,
+`test (3.11, 3.12, 3.13)` pass; `gate` fails by design: main carries
+the unreleased `docs:` commit `80e97b3` (patch level, 1.17.10
+pending) and a `feat:` PR would raise it to minor. Reproduced locally
+on a `main` worktree: "BLOCKED: a minor PR would raise the pending
+patch level of main: release 1.17.10 first". The ruleset requires a
+green gate, so the merge waits for that release (Discussion 1).
 
 ### 4.3 Verdict
 
@@ -412,9 +428,13 @@ their lesson.
 
 ### 4.4 Discussion
 
-| #   | Point | Decision |
-| --- | ----- | -------- |
-| 1   |       |          |
+| #   | Point                                                                                                                                                                                                                   | Decision                                                                                                         |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 1   | The merge gate blocks the PR: main has an unreleased patch-level `docs:` commit, this PR is minor. First natural occurrence of the "Blocked" case of TODO item 12                                                       | Release 1.17.10 from main first, then the gate passes on the next PR event; the TODO 12 case ticked once it does |
+| 2   | Four follow-ups found on the way: 20 (bare `=` hangs the parser), 21 (flag order, doc against code), 22 (several neighbor specs in one filter), 23 (group before or after the filter, orphans, kept-set initialisation) | Postponed, all recorded as TODO items on this branch with their direction                                        |
+| 3   | The playground is a new kind of devlog artifact: a `.dfd` with a filter menu, committed with its SVG                                                                                                                    | Accept; the Try it section describes it, no template change                                                      |
+| 4   | `~~ A` errors with "Name(s) unknown: ~", the sugar splitting it as `~ ~`; a clearer message would need the sugar to know `~~`                                                                                           | Accept as is (Scope boundary); revisit if TODO 22's doc task touches the sugar                                   |
+| 5   | On a grid, a `<>2` filter from the centre has no stray flow: the strict filter shows its effect from a corner or with a direction. Worth a sentence in the doc?                                                         | Accept as is: the doc example (§ 7.4.1.7) is directional already and names its two stray flows                   |
 
 Shipped: pending
 
