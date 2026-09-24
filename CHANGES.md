@@ -1,5 +1,14 @@
 <!-- semantic-release -->
 
+## v1.18.0 (2026-09-24)
+
+### Features
+
+- Strict only filter "!!" keeps only the path flows
+  ([#105](https://github.com/pbauermeister/dfd/pull/105),
+  [`d90cf84`](https://github.com/pbauermeister/dfd/commit/d90cf84e5b5a0f6a905e7aa820fcc96e61fc11fc))
+
+
 ## v1.17.10 (2026-09-24)
 
 ### Documentation
