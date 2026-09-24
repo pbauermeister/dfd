@@ -317,6 +317,27 @@ Approved: 2026-09-24 ("Go!")
 
 ### 3.1 Account
 
+- Step 1, `2b68430`: as planned, plus 088, an error fixture for `~~`
+  (criterion 9's `~~` case cannot be a parser unit test: the error
+  arises in the filter phase, "Name(s) unknown: ~"). Pre-feature
+  failure differs from the plan's wording: the sugar splits `!!` into
+  `! !` and the suite aborts at 082 with "Name(s) unknown: !<>2"
+  (`nr-test.sh` is `set -e`). No existing golden changed.
+- Step 2, `2dd016e`: as the mock-up. Two mutation smoke-tests instead
+  of one: the stray-flow skip disabled fails 082 and 084–087, not 083
+  (all its flows are shown anyway), so the plain reallow disabled was
+  run too and fails 083 and 087. `make format lint test` green: 102
+  pytest (97 + 5), 95 NR (88 + 7). Slip on the way: a `git checkout`
+  meant to revert a mutation reverted the whole uncommitted
+  `filters.py`; restored from the mock-up patch, the diff stat
+  checked before and after. Lesson: mutate and revert with an exact
+  text replacement, never with a checkout of a file carrying
+  uncommitted work.
+- Type safety note: `find_neighbors()` returns a three-tuple read in
+  two places (`Only`, `Without`), a pre-existing shape extended by
+  one element; a dataclass is the convention's answer if it grows
+  again.
+
 ## 4. Delivery
 
 ### 4.1 Try it
