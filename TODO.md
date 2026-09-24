@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 22
+Next number: 23
 
 ## Won't do
 
@@ -127,3 +127,18 @@ one (the span belongs to the direction, the flags qualify the
 selection). Make the parser accept the flags on either side of the
 span, migrate the examples and fixtures to the documented order, and
 say in § 7.3.3 that both are accepted.
+
+### 22. Several neighbor specs in one filter: undocumented, overwrite silent
+
+Found at the stop 1 discussion of #104 (devlog 104). `_parse_filter()`
+(`src/data_flow_diagram/dsl/parser.py`) consumes every leading
+argument that matches a neighbor spec, so `!<1 >2 C` is one filter
+with upstream span 1 and downstream span 2, equivalent to `!<1 C`
+plus `!>2 C`. `doc/README.md` § 7.3 and `doc/SYNTAX.md` § 7 write one
+`[NEIGHBOUR_SPEC]`, singular, and a second spec for the same
+direction (`!<1 <3 C`) silently overwrites the first. Decide: document
+the combined form and make the same-direction repeat an error, or
+reject a second spec. Leaning: document it, it exists and is harmless.
+Note for the doc: a flag or the `!!` strictness applies to the whole
+filter, whichever spec carries it; different strictness per direction
+is obtained by two filters.
