@@ -220,9 +220,9 @@ hands, which is the release, a separate step with its own command;
 "delivered" is as close to "ship" and as confusing. The stop marks
 the point where development is done and the final quality gate is
 entered: the user accepts the delivery, the PR leaves draft, review,
-checks and merge follow. Name it for that: `Ready:` (matches
-`gh pr ready` and GitHub's "ready for review"), or `Reviewable:`, or
-`Done:` (but `DONE` is the status at stop 4). Structural change:
+checks and merge follow. Decided: `Ready:`, as in `gh pr ready` and
+GitHub's "ready for review" ("ready for what" is answered by that
+usage); `Reviewable:` and `Done:` considered. Structural change:
 `templates/devlog.md` (the stop line and the guidance comments that
 cite it), `engineering/PROCESS.md` (the five-stops list, Phase 4),
 the memory notes; earlier devlogs keep `Shipped:`, history being
