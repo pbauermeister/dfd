@@ -301,7 +301,8 @@ def _apply_filters(
                     continue
 
             case model.Connection() as conn:
-                if conn.src in replacement or conn.dst in replacement:
+                replaced = conn.src in replacement or conn.dst in replacement
+                if replaced:
                     # rewrite replaced endpoint(s)
                     conn.src = replacement.get(conn.src, conn.src)
                     conn.dst = replacement.get(conn.dst, conn.dst)
@@ -312,14 +313,16 @@ def _apply_filters(
                             "=> Skipping connection: collapsed by replacement"
                         )
                         continue
+
+                # skip if either endpoint was filtered out, replaced or not
+                if conn.src not in kept_names or conn.dst not in kept_names:
+                    dprint(
+                        "=> Skipping connection: some end is not in the kept list"
+                    )
+                    continue
+
+                if replaced:
                     replaced_connections[conn.signature()] = conn
-                else:
-                    # skip if either endpoint was filtered out
-                    if conn.src not in kept_names or conn.dst not in kept_names:
-                        dprint(
-                            "=> Skipping connection: some end is not in the kept list"
-                        )
-                        continue
 
             case model.Frame() as frame:
                 # rewrite replaced names in frame membership
