@@ -279,7 +279,7 @@ wheels = [
 
 [[package]]
 name = "data-flow-diagram"
-version = "1.17.9"
+version = "1.17.10"
 source = { editable = "." }
 
 [package.dev-dependencies]
