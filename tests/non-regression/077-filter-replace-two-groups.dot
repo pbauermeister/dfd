@@ -1,0 +1,29 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/077-filter-replace-two-groups -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 10: process E */
+  "E" [shape=ellipse label="E" fillcolor="#eeeeee" style=filled ]
+
+  /* 12: flow A C a to c */
+  "AB" -> "CD" [label="a to c"]
+
+  /* 13: flow A E a to e */
+  "AB" -> "E" [label="a to e"]
+
+  /* 15: flow.r B D d to b */
+  "AB" -> "CD" [label="d to b" dir=back]
+
+  /* 16: flow D E d to e */
+  "CD" -> "E" [label="d to e"]
+
+  /* 18: process AB */
+  "AB" [shape=ellipse label="AB" fillcolor="#eeeeee" style=filled ]
+
+  /* 21: process CD */
+  "CD" [shape=ellipse label="CD" fillcolor="#eeeeee" style=filled ]
+}
