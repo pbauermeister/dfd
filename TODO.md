@@ -180,21 +180,6 @@ selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
 
-### 24. TODO.md commits must not bump the version
-
-Found at the delivery of #104: `main` carried one commit, `docs:
-TODO.md as numbered headings` (80e97b3), which bumps patch, so the
-`feat:` PR #105 was blocked by the merge gate ("release 1.17.10
-first") and 1.17.10 was released with no change to the package. A
-change to `TODO.md`, on any branch, is bookkeeping: it must use a
-type that bumps nothing (`chore`, `ci`, `style`; `make help-cc`).
-Define the rule: `chore:` for `TODO.md` (and, to decide, for the
-devlogs and `engineering/`, which do not ship either), in
-`engineering/RELEASING.md` "Versioning convention" and in the
-`commit-msg` hook if it can tell the paths; sweep the habit into
-`engineering/PROCESS.md` where TODO commits are described. Check
-whether `docs:` should keep bumping patch at all: the shipped doc
-(`doc/`, `README.md`) is part of the package, the rest is not.
 
 ### 25. `make install` should stamp the version with the branch and revision
 
