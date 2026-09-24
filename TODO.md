@@ -157,22 +157,6 @@ selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
 
-### 25. `make install` should stamp the version with the branch and revision
-
-Raised at the delivery of #104. `make install` (`uv tool install
---reinstall .`) installs the current, unreleased tree, which is its
-purpose: an official release is what `uv tool install
-data-flow-diagram` or `pipx` pull from PyPI. Yet `--version` reports
-the bare `MAJOR.MINOR.PATCH` of `pyproject.toml`, indistinguishable
-from the last release. Stamp a development install with where it
-comes from: the branch and the short hash, as a PEP 440 local version
-label after a `.devN` segment, e.g.
-`1.17.10.dev0+feature.104.keep.involved.flows.g294a988` (the label
-allows letters, digits and dots; `-`, `_` and `/` normalise to dots).
-Decide how: a dynamic version (`hatch-vcs` or `setuptools-scm` style,
-from `git describe`) or a `make install` recipe that rewrites the
-version in a scratch copy before installing. The release path
-(`make release`, `release.yml`) must keep the bare version.
 
 ### 26. Rename the `Shipped:` stop
 
