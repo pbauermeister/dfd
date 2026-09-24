@@ -43,7 +43,10 @@ and carries a type that bumps nothing, `chore` as a rule: `TODO.md`,
 `CLAUDE.md`, `.claude/`, `devlog/`, `discussions/`, `engineering/`,
 `templates/`. The list is `BOOKKEEPING_PATHS` in
 `tools/conventional-commits.py`; the `commit-msg` hook refuses a
-bumping type on such a commit. `doc/` and the root `README.md` are
+bumping type on such a commit, and `ci.yml` skips it (`paths-ignore`
+on its `push` and `pull_request` triggers, kept equal to the list by
+`make lint`; the merge gate and the PR-title check, required by the
+ruleset, run on every event). `doc/` and the root `README.md` are
 the product's manual and keep `docs` (patch). A bumping bookkeeping
 commit on `main` forces an empty release before the next higher-level
 PR (1.17.10, a `docs:` on `TODO.md`).

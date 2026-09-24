@@ -10,6 +10,8 @@ Usage:
       # bump level of the commit message on stdin (subject, optional body)
   conventional-commits.py gate-pr-against-main --current X.Y.Z --next X.Y.Z
       # fail when the PR message on stdin would raise the pending level
+  conventional-commits.py check-bookkeeping-paths
+      # ci.yml skips exactly the bookkeeping paths
   conventional-commits.py check-bookkeeping-commit MESSAGE_FILE
       # commit-msg hook: fail when the staged paths are all bookkeeping
       # and the message's type bumps the version
@@ -35,6 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT_PATH = ROOT / "pyproject.toml"
 HOOK_CONFIG_PATH = ROOT / ".pre-commit-config.yaml"
 PR_TITLE_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "pr-title.yml"
+CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 HOOK_ID = "conventional-pre-commit"
 
 # Paths that ship nothing: a commit confined to them is bookkeeping and
@@ -211,6 +214,43 @@ def gate_verdict(*, pending: Bump, incoming: Bump, next_: str) -> Verdict:
     return Verdict(allowed=True, reason=f"{incoming} on pending {pending}")
 
 
+def bookkeeping_globs() -> list[str]:
+    """The bookkeeping paths as the globs of a workflow's paths-ignore."""
+    return [
+        entry + "**" if entry.endswith("/") else entry
+        for entry in BOOKKEEPING_PATHS
+    ]
+
+
+def load_ci_paths_ignore() -> dict[str, list[str]]:
+    """The paths-ignore list of each trigger of ci.yml that has one."""
+    with CI_WORKFLOW_PATH.open() as f:
+        workflow = yaml.safe_load(f)  # yaml boundary
+    triggers = workflow[True]  # `on:` reads as the boolean True in YAML
+    return {
+        name: trigger["paths-ignore"]
+        for name, trigger in triggers.items()
+        if isinstance(trigger, dict) and "paths-ignore" in trigger
+    }
+
+
+def check_bookkeeping_paths() -> None:
+    """Fail unless ci.yml's push and pull_request skip the bookkeeping paths."""
+    expected = bookkeeping_globs()
+    actual = load_ci_paths_ignore()
+    ok = True
+    for trigger in ("push", "pull_request"):
+        if actual.get(trigger) != expected:
+            ok = False
+            print(
+                f"ERROR: {CI_WORKFLOW_PATH.name} {trigger} paths-ignore is "
+                f"{actual.get(trigger)}, expected {expected}"
+            )
+    if not ok:
+        sys.exit(1)
+    print(f"Bookkeeping paths consistent: {' '.join(expected)}")
+
+
 def is_bookkeeping(path: str) -> bool:
     """Whether a repository path ships nothing."""
     return any(
@@ -293,6 +333,7 @@ class Command(StrEnum):
     CHECK_TYPE_LISTS = "check-type-lists"
     PRINT_LEVEL_OF_MESSAGE = "print-level-of-message"
     GATE_PR_AGAINST_MAIN = "gate-pr-against-main"
+    CHECK_BOOKKEEPING_PATHS = "check-bookkeeping-paths"
     CHECK_BOOKKEEPING_COMMIT = "check-bookkeeping-commit"
 
 
@@ -316,6 +357,10 @@ def main() -> None:
     )
     gate.add_argument("--current", required=True, help="version of main")
     gate.add_argument("--next", required=True, help="next version of main")
+    subparsers.add_parser(
+        Command.CHECK_BOOKKEEPING_PATHS,
+        help="ci.yml skips exactly the bookkeeping paths",
+    )
     check = subparsers.add_parser(
         Command.CHECK_BOOKKEEPING_COMMIT,
         help="commit-msg hook: bookkeeping paths need a none-level type",
@@ -334,6 +379,8 @@ def main() -> None:
             run_level(bump_map)
         case Command.GATE_PR_AGAINST_MAIN:
             run_gate(bump_map, current=args.current, next_=args.next)
+        case Command.CHECK_BOOKKEEPING_PATHS:
+            check_bookkeeping_paths()
         case Command.CHECK_BOOKKEEPING_COMMIT:
             run_check_bookkeeping(bump_map, message_path=args.message_file)
         case _:

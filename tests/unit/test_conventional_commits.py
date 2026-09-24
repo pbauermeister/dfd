@@ -166,3 +166,10 @@ def test_read_commit_message_drops_comments(tmp_path: Path) -> None:
     f = tmp_path / "COMMIT_EDITMSG"
     f.write_text("docs: x\n# Please enter the commit message\n#\n")
     assert cc.read_commit_message(f) == "docs: x\n"
+
+
+def test_bookkeeping_globs() -> None:
+    globs = cc.bookkeeping_globs()
+    assert "TODO.md" in globs
+    assert "devlog/**" in globs
+    assert not any(g.endswith("/") for g in globs)
