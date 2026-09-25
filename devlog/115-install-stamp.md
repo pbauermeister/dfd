@@ -116,12 +116,13 @@ Tried: pending
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                   | Agent | User |
-| --- | ------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: fast track with a Try it stop, since the install touches the user's machine   | well  |      |
-| 2   | The spike before the go settled the mechanism in one round; the TODO's `.devN` form was corrected by it | well  |      |
+| #   | Point                                                                                                                                                                                                 | Agent    | User |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: fast track with a Try it stop, since the install touches the user's machine                                                                                                 | well     |      |
+| 2   | The spike before the go settled the mechanism in one round; the TODO's `.devN` form was corrected by it                                                                                               | well     |      |
+| 3   | Scripted edits of the devlog failed three times in a row (prettier reflow, two tables with a row 1): edit tables by line, anchored on the section, and never let a failed script commit half a change | not well |      |
 
-Process: 1 round before the go; no loop; rework after the go: none.
+Process: 1 round before the go; 2 loops at the review (uninstall recipe, stamp form); rework after the go: the stamp form.
 
 Closed: pending
 
