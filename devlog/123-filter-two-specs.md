@@ -103,6 +103,11 @@ repeat the filter for another one`; pre-fix parser: `FAIL: 091`
 
 Process: 1 round before the go; 2 loops at the review; rework after the go: the #122 revert, then the reversal.
 
+Pascal's note: the stop and review was the right call, to allow a deep
+questioning of the thing, better late than never. It may read as a
+`not well` item at the task's level; at a higher order it served the
+product.
+
 Closed: pending
 
 ### 4.2 Rule trace
