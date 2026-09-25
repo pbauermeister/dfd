@@ -75,6 +75,9 @@ Merge gate (`merge-gate.yml`, ruleset on `main`):
 - [ ] A title edit re-runs `conventional` and `gate`; a
       non-conventional title blocks the merge button.
 - [ ] PR behind `main`: BEHIND state, "Update branch", checks rerun.
+- [ ] Bookkeeping-only PR with a bumping title: the gate blocks it
+      with the hook's message (#117; provoke by editing the title of
+      a devlog-only PR to `docs:`, then put it back).
 
 ### 13. Extract the Markdown titles renumberer into its own tool
 
@@ -156,7 +159,6 @@ rule stays as documented, and both orders keep a meaning: `!` first
 selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
-
 
 ### 28. Examine Dependabot for the actions and the dev dependencies
 
