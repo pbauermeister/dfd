@@ -69,7 +69,10 @@ level is closed before the next one opens: the `Merge gate` check
 (`.github/workflows/merge-gate.yml`) blocks a PR whose type would raise
 the pending level of `main`, with the message "release X.Y.Z first".
 Merges at or below the pending level pass; a `main` whose pending
-commits bump nothing counts as empty. The check reflects `main` at the
+commits bump nothing counts as empty. The same check blocks a bumping
+title on a PR whose changed files are all bookkeeping (see
+"Bookkeeping commits"): the title is edited on GitHub, out of the
+hook's reach. The check reflects `main` at the
 PR's last event; the branch ruleset on `main` requires it to be green
 and the branch to be up to date, and `make release` lists the pending
 commits with their levels and warns if the order was broken.

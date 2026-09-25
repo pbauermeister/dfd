@@ -186,3 +186,48 @@ def test_check_bookkeeping_lets_a_merge_commit_through(
     f = tmp_path / "MERGE_MSG"
     f.write_text("Merge branch 'a' into b\n")
     cc.run_check_bookkeeping(BUMP_MAP, message_path=f)  # no SystemExit
+
+
+@pytest.mark.parametrize(
+    "pending, incoming, paths, allowed, reason",
+    [
+        pytest.param(
+            "none",
+            "patch",
+            ["TODO.md"],
+            False,
+            "bumps nothing",
+            id="docs-on-todo",
+        ),
+        pytest.param("none", "none", ["TODO.md"], True, "", id="chore-on-todo"),
+        pytest.param(
+            "none", "patch", ["src/a.py", "TODO.md"], True, "", id="ships"
+        ),
+        pytest.param(
+            "patch",
+            "minor",
+            ["src/a.py"],
+            False,
+            "release 1.17.8 first",
+            id="level-first",
+        ),
+        pytest.param("none", "minor", [], True, "", id="no-file-list"),
+    ],
+)
+def test_pr_verdict(
+    *,
+    pending: str,
+    incoming: str,
+    paths: list[str],
+    allowed: bool,
+    reason: str,
+) -> None:  # pytest passes parameters by keyword
+    verdict = cc.pr_verdict(
+        pending=cc.Bump(pending),
+        incoming=cc.Bump(incoming),
+        next_="1.17.8",
+        paths=paths,
+        bookkeeping=BOOKKEEPING,
+    )
+    assert verdict.allowed is allowed
+    assert reason in verdict.reason
