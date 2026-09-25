@@ -11,7 +11,7 @@ Usage:
   conventional-commits.py gate-pr-against-main --current X.Y.Z --next X.Y.Z
       # fail when the PR message on stdin would raise the pending level
   conventional-commits.py check-bookkeeping-paths
-      # ci.yml skips exactly the bookkeeping paths
+      # the push trigger of ci.yml skips exactly the bookkeeping paths
   conventional-commits.py check-bookkeeping-commit MESSAGE_FILE
       # commit-msg hook: fail when the staged paths are all bookkeeping
       # and the message's type bumps the version
@@ -236,19 +236,14 @@ def load_ci_paths_ignore() -> dict[str, list[str]]:
 
 
 def check_bookkeeping_paths() -> None:
-    """Fail unless ci.yml's push and pull_request skip the bookkeeping paths."""
+    """Fail unless the push trigger of ci.yml skips the bookkeeping paths."""
     expected = bookkeeping_globs(load_bookkeeping_paths())
     actual = load_ci_paths_ignore()
-    ok = True
-    for trigger in ("push", "pull_request"):
-        if actual.get(trigger) != expected:
-            ok = False
-            print(
-                f"ERROR: {CI_WORKFLOW_PATH.name} {trigger} paths-ignore is "
-                f"{actual.get(trigger)}, expected {expected}"
-            )
-    if not ok:
-        sys.exit(1)
+    if actual.get("push") != expected:
+        sys.exit(
+            f"ERROR: {CI_WORKFLOW_PATH.name} push paths-ignore is "
+            f"{actual.get('push')}, expected {expected}"
+        )
     print(f"Bookkeeping paths consistent: {' '.join(expected)}")
 
 
