@@ -1,0 +1,5 @@
+# Issue #123: "f" on the upstream spec only: Frame 1 (S2 upstream) goes,
+# Frame 2 (P5 downstream) stays, trimmed. Spans differ per side.
+#include tests/non-regression/028-filter-master.part
+
+!<f1 >2 P2
