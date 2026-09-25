@@ -314,8 +314,18 @@ class Only(Filter):
 
 
 @dataclass(kw_only=True)
+class Merge(Statement):
+    """Substitution: the items' flows are rewired to the replacer, the
+    items become unavailable; the kept set is not touched. Ordered with
+    the filters."""
+
+    names: list[str]  # the merged items
+    replacer: str  # an item declared elsewhere
+
+
+@dataclass(kw_only=True)
 class Without(Filter):
-    replaced_by: str
+    pass
 
 
 ##############################################################################
@@ -346,6 +356,7 @@ class Keyword(StrEnum):
     ONLY = "!"
     ONLY_STRICT = "!!"
     WITHOUT = "~"
+    MERGE = "merge"
 
     # Connection variants
     FLOW_REVERSED = "flow.r"
