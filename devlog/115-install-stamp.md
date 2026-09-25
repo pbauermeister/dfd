@@ -27,22 +27,26 @@ is `X.Y.Z+<branch>.g<hash>[.dirty]`; the checkout, `make release` and
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                                                            | Basis                                                                                                            | Alternatives considered                                                                           |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 1   | Local label only, no `.devN`: `X.Y.Z+<branch>.g<hash>[.dirty]`                                                                                      | user (the go): the tree is X.Y.Z plus changes and sorts after it; `.dev` sorts before and needs the next version | `X.Y.Z.devN+…` as the TODO wrote                                                                  |
-| 2   | A scratch copy stamped and installed; the checkout untouched                                                                                        | user (the go), spiked                                                                                            | setuptools-scm (replaces the pyproject version as source of truth, which semantic-release writes) |
-| 3   | The copy is `git ls-files --cached --others --exclude-standard` through `tar`: tracked and untracked, `.gitignore` respected, deleted files skipped | rule: the tree as it is, not the last commit (`git archive` drops uncommitted changes)                           | `rsync` of the directory with an exclude list (a second copy of `.gitignore`)                     |
-| 4   | The label computed by a tool (`tools/print-dev-version.py`, unit-tested), the recipe sequences copy, sed, install                                   | rule: CONVENTIONS.md "Script levels", no computation in a recipe                                                 | Everything in the recipe                                                                          |
-| 5   | `dirty` from `git status --porcelain --untracked-files=no`: tracked changes only                                                                    | taste: an untracked scratch file is not a modified tree                                                          | Untracked files count as dirty                                                                    |
-| 6   | PR type `build:` (patch)                                                                                                                            | user (the go): a recipe is tooling, not bookkeeping                                                              | `chore:` under #107's rule                                                                        |
+| #   | Decision                                                                                                                                                | Basis                                                                                                                           | Alternatives considered                                                                           |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 1   | Local label only, no `.devN`: `X.Y.Z+<branch>.g<hash>[.dirty]`                                                                                          | user (the go): the tree is X.Y.Z plus changes and sorts after it; `.dev` sorts before and needs the next version                | `X.Y.Z.devN+…` as the TODO wrote                                                                  |
+| 2   | A scratch copy stamped and installed; the checkout untouched                                                                                            | user (the go), spiked                                                                                                           | setuptools-scm (replaces the pyproject version as source of truth, which semantic-release writes) |
+| 3   | The copy is `git ls-files --cached --others --exclude-standard` through `tar`: tracked and untracked, `.gitignore` respected, deleted files skipped     | rule: the tree as it is, not the last commit (`git archive` drops uncommitted changes)                                          | `rsync` of the directory with an exclude list (a second copy of `.gitignore`)                     |
+| 4   | The label computed by a tool (`tools/print-dev-version.py`, unit-tested), the recipe sequences copy, sed, install                                       | rule: CONVENTIONS.md "Script levels", no computation in a recipe                                                                | Everything in the recipe                                                                          |
+| 5   | `dirty` from `git status --porcelain --untracked-files=no`: tracked changes only                                                                        | taste: an untracked scratch file is not a modified tree                                                                         | Untracked files count as dirty                                                                    |
+| 6   | PR type `build:` (patch)                                                                                                                                | user (the go): a recipe is tooling, not bookkeeping                                                                             | `chore:` under #107's rule                                                                        |
+| 7   | The simple form stays although a tree carrying a bumping commit prints the base it builds on, not the version it heads to                               | user (review, 2026-09-25): the stamp only tells a dev install apart; the hash names the base; semver compliance is not required | `next.dev0+label` when something bumps (from the release plan)                                    |
+| 8   | `make uninstall` removes the tool whatever installed it: uv tool, pipx, pip in the current `python3`, each asked in turn; nothing found is not an error | user (review): after a dev install, the official release is reinstalled                                                         | `uv tool uninstall` only (the former target)                                                      |
 
 ### 1.4 Acceptance criteria
 
 1. `make install` from a branch installs a tool whose `--version`
    carries the branch and the hash; `pyproject.toml` unchanged after.
-2. `tools/print-dev-version.py` unit-tested: separators to dots,
+2. `make uninstall` removes a uv tool, a pipx and a pip install, and
+   says so when nothing is installed.
+3. `tools/print-dev-version.py` unit-tested: separators to dots,
    runs collapsed, detached head, dirty suffix.
-3. `make format lint test` green.
+4. `make format lint test` green.
 
 Approved: 2026-09-24
 
@@ -56,6 +60,12 @@ Approved: 2026-09-24
   four-parameter test (PLR0917): keyword-only parameters, which
   pytest passes anyway.
 - This devlog.
+- Review loop (2026-09-25): `recipes/uninstall.sh` and the `uninstall`
+  target reworded; decisions 7 and 8. Tried against three isolated
+  installs (uv tool dir, `PIPX_HOME`, a seeded venv on the PATH): all
+  three removed in one run, "nothing installed" on the second, the
+  user's own install untouched; the closing PATH check warned about it,
+  as it should for that isolated run.
 
 ## 3. Delivery
 
@@ -65,6 +75,7 @@ Approved: 2026-09-24
 make install
 data-flow-diagram --version   # 1.18.0+build.115.install.stamp.g<hash>
 uv tool list | grep data-flow-diagram
+make uninstall                # then: uv tool install data-flow-diagram
 ```
 
 The user's current tool (1.17.9) is replaced; `make install` on
@@ -83,6 +94,9 @@ Tried: pending
    (criterion 1).
 2. Six cases green (criterion 2).
 3. 125 pytest, 95 NR fixtures, lint and format clean (criterion 3).
+4. The uninstall recipe run against isolated uv tool, pipx and pip
+   installs: three "uninstalled" lines, then "nothing installed as
+   data-flow-diagram" on a second run (criterion 4).
 
 ### 3.3 Verdict
 

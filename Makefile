@@ -85,8 +85,8 @@ build: require clean lint test doc ## full local build, before a local install
 install: ## install user-wide as a uv tool, version stamped with branch and revision
 	./recipes/install.sh
 
-uninstall: ## remove the user-wide uv tool install
-	uv tool uninstall data-flow-diagram
+uninstall: ## remove the user-wide install, whatever installed it (uv tool, pipx, pip)
+	./recipes/uninstall.sh
 
 ################################################################################
 # Release:: ##
