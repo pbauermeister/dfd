@@ -1,5 +1,0 @@
-# Issue #123: the strict twin of 099: path flows of both sides shown
-# (f5 claimed by both), the stray f8 between C2 and P5 hidden.
-#include tests/non-regression/028-filter-master.part
-
-!![1 >2 S2

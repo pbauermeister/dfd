@@ -172,29 +172,21 @@ def test_check_raises(dfd_text: str) -> None:
         checker.check(statements)
 
 
-def test_parse_filter_two_specs_one_per_direction() -> None:
-    # "<1 >2": one level upstream, two downstream, one filter
-    tokens = scanner.scan(provenance=None, source_text="process A\n! <1 >2 A")
-    statements, _, _ = parser.parse(tokens)
-    only = statements[-1]
-    assert isinstance(only, model.Only)
-    assert (only.neighbors_up.distance, only.neighbors_down.distance) == (1, 2)
-
-
 @pytest.mark.parametrize(
     "specs",
     [
+        pytest.param("<1 >2", id="upstream-and-downstream"),
         pytest.param("<1 <3", id="upstream-twice"),
-        pytest.param(">1 >3", id="downstream-twice"),
+        pytest.param(">1 ]1", id="stream-and-layout"),
         pytest.param("<>1 <3", id="both-then-upstream"),
-        pytest.param("[1 <3", id="layout-then-flow-upstream"),
     ],
 )
-def test_parse_filter_direction_twice_raises(specs: str) -> None:
+def test_parse_filter_second_spec_raises(specs: str) -> None:
+    # one neighbor specification per filter, "<>" being one
     tokens = scanner.scan(
         provenance=None, source_text=f"process A\n! {specs} A"
     )
-    with pytest.raises(exception.DfdException):
+    with pytest.raises(exception.DfdException, match="One neighbor"):
         parser.parse(tokens)
 
 
