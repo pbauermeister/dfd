@@ -2,7 +2,7 @@
 
 Date: 2026-09-25
 Status: PENDING
-Issue: #127 · PR: #PPP · Branch: `feature/127-substitution-statement`
+Issue: #127 · PR: #128 · Branch: `feature/127-substitution-statement`
 Task nature: change
 Track: full
 Agent: Claude Fable 5.1
