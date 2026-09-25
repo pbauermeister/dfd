@@ -70,6 +70,12 @@ Approved: 2026-09-25
   the two-filter example. Fixtures 091 (error) and 092 (two filters)
   replace the seven; unit cases replaced. TODO 30 for `[]`.
 - This devlog.
+- Review (2026-09-25): asked whether the regex alone could replace the
+  guard: no, it matches one term and the loop consumes every leading
+  match; a line-level regex would refuse the second spec as an unknown
+  name, a worse message. The same loop let a second replacer win
+  silently (`~=A =B C`): guarded too, "One replacer per filter", one
+  unit case.
 
 ## 3. Delivery
 
@@ -102,6 +108,11 @@ repeat the filter for another one`; pre-fix parser: `FAIL: 091`
 | 3   | The reversal cost one hour and left no trace in the code; deciding it at the draft would have cost one question                                    | tension  |      |
 
 Process: 1 round before the go; 2 loops at the review; rework after the go: the #122 revert, then the reversal.
+
+Pascal's note: the stop and review was the right call, to allow a deep
+questioning of the thing, better late than never. It may read as a
+`not well` item at the task's level; at a higher order it served the
+product.
 
 Closed: pending
 

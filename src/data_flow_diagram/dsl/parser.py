@@ -220,6 +220,8 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                 raise exception.DfdException(
                     f"Replacer specification is only allowed for {Keyword.WITHOUT} filter"
                 )
+            if replacer:
+                raise exception.DfdException("One replacer per filter")
             replacer = name
             args = args[1:]
         elif m.group("neighbors"):
