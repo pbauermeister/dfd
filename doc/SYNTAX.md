@@ -288,6 +288,9 @@ DIRECTION[FLAGS]SPAN
 | `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames |
 | `SPAN`      | `*` = unlimited, or integer distance                           |
 
+One specification per filter (`<>` is one); a second is an error.
+Another neighbourhood is another filter with the same items.
+
 Examples: `>*` (all downstream), `<>2` (two levels in both directions),
 `<>xf2` (two levels, neighbors only, suppress frames).
 

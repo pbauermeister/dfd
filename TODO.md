@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 30
+Next number: 31
 
 ## Won't do
 
@@ -87,32 +87,6 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-### 21. Filter flag order: the doc says `<>2xf`, the parser wants `<>xf2`
-
-Found at the stop 0 review of #104 (devlog 104). `doc/README.md`
-§ 7.3.3 gives `DIRECTION[SPAN][FLAGS]`; `RX_FILTER_ARG` in
-`src/data_flow_diagram/dsl/parser.py` and every example (`!<>xf2`)
-put the flags before the span. The documented order is the logical
-one (the span belongs to the direction, the flags qualify the
-selection). Make the parser accept the flags on either side of the
-span, migrate the examples and fixtures to the documented order, and
-say in § 7.3.3 that both are accepted.
-
-### 22. Several neighbor specs in one filter: undocumented, overwrite silent
-
-Found at the stop 1 discussion of #104 (devlog 104). `_parse_filter()`
-(`src/data_flow_diagram/dsl/parser.py`) consumes every leading
-argument that matches a neighbor spec, so `!<1 >2 C` is one filter
-with upstream span 1 and downstream span 2, equivalent to `!<1 C`
-plus `!>2 C`. `doc/README.md` § 7.3 and `doc/SYNTAX.md` § 7 write one
-`[NEIGHBOUR_SPEC]`, singular, and a second spec for the same
-direction (`!<1 <3 C`) silently overwrites the first. Decide: document
-the combined form and make the same-direction repeat an error, or
-reject a second spec. Leaning: document it, it exists and is harmless.
-Note for the doc: a flag or the `!!` strictness applies to the whole
-filter, whichever spec carries it; different strictness per direction
-is obtained by two filters.
-
 ### 23. A keep filter after a replacement re-adds the replaced items as orphans
 
 Found at the stop 1 discussion of #104 (devlog 104). On `A→B→C→D`
@@ -173,3 +147,14 @@ the staged Python files (the hook framework is installed for the
 commit-msg stage already), a pre-push hook, or CI as a required
 check (which #111 made a matter of the push-only trigger). Weigh the
 delay at each commit against the value.
+
+### 30. A symmetrical layout neighborhood `[]`
+
+Raised at the review of #124 (2026-09-25). `<>` is the symmetrical
+stream neighborhood; the layout counterpart `[]` (left and right) is
+not in the grammar (`RX_FILTER_ARG` accepts `<>`, `<`, `>`, `[`,
+`]`) and is refused as an unknown name. Since #123 a filter takes one
+neighborhood specification, so `[1` and `]1` on the same items need
+two filters; `[]` would be the one-filter form. New syntax, `feat:`
+(minor): after the pending patch release. Fixture, README § 7.3.3,
+SYNTAX.md § 7.3.

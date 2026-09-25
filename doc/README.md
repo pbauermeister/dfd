@@ -1088,7 +1088,7 @@ filters, `!!<2 A` and `!>1 A`.
 
 #### 7.3.3. Neighbors syntax
 
-`DIRECTION[SPAN][FLAGS]`
+`DIRECTION[FLAGS]SPAN`
 
 - DIRECTION:
   - `>`: downstream neighbors
@@ -1102,6 +1102,17 @@ filters, `!!<2 A` and `!>1 A`.
 - FLAGS:
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
+
+One neighbors specification per filter, `<>` being one: a second one
+is an error, because a stream direction and a layout direction do not
+compose (they agree only where the arrows are drawn in the stream's
+direction). Another neighborhood is another filter, with the same
+items:
+
+```
+!<1 P
+!>2 P
+```
 
 ### 7.4. Filters example
 

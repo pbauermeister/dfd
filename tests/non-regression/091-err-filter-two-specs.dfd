@@ -1,0 +1,5 @@
+# Issue #123: one neighbor specification per filter; a second one is an
+# error, whatever its direction.
+#include tests/non-regression/028-filter-master.part
+
+!<1 >2 P2

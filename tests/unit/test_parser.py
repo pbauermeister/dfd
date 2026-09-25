@@ -172,6 +172,33 @@ def test_check_raises(dfd_text: str) -> None:
         checker.check(statements)
 
 
+@pytest.mark.parametrize(
+    "specs",
+    [
+        pytest.param("<1 >2", id="upstream-and-downstream"),
+        pytest.param("<1 <3", id="upstream-twice"),
+        pytest.param(">1 ]1", id="stream-and-layout"),
+        pytest.param("<>1 <3", id="both-then-upstream"),
+    ],
+)
+def test_parse_filter_second_spec_raises(specs: str) -> None:
+    # one neighbor specification per filter, "<>" being one
+    tokens = scanner.scan(
+        provenance=None, source_text=f"process A\n! {specs} A"
+    )
+    with pytest.raises(exception.DfdException, match="One neighbor"):
+        parser.parse(tokens)
+
+
+def test_parse_filter_second_replacer_raises() -> None:
+    # the loop consumes every leading spec: a second replacer used to win
+    tokens = scanner.scan(
+        provenance=None, source_text="process A\nprocess B\n~=A =B A"
+    )
+    with pytest.raises(exception.DfdException, match="One replacer"):
+        parser.parse(tokens)
+
+
 @pytest.mark.parametrize(("filter_line", "strict"), FILTER_STRICTNESS_CASES)
 def test_parse_filter_strictness(filter_line: str, *, strict: bool) -> None:
     # "!!" yields an Only statement flagged strict, "!" one that is not

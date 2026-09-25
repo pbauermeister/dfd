@@ -201,6 +201,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     cmd = terms[0]
     args = terms[1:]
     replacer = ""
+    spec_given = False
 
     # consume leading neighbor/replacer specifications before the anchor names
     while args:
@@ -219,10 +220,21 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                 raise exception.DfdException(
                     f"Replacer specification is only allowed for {Keyword.WITHOUT} filter"
                 )
+            if replacer:
+                raise exception.DfdException("One replacer per filter")
             replacer = name
             args = args[1:]
         elif m.group("neighbors"):
             fn, is_up, is_down = _parse_neighbor_spec(m, arg)
+
+            # one specification per filter: stream and layout directions
+            # do not compose, another neighborhood is another filter
+            if spec_given:
+                raise exception.DfdException(
+                    "One neighbor specification per filter;"
+                    " repeat the filter for another one"
+                )
+            spec_given = True
 
             # assign parsed spec to the matching direction(s)
             if is_up:
