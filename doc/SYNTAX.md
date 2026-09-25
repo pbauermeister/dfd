@@ -279,7 +279,7 @@ replacement item instead of discarding them.
 ### 7.3. Neighbour specification
 
 ```
-DIRECTION SPAN [FLAGS]
+DIRECTION[FLAGS]SPAN
 ```
 
 | Part        | Values                                                         |
@@ -288,14 +288,13 @@ DIRECTION SPAN [FLAGS]
 | `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames |
 | `SPAN`      | `*` = unlimited, or integer distance                           |
 
-The flags are also accepted before the span (`<>xf2`). Two
-specifications, one per direction (`<1 >2`); `<>` counts for both, and
-a direction given twice is an error. `x` applies to the whole filter,
-`f` to the direction whose specification carries it and to the
+Two specifications, one per direction (`<1 >2`); `<>` counts for both,
+and a direction given twice is an error. `x` applies to the whole
+filter, `f` to the direction whose specification carries it and to the
 anchors.
 
 Examples: `>*` (all downstream), `<>2` (two levels in both directions),
-`<>2xf` (two levels, neighbors only, suppress frames).
+`<>xf2` (two levels, neighbors only, suppress frames).
 
 ### 7.4. Filter semantics
 
