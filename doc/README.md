@@ -1425,6 +1425,30 @@ store db_all All DBs
 
 ![Filtering](./img/filter-replace.svg)
 
+The order of the two filters carries a meaning. Above, the `!` selects
+on the original flows, then the group is formed. Declaring the group
+first selects on the grouped diagram: the replacement rewires the flows
+without initialising the kept set, and the `!` that follows starts
+empty and walks the rewired flows, from the super DB included:
+
+```data-flow-diagram img/filter-replace-first.svg
+#include #img/data-pipeline
+
+store db_all All DBs
+
+# Replace the DBs by the super DB first: a rewiring, nothing is kept yet
+~=db_all db_aggr db_fcast db_params
+
+# Then keep the super DB and its immediate neighbors on the rewired flows
+!<>1 db_all
+```
+
+![Filtering](./img/filter-replace-first.svg)
+
+A replaced item is no longer available to the filters that follow: `!
+db_aggr` after the replacement is an error. A replacement before any
+other filter takes no neighbor specification.
+
 ## 8. Influencing the layout
 
 Let us consider this diagram:

@@ -304,13 +304,20 @@ Filters are processed **sequentially** in source order:
 1. Each `!` adds anchors (and their neighbors) to the kept set.
 2. Each `~` removes anchors (and their neighbors) from the kept set.
 3. Anchors referenced by a filter must exist and be currently available in
-   the kept set; otherwise an error is raised.
-4. After all filters are processed, statements are filtered: items not in
+   the kept set, and not replaced by a previous `~=`; otherwise an error is
+   raised.
+4. A replacement (`~=`) rewires the flows of the removed items to the
+   replacement item; the filters that follow read the flows as rewired.
+   A replacement before any other filter does not initialise the kept set
+   (it takes no neighbour specification): a `!` that follows starts empty
+   and selects on the grouped diagram, while `!` before `~=` selects on
+   the original one and then collapses the group.
+5. After all filters are processed, statements are filtered: items not in
    the kept set are dropped, connections with missing endpoints are dropped,
    and frames are trimmed or dropped.
-5. Connections whose endpoints have a replacement are rewritten; duplicates
+6. Connections whose endpoints have a replacement are rewritten; duplicates
    from replacement are deduplicated.
-6. Stray flows are dropped. A flow is a stray flow when it touches an item
+7. Stray flows are dropped. A flow is a stray flow when it touches an item
    selected by a `!!` filter, and neither is a path flow of some `!!` filter
    nor joins two items named together by a `!` filter. Constraints are never
    stray flows. Without any `!!`, nothing is dropped by this step.
