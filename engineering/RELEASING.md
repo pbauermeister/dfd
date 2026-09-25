@@ -52,7 +52,12 @@ merge of a bookkeeping-only PR neither, while a pull_request event
 would be judged on the whole PR. CI tests the branch tip, which the
 ruleset's up-to-date rule makes the merge result; the merge gate and
 the PR-title check, required by the ruleset, keep their pull_request
-triggers and run on every PR event. `doc/` and the root `README.md` are
+triggers and run on every PR event. GitHub's skip markers
+(`[skip ci]` and its variants) act wherever they stand in a commit
+message, a quotation included, and the PR body becomes the squash
+commit's body: never write one literally in a commit message or a PR
+body (the merge of #112 ran no CI on `main` for that reason). `doc/`
+and the root `README.md` are
 the product's manual and keep `docs` (patch). A bumping bookkeeping
 commit on `main` forces an empty release before the next higher-level
 PR (1.17.10, a `docs:` on `TODO.md`).
