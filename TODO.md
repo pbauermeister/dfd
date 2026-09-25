@@ -87,17 +87,6 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-### 20. A bare `=` in a filter statement hangs the parser
-
-Found while mocking up #104 (devlog 104): `~= G B C` (space after
-the replacer sign) never returns. In `_parse_filter()`
-(`src/data_flow_diagram/dsl/parser.py`) `RX_FILTER_ARG` matches `=`
-with an empty `replacer` group, which is falsy, so neither branch
-consumes the argument and the `while args` loop spins. Fix: test the
-group for `None`, not truthiness, and raise "replacer name expected"
-on an empty one; add the robustness case to
-`tests/unit/test_parser.py::test_check_raises` and an `-err-` NR
-fixture.
 
 ### 21. Filter flag order: the doc says `<>2xf`, the parser wants `<>xf2`
 
