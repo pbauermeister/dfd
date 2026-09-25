@@ -95,7 +95,7 @@ The user's current tool (1.17.9) is replaced; `make install` on
 release, when `uv tool install data-flow-diagram` puts the bare
 release back.
 
-Tried: pending
+Tried: 2026-09-25 (`make install`, `--version`, `make uninstall` on the user's machine)
 
 ### 3.2 Test report
 
