@@ -8,8 +8,11 @@ Usage:
       # the hook and the PR-title workflow accept exactly the map's types
   conventional-commits.py print-level-of-message
       # bump level of the commit message on stdin (subject, optional body)
-  conventional-commits.py gate-pr-against-main --current X.Y.Z --next X.Y.Z
-      # fail when the PR message on stdin would raise the pending level
+  conventional-commits.py gate-pr-against-main --current X.Y.Z --next X.Y.Z \
+      [--changed-files FILE]
+      # fail when the PR message on stdin would raise the pending level,
+      # or bumps while the PR's changed files (one per line) are all
+      # bookkeeping
   conventional-commits.py check-bookkeeping-paths
       # the push trigger of ci.yml skips exactly the bookkeeping paths
   conventional-commits.py check-bookkeeping-commit MESSAGE_FILE
@@ -321,16 +324,52 @@ def run_level(bump_map: BumpMap) -> None:
         sys.exit(f"ERROR: {e}")
 
 
-def run_gate(bump_map: BumpMap, *, current: str, next_: str) -> None:
-    """Gate the PR message on stdin against the pending level of main."""
+def pr_verdict(
+    *,
+    pending: Bump,
+    incoming: Bump,
+    next_: str,
+    paths: list[str],
+    bookkeeping: list[str],
+) -> Verdict:
+    """The level gate, then the bookkeeping gate on the PR's files.
+
+    The PR title is the type that reaches main and it is edited on
+    GitHub without a hook: a bumping title on files that ship nothing
+    is refused here as the commit-msg hook refuses the commit.
+    """
+    verdict = gate_verdict(pending=pending, incoming=incoming, next_=next_)
+    if not verdict.allowed:
+        return verdict
+    return bookkeeping_verdict(
+        level=incoming, paths=paths, bookkeeping=bookkeeping
+    )
+
+
+def run_gate(
+    bump_map: BumpMap,
+    *,
+    current: str,
+    next_: str,
+    changed_files: Path | None,
+) -> None:
+    """Gate the PR message on stdin against main and the PR's files."""
     try:
         pending = level_between(current, next_)
         incoming = parse_level(sys.stdin.read(), bump_map)
     except ValueError as e:
         sys.exit(f"ERROR: {e}")
+    paths = changed_files.read_text().split() if changed_files else []
     print(f"pending on main: {pending} ({current} -> {next_})")
     print(f"incoming PR:     {incoming}")
-    verdict = gate_verdict(pending=pending, incoming=incoming, next_=next_)
+    print(f"changed files:   {len(paths)}")
+    verdict = pr_verdict(
+        pending=pending,
+        incoming=incoming,
+        next_=next_,
+        paths=paths,
+        bookkeeping=load_bookkeeping_paths(),
+    )
     if not verdict.allowed:
         sys.exit(f"BLOCKED: {verdict.reason}")
     print(f"allowed: {verdict.reason}")
@@ -365,6 +404,11 @@ def main() -> None:
     )
     gate.add_argument("--current", required=True, help="version of main")
     gate.add_argument("--next", required=True, help="next version of main")
+    gate.add_argument(
+        "--changed-files",
+        type=Path,
+        help="the PR's changed paths, one per line (bookkeeping gate)",
+    )
     subparsers.add_parser(
         Command.CHECK_BOOKKEEPING_PATHS,
         help="ci.yml skips exactly the bookkeeping paths",
@@ -386,7 +430,12 @@ def main() -> None:
         case Command.PRINT_LEVEL_OF_MESSAGE:
             run_level(bump_map)
         case Command.GATE_PR_AGAINST_MAIN:
-            run_gate(bump_map, current=args.current, next_=args.next)
+            run_gate(
+                bump_map,
+                current=args.current,
+                next_=args.next,
+                changed_files=args.changed_files,
+            )
         case Command.CHECK_BOOKKEEPING_PATHS:
             check_bookkeeping_paths()
         case Command.CHECK_BOOKKEEPING_COMMIT:

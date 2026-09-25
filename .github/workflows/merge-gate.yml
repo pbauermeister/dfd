@@ -1,7 +1,9 @@
 # Unreleased changes on main never span two levels: a PR whose type
 # would raise the pending level of main is blocked until the pending
-# changes are released. The tool and its configuration come from the
-# PR checkout, the history from a worktree of main. See engineering/RELEASING.md.
+# changes are released; and a bumping title on a PR whose files are all
+# bookkeeping is blocked, as the commit-msg hook blocks such a commit.
+# The tool and its configuration come from the PR checkout, the history
+# from a worktree of main. See engineering/RELEASING.md.
 name: Merge gate
 
 on:
@@ -32,6 +34,7 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           pr="$GITHUB_WORKSPACE"
+          git -C "$pr" diff --name-only origin/main...HEAD > "$RUNNER_TEMP/changed-files"
           cd ../main
           current=$(uv run --project "$pr" semantic-release -c "$pr/pyproject.toml" \
                     --noop version --print-last-released 2>/dev/null)
@@ -39,4 +42,5 @@ jobs:
                  --noop version --print 2>/dev/null)
           printf '%s\n\n%s\n' "$PR_TITLE" "$PR_BODY" \
             | uv run --project "$pr" "$pr/tools/conventional-commits.py" gate-pr-against-main \
-                --current "$current" --next "$next"
+                --current "$current" --next "$next" \
+                --changed-files "$RUNNER_TEMP/changed-files"
