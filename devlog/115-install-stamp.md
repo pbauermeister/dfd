@@ -22,21 +22,21 @@ rewritten builds and installs, `--version` prints the label, a stale
 ### 1.2 Goal
 
 `make install` installs the working tree as a uv tool whose version
-is `X.Y.Z+<branch>.g<hash>[.dirty]`; the checkout, `make release` and
-`release.yml` keep the bare version.
+is the stamp `0+<branch>.git<hash>[.dirty]`; the checkout, `make
+release` and `release.yml` keep the bare version.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                                                                | Basis                                                                                                                           | Alternatives considered                                                                           |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 1   | Local label only, no `.devN`: `X.Y.Z+<branch>.g<hash>[.dirty]`                                                                                          | user (the go): the tree is X.Y.Z plus changes and sorts after it; `.dev` sorts before and needs the next version                | `X.Y.Z.devN+…` as the TODO wrote                                                                  |
-| 2   | A scratch copy stamped and installed; the checkout untouched                                                                                            | user (the go), spiked                                                                                                           | setuptools-scm (replaces the pyproject version as source of truth, which semantic-release writes) |
-| 3   | The copy is `git ls-files --cached --others --exclude-standard` through `tar`: tracked and untracked, `.gitignore` respected, deleted files skipped     | rule: the tree as it is, not the last commit (`git archive` drops uncommitted changes)                                          | `rsync` of the directory with an exclude list (a second copy of `.gitignore`)                     |
-| 4   | The label computed by a tool (`tools/print-dev-version.py`, unit-tested), the recipe sequences copy, sed, install                                       | rule: CONVENTIONS.md "Script levels", no computation in a recipe                                                                | Everything in the recipe                                                                          |
-| 5   | `dirty` from `git status --porcelain --untracked-files=no`: tracked changes only                                                                        | taste: an untracked scratch file is not a modified tree                                                                         | Untracked files count as dirty                                                                    |
-| 6   | PR type `build:` (patch)                                                                                                                                | user (the go): a recipe is tooling, not bookkeeping                                                                             | `chore:` under #107's rule                                                                        |
-| 7   | The simple form stays although a tree carrying a bumping commit prints the base it builds on, not the version it heads to                               | user (review, 2026-09-25): the stamp only tells a dev install apart; the hash names the base; semver compliance is not required | `next.dev0+label` when something bumps (from the release plan)                                    |
-| 8   | `make uninstall` removes the tool whatever installed it: uv tool, pipx, pip in the current `python3`, each asked in turn; nothing found is not an error | user (review): after a dev install, the official release is reinstalled                                                         | `uv tool uninstall` only (the former target)                                                      |
+| #   | Decision                                                                                                                                                                                   | Basis                                                                                                                                                                                                             | Alternatives considered                                                                           |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 1   | Local label only, no `.devN`: `X.Y.Z+<branch>.g<hash>[.dirty]`                                                                                                                             | user (the go): the tree is X.Y.Z plus changes and sorts after it; `.dev` sorts before and needs the next version                                                                                                  | `X.Y.Z.devN+…` as the TODO wrote                                                                  |
+| 2   | A scratch copy stamped and installed; the checkout untouched                                                                                                                               | user (the go), spiked                                                                                                                                                                                             | setuptools-scm (replaces the pyproject version as source of truth, which semantic-release writes) |
+| 3   | The copy is `git ls-files --cached --others --exclude-standard` through `tar`: tracked and untracked, `.gitignore` respected, deleted files skipped                                        | rule: the tree as it is, not the last commit (`git archive` drops uncommitted changes)                                                                                                                            | `rsync` of the directory with an exclude list (a second copy of `.gitignore`)                     |
+| 4   | The label computed by a tool (`tools/print-dev-version.py`, unit-tested), the recipe sequences copy, sed, install                                                                          | rule: CONVENTIONS.md "Script levels", no computation in a recipe                                                                                                                                                  | Everything in the recipe                                                                          |
+| 5   | `dirty` from `git status --porcelain --untracked-files=no`: tracked changes only                                                                                                           | taste: an untracked scratch file is not a modified tree                                                                                                                                                           | Untracked files count as dirty                                                                    |
+| 6   | PR type `build:` (patch)                                                                                                                                                                   | user (the go): a recipe is tooling, not bookkeeping                                                                                                                                                               | `chore:` under #107's rule                                                                        |
+| 7   | Release segment `0`, no base version in the stamp: `0+<branch>.git<hash>[.dirty]`; the hash names the base, the stamp sorts below every release so a release always upgrades a dev install | user (review, 2026-09-25): a stamp for dev and test only, semver compliance not needed; a prefix would mislead once a bumping commit is on the branch; a version with no numeric segment does not build (PEP 440) | `X.Y.Z+…` (first version); `next.dev0+…` from the release plan                                    |
+| 8   | `make uninstall` removes the tool whatever installed it: uv tool, pipx, pip in the current `python3`, each asked in turn; nothing found is not an error                                    | user (review): after a dev install, the official release is reinstalled                                                                                                                                           | `uv tool uninstall` only (the former target)                                                      |
 
 ### 1.4 Acceptance criteria
 
@@ -60,6 +60,12 @@ Approved: 2026-09-24
   four-parameter test (PLR0917): keyword-only parameters, which
   pytest passes anyway.
 - This devlog.
+- Review loop (2026-09-25), second round: the stamp is
+  `0+<branch>.git<hash>[.dirty]` (row 7); tool, tests, recipe header,
+  CONVENTIONS.md and the Makefile line follow; the recipe run again
+  against the isolated tool dir prints `0+build.115.install.stamp.git…`.
+  The first-form observation in the test report (`1.18.0+…`) stands as
+  history.
 - Review loop (2026-09-25): `recipes/uninstall.sh` and the `uninstall`
   target reworded; decisions 7 and 8. Tried against three isolated
   installs (uv tool dir, `PIPX_HOME`, a seeded venv on the PATH): all
@@ -73,13 +79,13 @@ Approved: 2026-09-24
 
 ```bash
 make install
-data-flow-diagram --version   # 1.18.0+build.115.install.stamp.g<hash>
+data-flow-diagram --version   # 0+build.115.install.stamp.git<hash>
 uv tool list | grep data-flow-diagram
 make uninstall                # then: uv tool install data-flow-diagram
 ```
 
 The user's current tool (1.17.9) is replaced; `make install` on
-`main` after the merge gives `1.18.0+main.g<hash>` until the next
+`main` after the merge gives `0+main.git<hash>` until the next
 release, when `uv tool install data-flow-diagram` puts the bare
 release back.
 
@@ -110,10 +116,10 @@ Tried: pending
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                   | Agent | User |
-| --- | ------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: fast track with a Try it stop, since the install touches the user's machine   | well  |      |
-| 2   | The spike before the go settled the mechanism in one round; the TODO's `.devN` form was corrected by it | well  |      |
+| #   | Point                                                                                                                                     | Agent                                                                   | User                             |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------- |
+| 1   | Local label only, no `.devN`: the tree's origin as a PEP 440 local label (first form `X.Y.Z+<branch>.g<hash>[.dirty]`, replaced by row 7) | user (the go): a `.dev` segment sorts before and needs the next version | `X.Y.Z.devN+…` as the TODO wrote |
+| 2   | The spike before the go settled the mechanism in one round; the TODO's `.devN` form was corrected by it                                   | well                                                                    |                                  |
 
 Process: 1 round before the go; no loop; rework after the go: none.
 
