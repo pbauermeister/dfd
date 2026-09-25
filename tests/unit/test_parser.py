@@ -172,6 +172,28 @@ def test_check_raises(dfd_text: str) -> None:
         checker.check(statements)
 
 
+@pytest.mark.parametrize(
+    "spec",
+    [
+        pytest.param("<>2xf", id="documented-order"),
+        pytest.param("<>xf2", id="former-order"),
+        pytest.param("<>x2f", id="split"),
+    ],
+)
+def test_parse_filter_flags_either_side_of_span(spec: str) -> None:
+    # the flags qualify the same selection wherever they stand
+    tokens = scanner.scan(provenance=None, source_text=f"process A\n! {spec} A")
+    statements, _, _ = parser.parse(tokens)
+    only = statements[-1]
+    assert isinstance(only, model.Only)
+    for fn in (only.neighbors_up, only.neighbors_down):
+        assert (fn.distance, fn.suppress_anchors, fn.suppress_frames) == (
+            2,
+            True,
+            True,
+        )
+
+
 @pytest.mark.parametrize(("filter_line", "strict"), FILTER_STRICTNESS_CASES)
 def test_parse_filter_strictness(filter_line: str, *, strict: bool) -> None:
     # "!!" yields an Only statement flagged strict, "!" one that is not

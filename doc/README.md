@@ -1103,6 +1103,9 @@ filters, `!!<2 A` and `!>1 A`.
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
 
+The flags are also accepted before the span (`<>xf2`), the order of
+earlier versions.
+
 ### 7.4. Filters example
 
 First, let us create a master diagram:
@@ -1287,7 +1290,7 @@ Here:
 #include #img/data-pipeline
 
 # We keep two levels of downstream neighbors, but not proc_flow itself
-!<>x2 proc_flow
+!<>2x proc_flow
 
 # Note the 'x' flag, meaning "not the item themselves, but the neighbors"
 ```
@@ -1300,7 +1303,7 @@ Here:
 #include #img/data-pipeline
 
 # Like in the previous example, and without frames
-!<>xf2 proc_flow
+!<>2xf proc_flow
 
 # Note the 'f' flag, meaning "remove involved frames"
 ```
