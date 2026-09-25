@@ -1078,13 +1078,13 @@ filters, `!!<2 A` and `!>1 A`.
 
 #### 7.3.1. The "Only" filter
 
-`![NEIGHBOURS [NEIGHBOURS] ][ITEM_NAMES]`
+`![NEIGHBOURS ][ITEM_NAMES]`
 
-`!![NEIGHBOURS [NEIGHBOURS] ][ITEM_NAMES]` (strict: only the path flows)
+`!![NEIGHBOURS ][ITEM_NAMES]` (strict: only the path flows)
 
 #### 7.3.2. The "Without" filter
 
-`~[NEIGHBOURS [NEIGHBOURS] ][ITEM_NAMES]`
+`~[NEIGHBOURS ][ITEM_NAMES]`
 
 #### 7.3.3. Neighbors syntax
 
@@ -1103,14 +1103,16 @@ filters, `!!<2 A` and `!>1 A`.
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
 
-Two specifications may be given, one per direction: `!<1 >2 P` keeps
-one level upstream and two downstream of `P`, as `!<1 P` followed by
-`!>2 P` would. `<>` counts for both directions, and a direction given
-twice is an error. The `x` flag on either specification applies to the
-whole filter (the listed items are in or out); `f` applies to the
-direction whose specification carries it, and to the listed items.
-Strictness (`!!`) applies to the whole filter: a different strictness
-per direction takes two filters.
+One neighbors specification per filter, `<>` being one: a second one
+is an error, because a stream direction and a layout direction do not
+compose (they agree only where the arrows are drawn in the stream's
+direction). Another neighborhood is another filter, with the same
+items:
+
+```
+!<1 P
+!>2 P
+```
 
 ### 7.4. Filters example
 

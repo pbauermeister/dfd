@@ -1,5 +1,0 @@
-# Issue #123: the combined form on a removal: P2, its upstream S1 and S2
-# and its downstream C2 and E2 go; Frame 1 keeps C1.
-#include tests/non-regression/028-filter-master.part
-
-~<1 >1 P2

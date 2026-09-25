@@ -1,5 +1,0 @@
-# Issue #123: two neighbor specifications in one filter, one per
-# direction: one level upstream of P2, two downstream.
-#include tests/non-regression/028-filter-master.part
-
-!<1 >2 P2

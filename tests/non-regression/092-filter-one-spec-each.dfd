@@ -1,0 +1,6 @@
+# Issue #123: another neighborhood is another filter with the same
+# items: one level upstream of P2, then two downstream.
+#include tests/non-regression/028-filter-master.part
+
+!<1 P2
+!>2 P2

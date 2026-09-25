@@ -1,5 +1,0 @@
-# Issue #123: "x" on the downstream spec only applies to the whole
-# filter: P2 vanishes. Spans differ per side, swapped.
-#include tests/non-regression/028-filter-master.part
-
-!<2 >x1 P2

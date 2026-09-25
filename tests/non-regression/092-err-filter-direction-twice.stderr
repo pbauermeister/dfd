@@ -1,4 +1,0 @@
-ERROR: (most recent first)
-  line 5: !<>1 <3 P2
-  line 1: <file:tests/non-regression/092-err-filter-direction-twice.dfd>
-Error: Upstream neighbors specified twice

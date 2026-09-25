@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 30
+Next number: 31
 
 ## Won't do
 
@@ -147,3 +147,14 @@ the staged Python files (the hook framework is installed for the
 commit-msg stage already), a pre-push hook, or CI as a required
 check (which #111 made a matter of the push-only trigger). Weigh the
 delay at each commit against the value.
+
+### 30. A symmetrical layout neighborhood `[]`
+
+Raised at the review of #124 (2026-09-25). `<>` is the symmetrical
+stream neighborhood; the layout counterpart `[]` (left and right) is
+not in the grammar (`RX_FILTER_ARG` accepts `<>`, `<`, `>`, `[`,
+`]`) and is refused as an unknown name. Since #123 a filter takes one
+neighborhood specification, so `[1` and `]1` on the same items need
+two filters; `[]` would be the one-filter form. New syntax, `feat:`
+(minor): after the pending patch release. Fixture, README § 7.3.3,
+SYNTAX.md § 7.3.

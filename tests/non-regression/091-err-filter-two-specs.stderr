@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 5: !<1 >2 P2
+  line 1: <file:tests/non-regression/091-err-filter-two-specs.dfd>
+Error: One neighbor specification per filter; repeat the filter for another one

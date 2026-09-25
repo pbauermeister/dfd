@@ -1,7 +1,0 @@
-# Issue #123: a layout direction with a flow direction. Left of S2 by
-# layout is P2 (f5 drawn P2 <-- S2); downstream of S2 by flow reaches P2
-# through the same f5, then C2, E2, and P5 then C1. Expected: S2, P2,
-# P5, C2, E2, C1.
-#include tests/non-regression/028-filter-master.part
-
-![1 >2 S2
