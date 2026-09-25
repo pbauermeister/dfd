@@ -1,7 +1,7 @@
 # 119 — A bare replacer sign in a filter is an error, not a hang
 
 Date: 2026-09-25
-Status: ONGOING
+Status: DONE
 Issue: #119 · PR: #120 · Branch: `fix/119-bare-replacer-sign`
 Task nature: change
 Track: fast
@@ -71,14 +71,14 @@ Approved: 2026-09-25
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                           | Agent    | User |
-| --- | ----------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track for a diagnosed one-liner                                  | well     |      |
-| 2   | Lint was run before the commit but its exit was not read; the duplicate test reached the remote | not well |      |
+| #   | Point                                                                                           | Agent    | User     |
+| --- | ----------------------------------------------------------------------------------------------- | -------- | -------- |
+| 1   | Process and template fit: fast track for a diagnosed one-liner                                  | well     | well     |
+| 2   | Lint was run before the commit but its exit was not read; the duplicate test reached the remote | not well | not well |
 
 Process: 1 round before the go; no loop; rework after the go: the test placement.
 
-Closed: pending
+Closed: 2026-09-25
 
 ### 4.2 Rule trace
 
