@@ -273,9 +273,7 @@ kind, in which order, before which names, belongs to the loop of the
 statement parser, as the facts that span statements belong to the
 checker. No scope reaches into another; a term regex that looked at a
 sibling, or a line regex that knew term syntax, would leave rules with
-no home. The only serious reason to revisit the line scope would be a
-term that needs whitespace inside it, which nothing in the language
-asks for.
+no home. The scopes are fundamental: the DSL is extended so that they stay respected, never the other way round.
 
 ## Markdown formatting
 
