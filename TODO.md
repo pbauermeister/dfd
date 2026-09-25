@@ -197,21 +197,6 @@ from `git describe`) or a `make install` recipe that rewrites the
 version in a scratch copy before installing. The release path
 (`make release`, `release.yml`) must keep the bare version.
 
-### 26. Rename the `Shipped:` stop
-
-Raised at stop 3 of #104. "Ship" means putting the thing in users'
-hands, which is the release, a separate step with its own command;
-"delivered" is as close to "ship" and as confusing. The stop marks
-the point where development is done and the final quality gate is
-entered: the user accepts the delivery, the PR leaves draft, review,
-checks and merge follow. Decided: `Ready:`, as in `gh pr ready` and
-GitHub's "ready for review" ("ready for what" is answered by that
-usage); `Reviewable:` and `Done:` considered. Structural change:
-`templates/devlog.md` (the stop line and the guidance comments that
-cite it), `engineering/PROCESS.md` (the five-stops list, Phase 4),
-the memory notes; earlier devlogs keep `Shipped:`, history being
-history.
-
 ### 27. Merge gate: a bookkeeping-only PR must not bump
 
 From #107. The `commit-msg` hook checks each commit's staged paths,
