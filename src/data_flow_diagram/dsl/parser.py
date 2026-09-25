@@ -202,6 +202,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     cmd = terms[0]
     args = terms[1:]
     replacer = ""
+    up_given = down_given = False
 
     # consume leading neighbor/replacer specifications before the anchor names
     while args:
@@ -225,11 +226,21 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
         elif m.group("neighbors"):
             fn, is_up, is_down = _parse_neighbor_spec(m, arg)
 
-            # assign parsed spec to the matching direction(s)
+            # assign parsed spec to the matching direction(s), once each
             if is_up:
+                if up_given:
+                    raise exception.DfdException(
+                        "Upstream neighbors specified twice"
+                    )
                 f.neighbors_up = fn
+                up_given = True
             if is_down:
+                if down_given:
+                    raise exception.DfdException(
+                        "Downstream neighbors specified twice"
+                    )
                 f.neighbors_down = fn
+                down_given = True
 
             args = args[1:]
 

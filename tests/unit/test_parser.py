@@ -194,6 +194,32 @@ def test_parse_filter_flags_either_side_of_span(spec: str) -> None:
         )
 
 
+def test_parse_filter_two_specs_one_per_direction() -> None:
+    # "<1 >2": one level upstream, two downstream, one filter
+    tokens = scanner.scan(provenance=None, source_text="process A\n! <1 >2 A")
+    statements, _, _ = parser.parse(tokens)
+    only = statements[-1]
+    assert isinstance(only, model.Only)
+    assert (only.neighbors_up.distance, only.neighbors_down.distance) == (1, 2)
+
+
+@pytest.mark.parametrize(
+    "specs",
+    [
+        pytest.param("<1 <3", id="upstream-twice"),
+        pytest.param(">1 >3", id="downstream-twice"),
+        pytest.param("<>1 <3", id="both-then-upstream"),
+        pytest.param("[1 <3", id="layout-then-flow-upstream"),
+    ],
+)
+def test_parse_filter_direction_twice_raises(specs: str) -> None:
+    tokens = scanner.scan(
+        provenance=None, source_text=f"process A\n! {specs} A"
+    )
+    with pytest.raises(exception.DfdException):
+        parser.parse(tokens)
+
+
 @pytest.mark.parametrize(("filter_line", "strict"), FILTER_STRICTNESS_CASES)
 def test_parse_filter_strictness(filter_line: str, *, strict: bool) -> None:
     # "!!" yields an Only statement flagged strict, "!" one that is not
