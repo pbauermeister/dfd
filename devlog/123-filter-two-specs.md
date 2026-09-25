@@ -1,7 +1,7 @@
 # 123 — One neighbor specification per filter
 
 Date: 2026-09-25
-Status: ONGOING
+Status: DONE
 Issue: #123 · PR: #124 · Branch: `fix/123-filter-two-specs`
 Task nature: change
 Track: fast
@@ -101,11 +101,11 @@ repeat the filter for another one`; pre-fix parser: `FAIL: 091`
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                              | Agent    | User |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track, three loops; the draft's leaning was executed before the design question (`>` vs `]`) was asked              | not well |      |
-| 2   | The seam fixtures were the right instrument: they proved the combined form consistent, which made the decision to forbid it a choice, not a repair | well     |      |
-| 3   | The reversal cost one hour and left no trace in the code; deciding it at the draft would have cost one question                                    | tension  |      |
+| #   | Point                                                                                                                                              | Agent    | User       |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: fast track, three loops; the draft's leaning was executed before the design question (`>` vs `]`) was asked              | not well | ended well |
+| 2   | The seam fixtures were the right instrument: they proved the combined form consistent, which made the decision to forbid it a choice, not a repair | well     | well       |
+| 3   | The reversal cost one hour and left no trace in the code; deciding it at the draft would have cost one question                                    | tension  | ended well |
 
 Process: 1 round before the go; 2 loops at the review; rework after the go: the #122 revert, then the reversal.
 
@@ -114,7 +114,7 @@ questioning of the thing, better late than never. It may read as a
 `not well` item at the task's level; at a higher order it served the
 product.
 
-Closed: pending
+Closed: 2026-09-25
 
 ### 4.2 Rule trace
 
