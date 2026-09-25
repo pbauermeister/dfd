@@ -47,6 +47,8 @@ Approved: 2026-09-25
   duplicated an existing `test_parse_raises` (F811).
 - `f6005d6` test: the case folded into the existing list.
 - This devlog.
+- Review (2026-09-25): the replacer group bound once with a walrus,
+  used three times (asked in the review).
 
 ## 3. Delivery
 
