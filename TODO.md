@@ -87,10 +87,6 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-
-
-
-
 ### 28. Examine Dependabot for the actions and the dev dependencies
 
 Raised at the review of #114 (2026-09-25): four actions had drifted

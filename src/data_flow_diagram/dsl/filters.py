@@ -20,8 +20,13 @@ def _collect_connected_names(
     names: set[str],
     search_downstream: bool,
     use_layout_direction: bool,
+    replacement: dict[str, str],
 ) -> tuple[set[str], list[model.Connection]]:
     """Find items connected to a set of names in one direction.
+
+    The connections are read as rewired by the replacements so far: a
+    flow to a replaced item is a flow to its replacer, and a flow whose
+    two ends collapsed is no flow.
 
     Returns (found_names, connections followed).
     """
@@ -34,7 +39,10 @@ def _collect_connected_names(
                 if conn.type == model.Keyword.CONSTRAINT:
                     continue
 
-                src, dst = conn.src, conn.dst
+                src = replacement.get(conn.src, conn.src)
+                dst = replacement.get(conn.dst, conn.dst)
+                if src == dst:
+                    continue
                 if conn.reversed and not use_layout_direction:
                     src, dst = dst, src
 
@@ -73,6 +81,7 @@ def _expand_neighbors_in_dir(
     max_neighbors: int,
     fn: model.FilterNeighbors,
     down: bool,
+    replacement: dict[str, str],
 ) -> tuple[set[str], set[int]]:
     """Expand neighbors in one direction by successive waves of connections.
 
@@ -87,6 +96,7 @@ def _expand_neighbors_in_dir(
             names=names,
             search_downstream=down,
             use_layout_direction=fn.layout_direction,
+            replacement=replacement,
         )
         if not names:
             break
@@ -104,6 +114,7 @@ def find_neighbors(
     filter: model.Filter,
     statements: model.Statements,
     max_neighbors: int,
+    replacement: dict[str, str],
     debug: bool,
 ) -> tuple[set[str], set[str], set[int]]:
     """Collect neighbor names by following connections outward from filter anchors.
@@ -116,6 +127,7 @@ def find_neighbors(
         max_neighbors=max_neighbors,
         fn=filter.neighbors_down,
         down=True,
+        replacement=replacement,
     )
     ups, up_ids = _expand_neighbors_in_dir(
         statements=statements,
@@ -123,6 +135,7 @@ def find_neighbors(
         max_neighbors=max_neighbors,
         fn=filter.neighbors_up,
         down=False,
+        replacement=replacement,
     )
     return downs, ups, down_ids | up_ids
 
@@ -162,6 +175,23 @@ def _check_filter_names(
         raise exception.DfdException(
             f' Name(s) no longer available due to previous filters: {diff}',
             source=source,
+        )
+
+
+def _check_not_replaced(
+    *,
+    names: set[str],
+    replacement: dict[str, str],
+    source: model.SourceLine,
+) -> None:
+    """Refuse an anchor that a previous filter replaced."""
+    replaced = sorted(names & replacement.keys())
+    if replaced:
+        diff = ", ".join(
+            f"{name} (by {replacement[name]})" for name in replaced
+        )
+        raise exception.DfdException(
+            f' Name(s) no longer available, replaced: {diff}', source=source
         )
 
 
@@ -229,6 +259,11 @@ def _collect_kept_names(
                     all_names=all_names,
                     source=statement.source,
                 )
+                _check_not_replaced(
+                    names=names,
+                    replacement=replacement,
+                    source=statement.source,
+                )
 
                 # add anchor names (suppressed by "x" flag: neighbors only)
                 if (
@@ -244,6 +279,7 @@ def _collect_kept_names(
                     filter=f,
                     statements=statements,
                     max_neighbors=len(all_names),
+                    replacement=replacement,
                     debug=debug,
                 )
                 dprint("ONLY: adding neighbors:", downs, ups)
@@ -278,12 +314,42 @@ def _collect_kept_names(
                 )
 
             case model.Without() as f:
+                names = set(f.names)
+                _check_not_replaced(
+                    names=names,
+                    replacement=replacement,
+                    source=statement.source,
+                )
+
+                # a replacement before any other filter is a rewiring, not a
+                # removal: it does not initialise the kept set, so that the
+                # keep filter that follows selects on the grouped graph
+                if kept_names is None and f.replaced_by:
+                    if f.neighbors_up.distance or f.neighbors_down.distance:
+                        raise exception.DfdException(
+                            " A replacement before any other filter takes no"
+                            " neighbor specification",
+                            source=statement.source,
+                        )
+                    _check_filter_names(
+                        names=names | {f.replaced_by},
+                        in_names=all_names,
+                        all_names=all_names,
+                        source=statement.source,
+                    )
+                    dprint(
+                        "WITHOUT: rewiring only:", names, "->", f.replaced_by
+                    )
+                    for name in names:
+                        replacement[name] = f.replaced_by
+                    continue
+
                 # Without is subtractive: first Without starts with all names
+                # (minus the replaced ones)
                 if kept_names is None:
-                    kept_names = all_names.copy()
+                    kept_names = all_names - replacement.keys()
 
                 # validate filter names and register replacements
-                names = set(f.names)
                 names_to_check = names.copy()
                 if f.replaced_by:
                     names_to_check.add(f.replaced_by)
@@ -309,6 +375,7 @@ def _collect_kept_names(
                     filter=f,
                     statements=statements,
                     max_neighbors=len(all_names),
+                    replacement=replacement,
                     debug=debug,
                 )
                 dprint("WITHOUT: removing neighbors:", downs, ups)
@@ -463,9 +530,12 @@ def handle_filters(
 
     _mark_non_hidable(statements, decisions.only_names)
 
-    # default to keeping all names if no filter was encountered
+    # default to keeping all names (minus the replaced ones) when no
+    # filter initialised the kept set
     kept_names = (
-        decisions.kept_names if decisions.kept_names is not None else all_names
+        decisions.kept_names
+        if decisions.kept_names is not None
+        else all_names - decisions.replacement.keys()
     )
     dprint("\nItems to keep", kept_names)
 

@@ -1,0 +1,14 @@
+# Issue #125: an anchor that a previous filter replaced is an error.
+
+process A
+process B
+process C
+process D
+process G Group
+
+A -> B ab
+B -> C bc
+C -> D cd
+
+~=G B C
+! B

@@ -1,0 +1,65 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/095-filter-replace-first-then-keep -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=TB
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 8: process A1 */
+  "A1" [shape=ellipse label="A1" fillcolor="#eeeeee" style=filled ]
+
+  /* 9: process A2 */
+  "A2" [shape=ellipse label="A2" fillcolor="#eeeeee" style=filled ]
+
+  /* 10: process A3 */
+  "A3" [shape=ellipse label="A3" fillcolor="#eeeeee" style=filled ]
+
+  /* 14: process C1 */
+  "C1" [shape=ellipse label="C1" fillcolor="#eeeeee" style=filled ]
+
+  /* 15: process C2 */
+  "C2" [shape=ellipse label="C2" fillcolor="#eeeeee" style=filled ]
+
+  /* 16: process C3 */
+  "C3" [shape=ellipse label="C3" fillcolor="#eeeeee" style=filled ]
+
+  /* 17: process Z Group */
+  "Z" [shape=ellipse label="Group" fillcolor="#eeeeee" style=filled ]
+
+  /* 19: flow A1 B1 a1b1 */
+  "A1" -> "Z" [label="a1b1"]
+
+  /* 20: flow B1 C1 b1c1 */
+  "Z" -> "C1" [label="b1c1"]
+
+  /* 21: flow A2 B2 a2b2 */
+  "A2" -> "Z" [label="a2b2"]
+
+  /* 22: flow B2 C2 b2c2 */
+  "Z" -> "C2" [label="b2c2"]
+
+  /* 23: flow A3 B3 a3b3 */
+  "A3" -> "Z" [label="a3b3"]
+
+  /* 24: flow B3 C3 b3c3 */
+  "Z" -> "C3" [label="b3c3"]
+
+  /* 25: flow? A1 A2 a1a2 */
+  "A1" -> "A2" [label="a1a2" constraint=false]
+
+  /* 26: flow? A2 A3 a2a3 */
+  "A2" -> "A3" [label="a2a3" constraint=false]
+
+  /* 29: flow? C1 C2 c1c2 */
+  "C1" -> "C2" [label="c1c2" constraint=false]
+
+  /* 30: flow? C2 C3 c2c3 */
+  "C2" -> "C3" [label="c2c3" constraint=false]
+
+  /* 31: flow? A1 B2 a1b2 */
+  "A1" -> "Z" [label="a1b2" constraint=false]
+
+  /* 32: uflow? B1 C2 b1c2 */
+  "Z" -> "C2" [label="b1c2" dir=none constraint=false]
+}

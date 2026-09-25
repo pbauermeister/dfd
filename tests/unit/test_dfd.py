@@ -47,6 +47,37 @@ def test_filter_already_removed() -> None:
         filters.handle_filters(statements)
 
 
+def test_filter_anchor_replaced() -> None:
+    # Naming an item that a previous filter replaced must raise
+    statements = _parse(
+        """
+        process  A  aaa
+        process  B  bbb
+        process  G  group
+        A  -->  B  ab
+        ~ =G B
+        ! B
+    """
+    )
+    with pytest.raises(exception.DfdException, match="replaced: B \\(by G\\)"):
+        filters.handle_filters(statements)
+
+
+def test_filter_replacement_first_takes_no_neighbors() -> None:
+    # A replacement before any other filter is a rewiring: no neighbors
+    statements = _parse(
+        """
+        process  A  aaa
+        process  B  bbb
+        process  G  group
+        A  -->  B  ab
+        ~ <1 =G B
+    """
+    )
+    with pytest.raises(exception.DfdException, match="no neighbor"):
+        filters.handle_filters(statements)
+
+
 def test_filter_replacer_unknown() -> None:
     # Replacing with a name that doesn't exist in the diagram must raise
     statements = _parse(

@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 14: ! B
+  line 1: <file:tests/non-regression/094-err-filter-anchor-replaced.dfd>
+Error:  Name(s) no longer available, replaced: B (by G)

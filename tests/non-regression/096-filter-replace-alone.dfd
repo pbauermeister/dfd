@@ -1,0 +1,14 @@
+# Issue #125: a replacement as the only filter: B and C are gone, the
+# others stay. Expected: A -> G -> D.
+
+process A
+process B
+process C
+process D
+process G Group
+
+A -> B ab
+B -> C bc
+C -> D cd
+
+~=G B C

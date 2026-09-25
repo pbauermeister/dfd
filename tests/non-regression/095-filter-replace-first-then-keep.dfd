@@ -1,0 +1,36 @@
+# Issue #125: the group declared first, then a keep filter around it
+# (block J of devlog/104-try-it.dfd). The replacement does not
+# initialise the kept set: "!" starts empty and selects two levels
+# downstream of A1 and Z on the grouped graph. Expected: A1, A2, A3,
+# Z, C1, C2, C3; no orphan.
+
+style vertical
+
+process A1
+process A2
+process A3
+process B1
+process B2
+process B3
+process C1
+process C2
+process C3
+process Z Group
+
+A1 -> B1 a1b1
+B1 -> C1 b1c1
+A2 -> B2 a2b2
+B2 -> C2 b2c2
+A3 -> B3 a3b3
+B3 -> C3 b3c3
+A1 ->? A2 a1a2
+A2 ->? A3 a2a3
+B1 ->? B2 b1b2
+B2 ->? B3 b2b3
+C1 ->? C2 c1c2
+C2 ->? C3 c2c3
+A1 ->? B2 a1b2
+B1 --? C2 b1c2
+
+~=Z B1 B2 B3
+!>2 A1 Z
