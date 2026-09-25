@@ -82,11 +82,11 @@ nr-test: ## NR tests: verify fixtures still match their golden files
 
 build: require clean lint test doc ## full local build, before a local install
 
-install: ## install user-wide as a uv tool (isolated venv, no sudo)
-	uv tool install --reinstall .
+install: ## install user-wide as a uv tool, version = stamp of branch and revision
+	./recipes/install.sh
 
-uninstall: ## remove the user-wide uv tool install
-	uv tool uninstall data-flow-diagram
+uninstall: ## remove the user-wide install, whatever installed it (uv tool, pipx, pip)
+	./recipes/uninstall.sh
 
 ################################################################################
 # Release:: ##

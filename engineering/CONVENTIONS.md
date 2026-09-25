@@ -132,7 +132,7 @@ The package structure must work in all installation modes:
 - Package discovery is configured in `pyproject.toml`
   (`[tool.setuptools.packages.find]`, `where = ["src"]`), which
   auto-discovers sub-packages with `__init__.py` files. The version
-  is a static `project.version`, bumped by `make release`.
+  is a static `project.version`, bumped by `make release`; `make install` stamps a copy of the tree (`0+<branch>.git<hash>[.dirty]`, `tools/print-dev-version.py`: no base claimed, the hash names it), the checkout keeps the bare version.
 
 ## Constants
 
