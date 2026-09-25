@@ -1,5 +1,52 @@
 <!-- semantic-release -->
 
+## v1.18.1 (2026-09-25)
+
+### Bug Fixes
+
+- A bare replacer sign in a filter is an error, not a hang
+  ([`d9b2e49`](https://github.com/pbauermeister/dfd/commit/d9b2e49e8844000a7325c12c3fb832d1dbb6b703))
+
+- One neighbor specification per filter, a second one is an error
+  ([`e26ba92`](https://github.com/pbauermeister/dfd/commit/e26ba92e30b103967c2f938af5afeca27b1d14c1))
+
+### Build System
+
+- Make install stamps the version with the branch and revision
+  ([`1ddeff4`](https://github.com/pbauermeister/dfd/commit/1ddeff4f44c359b2fdb9cd6d45f8ce00530b4aea))
+
+### Chores
+
+- Bookkeeping commits must not bump the version
+  ([`aebbe98`](https://github.com/pbauermeister/dfd/commit/aebbe98c37a80865ba028f0c152504ebbf2cb958))
+
+- Devlog 125, a task stopped at its review, and its try-it pictures
+  ([`b03e03d`](https://github.com/pbauermeister/dfd/commit/b03e03dbcd9ecdd1587f3712b1033efac64745ce))
+
+- Rename the Shipped stop to Ready ([#110](https://github.com/pbauermeister/dfd/pull/110),
+  [`8f59beb`](https://github.com/pbauermeister/dfd/commit/8f59bebfe941cb2681c3d104c99ec5e99895367d))
+
+- TODO 31, codify the batch of chained fast-track tasks
+  ([`e6fc61b`](https://github.com/pbauermeister/dfd/commit/e6fc61bbf666689ccf9db799cb34ce9f035951dd))
+
+- TODO 31, fit by kind as one way among others
+  ([`1ffb80f`](https://github.com/pbauermeister/dfd/commit/1ffb80f42ae55a0fda0b78c2e4188605d33e20e2))
+
+- TODO 31, the assessment also judges the fit and the order of the batch
+  ([`6611e05`](https://github.com/pbauermeister/dfd/commit/6611e052b4deca77d9086ba272c0a946ab799cfc))
+
+### Continuous Integration
+
+- Clear the GitHub Actions deprecation annotations
+  ([`3a48eef`](https://github.com/pbauermeister/dfd/commit/3a48eef4f251b98798435646f228c87dac02bf10))
+
+- Skip CI on pushes confined to bookkeeping paths
+  ([`4152d66`](https://github.com/pbauermeister/dfd/commit/4152d662605e975e99abf99bf46239d4ec05e717))
+
+- The merge gate blocks a bumping title on a bookkeeping-only PR
+  ([`3df8c0c`](https://github.com/pbauermeister/dfd/commit/3df8c0c97366c7990c46f81887fd7f11a71fce2b))
+
+
 ## v1.18.0 (2026-09-24)
 
 ### Features
