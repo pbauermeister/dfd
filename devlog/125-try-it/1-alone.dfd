@@ -1,0 +1,4 @@
+#include devlog/125-try-it/base.dfd
+
+# one level upstream of B and C removed (A, E), B and C collapsed into G
+~<1 =G B C
