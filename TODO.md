@@ -90,40 +90,6 @@ of existing tools and requirements in
 
 
 
-### 23. A keep filter after a replacement re-adds the replaced items as orphans
-
-Found at the stop 1 discussion of #104 (devlog 104). On `A→B→C→D`
-with `~=G B C` then `!<2 D`, the traversal in
-`_collect_connected_names()` (`src/data_flow_diagram/dsl/filters.py`)
-reads the original connections, follows `cd` to C and `bc` to B, and
-re-adds them to the kept set; the replacement map is permanent, so
-their flows still go to G: B and C render as orphan items next to
-G. `~=G B C` then `! B` does the same for an explicit anchor. The
-documented order, `!` before `~=`, is unaffected. Fix: traversal and
-anchors work on the current state, connections followed as rewired so
-far (from D the traversal reaches G), and an anchor that names a
-replaced item is an error like "no longer available". Two NR
-fixtures, traversal and explicit anchor.
-
-Design point raised at the Try it of #104: the natural reading is to
-declare the group first and filter around it (`~=Z C G` then
-`!<2 D Z`, block J of `devlog/104-try-it.dfd`), and the language
-cannot express the neighborhood of a group today. A `~` as first
-filter starts from the full set, so the `!` that follows narrows
-nothing; a `!` first cannot anchor on Z, which has no flows before the
-replacement; and `! Z` then `~=Z C G` errors, C and G being outside
-the kept set. Traversal on the current state removes the orphans but
-not the full-set start. Decide with the fix: a replacement as first
-filter that does not fill the set, a `!` after `~` that narrows, or
-another form. The doc's group example (§ 7.4.2.2) writes `!` first
-and stays valid either way. Direction agreed at the Try it of #104: a
-replacement is a rewiring, not a removal, so `~=` does not count as
-the first filter that initialises the kept set; the `!` that follows
-starts empty and traverses the rewired flows. The plain `~`-first
-rule stays as documented, and both orders keep a meaning: `!` first
-selects on the original graph and then collapses, `~=` first selects
-on the grouped graph. Statement order carries meaning since filters
-exist; before them it only steered the layout.
 
 ### 28. Examine Dependabot for the actions and the dev dependencies
 
