@@ -262,6 +262,21 @@ All identifiers, comments, documentation, and commit messages use
 
 **YAGNI + open door**: Implement only what current needs require. Do not invent abstractions, base classes, hooks, or infrastructure for hypothetical future needs. However, structure the current solution so that natural future growth (splitting a file, adding a case, extending a module) requires no rework of the existing structure. Complexity must be justified by a present need, not a future one. Starting with a single file that can later be split into modules is a good example of this principle in action.
 
+**Parser scopes** (decided at #123): the DSL parser has three scopes,
+and each rule lives in exactly one. The line: the first word, the
+keyword, decides how the rest is split; a filter splits its rest on
+whitespace into terms, an item takes a name and leaves the rest as the
+label, whitespace included, no quotes needed. The term: each term is
+dissected by its own regex (`RX_FILTER_ARG` for a filter argument),
+which knows nothing of its siblings. The sequence: how many terms of a
+kind, in which order, before which names, belongs to the loop of the
+statement parser, as the facts that span statements belong to the
+checker. No scope reaches into another; a term regex that looked at a
+sibling, or a line regex that knew term syntax, would leave rules with
+no home. The only serious reason to revisit the line scope would be a
+term that needs whitespace inside it, which nothing in the language
+asks for.
+
 ## Markdown formatting
 
 - Match VSCode's table formatter exactly: pad every table cell so all
