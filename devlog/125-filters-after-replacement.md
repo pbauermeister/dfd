@@ -1,7 +1,7 @@
 # 125 — Filters after a replacement work on the rewired graph
 
 Date: 2026-09-25
-Status: ONGOING
+Status: REJECTED
 Issue: #125 · PR: #126 · Branch: `fix/125-filters-after-replacement`
 Task nature: change
 Track: fast
@@ -71,7 +71,7 @@ xdg-open doc/img/filter-replace-first.svg     # the group-first picture
 make nr-review && xdg-open tests/non-regression/095-filter-replace-first-then-keep.svg
 ```
 
-Tried: pending
+Tried: 2026-09-25 (the try-it pictures of `devlog/125-try-it/`, case 2 wrong on both code bases)
 
 ### 3.2 Test report
 
@@ -87,33 +87,49 @@ Tried: pending
 
 ### 3.3 Verdict
 
-**Recommendation:** accept with reservations
+**Recommendation:** reject
 
-- The three rules are each locked by a fixture that fails without them.
-
-Reservations:
-
-1. Decision 4 (no neighbor specification on a leading `~=`) was mine,
-   not in the draft; it closes a case rather than defining it, and can
-   be reopened if a use appears.
+- The fixes hold, each locked by a fixture, but the review found the
+  flaw upstream of them: `~=` conflates a substitution with a filter,
+  and rules 3 and 4 of this task were decrees covering that. Shipping
+  the fixes would ship a still broken concept. The concept and the
+  material go to #127 (the substitution statement `=G B C`, `~=`
+  desugared and deprecated); nothing is merged from here.
 
 ## 4. Closure
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                    | Agent      | User |
-| --- | -------------------------------------------------------------------------------------------------------- | ---------- | ---- |
-| 1   | Process fit: the review became a design round the fast track cannot hold; the stop rule was applied late | not well   |      |
-| 2   | The flaw was in the concept: `~=` conflates a substitution with a filter, so every rule here was decreed | surprise   |      |
-| 3   | The joint effort to solve it in place (alternatives, mutations, a deferred implementation, renders)      | not well   |      |
-| 4   | The decision to abort: nothing shipped on a broken concept, the material carried to a new task           | ended well |      |
-| 5   | The pictures decided what prose could not; the reviewer's reading of case 2 named the concept            | well       |      |
+| #   | Point                                                                                                    | Agent      | User       |
+| --- | -------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| 1   | Process fit: the review became a design round the fast track cannot hold; the stop rule was applied late | not well   | ended well |
+| 2   | The flaw was in the concept: `~=` conflates a substitution with a filter, so every rule here was decreed | surprise   | surprise   |
+| 3   | The joint effort to solve it in place (alternatives, mutations, a deferred implementation, renders)      | not well   | not well   |
+| 4   | The decision to abort: nothing shipped on a broken concept, the material carried to a new task           | ended well | ended well |
+| 5   | The pictures decided what prose could not; the reviewer's reading of case 2 named the concept            | well       | well       |
 
 Process: 1 round before the go; 3 loops at the review; rework after the go: abandoned, the task stopped.
 
-Closed: pending
+Pascal's note: on row 1, more lenient than the agent, because the
+process permitted to realign: there is a valve.
 
-### 4.2 Rule trace
+Closed: 2026-09-25
+
+### 4.2 Forward-looking
+
+- Issue #127: the substitution statement, full track, this file and
+  the review of PR #126 as its brief. Fixtures 093–096, the traversal
+  through the rewiring, `_check_not_replaced()`, the README § 7.4.2.2
+  example and the try-it cases are its material, on the branch
+  `fix/125-filters-after-replacement`, left on origin unmerged.
+- Found on the way and carried into #127's brief: chained
+  substitutions lose their flows on `main` (`~=G B C` then `~=H G D`
+  renders A and H with no flow); the strict flow collector reads raw
+  ends; `~ X` then `! X` re-adds X against SYNTAX.md § 7.4 rule 3.
+- This file reaches `main` by a direct commit, with the try-it
+  folder: the record of a stopped task.
+
+### 4.3 Rule trace
 
 | Source                | Rule                                                             | Verb (applied / created) |
 | --------------------- | ---------------------------------------------------------------- | ------------------------ |

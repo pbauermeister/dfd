@@ -221,6 +221,7 @@ class _FilterDecisions:
     kept_names: set[str] | None  # None: no filter statement encountered
     only_names: set[str]  # anchors of "only" filters, made non-hidable
     replacement: dict[str, str]  # removed name -> replacing name
+    pending_removals: set[str]  # neighbors named by a leading replacement
     skip_frames_for_names: set[str]
     vetoed_ids: set[int]  # flows touching a strict selection
     allowed_ids: set[int]  # path flows, and flows joining a plain selection
@@ -236,6 +237,10 @@ def _collect_kept_names(
     kept_names: set[str] | None = None
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
+    # neighbors named by a replacement before any other filter: removed
+    # when the kept set starts full, moot when it starts empty (as a
+    # removal before a keep filter is today)
+    pending_removals: set[str] = set()
     skip_frames_for_names: set[str] = set()
     vetoed_ids: set[int] = set()
     allowed_ids: set[int] = set()
@@ -325,12 +330,6 @@ def _collect_kept_names(
                 # removal: it does not initialise the kept set, so that the
                 # keep filter that follows selects on the grouped graph
                 if kept_names is None and f.replaced_by:
-                    if f.neighbors_up.distance or f.neighbors_down.distance:
-                        raise exception.DfdException(
-                            " A replacement before any other filter takes no"
-                            " neighbor specification",
-                            source=statement.source,
-                        )
                     _check_filter_names(
                         names=names | {f.replaced_by},
                         in_names=all_names,
@@ -340,21 +339,32 @@ def _collect_kept_names(
                     dprint(
                         "WITHOUT: rewiring only:", names, "->", f.replaced_by
                     )
+                    # the anchors' neighbors on the graph as it stands, before
+                    # their flows are rewired to the replacer
+                    downs, ups, _ = find_neighbors(
+                        filter=f,
+                        statements=statements,
+                        max_neighbors=len(all_names),
+                        replacement=replacement,
+                        debug=debug,
+                    )
+                    dprint("WITHOUT: neighbors pending removal:", downs, ups)
+                    pending_removals |= downs | ups
                     for name in names:
                         replacement[name] = f.replaced_by
                     continue
 
                 # Without is subtractive: first Without starts with all names
-                # (minus the replaced ones)
+                # (minus the replaced ones and the pending removals)
                 if kept_names is None:
-                    kept_names = all_names - replacement.keys()
+                    kept_names = (
+                        all_names - replacement.keys() - pending_removals
+                    )
 
-                # validate filter names and register replacements
+                # validate filter names
                 names_to_check = names.copy()
                 if f.replaced_by:
                     names_to_check.add(f.replaced_by)
-                    for name in names:
-                        replacement[name] = f.replaced_by
                 _check_filter_names(
                     names=names_to_check,
                     in_names=kept_names,
@@ -370,7 +380,9 @@ def _collect_kept_names(
                     dprint("WITHOUT: removing items:", names)
                     kept_names.difference_update(names)
 
-                # remove upstream/downstream neighbor names
+                # remove upstream/downstream neighbor names, found on the
+                # graph as it stands: the anchors' own flows are rewired to
+                # the replacer only once they are registered, below
                 downs, ups, _ = find_neighbors(
                     filter=f,
                     statements=statements,
@@ -381,6 +393,11 @@ def _collect_kept_names(
                 dprint("WITHOUT: removing neighbors:", downs, ups)
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
+
+                # register the replacements
+                if f.replaced_by:
+                    for name in names:
+                        replacement[name] = f.replaced_by
 
                 _collect_frame_skips(
                     f=f,
@@ -397,6 +414,7 @@ def _collect_kept_names(
         kept_names=kept_names,
         only_names=only_names,
         replacement=replacement,
+        pending_removals=pending_removals,
         skip_frames_for_names=skip_frames_for_names,
         vetoed_ids=vetoed_ids,
         allowed_ids=allowed_ids,
@@ -535,7 +553,9 @@ def handle_filters(
     kept_names = (
         decisions.kept_names
         if decisions.kept_names is not None
-        else all_names - decisions.replacement.keys()
+        else all_names
+        - decisions.replacement.keys()
+        - decisions.pending_removals
     )
     dprint("\nItems to keep", kept_names)
 
