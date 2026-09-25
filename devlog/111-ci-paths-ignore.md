@@ -87,7 +87,7 @@ Approved: 2026-09-24
 gh api "repos/pbauermeister/dfd/actions/runs?head_sha=8413c64" \
   --jq '.workflow_runs[] | "\(.name)\t\(.event)\t\(.conclusion)"'
    # PR title, Merge gate (pull_request) and CI (push): the rework ships
-gh api "repos/pbauermeister/dfd/actions/runs?head_sha=<this devlog's sha>" \
+gh api "repos/pbauermeister/dfd/actions/runs?head_sha=3a8b95e" \
   --jq '.workflow_runs[] | "\(.name)\t\(.event)\t\(.conclusion)"'
    # PR title and Merge gate only: a devlog-only push
 gh pr checks 112   # the CI run of 8413c64 still shown on the PR
@@ -100,8 +100,8 @@ Tried: pending
 1. `make lint`: `Bookkeeping paths consistent: …`; with `devlog/**`
    misspelt, `ERROR:` and exit 1 (criterion 1).
 2. `8413c64` (ships `ci.yml`): `CI push` run started, `PR title` and
-   `Merge gate` completed. The devlog-only push: recorded at the Try
-   it, once observed (criterion 2).
+   `Merge gate` completed, CI `success`. `3a8b95e` (this devlog
+   only): `PR title` and `Merge gate` only, no CI run (criterion 2).
 3. 119 pytest, 95 NR fixtures; lint and format clean (criterion 3).
 
 ### 3.3 Verdict
