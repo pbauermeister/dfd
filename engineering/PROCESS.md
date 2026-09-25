@@ -161,9 +161,10 @@ file), the branch and draft PR are created during the task start process
 6. Merge (or ask the user to merge) only after the PR is approved, CI passes,
    and the `conventional` and `gate` checks are green on an up-to-date branch
    (the ruleset on `main` requires them; see the merge gate in
-   `engineering/RELEASING.md`). A PR confined to bookkeeping paths starts
-   no CI run (see "Bookkeeping commits" there): the two required checks
-   are all there is to wait for.
+   `engineering/RELEASING.md`). A push confined to bookkeeping paths, a devlog
+   commit typically, starts no CI run (see "Bookkeeping commits" there):
+   the run to wait for is the one of the last push that shipped
+   something, and the two required checks.
 
 Devlog in the PR, squash merge and the PR title as the single conventional
 subject hold each other up: the devlog commits vanish at squash and stay out
