@@ -101,12 +101,15 @@ Reservations:
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                        | Agent | User |
-| --- | ---------------------------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: fast track for a design agreed at a previous task's Try it; the rules were written before the code | well  |      |
-| 2   | The batch order paid: 20 and 21 cleared the parser, 22 the doc section, so this task touched `filters.py` and § 7.4 only     | well  |      |
+| #   | Point                                                                                                                                                                                                                                                                 | Agent      | User |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---- |
+| 1   | Process and template fit: fast track for a design agreed at a previous task's Try it; the review became a design round, which the fast track cannot hold, and the template's own rule (the work inflates: switch track or stop) was applied late                      | not well   |      |
+| 2   | The flaw was in the concept, not in the code: `~=` conflates a substitution with a filter, which is why every rule of this task (3, D4, the leading form, the neighbors) had to be decreed rather than derived; found by the reviewer's questions and by the pictures | surprise   |      |
+| 3   | The joint effort to solve it in place: alternatives, a comparison table, mutations, an implementation of the deferred reading, renders on two code bases, all on a fast-track PR, before the stop was proposed                                                        | not well   |      |
+| 4   | The decision to abort: nothing shipped on a broken concept, the concept and its material carried to a new task, the path retraceable in this file                                                                                                                     | ended well |      |
+| 5   | The try-it pictures decided what prose could not: case 2 was wrong on both code bases, visibly, and the reviewer's reading of it named the concept                                                                                                                    | well       |      |
 
-Process: 1 round before the go; no loop; rework after the go: none.
+Process: 1 round before the go; 3 loops at the review; rework after the go: abandoned, the task stopped.
 
 Closed: pending
 
