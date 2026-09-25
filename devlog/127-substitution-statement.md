@@ -98,13 +98,59 @@ Framed: 2026-09-25
 Triggers: a new container name (`Merge`, the keyword `merge`); an
 intent inherited from a prior task (#125's rules); one conceptual row
 among mechanical churn (the desugaring's home).
-Mock-up: yes, in a throwaway worktree, before stop 1: the model
-dataclass, the `parse()` loop accepting one line to yield two
-statements, `_parse_merge()` splitting its arguments at `:`, a
-`Merge` case in `_collect_kept_names()`, and the try-it cases
-rendered.
+Mock-up: yes, built in a throwaway worktree (`mockup/127`, kept as
+the material of steps 1 and 2): the model, `_parse_merge()`, the
+`parse()` loop yielding one statement or two, `_desugar_replacer()`,
+`_ends()` and `_register_merge()`, the `Merge` case, the availability
+set. The whole suite passes unchanged on it: 136 unit tests, every
+golden byte-identical, the seven `~=` fixtures now going through the
+desugaring. The slice that decides, the parser's side:
+
+```python
+def _parse_merge(source: model.SourceLine) -> model.Statement:
+    """Parse merge ITEM [ITEM...] : REPLACER"""
+    head, sep, tail = source.text.partition(":")
+    if not sep:
+        raise exception.DfdException("Expected ': REPLACER' after the items")
+    names = head.split()[1:]
+    replacers = tail.split()
+    ...
+    return model.Merge(source=source, names=names, replacer=replacers[0])
+
+
+def _desugar_replacer(f, *, replacer, spec) -> list[model.Statement]:
+    """The deprecated "~[SPEC] =R ITEMS": a merge, then the neighbors' removal."""
+    merge = model.Merge(source=f.source, names=f.names, replacer=replacer)
+    if spec is None:
+        print_warning(f"'~=' is deprecated, write: {hint}")
+        return [merge]
+    f.neighbors_up.suppress_anchors = True      # the x flag: the group's
+    f.neighbors_down.suppress_anchors = True    # neighbors, not the group
+    without = model.Without(**f.__dict__); without.names = [replacer]
+    print_warning(f"'~=' is deprecated, write: {hint}, then ~{spec_x} {replacer}")
+    return [merge, without]
+```
+
+and `parse()` reads `for statement in parsed if isinstance(parsed, list)
+else [parsed]:`. The pictures, on the try-it base (A and E feed B, B → C
+→ D → F, G the group, H a super group):
+
+| Case                                                      | Result                                                                                       |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `merge B C : G` then `~<x1 G`, and the sugar `~<1 =G B C` | identical: G → D → F, A and E removed; the warning reads `write: merge B C : G, then ~<x1 G` |
+| the same, then `!>1 A`                                    | error: A no longer available (try-it case 2)                                                 |
+| `merge B C : G` then `!>1 A`, and the sugar `~=G B C`     | A → G (case 3)                                                                               |
+| `!>1 A B` then `merge B C : G`                            | A → G: the replacer takes the place of the kept member                                       |
+| `!>1 A` then `merge C D : G`                              | A → B, untouched: nothing kept was merged                                                    |
+| `merge B C : G` then `merge G D : H`                      | A → H, E → H, H → F: the chain, flat map                                                     |
+| `merge G D : H` then `merge B C : G`                      | error: G no longer available (merged away)                                                   |
+| `B -> X`, `merge B C : G`, `!!<1 D`, `! X`                | G → D only: the rewired stray flow G → X touching the strict selection is hidden             |
+| `merge B C`, `merge : G`, `merge B C : B`                 | the three parse errors                                                                       |
+
 Design question: where the desugaring of `~SPEC =G B C` lives.
-Options: three, below; the recommended one is option 1.
+Options: three, below; the mock-up decided option 1: the parser side is
+forty lines, the model has no replacer field left, and filters.py has
+one `Merge` case.
 
 | Option                                                      | What differs                                                                                                                                                        | For                                                                                                             | Against                                                                                                                   |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -137,6 +183,8 @@ Options: three, below; the recommended one is option 1.
 | 8   | The docs show `=` only: README § 7.3 gains "Substitution", § 7.4.2.2 uses it; SYNTAX.md § 7.2 loses `[=REPLACEMENT]`, a § 7.x "Substitution" and the glossary term                                                                                                                                                                                                                                                                                  | user: the docs do not mention the deprecated form                                                                                                                                                                                                                                                                                                                                                                | A "deprecated" note in the docs                                                                                                                                                                               |
 | 9   | Fixtures: the eight files using `~=` migrate to `=`; one fixture keeps `~=` for the sugar (same DOT as its `=` twin); the try-it cases become fixtures (case 2 an error, case 3 the `A→Group` picture, block J); the chain; the strict stray flow after a substitution; `~ X` then `! X` as an error                                                                                                                                                | rule: fixtures lock accepted behavior; the pictures of the review are the acceptance                                                                                                                                                                                                                                                                                                                             | Keep `~=` in the fixtures (they would exercise the deprecated path only)                                                                                                                                      |
 | 10  | Frames: the replacer inherits a frame only when every replaced item belongs to that one frame and the replacer is declared in none; otherwise it inherits nothing (the replaced items leave their frames, an emptied frame disappears). A replacer declared in a frame keeps it. The frame check of the checker ("is in multiple frames") is re-run on the filtered statements by `dfd.py`, so an inherited frame plus a declared one is that error | user (stop 0 discussion): unnamed frames cannot be chosen; measured on `main`: the replacer inherited every frame, an item in two clusters                                                                                                                                                                                                                                                                       | An error on any ambiguity; an option on `=`                                                                                                                                                                   |
+| 11  | A substitution rewrites the kept set as it rewrites the flows: when a merged item is kept, the replacer takes its place (`!>1 A B` then `merge B C : G` shows A → G); when none is, the kept set is untouched                                                                                                                                                                                                                                       | mock-up: without it the group vanished silently after a keep filter, where `main` errors ("db_all" had to be listed in the doc example's `!`); a substitution is a rewrite of everything the merged names appear in                                                                                                                                                                                              | Require the replacer to be kept (an error); leave the group unkept                                                                                                                                            |
+| 12  | The replacer must be available: merging into an item already merged away is an error; a chain is written forward (`merge B C : G` then `merge G D : H`)                                                                                                                                                                                                                                                                                             | mock-up (chain reversed): the replacer is an anchor like the others; resolving it silently would hide a mistake                                                                                                                                                                                                                                                                                                  | Resolve the replacer through the map                                                                                                                                                                          |
 
 ### 1.9 Acceptance criteria
 
@@ -144,8 +192,9 @@ Options: three, below; the recommended one is option 1.
    `merge B C`, `merge B C : B` and `merge B C : G H` raise; `~=G B C` and `~<1 =G B C` parse to the two statements and
    print one warning line naming the new form (unit, `capsys`).
 2. Fixtures: the migrated eight render byte-identical DOT; the sugar
-   twin renders as its `=` twin; the try-it cases render as decided
-   (case 2 an `-err-` fixture); the chain gives `A→H`; the strict
+   twin renders as its `merge` twin; the try-it cases render as decided
+   (case 2 an `-err-` fixture); the chain gives `A→H` and its reverse errors; a keep filter then a
+   merge shows the replacer in place of the kept member; the strict
    stray flow after a substitution is hidden; `~ X` then `! X` errors.
    The chain, the strict and the availability fixtures fail on `main`
    (mutation smoke-test by the pre-fix code).
