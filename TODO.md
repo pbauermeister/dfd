@@ -157,16 +157,6 @@ selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
 
-### 27. Merge gate: a bookkeeping-only PR must not bump
-
-From #107. The `commit-msg` hook checks each commit's staged paths,
-but the PR title is the type that reaches `main`, and a title is
-edited on GitHub without a hook. Extend `merge-gate.yml` (or
-`tools/conventional-commits.py gate-pr-against-main`) with the PR's
-changed files (`gh api .../pulls/N/files` or the `git diff` against
-the merge base): every path in `bookkeeping_paths` of
-`pyproject.toml` and a bumping title is blocked, same message as the
-hook.
 
 ### 28. Examine Dependabot for the actions and the dev dependencies
 
