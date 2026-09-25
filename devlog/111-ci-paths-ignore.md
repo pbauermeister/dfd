@@ -99,7 +99,8 @@ Closed: pending
 
 ### 4.2 Rule trace
 
-| Source                                                  | Rule                                                      | Verb (applied / created) |
-| ------------------------------------------------------- | --------------------------------------------------------- | ------------------------ |
-| `engineering/RELEASING.md` "Bookkeeping commits" (#107) | CI skips a push or a PR confined to the bookkeeping paths | created (sentence added) |
-| `engineering/PROCESS.md` "Established tool vs bespoke"  | Measure, don't estimate (no unverified YAML anchor)       | applied                  |
+| Source                                                  | Rule                                                                     | Verb (applied / created) |
+| ------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------ |
+| `engineering/RELEASING.md` "Bookkeeping commits" (#107) | CI skips a push or a PR confined to the bookkeeping paths                | created (sentence added) |
+| `engineering/PROCESS.md` "Established tool vs bespoke"  | Measure, don't estimate (no unverified YAML anchor)                      | applied                  |
+| `engineering/PROCESS.md` "Branching and PR workflow" 6  | A bookkeeping-only PR has no CI to wait for (asked at the merge of #108) | created (sentence added) |
