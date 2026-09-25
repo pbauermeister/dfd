@@ -72,7 +72,7 @@ This way the user can grant autonomy for straightforward steps and keep
 tighter control over sensitive or uncertain ones.
 
 Three more stops follow, at the places the template marks: `Tried:` (after
-Try it; the user may mandate a loop), `Shipped:` (the ship decision, after
+Try it; the user may mandate a loop), `Ready:` (the ready decision, after
 the test report, the verdict and the discussion; then the PR is marked
 ready), `Closed:` (after the Retrospective; status `DONE`). The template's
 guidance comments are the reference for what each stop needs.
@@ -114,7 +114,7 @@ remind them of it.
   the issue title.
 - The template's guidance comments are the reference for the structure, the
   task natures, the five stops (`Framed:`, `Approved:`, `Tried:`,
-  `Shipped:`, `Closed:`, dated lines the agent fills on the user's go,
+  `Ready:`, `Closed:`, dated lines the agent fills on the user's go,
   never before)
   and the budget; the copy replaces them by content. Sections are cited by
   number and title.
