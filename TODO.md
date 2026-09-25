@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 28
+Next number: 29
 
 ## Won't do
 
@@ -157,7 +157,6 @@ selects on the original graph and then collapses, `~=` first selects
 on the grouped graph. Statement order carries meaning since filters
 exist; before them it only steered the layout.
 
-
 ### 27. Merge gate: a bookkeeping-only PR must not bump
 
 From #107. The `commit-msg` hook checks each commit's staged paths,
@@ -168,3 +167,17 @@ changed files (`gh api .../pulls/N/files` or the `git diff` against
 the merge base): every path in `bookkeeping_paths` of
 `pyproject.toml` and a bumping title is blocked, same message as the
 hook.
+
+### 28. Examine Dependabot for the actions and the dev dependencies
+
+Raised at the review of #114 (2026-09-25): four actions had drifted
+a year, and the surprise was not the bumps but the rules underneath
+(setup-uv's immutable releases, no moving major tag past v7). Regular
+small updates are cheaper than one accumulated migration. Examine
+the pros and cons of `.github/dependabot.yml`: the `github-actions`
+ecosystem, grouped so the actions arrive as one PR, weekly or
+monthly; a `uv` entry for the dev dependency group and the pre-commit
+hook revision; PRs typed `chore(deps):` (none-level, CI runs on their
+push). Against: bot noise, a merge each time, the review of release
+notes on a major still by hand. Decide the pinning policy with it:
+current major or exact tag for actions, release notes read on a major.
