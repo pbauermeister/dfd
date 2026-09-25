@@ -34,6 +34,9 @@ BUMP_MAP = cc.BumpMap(
     default=cc.Bump.NONE,
 )
 
+# the bookkeeping paths of pyproject.toml, as data, likewise
+BOOKKEEPING = ["TODO.md", ".claude/", "devlog/", "engineering/", "templates/"]
+
 
 @pytest.mark.parametrize(
     "message, expected",
@@ -139,7 +142,7 @@ def test_is_bookkeeping(
     path: str,
     expected: bool,  # noqa: FBT001  pytest passes parameters by keyword
 ) -> None:
-    assert cc.is_bookkeeping(path) is expected
+    assert cc.is_bookkeeping(path, bookkeeping=BOOKKEEPING) is expected
 
 
 @pytest.mark.parametrize(
@@ -158,7 +161,9 @@ def test_bookkeeping_verdict(
     paths: list[str],
     allowed: bool,  # noqa: FBT001  pytest passes parameters by keyword
 ) -> None:
-    verdict = cc.bookkeeping_verdict(level=cc.Bump(level), paths=paths)
+    verdict = cc.bookkeeping_verdict(
+        level=cc.Bump(level), paths=paths, bookkeeping=BOOKKEEPING
+    )
     assert verdict.allowed is allowed
 
 

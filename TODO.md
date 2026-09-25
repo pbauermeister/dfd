@@ -219,5 +219,6 @@ but the PR title is the type that reaches `main`, and a title is
 edited on GitHub without a hook. Extend `merge-gate.yml` (or
 `tools/conventional-commits.py gate-pr-against-main`) with the PR's
 changed files (`gh api .../pulls/N/files` or the `git diff` against
-the merge base): every path in `BOOKKEEPING_PATHS` and a bumping
-title is blocked, same message as the hook.
+the merge base): every path in `bookkeeping_paths` of
+`pyproject.toml` and a bumping title is blocked, same message as the
+hook.
