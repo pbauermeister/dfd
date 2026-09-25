@@ -88,16 +88,6 @@ of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
 
-### 21. Filter flag order: the doc says `<>2xf`, the parser wants `<>xf2`
-
-Found at the stop 0 review of #104 (devlog 104). `doc/README.md`
-§ 7.3.3 gives `DIRECTION[SPAN][FLAGS]`; `RX_FILTER_ARG` in
-`src/data_flow_diagram/dsl/parser.py` and every example (`!<>xf2`)
-put the flags before the span. The documented order is the logical
-one (the span belongs to the direction, the flags qualify the
-selection). Make the parser accept the flags on either side of the
-span, migrate the examples and fixtures to the documented order, and
-say in § 7.3.3 that both are accepted.
 
 ### 22. Several neighbor specs in one filter: undocumented, overwrite silent
 
