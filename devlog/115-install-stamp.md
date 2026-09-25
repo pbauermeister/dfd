@@ -37,6 +37,7 @@ release` and `release.yml` keep the bare version.
 | 6   | PR type `build:` (patch)                                                                                                                                                                   | user (the go): a recipe is tooling, not bookkeeping                                                                                                                                                               | `chore:` under #107's rule                                                                        |
 | 7   | Release segment `0`, no base version in the stamp: `0+<branch>.git<hash>[.dirty]`; the hash names the base, the stamp sorts below every release so a release always upgrades a dev install | user (review, 2026-09-25): a stamp for dev and test only, semver compliance not needed; a prefix would mislead once a bumping commit is on the branch; a version with no numeric segment does not build (PEP 440) | `X.Y.Z+…` (first version); `next.dev0+…` from the release plan                                    |
 | 8   | `make uninstall` removes the tool whatever installed it: uv tool, pipx, pip in the current `python3`, each asked in turn; nothing found is not an error                                    | user (review): after a dev install, the official release is reinstalled                                                                                                                                           | `uv tool uninstall` only (the former target)                                                      |
+| 9   | The staging (copy of the tree, stamp) is a tool, `tools/stage-dev-tree.sh DEST`; the recipe sequences stage, install, `--version`                                                          | user (review): the traced pipeline was noise, only its outcome matters; a tool never traces (CONVENTIONS.md "Script levels")                                                                                      | Silence the pipeline inside the recipe with `set +x`                                              |
 
 ### 1.4 Acceptance criteria
 
@@ -66,6 +67,11 @@ Approved: 2026-09-24
   against the isolated tool dir prints `0+build.115.install.stamp.git…`.
   The first-form observation in the test report (`1.18.0+…`) stands as
   history.
+- Review loop (2026-09-25), third round: the copy and the stamp moved
+  to `tools/stage-dev-tree.sh` (row 9); before, the recipe traced the
+  three-command pipeline, the `sed` and the `grep`; after, it traces
+  the tool call and the install, the tool prints `-- copy` and
+  `-- stamp: 1.18.0 -> 0+…`. Run again against the isolated tool dir.
 - Review loop (2026-09-25): `recipes/uninstall.sh` and the `uninstall`
   target reworded; decisions 7 and 8. Tried against three isolated
   installs (uv tool dir, `PIPX_HOME`, a seeded venv on the PATH): all
