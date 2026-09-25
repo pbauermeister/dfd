@@ -10,14 +10,19 @@ Usage:
       # bump level of the commit message on stdin (subject, optional body)
   conventional-commits.py gate-pr-against-main --current X.Y.Z --next X.Y.Z
       # fail when the PR message on stdin would raise the pending level
+  conventional-commits.py check-bookkeeping-commit MESSAGE_FILE
+      # commit-msg hook: fail when the staged paths are all bookkeeping
+      # and the message's type bumps the version
 
 The map is `[tool.semantic_release.commit_parser_options]`, the same
 section python-semantic-release applies at release time, so the table
-cannot drift from the actual behavior.
+cannot drift from the actual behavior. The bookkeeping paths are
+`[tool.conventional-commits] bookkeeping_paths` of the same file.
 """
 
 import argparse
 import re
+import subprocess
 import sys
 import tomllib
 from dataclasses import dataclass
@@ -76,6 +81,20 @@ def load_bump_map() -> BumpMap:
         patch_tags=options["patch_tags"],
         default=BUMP_LEVELS[options["default_bump_level"]],
     )
+
+
+def load_bookkeeping_paths() -> list[str]:
+    """Read the bookkeeping paths from pyproject.toml.
+
+    Paths that ship nothing: a commit confined to them is bookkeeping
+    and must carry a type that bumps nothing (engineering/RELEASING.md
+    "Bookkeeping commits"). Directories end with a slash.
+    """
+    with PYPROJECT_PATH.open("rb") as f:
+        paths: list[str] = tomllib.load(f)["tool"]["conventional-commits"][
+            "bookkeeping_paths"
+        ]
+    return paths
 
 
 def print_table(bump_map: BumpMap) -> None:
@@ -194,6 +213,72 @@ def gate_verdict(*, pending: Bump, incoming: Bump, next_: str) -> Verdict:
     return Verdict(allowed=True, reason=f"{incoming} on pending {pending}")
 
 
+def is_bookkeeping(path: str, *, bookkeeping: list[str]) -> bool:
+    """Whether a repository path is in the bookkeeping list."""
+    return any(
+        path == entry or (entry.endswith("/") and path.startswith(entry))
+        for entry in bookkeeping
+    )
+
+
+def bookkeeping_verdict(
+    *, level: Bump, paths: list[str], bookkeeping: list[str]
+) -> Verdict:
+    """Allow a commit unless it is confined to bookkeeping paths and bumps.
+
+    An empty path list (an empty or merge commit) is allowed: nothing
+    says what the commit is about.
+    """
+    if not paths or level == Bump.NONE:
+        return Verdict(allowed=True, reason=f"{level} level")
+    shipping = [
+        path
+        for path in paths
+        if not is_bookkeeping(path, bookkeeping=bookkeeping)
+    ]
+    if shipping:
+        return Verdict(allowed=True, reason=f"ships {shipping[0]}")
+    return Verdict(
+        allowed=False,
+        reason=f"a {level} type on bookkeeping paths only "
+        f"({', '.join(paths)}): use a type that bumps nothing",
+    )
+
+
+def staged_paths() -> list[str]:
+    """The paths staged for the commit being made."""
+    out = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    return out.split()
+
+
+def read_commit_message(path: Path) -> str:
+    """The commit message of a message file, comment lines dropped."""
+    lines = path.read_text().split("\n")
+    return "\n".join(line for line in lines if not line.startswith("#"))
+
+
+def run_check_bookkeeping(bump_map: BumpMap, *, message_path: Path) -> None:
+    """Fail when the commit is bookkeeping only and its type bumps.
+
+    A message that is not conventional (a merge commit, a typo) is the
+    conventional hook's business: this check lets it through.
+    """
+    try:
+        level = parse_level(read_commit_message(message_path), bump_map)
+    except ValueError:
+        return
+    verdict = bookkeeping_verdict(
+        level=level, paths=staged_paths(), bookkeeping=load_bookkeeping_paths()
+    )
+    if not verdict.allowed:
+        sys.exit(f"BLOCKED: {verdict.reason}")
+
+
 def run_level(bump_map: BumpMap) -> None:
     """Print the bump level of the commit message on stdin."""
     try:
@@ -222,6 +307,7 @@ class Command(StrEnum):
     CHECK_TYPE_LISTS = "check-type-lists"
     PRINT_LEVEL_OF_MESSAGE = "print-level-of-message"
     GATE_PR_AGAINST_MAIN = "gate-pr-against-main"
+    CHECK_BOOKKEEPING_COMMIT = "check-bookkeeping-commit"
 
 
 def main() -> None:
@@ -244,6 +330,11 @@ def main() -> None:
     )
     gate.add_argument("--current", required=True, help="version of main")
     gate.add_argument("--next", required=True, help="next version of main")
+    check = subparsers.add_parser(
+        Command.CHECK_BOOKKEEPING_COMMIT,
+        help="commit-msg hook: bookkeeping paths need a none-level type",
+    )
+    check.add_argument("message_file", type=Path, help="the commit message")
     args = parser.parse_args()
     command = Command(args.command)  # argparse boundary
 
@@ -257,6 +348,8 @@ def main() -> None:
             run_level(bump_map)
         case Command.GATE_PR_AGAINST_MAIN:
             run_gate(bump_map, current=args.current, next_=args.next)
+        case Command.CHECK_BOOKKEEPING_COMMIT:
+            run_check_bookkeeping(bump_map, message_path=args.message_file)
         case _:
             assert_never(command)
 

@@ -1,6 +1,8 @@
-# Conventional commit messages, checked at commit time. Installed by
-# `make require` (pre-commit install --hook-type commit-msg). The type
-# list must equal allowed_tags in pyproject.toml; `make lint` checks it.
+# Commit messages, checked at commit time. Installed by `make require`
+# (pre-commit install --hook-type commit-msg). Conventional form: the
+# type list must equal allowed_tags in pyproject.toml; `make lint`
+# checks it. Bookkeeping: a commit confined to paths that ship nothing
+# must carry a type that bumps nothing (engineering/RELEASING.md).
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
@@ -8,3 +10,10 @@ repos:
       - id: conventional-pre-commit
         stages: [commit-msg]
         args: [feat, fix, perf, refactor, docs, test, build, chore, ci, style]
+  - repo: local
+    hooks:
+      - id: bookkeeping-commit-type
+        name: Bookkeeping commit type
+        entry: uv run --no-sync ./tools/conventional-commits.py check-bookkeeping-commit
+        language: system
+        stages: [commit-msg]

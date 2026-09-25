@@ -36,6 +36,18 @@ invisible effects that deserve a release.
 A PR's type must be at the highest bump level among its commits and
 name the PR's purpose: review the title before merging.
 
+### Bookkeeping commits
+
+A commit or a PR confined to paths that ship nothing is bookkeeping
+and carries a type that bumps nothing, `chore` as a rule: `TODO.md`,
+`CLAUDE.md`, `.claude/`, `devlog/`, `discussions/`, `engineering/`,
+`templates/`. The list is `bookkeeping_paths` in `pyproject.toml`
+(`[tool.conventional-commits]`, next to the bump map); the
+`commit-msg` hook refuses a bumping type on such a commit. `doc/` and the root `README.md` are
+the product's manual and keep `docs` (patch). A bumping bookkeeping
+commit on `main` forces an empty release before the next higher-level
+PR (1.17.10, a `docs:` on `TODO.md`).
+
 ### Merge gate
 
 Unreleased changes on `main` never span two levels, so that every

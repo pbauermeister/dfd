@@ -173,8 +173,10 @@ Direct commits to `main` are reserved for housekeeping (TODO item removals,
 during a task is committed on the task branch, not on `main`: it shows the
 context it originated in and how the pressure on the task was released, and
 while the branch is being worked on it serves as a reservation. Every commit
-message, everywhere, is in conventional form: the `commit-msg` hook installed
-by `make require` enforces it.
+message, everywhere, is in conventional form, and a commit confined to
+bookkeeping paths (`TODO.md`, the devlogs, `engineering/`, see
+"Bookkeeping commits" in `engineering/RELEASING.md`) is a `chore:`: the
+`commit-msg` hook installed by `make require` enforces both.
 
 ## Task closing
 
