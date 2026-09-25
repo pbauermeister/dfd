@@ -1,0 +1,18 @@
+# Try-it for decision 4 of #125: neighbors on a replacement that comes
+# before any other filter. Base graph: two sources feed B; the chain
+# goes on to D and F. G is the group to collapse B and C into.
+style horizontal
+
+process A
+process E
+process B
+process C
+process D
+process F
+process G Group
+
+A -> B ab
+E -> B eb
+B -> C bc
+C -> D cd
+D -> F df
