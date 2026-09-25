@@ -1,0 +1,7 @@
+# Issue #127: the replacer would inherit F1 and is declared in F2: an
+# item in two frames.
+#include tests/non-regression/093-filter-merge-master.part
+
+frame A B C = F1
+frame F G = F2
+merge B C : G

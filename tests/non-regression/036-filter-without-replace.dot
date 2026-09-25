@@ -23,7 +23,6 @@ digraph D {
     label="Frame 1"
     style=dashed
     "S0"
-    "S0"
   }
 
   /* 32: frame P4 P5 = Frame 2 */

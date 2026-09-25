@@ -1,0 +1,10 @@
+# Issue #127: the stray flow B -> X, rewired to G -> X, touches the
+# strict selection (G, D) and is on no path: hidden. Expected: X and
+# G -> D, no flow to X.
+#include tests/non-regression/093-filter-merge-master.part
+
+process X
+B -> X bx
+merge B C : G
+!!<1 D
+! X

@@ -1,0 +1,8 @@
+# Issue #127: the replacer is declared in a frame and inherits none
+# (the group is split). Expected: F3 holds F and G.
+#include tests/non-regression/093-filter-merge-master.part
+
+frame A B = F1
+frame C D = F2
+frame F G = F3
+merge B C : G

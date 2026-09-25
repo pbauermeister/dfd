@@ -1,0 +1,6 @@
+# Issue #127: all merged items are in one frame, so the replacer takes
+# their place in it. Expected: frame F1 holds A and G.
+#include tests/non-regression/093-filter-merge-master.part
+
+frame A B C = F1
+merge B C : G

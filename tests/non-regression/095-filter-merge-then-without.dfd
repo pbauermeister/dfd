@@ -1,0 +1,6 @@
+# Issue #127: what 094 means. The x flag: the group's neighbors go, not
+# the group. Same DOT as 094.
+#include tests/non-regression/093-filter-merge-master.part
+
+merge B C : G
+~<x1 G

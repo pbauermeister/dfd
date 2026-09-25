@@ -1,0 +1,20 @@
+# Master diagram for the merge tests (#127): A and E feed B, then the
+# chain B -> C -> D -> F. G is the group to merge B and C into, H a
+# super group.
+
+style horizontal
+
+process A
+process E
+process B
+process C
+process D
+process F
+process G Group
+process H Super
+
+A -> B ab
+E -> B eb
+B -> C bc
+C -> D cd
+D -> F df

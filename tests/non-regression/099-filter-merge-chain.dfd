@@ -1,0 +1,5 @@
+# Issue #127: a chain of merges. Expected: A and E -> H -> F.
+#include tests/non-regression/093-filter-merge-master.part
+
+merge B C : G
+merge G D : H

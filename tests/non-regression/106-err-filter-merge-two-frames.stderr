@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 6: frame F G = F2
+  line 1: <file:tests/non-regression/106-err-filter-merge-two-frames.dfd>
+Error: Item "G", is in multiple frames

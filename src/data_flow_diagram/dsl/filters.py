@@ -14,12 +14,33 @@ from .. import exception, model
 from ..console import dprint
 
 
+def _ends(conn: model.Connection, merged: dict[str, str]) -> tuple[str, str]:
+    """A flow's ends as merged so far: what a rewrite would have written.
+
+    The map is flat (see _register_merge), so one lookup per end.
+    """
+    return merged.get(conn.src, conn.src), merged.get(conn.dst, conn.dst)
+
+
+def _register_merge(
+    merged: dict[str, str], *, names: set[str], replacer: str
+) -> None:
+    """Add a merge to the map and keep it flat: a chain resolves in one hop."""
+    target = merged.get(replacer, replacer)
+    for name in names:
+        merged[name] = target
+    for name, value in merged.items():
+        if value in names:
+            merged[name] = target
+
+
 def _collect_connected_names(
     *,
     statements: model.Statements,
     names: set[str],
     search_downstream: bool,
     use_layout_direction: bool,
+    merged: dict[str, str],
 ) -> tuple[set[str], list[model.Connection]]:
     """Find items connected to a set of names in one direction.
 
@@ -34,7 +55,9 @@ def _collect_connected_names(
                 if conn.type == model.Keyword.CONSTRAINT:
                     continue
 
-                src, dst = conn.src, conn.dst
+                src, dst = _ends(conn, merged)
+                if src == dst:
+                    continue  # collapsed by a merge
                 if conn.reversed and not use_layout_direction:
                     src, dst = dst, src
 
@@ -73,6 +96,7 @@ def _expand_neighbors_in_dir(
     max_neighbors: int,
     fn: model.FilterNeighbors,
     down: bool,
+    merged: dict[str, str],
 ) -> tuple[set[str], set[int]]:
     """Expand neighbors in one direction by successive waves of connections.
 
@@ -87,6 +111,7 @@ def _expand_neighbors_in_dir(
             names=names,
             search_downstream=down,
             use_layout_direction=fn.layout_direction,
+            merged=merged,
         )
         if not names:
             break
@@ -104,6 +129,7 @@ def find_neighbors(
     filter: model.Filter,
     statements: model.Statements,
     max_neighbors: int,
+    merged: dict[str, str],
     debug: bool,
 ) -> tuple[set[str], set[str], set[int]]:
     """Collect neighbor names by following connections outward from filter anchors.
@@ -116,6 +142,7 @@ def find_neighbors(
         max_neighbors=max_neighbors,
         fn=filter.neighbors_down,
         down=True,
+        merged=merged,
     )
     ups, up_ids = _expand_neighbors_in_dir(
         statements=statements,
@@ -123,21 +150,28 @@ def find_neighbors(
         max_neighbors=max_neighbors,
         fn=filter.neighbors_up,
         down=False,
+        merged=merged,
     )
     return downs, ups, down_ids | up_ids
 
 
 def _collect_flow_ids(
-    statements: model.Statements, names: set[str], *, touching: bool
+    statements: model.Statements,
+    names: set[str],
+    *,
+    touching: bool,
+    merged: dict[str, str],
 ) -> set[int]:
-    """Ids of the flows touching (one end) or joining (both ends) the names."""
+    """Ids of the flows joining (or touching) a set of names, ends read
+    through the merges."""
     ids: set[int] = set()
     for statement in statements:
         match statement:
             case model.Connection() as conn:
-                if conn.type == model.Keyword.CONSTRAINT:
-                    continue  # constraints are layout hints, not flows
-                ends_in = (conn.src in names) + (conn.dst in names)
+                src, dst = _ends(conn, merged)
+                if src == dst:
+                    continue
+                ends_in = (src in names) + (dst in names)
                 if ends_in == 2 or (touching and ends_in == 1):
                     ids.add(id(conn))
             case _:
@@ -162,6 +196,18 @@ def _check_filter_names(
         raise exception.DfdException(
             f' Name(s) no longer available due to previous filters: {diff}',
             source=source,
+        )
+
+
+def _check_not_merged(
+    *, names: set[str], merged: dict[str, str], source: model.SourceLine
+) -> None:
+    """Refuse a name that a previous merge took away."""
+    gone = sorted(names & merged.keys())
+    if gone:
+        diff = ", ".join(f"{name} (into {merged[name]})" for name in gone)
+        raise exception.DfdException(
+            f" Name(s) merged by a previous statement: {diff}", source=source
         )
 
 
@@ -190,7 +236,8 @@ class _FilterDecisions:
 
     kept_names: set[str] | None  # None: no filter statement encountered
     only_names: set[str]  # anchors of "only" filters, made non-hidable
-    replacement: dict[str, str]  # removed name -> replacing name
+    replacement: dict[str, str]  # merged name -> replacer (flat)
+    merged_names: set[str]  # names merged away: never kept
     skip_frames_for_names: set[str]
     vetoed_ids: set[int]  # flows touching a strict selection
     allowed_ids: set[int]  # path flows, and flows joining a plain selection
@@ -206,6 +253,7 @@ def _collect_kept_names(
     kept_names: set[str] | None = None
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
+    unavailable: set[str] = set()  # removed by a "~" or merged away
     skip_frames_for_names: set[str] = set()
     vetoed_ids: set[int] = set()
     allowed_ids: set[int] = set()
@@ -221,11 +269,14 @@ def _collect_kept_names(
                 if kept_names is None:
                     kept_names = set()
 
-                # validate filter names
+                # validate filter names: known, and not removed or merged
                 names = set(f.names)
+                _check_not_merged(
+                    names=names, merged=replacement, source=statement.source
+                )
                 _check_filter_names(
                     names=names,
-                    in_names=all_names,
+                    in_names=all_names - unavailable,
                     all_names=all_names,
                     source=statement.source,
                 )
@@ -244,6 +295,7 @@ def _collect_kept_names(
                     filter=f,
                     statements=statements,
                     max_neighbors=len(all_names),
+                    merged=replacement,
                     debug=debug,
                 )
                 dprint("ONLY: adding neighbors:", downs, ups)
@@ -261,12 +313,15 @@ def _collect_kept_names(
                     selection |= names
                 if f.strict:
                     vetoed_ids |= _collect_flow_ids(
-                        statements, selection, touching=True
+                        statements, selection, touching=True, merged=replacement
                     )
                     allowed_ids |= path_ids
                 else:
                     allowed_ids |= _collect_flow_ids(
-                        statements, selection, touching=False
+                        statements,
+                        selection,
+                        touching=False,
+                        merged=replacement,
                     )
 
                 _collect_frame_skips(
@@ -277,21 +332,42 @@ def _collect_kept_names(
                     skip_frames_for_names=skip_frames_for_names,
                 )
 
+            case model.Merge() as m:
+                # a substitution: the items merged away into the replacer
+                names = set(m.names)
+                _check_not_merged(
+                    names=names | {m.replacer},
+                    merged=replacement,
+                    source=statement.source,
+                )
+                _check_filter_names(
+                    names=names | {m.replacer},
+                    in_names=all_names - unavailable,
+                    all_names=all_names,
+                    source=statement.source,
+                )
+                dprint("MERGE:", names, "->", m.replacer)
+                _register_merge(replacement, names=names, replacer=m.replacer)
+                unavailable |= names
+                # the substitution rewrites the kept set too: the replacer
+                # takes the place of the merged items it stands for
+                if kept_names is not None and kept_names & names:
+                    kept_names -= names
+                    kept_names.add(m.replacer)
+
             case model.Without() as f:
                 # Without is subtractive: first Without starts with all names
                 if kept_names is None:
-                    kept_names = all_names.copy()
+                    kept_names = all_names - unavailable
 
-                # validate filter names and register replacements
+                # validate filter names: known, and not removed or merged
                 names = set(f.names)
-                names_to_check = names.copy()
-                if f.replaced_by:
-                    names_to_check.add(f.replaced_by)
-                    for name in names:
-                        replacement[name] = f.replaced_by
+                _check_not_merged(
+                    names=names, merged=replacement, source=statement.source
+                )
                 _check_filter_names(
-                    names=names_to_check,
-                    in_names=kept_names,
+                    names=names,
+                    in_names=kept_names - unavailable,
                     all_names=all_names,
                     source=statement.source,
                 )
@@ -303,17 +379,20 @@ def _collect_kept_names(
                 ):
                     dprint("WITHOUT: removing items:", names)
                     kept_names.difference_update(names)
+                    unavailable |= names
 
                 # remove upstream/downstream neighbor names
                 downs, ups, _ = find_neighbors(
                     filter=f,
                     statements=statements,
                     max_neighbors=len(all_names),
+                    merged=replacement,
                     debug=debug,
                 )
                 dprint("WITHOUT: removing neighbors:", downs, ups)
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
+                unavailable |= downs | ups
 
                 _collect_frame_skips(
                     f=f,
@@ -330,6 +409,7 @@ def _collect_kept_names(
         kept_names=kept_names,
         only_names=only_names,
         replacement=replacement,
+        merged_names=set(replacement),
         skip_frames_for_names=skip_frames_for_names,
         vetoed_ids=vetoed_ids,
         allowed_ids=allowed_ids,
@@ -347,6 +427,53 @@ def _mark_non_hidable(
                     item.hidable = False
 
 
+def _inherited_frames(
+    statements: model.Statements, replacement: dict[str, str]
+) -> dict[str, int]:
+    """Replacer -> id of the one frame it inherits.
+
+    A replacer inherits a frame only when every item merged into it is in
+    that frame; otherwise it inherits none (unnamed frames cannot be
+    chosen). A replacer also declared in another frame is then in two
+    frames: the frame check run after the filters reports it.
+    """
+    frame_of: dict[str, int] = {}
+    for statement in statements:
+        if isinstance(statement, model.Frame):
+            for name in statement.items:
+                frame_of[name] = id(statement)
+    members: dict[str, set[str]] = {}
+    for name, replacer in replacement.items():
+        members.setdefault(replacer, set()).add(name)
+    inherited: dict[str, int] = {}
+    for replacer, names in members.items():
+        frames = {frame_of.get(name) for name in names}
+        if len(frames) == 1 and None not in frames:
+            (frame_id,) = frames
+            assert frame_id is not None
+            inherited[replacer] = frame_id
+    return inherited
+
+
+def _merge_frame_items(
+    frame: model.Frame,
+    *,
+    replacement: dict[str, str],
+    inherited: dict[str, int],
+) -> list[str]:
+    """A frame's items once merged: merged names out, an inheriting
+    replacer in, at the place of its first merged item."""
+    items: list[str] = []
+    for name in frame.items:
+        replacer = replacement.get(name)
+        if replacer is None:
+            if name not in items:
+                items.append(name)
+        elif inherited.get(replacer) == id(frame) and replacer not in items:
+            items.append(replacer)
+    return items
+
+
 def _apply_filters(
     *,
     statements: model.Statements,
@@ -361,6 +488,7 @@ def _apply_filters(
     """
     new_statements: list[model.Statement] = []
     replaced_connections: dict[str, model.Connection] = {}
+    inherited_frames = _inherited_frames(statements, replacement)
     for statement in statements:
         dprint(f"\nHandling statement: {statement}")
         match statement:
@@ -400,11 +528,11 @@ def _apply_filters(
                     replaced_connections[conn.signature()] = conn
 
             case model.Frame() as frame:
-                # rewrite replaced names in frame membership
-                for name in frame.items:
-                    if name in replacement:
-                        frame.items.remove(name)
-                        frame.items.append(replacement[name])
+                # merged names leave the frame; a replacer takes their place
+                # only in the one frame holding all the items merged into it
+                frame.items = _merge_frame_items(
+                    frame, replacement=replacement, inherited=inherited_frames
+                )
 
                 # skip frames with no remaining kept items
                 names = set(frame.items)
@@ -463,10 +591,11 @@ def handle_filters(
 
     _mark_non_hidable(statements, decisions.only_names)
 
-    # default to keeping all names if no filter was encountered
+    # default to keeping all names if no filter was encountered; a merged
+    # name is never kept, whichever filter initialised the set
     kept_names = (
         decisions.kept_names if decisions.kept_names is not None else all_names
-    )
+    ) - decisions.merged_names
     dprint("\nItems to keep", kept_names)
 
     # phase 2: apply filters to statements
