@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Install the working tree user-wide as a uv tool, its version stamped
-# with the branch and the revision (tools/print-dev-version.py), so
-# that `data-flow-diagram --version` tells a development install from
-# the release it builds on. The tree is copied to a scratch directory
+# Install the working tree user-wide as a uv tool, its version a
+# stamp of the branch and the revision (tools/print-dev-version.py,
+# `0+<branch>.git<hash>[.dirty]`), so that `data-flow-diagram
+# --version` tells a development install from any release. The tree is copied to a scratch directory
 # (tracked and untracked files, .gitignore respected) and the version
 # rewritten there: the checkout is never touched, the release path
 # keeps the bare version. `uv tool upgrade` cannot follow a removed
