@@ -1,10 +1,25 @@
 name: CI
 
+# Push-only, every branch: a push event is filtered on the files of the
+# push itself (two-dot diff), so a push confined to bookkeeping paths
+# (bookkeeping_paths in pyproject.toml; `make lint` keeps the lists
+# equal) starts nothing, on any branch and whatever else the PR holds;
+# a pull_request event would be filtered on the whole PR. CI tests the
+# branch tip; the ruleset's up-to-date rule makes the tip the merge
+# result. CI is not a required check, so a skipped run never blocks a
+# merge. The workflow_call trigger stays unfiltered: release.yml always
+# gates on the suite.
 on:
   push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    branches: ["**"]
+    paths-ignore:
+      - "TODO.md"
+      - "CLAUDE.md"
+      - ".claude/**"
+      - "devlog/**"
+      - "discussions/**"
+      - "engineering/**"
+      - "templates/**"
   # called as the gate of release.yml
   workflow_call:
 

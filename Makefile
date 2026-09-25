@@ -56,6 +56,7 @@ lint: ## lint source files, check CI and hooks agree with pyproject.toml
 	uv run ./recipes/lint.sh
 	uv run ./tools/check-python-versions.py $(PYTHONS)
 	uv run ./tools/conventional-commits.py check-type-lists
+	uv run ./tools/conventional-commits.py check-bookkeeping-paths
 
 test: ## run unit tests and non-regression tests
 	uv run pytest

@@ -43,7 +43,16 @@ and carries a type that bumps nothing, `chore` as a rule: `TODO.md`,
 `CLAUDE.md`, `.claude/`, `devlog/`, `discussions/`, `engineering/`,
 `templates/`. The list is `bookkeeping_paths` in `pyproject.toml`
 (`[tool.conventional-commits]`, next to the bump map); the
-`commit-msg` hook refuses a bumping type on such a commit. `doc/` and the root `README.md` are
+`commit-msg` hook refuses a bumping type on such a commit, and
+`ci.yml` skips a push confined to them (`paths-ignore` on its `push`
+trigger, kept equal to the list by `make lint`). CI runs on pushes
+only, to every branch, and a push is judged on its own files: a
+devlog-only push starts no run whatever else the PR holds, a squash
+merge of a bookkeeping-only PR neither, while a pull_request event
+would be judged on the whole PR. CI tests the branch tip, which the
+ruleset's up-to-date rule makes the merge result; the merge gate and
+the PR-title check, required by the ruleset, keep their pull_request
+triggers and run on every PR event. `doc/` and the root `README.md` are
 the product's manual and keep `docs` (patch). A bumping bookkeeping
 commit on `main` forces an empty release before the next higher-level
 PR (1.17.10, a `docs:` on `TODO.md`).

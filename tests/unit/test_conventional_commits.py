@@ -173,6 +173,13 @@ def test_read_commit_message_drops_comments(tmp_path: Path) -> None:
     assert cc.read_commit_message(f) == "docs: x\n"
 
 
+def test_bookkeeping_globs() -> None:
+    globs = cc.bookkeeping_globs(BOOKKEEPING)
+    assert "TODO.md" in globs
+    assert "devlog/**" in globs
+    assert not any(g.endswith("/") for g in globs)
+
+
 def test_check_bookkeeping_lets_a_merge_commit_through(
     tmp_path: Path,
 ) -> None:
