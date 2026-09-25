@@ -32,16 +32,16 @@ two replaced groups), #104 (the strict filter and its flow ids), #123
 
 ### 1.2 Goal
 
-`=G B C` is a statement of its own, a substitution: the flows of B and
+`merge B C : G` is a statement of its own, a substitution: the flows of B and
 C are rewired to G, B and C become unavailable, the kept set is not
 touched. It is processed in source order with the filters, because the
 order carries meaning: `!` before `=` selects on the original graph and
 then collapses, `=` before `!` selects on the grouped graph. The former
-`~[SPEC] =G B C` still parses, as sugar for `=G B C` followed, when a
+`~[SPEC] =G B C` still parses, as sugar for `merge B C : G` followed, when a
 spec is given, by `~SPECx G`, with a deprecation warning on stderr; the
 docs no longer show it. A filter naming an item that a previous filter
 removed or a substitution replaced is an error. Chained substitutions
-compose (`=G B C` then `=H G D` on `A→B→C→D` gives `A→H`). Every valid
+compose (`merge B C : G` then `merge G D : H` on `A→B→C→D` gives `A→H`). Every valid
 diagram of the fixtures and the docs renders as before, in the new
 form.
 
@@ -60,9 +60,9 @@ form.
 ### 1.4 Invariants
 
 - Parser scopes (`engineering/CONVENTIONS.md` "Design philosophy"):
-  the keyword decides the split; `=G` is split as `!A` is, a space
-  inserted after the mnemonic; the term regexes know no siblings; the
-  sequence rules live in the statement parser.
+  the keyword decides the split, and the `:` of a `merge` line is a
+  line-level fact like the keyword; the term regexes know no siblings;
+  the sequence rules live in the statement parser.
 - The two-phase filter design (`filters.py`): phase one decides, the
   kept set, the substitution map, the flow-id sets; phase two applies
   once. The map is read through one accessor by every reader of phase
@@ -75,11 +75,11 @@ form.
   availability rule turns a re-add into an error (none found: no
   fixture or doc example names, in a `!`, an item a previous `~`
   removed).
-- Type safety (`engineering/CONVENTIONS.md`): a `Substitution`
+- Type safety (`engineering/CONVENTIONS.md`): a `Merge`
   dataclass, keyword-only calls, `assert_never` on the statement
   match.
 
-Framed: pending
+Framed: 2026-09-25
 
 ### 1.5 Taste
 
@@ -95,22 +95,22 @@ Framed: pending
 
 ### 1.6 Set-based design
 
-Triggers: a new container name (`Substitution`, the keyword `=`); an
+Triggers: a new container name (`Merge`, the keyword `merge`); an
 intent inherited from a prior task (#125's rules); one conceptual row
 among mechanical churn (the desugaring's home).
 Mock-up: yes, in a throwaway worktree, before stop 1: the model
 dataclass, the `parse()` loop accepting one line to yield two
-statements, the `=` mnemonic in `_apply_syntactic_sugars()`, a
-`Substitution` case in `_collect_kept_names()`, and the try-it cases
+statements, `_parse_merge()` splitting its arguments at `:`, a
+`Merge` case in `_collect_kept_names()`, and the try-it cases
 rendered.
 Design question: where the desugaring of `~SPEC =G B C` lives.
 Options: three, below; the recommended one is option 1.
 
-| Option                                                      | What differs                                                                                                                                                        | For                                                                                                                    | Against                                                                                                                   |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 1. The parser yields two statements for the deprecated line | `parse()` accepts a list from a statement parser; `Without.replaced_by` disappears from the model; `_parse_filter()` warns and returns `[Substitution, Without(x)]` | The model never sees the conflation again; filters.py handles one `Substitution` case; the warning has the source line | `parse()` grows a list branch; both statements carry the same source line (fine for errors)                               |
-| 2. filters.py desugars                                      | `Without.replaced_by` stays; `_collect_kept_names()` treats a `Without` with a replacer as substitution then removal                                                | No parser change beyond `=`                                                                                            | The conflation stays in the model and in the filter code; two code paths for one concept; the warning far from the source |
-| 3. A pre-pass rewrites the source line                      | The sugar step rewrites `~<1 =G B C` into two source lines before parsing                                                                                           | Parser and model untouched by the deprecation                                                                          | The line-level sugar step learns term syntax (the spec, the replacer), against the parser scopes rule                     |
+| Option                                                      | What differs                                                                                                                                                        | For                                                                                                             | Against                                                                                                                   |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 1. The parser yields two statements for the deprecated line | `parse()` accepts a list from a statement parser; `Without.replaced_by` disappears from the model; `_parse_filter()` warns and returns `[Substitution, Without(x)]` | The model never sees the conflation again; filters.py handles one `Merge` case; the warning has the source line | `parse()` grows a list branch; both statements carry the same source line (fine for errors)                               |
+| 2. filters.py desugars                                      | `Without.replaced_by` stays; `_collect_kept_names()` treats a `Without` with a replacer as substitution then removal                                                | No parser change beyond `=`                                                                                     | The conflation stays in the model and in the filter code; two code paths for one concept; the warning far from the source |
+| 3. A pre-pass rewrites the source line                      | The sugar step rewrites `~<1 =G B C` into two source lines before parsing                                                                                           | Parser and model untouched by the deprecation                                                                   | The line-level sugar step learns term syntax (the spec, the replacer), against the parser scopes rule                     |
 
 ### 1.7 Spikes
 
@@ -125,23 +125,23 @@ Options: three, below; the recommended one is option 1.
 
 ### 1.8 Design decisions
 
-| #   | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                            | Basis                                                                                                                                      | Alternatives considered                                                                                                                                        |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `=REPLACER ITEM [ITEM...]`, keyword `=`, a `Substitution` statement; `=G` split by the mnemonic rule like `!A`                                                                                                                                                                                                                                                                                                                                      | user (the #125 review): a substitution is not a filter                                                                                     | A word keyword (`replace G B C`): the DSL's statement operators are symbols (`!`, `~`); `=` is already the replacer sign                                       |
-| 2   | A substitution touches no kept set; it is ordered with the filters                                                                                                                                                                                                                                                                                                                                                                                  | user: order carries meaning, `!` then `=` collapses a selection, `=` then `!` selects on the grouped graph                                 | Process substitutions first, always (loses the `!`-first meaning of the doc example)                                                                           |
-| 3   | `~SPEC =G B C` is sugar for `=G B C` then `~SPECx G`; `~=G B C` alone for `=G B C`; a stderr warning names the new form                                                                                                                                                                                                                                                                                                                             | user: compatibility without breaking; the `x` flag because the neighbors of the group are removed, not the group                           | Break now (a major for one form fewer)                                                                                                                         |
-| 4   | Option 1: the parser yields the two statements                                                                                                                                                                                                                                                                                                                                                                                                      | option 1                                                                                                                                   | 2, 3 above                                                                                                                                                     |
-| 5   | Availability: an anchor removed by a previous `~` or substituted is an error, for `!` and `~` alike                                                                                                                                                                                                                                                                                                                                                 | user (case 2 of the try-it); SYNTAX.md § 7.4 rule 3 already says it; no fixture depends on the re-add                                      | Keep the re-add (today's `!` check against all names)                                                                                                          |
-| 6   | The substitution map is flat: registering `=H G D` resolves H through the map and rewrites every value G into H; one accessor gives a flow's ends to the traversal and to the strict flow collector                                                                                                                                                                                                                                                 | user (the chain example); the invariant of § 1.4                                                                                           | A resolve loop on every read; a rewrite of the statements after each `=` (option B of the #125 review, rejected: phase two relies on the untouched statements) |
-| 7   | A substitution's neighbors, in the sugar, are searched before the registration: the neighbors of the group as it stands                                                                                                                                                                                                                                                                                                                             | found at the #125 review: searched after, the anchors' flows already lead to the replacer and nothing is found                             | Search from the replacer                                                                                                                                       |
-| 8   | The docs show `=` only: README § 7.3 gains "Substitution", § 7.4.2.2 uses it; SYNTAX.md § 7.2 loses `[=REPLACEMENT]`, a § 7.x "Substitution" and the glossary term                                                                                                                                                                                                                                                                                  | user: the docs do not mention the deprecated form                                                                                          | A "deprecated" note in the docs                                                                                                                                |
-| 9   | Fixtures: the eight files using `~=` migrate to `=`; one fixture keeps `~=` for the sugar (same DOT as its `=` twin); the try-it cases become fixtures (case 2 an error, case 3 the `A→Group` picture, block J); the chain; the strict stray flow after a substitution; `~ X` then `! X` as an error                                                                                                                                                | rule: fixtures lock accepted behavior; the pictures of the review are the acceptance                                                       | Keep `~=` in the fixtures (they would exercise the deprecated path only)                                                                                       |
-| 10  | Frames: the replacer inherits a frame only when every replaced item belongs to that one frame and the replacer is declared in none; otherwise it inherits nothing (the replaced items leave their frames, an emptied frame disappears). A replacer declared in a frame keeps it. The frame check of the checker ("is in multiple frames") is re-run on the filtered statements by `dfd.py`, so an inherited frame plus a declared one is that error | user (stop 0 discussion): unnamed frames cannot be chosen; measured on `main`: the replacer inherited every frame, an item in two clusters | An error on any ambiguity; an option on `=`                                                                                                                    |
+| #   | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                            | Basis                                                                                                                                                                                                                                                                                                                                                                                                            | Alternatives considered                                                                                                                                                                                       |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `merge ITEM [ITEM...] : REPLACER`, keyword `merge`, a `Merge` statement; the items first, then `:`, then the replacer, an item declared elsewhere                                                                                                                                                                                                                                                                                                   | user (stop 0 discussion): a substitution is not a filter, so a word keyword like every non-filter statement; `=` already means "a title follows" in `frame`; the rule adopted for the DSL: `:` introduces a name-first tail, a title needs no separator after a name, `=` stays for the nameless frame only. Anticipated, not built: `frame A B C : F1 Storage` and the one-shot `merge A B C : store G All DBs` | `=G B C` (a third meaning of `=`, a symbol for a non-filter); `replace G B C` (verb with inverted order); `process G = All DBs` for full consistency (breaks the basic declaration and drags the flow labels) |
+| 2   | A substitution touches no kept set; it is ordered with the filters                                                                                                                                                                                                                                                                                                                                                                                  | user: order carries meaning, `!` then `=` collapses a selection, `=` then `!` selects on the grouped graph                                                                                                                                                                                                                                                                                                       | Process substitutions first, always (loses the `!`-first meaning of the doc example)                                                                                                                          |
+| 3   | `~SPEC =G B C` is sugar for `merge B C : G` then `~SPECx G`; `~=G B C` alone for `merge B C : G`; a stderr warning names the new form                                                                                                                                                                                                                                                                                                               | user: compatibility without breaking; the `x` flag because the neighbors of the group are removed, not the group                                                                                                                                                                                                                                                                                                 | Break now (a major for one form fewer)                                                                                                                                                                        |
+| 4   | Option 1: the parser yields the two statements                                                                                                                                                                                                                                                                                                                                                                                                      | option 1                                                                                                                                                                                                                                                                                                                                                                                                         | 2, 3 above                                                                                                                                                                                                    |
+| 5   | Availability: an anchor removed by a previous `~` or substituted is an error, for `!` and `~` alike                                                                                                                                                                                                                                                                                                                                                 | user (case 2 of the try-it); SYNTAX.md § 7.4 rule 3 already says it; no fixture depends on the re-add                                                                                                                                                                                                                                                                                                            | Keep the re-add (today's `!` check against all names)                                                                                                                                                         |
+| 6   | The substitution map is flat: registering `merge G D : H` resolves H through the map and rewrites every value G into H; one accessor gives a flow's ends to the traversal and to the strict flow collector                                                                                                                                                                                                                                          | user (the chain example); the invariant of § 1.4                                                                                                                                                                                                                                                                                                                                                                 | A resolve loop on every read; a rewrite of the statements after each `=` (option B of the #125 review, rejected: phase two relies on the untouched statements)                                                |
+| 7   | A substitution's neighbors, in the sugar, are searched before the registration: the neighbors of the group as it stands                                                                                                                                                                                                                                                                                                                             | found at the #125 review: searched after, the anchors' flows already lead to the replacer and nothing is found                                                                                                                                                                                                                                                                                                   | Search from the replacer                                                                                                                                                                                      |
+| 8   | The docs show `=` only: README § 7.3 gains "Substitution", § 7.4.2.2 uses it; SYNTAX.md § 7.2 loses `[=REPLACEMENT]`, a § 7.x "Substitution" and the glossary term                                                                                                                                                                                                                                                                                  | user: the docs do not mention the deprecated form                                                                                                                                                                                                                                                                                                                                                                | A "deprecated" note in the docs                                                                                                                                                                               |
+| 9   | Fixtures: the eight files using `~=` migrate to `=`; one fixture keeps `~=` for the sugar (same DOT as its `=` twin); the try-it cases become fixtures (case 2 an error, case 3 the `A→Group` picture, block J); the chain; the strict stray flow after a substitution; `~ X` then `! X` as an error                                                                                                                                                | rule: fixtures lock accepted behavior; the pictures of the review are the acceptance                                                                                                                                                                                                                                                                                                                             | Keep `~=` in the fixtures (they would exercise the deprecated path only)                                                                                                                                      |
+| 10  | Frames: the replacer inherits a frame only when every replaced item belongs to that one frame and the replacer is declared in none; otherwise it inherits nothing (the replaced items leave their frames, an emptied frame disappears). A replacer declared in a frame keeps it. The frame check of the checker ("is in multiple frames") is re-run on the filtered statements by `dfd.py`, so an inherited frame plus a declared one is that error | user (stop 0 discussion): unnamed frames cannot be chosen; measured on `main`: the replacer inherited every frame, an item in two clusters                                                                                                                                                                                                                                                                       | An error on any ambiguity; an option on `=`                                                                                                                                                                   |
 
 ### 1.9 Acceptance criteria
 
-1. `=G B C` parses to a `Substitution`; `= G B C`, `=G` alone, `=G G`
-   raise; `~=G B C` and `~<1 =G B C` parse to the two statements and
+1. `merge B C : G` parses to a `Merge`; `merge : G`, `merge B C :`,
+   `merge B C`, `merge B C : B` and `merge B C : G H` raise; `~=G B C` and `~<1 =G B C` parse to the two statements and
    print one warning line naming the new form (unit, `capsys`).
 2. Fixtures: the migrated eight render byte-identical DOT; the sugar
    twin renders as its `=` twin; the try-it cases render as decided
@@ -173,14 +173,14 @@ Files: `model.py`, `dsl/parser.py`, `console.py`,
 
 Actions:
 
-1. `Keyword.SUBSTITUTE = "="`; `Substitution(Statement)` with
-   `replacer: str`, `names: list[str]`; `Without` loses `replaced_by`.
-2. `_apply_syntactic_sugars()`: `=` joins the mnemonics that get a
-   space inserted (longest first, `!!` before `!`).
-3. `_parse_substitution()`: replacer then one name at least, none
-   equal to the replacer; registered in `_PARSERS`.
+1. `Keyword.MERGE = "merge"`; `Merge(Statement)` with `names:
+list[str]`, `replacer: str`; `Without` loses `replaced_by`.
+2. `_parse_merge()`: the terms before `:` are the items, one at least,
+   the one term after it the replacer, none of the items equal to it;
+   registered in `_PARSERS`.
+3. (merged into 2)
 4. `parse()` accepts a statement parser returning a list; the
-   post-parse match gets a `Substitution` case and `assert_never`.
+   post-parse match gets a `Merge` case and `assert_never`.
 5. `_parse_filter()`: the replacer form warns through
    `console.print_warning()` ("line N: `~=` is deprecated: write `=G B
 C`, then `~<1x G` for the neighbors") and returns the two
@@ -193,7 +193,7 @@ green; the NR suite still green (the filters still accept the old
 model? no: step 2 lands the filter side, so the suite is green at the
 end of step 2; steps 1 and 2 share one step gate).
 
-Commit: `feat: substitution statement "=", the "~=" form desugared with a warning`
+Commit: `feat: merge statement, the "~=" form desugared with a warning`
 
 **Step 2 — Filters** (`feat:`)
 
@@ -205,7 +205,7 @@ Actions:
    `_collect_connected_names()` and `_collect_flow_ids()`.
 2. The flat map: `_register(substitution, replacer, names)` resolves
    the replacer and rewrites existing values.
-3. `_collect_kept_names()`: a `Substitution` case (register, mark the
+3. `_collect_kept_names()`: a `Merge` case (register, mark the
    names unavailable, kept set untouched); `Only` and `Without` check
    their anchors against the unavailable set (removed by a `~`, or
    substituted); the `Without` case loses its replacer branch; the
@@ -229,7 +229,7 @@ filter, the eight `~=` files, `tests/RULES.md`.
 
 Actions:
 
-1. README § 7.3: a "Substitution" subsection (`=REPLACER ITEM...`,
+1. README § 7.3: a "Merge" subsection (`merge ITEM... : REPLACER`,
    ordered with the filters, both orders' meanings); § 7.3.2 without
    the replacer; § 7.4.2.2 in the new form, plus the group-first
    variant from the #125 branch.
@@ -251,10 +251,10 @@ case 2 the error, case 3 the picture; the devlog's Delivery filled.
 
 | File                                                                   | Change                                                                                                      |
 | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `src/data_flow_diagram/model.py`                                       | `Keyword.SUBSTITUTE`, `Substitution`; `Without.replaced_by` removed                                         |
+| `src/data_flow_diagram/model.py`                                       | `Keyword.MERGE`, `Merge`; `Without.replaced_by` removed                                                     |
 | `src/data_flow_diagram/dsl/parser.py`                                  | `=` mnemonic, `_parse_substitution()`, list-returning parsers, the deprecated form desugared with a warning |
 | `src/data_flow_diagram/console.py`                                     | `print_warning()`                                                                                           |
-| `src/data_flow_diagram/dsl/filters.py`                                 | accessor, flat map, `Substitution` case, availability, replacer branch removed, frame inheritance rule      |
+| `src/data_flow_diagram/dsl/filters.py`                                 | accessor, flat map, `Merge` case, availability, replacer branch removed, frame inheritance rule             |
 | `src/data_flow_diagram/dsl/checker.py`, `src/data_flow_diagram/dfd.py` | the frame check callable on its own, re-run after the filters                                               |
 | `doc/README.md`, `doc/SYNTAX.md`                                       | § 7.3 and § 7.4 as decided                                                                                  |
 | `tests/non-regression/`                                                | eight migrations, one sugar twin, the new fixtures                                                          |
