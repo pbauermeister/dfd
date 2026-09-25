@@ -1,7 +1,7 @@
 # 115 — `make install` stamps the version with the branch and revision
 
 Date: 2026-09-24
-Status: ONGOING
+Status: DONE
 Issue: #115 · PR: #116 · Branch: `build/115-install-stamp`
 Task nature: change
 Track: fast
@@ -122,15 +122,15 @@ Tried: pending
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                                                                                 | Agent    | User |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track with a Try it stop, since the install touches the user's machine                                                                                                 | well     |      |
-| 2   | The spike before the go settled the mechanism in one round; the TODO's `.devN` form was corrected by it                                                                                               | well     |      |
-| 3   | Scripted edits of the devlog failed three times in a row (prettier reflow, two tables with a row 1): edit tables by line, anchored on the section, and never let a failed script commit half a change | not well |      |
+| #   | Point                                                                                                                                                                                                 | Agent    | User       |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: fast track with a Try it stop, since the install touches the user's machine                                                                                                 | well     | well       |
+| 2   | The spike before the go settled the mechanism in one round; the TODO's `.devN` form was corrected by it                                                                                               | well     | well       |
+| 3   | Scripted edits of the devlog failed three times in a row (prettier reflow, two tables with a row 1): edit tables by line, anchored on the section, and never let a failed script commit half a change | not well | don't care |
 
-Process: 1 round before the go; 2 loops at the review (uninstall recipe, stamp form); rework after the go: the stamp form.
+Process: 1 round before the go; 3 loops at the review (uninstall recipe, stamp form, staging tool); rework after the go: the stamp form.
 
-Closed: pending
+Closed: 2026-09-25
 
 ### 4.2 Rule trace
 
