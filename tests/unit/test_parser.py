@@ -148,6 +148,26 @@ def test_parse_valid_syntax() -> None:
         pytest.fail(f"Unexpected DfdException on valid syntax: {e}")
 
 
+PARSE_ERROR_CASES = [
+    pytest.param(
+        """
+        process  A  text
+        process  B  text
+        ~=  B  A
+        """,
+        id="bare-replacer-sign",  # "=" alone: the parser used to spin forever
+    ),
+]
+
+
+@pytest.mark.parametrize("dfd_text", PARSE_ERROR_CASES)
+def test_parse_raises(dfd_text: str) -> None:
+    # Each malformed snippet must trigger a DfdException in parse()
+    tokens = scanner.scan(provenance=None, source_text=dfd_text)
+    with pytest.raises(exception.DfdException):
+        parser.parse(tokens)
+
+
 def test_parse_unknown_keyword_raises() -> None:
     # An unrecognised keyword must be caught by parse(), not silently ignored
     tokens = scanner.scan(provenance=None, source_text="xyz")

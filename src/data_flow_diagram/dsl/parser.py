@@ -210,7 +210,11 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
         if not m:
             break  # no neighbor/replacer specification
 
-        if m.group("replacer"):
+        if m.group("replacer") is not None:
+            if not m.group("replacer"):
+                raise exception.DfdException(
+                    "Replacer name expected right after '=' (no space)"
+                )
             if cmd != Keyword.WITHOUT:
                 raise exception.DfdException(
                     f"Replacer specification is only allowed for {Keyword.WITHOUT} filter"

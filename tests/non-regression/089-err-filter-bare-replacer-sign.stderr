@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 10: ~= G B
+  line 1: <file:tests/non-regression/089-err-filter-bare-replacer-sign.dfd>
+Error: Replacer name expected right after '=' (no space)
