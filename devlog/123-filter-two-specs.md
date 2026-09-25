@@ -118,7 +118,8 @@ Closed: pending
 
 ### 4.2 Rule trace
 
-| Source                  | Rule                                                              | Verb (applied / created) |
-| ----------------------- | ----------------------------------------------------------------- | ------------------------ |
-| `tests/RULES.md`        | Mutation smoke-test after adding NR fixtures                      | applied                  |
-| `doc/README.md` § 7.3.3 | One neighbors specification per filter; another is another filter | created                  |
+| Source                                           | Rule                                                                                                                                    | Verb (applied / created) |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `tests/RULES.md`                                 | Mutation smoke-test after adding NR fixtures                                                                                            | applied                  |
+| `doc/README.md` § 7.3.3                          | One neighbors specification per filter; another is another filter                                                                       | created                  |
+| `engineering/CONVENTIONS.md` "Design philosophy" | Parser scopes: line (the keyword decides the split), term (its own regex), sequence (the statement loop); no scope reaches into another | created                  |
