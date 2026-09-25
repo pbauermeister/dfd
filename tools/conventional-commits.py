@@ -18,7 +18,8 @@ Usage:
 
 The map is `[tool.semantic_release.commit_parser_options]`, the same
 section python-semantic-release applies at release time, so the table
-cannot drift from the actual behavior.
+cannot drift from the actual behavior. The bookkeeping paths are
+`[tool.conventional-commits] bookkeeping_paths` of the same file.
 """
 
 import argparse
@@ -39,19 +40,6 @@ HOOK_CONFIG_PATH = ROOT / ".pre-commit-config.yaml"
 PR_TITLE_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "pr-title.yml"
 CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 HOOK_ID = "conventional-pre-commit"
-
-# Paths that ship nothing: a commit confined to them is bookkeeping and
-# must carry a type that bumps nothing (engineering/RELEASING.md
-# "Bookkeeping commits"). Directories end with a slash.
-BOOKKEEPING_PATHS = (
-    "TODO.md",
-    "CLAUDE.md",
-    ".claude/",
-    "devlog/",
-    "discussions/",
-    "engineering/",
-    "templates/",
-)
 
 # `<type>[(scope)][!]: description`
 SUBJECT_RE = re.compile(r"^(?P<type>[a-z]+)(\([^)]*\))?(?P<breaking>!)?: \S")
@@ -96,6 +84,20 @@ def load_bump_map() -> BumpMap:
         patch_tags=options["patch_tags"],
         default=BUMP_LEVELS[options["default_bump_level"]],
     )
+
+
+def load_bookkeeping_paths() -> list[str]:
+    """Read the bookkeeping paths from pyproject.toml.
+
+    Paths that ship nothing: a commit confined to them is bookkeeping
+    and must carry a type that bumps nothing (engineering/RELEASING.md
+    "Bookkeeping commits"). Directories end with a slash.
+    """
+    with PYPROJECT_PATH.open("rb") as f:
+        paths: list[str] = tomllib.load(f)["tool"]["conventional-commits"][
+            "bookkeeping_paths"
+        ]
+    return paths
 
 
 def print_table(bump_map: BumpMap) -> None:
@@ -214,11 +216,10 @@ def gate_verdict(*, pending: Bump, incoming: Bump, next_: str) -> Verdict:
     return Verdict(allowed=True, reason=f"{incoming} on pending {pending}")
 
 
-def bookkeeping_globs() -> list[str]:
+def bookkeeping_globs(bookkeeping: list[str]) -> list[str]:
     """The bookkeeping paths as the globs of a workflow's paths-ignore."""
     return [
-        entry + "**" if entry.endswith("/") else entry
-        for entry in BOOKKEEPING_PATHS
+        entry + "**" if entry.endswith("/") else entry for entry in bookkeeping
     ]
 
 
@@ -236,7 +237,7 @@ def load_ci_paths_ignore() -> dict[str, list[str]]:
 
 def check_bookkeeping_paths() -> None:
     """Fail unless ci.yml's push and pull_request skip the bookkeeping paths."""
-    expected = bookkeeping_globs()
+    expected = bookkeeping_globs(load_bookkeeping_paths())
     actual = load_ci_paths_ignore()
     ok = True
     for trigger in ("push", "pull_request"):
@@ -251,15 +252,17 @@ def check_bookkeeping_paths() -> None:
     print(f"Bookkeeping paths consistent: {' '.join(expected)}")
 
 
-def is_bookkeeping(path: str) -> bool:
-    """Whether a repository path ships nothing."""
+def is_bookkeeping(path: str, *, bookkeeping: list[str]) -> bool:
+    """Whether a repository path is in the bookkeeping list."""
     return any(
         path == entry or (entry.endswith("/") and path.startswith(entry))
-        for entry in BOOKKEEPING_PATHS
+        for entry in bookkeeping
     )
 
 
-def bookkeeping_verdict(*, level: Bump, paths: list[str]) -> Verdict:
+def bookkeeping_verdict(
+    *, level: Bump, paths: list[str], bookkeeping: list[str]
+) -> Verdict:
     """Allow a commit unless it is confined to bookkeeping paths and bumps.
 
     An empty path list (an empty or merge commit) is allowed: nothing
@@ -267,7 +270,11 @@ def bookkeeping_verdict(*, level: Bump, paths: list[str]) -> Verdict:
     """
     if not paths or level == Bump.NONE:
         return Verdict(allowed=True, reason=f"{level} level")
-    shipping = [path for path in paths if not is_bookkeeping(path)]
+    shipping = [
+        path
+        for path in paths
+        if not is_bookkeeping(path, bookkeeping=bookkeeping)
+    ]
     if shipping:
         return Verdict(allowed=True, reason=f"ships {shipping[0]}")
     return Verdict(
@@ -304,7 +311,9 @@ def run_check_bookkeeping(bump_map: BumpMap, *, message_path: Path) -> None:
         level = parse_level(read_commit_message(message_path), bump_map)
     except ValueError:
         return
-    verdict = bookkeeping_verdict(level=level, paths=staged_paths())
+    verdict = bookkeeping_verdict(
+        level=level, paths=staged_paths(), bookkeeping=load_bookkeeping_paths()
+    )
     if not verdict.allowed:
         sys.exit(f"BLOCKED: {verdict.reason}")
 

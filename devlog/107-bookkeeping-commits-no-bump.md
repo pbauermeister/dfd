@@ -27,13 +27,13 @@ TODO and direct commits, and enforced by the `commit-msg` hook.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                                                   | Basis                                                                                | Alternatives considered                                                                                                  |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| 1   | Non-shipping set: `TODO.md`, `CLAUDE.md`, `.claude/`, `devlog/`, `discussions/`, `engineering/`, `templates/`; `doc/` and `README.md` ship | user (the go)                                                                        | `tests/`, `tools/` as bookkeeping: they do not ship either, but `test:`/`build:` are the honest types and were not asked |
-| 2   | Enforced by a path-aware local `commit-msg` hook, a subcommand of `tools/conventional-commits.py` (the bump map's owner)                   | user (the go): the direct-to-main commit that hurt has no PR, only a hook catches it | Rule in prose only; a merge-gate check of the title against the PR's files (TODO 27)                                     |
-| 3   | `docs:` keeps bumping patch                                                                                                                | user (the go): the manual is the product's user-facing surface                       | `docs` to none, doc fixes waiting for the next code release                                                              |
-| 4   | The list lives once, `BOOKKEEPING_PATHS` in the tool; the prose cites it                                                                   | rule: single source of truth (as the bump map in `pyproject.toml`)                   | A second copy in the docs                                                                                                |
-| 5   | An empty staged set (empty or merge commit) is allowed                                                                                     | rule: nothing says what the commit is about                                          | Refuse                                                                                                                   |
+| #   | Decision                                                                                                                                                | Basis                                                                                                                         | Alternatives considered                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Non-shipping set: `TODO.md`, `CLAUDE.md`, `.claude/`, `devlog/`, `discussions/`, `engineering/`, `templates/`; `doc/` and `README.md` ship              | user (the go)                                                                                                                 | `tests/`, `tools/` as bookkeeping: they do not ship either, but `test:`/`build:` are the honest types and were not asked |
+| 2   | Enforced by a path-aware local `commit-msg` hook, a subcommand of `tools/conventional-commits.py` (the bump map's owner)                                | user (the go): the direct-to-main commit that hurt has no PR, only a hook catches it                                          | Rule in prose only; a merge-gate check of the title against the PR's files (TODO 27)                                     |
+| 3   | `docs:` keeps bumping patch                                                                                                                             | user (the go): the manual is the product's user-facing surface                                                                | `docs` to none, doc fixes waiting for the next code release                                                              |
+| 4   | The list lives once, `bookkeeping_paths` in `pyproject.toml` `[tool.conventional-commits]`, next to the bump map; the tool reads it, the prose cites it | user (review of PR #108): a list buried in a tool under `tools/` is not findable; `pyproject.toml` already holds the CC rules | A constant in the tool (first version); a top-level YAML of CC parameters                                                |
+| 5   | An empty staged set (empty or merge commit) is allowed                                                                                                  | rule: nothing says what the commit is about                                                                                   | Refuse                                                                                                                   |
 
 ### 1.4 Acceptance criteria
 
@@ -72,6 +72,10 @@ Approved: 2026-09-24
   is not conventional and the hook refused it, while the conventional
   hook lets merges through. The check now returns on a non-conventional
   message: that verdict belongs to the other hook.
+- Review loop (2026-09-25): the list moved from a constant of the
+  tool to `[tool.conventional-commits] bookkeeping_paths` in
+  `pyproject.toml`, read by `load_bookkeeping_paths()` and passed
+  explicitly, as the bump map is; the tests pass their own list.
 
 ## 3. Delivery
 

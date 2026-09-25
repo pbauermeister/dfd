@@ -13,7 +13,7 @@ Agent: Claude Fable 5.1
 
 TODO item 18 (removed in the first commit). Third of the batch of
 five build-related tasks of 2026-09-24 (24, 26, 18, 19, 25). Stacked
-on #107 (PR #108), whose `BOOKKEEPING_PATHS` is the list this task
+on #107 (PR #108), whose `bookkeeping_paths` (in `pyproject.toml` since the review of #108) is the list this task
 filters on; the PR is retargeted to `main` when #108 merges.
 
 ### 1.2 Goal
@@ -22,7 +22,7 @@ filters on; the PR is retargeted to `main` when #108 merges.
 bookkeeping paths; `merge-gate.yml` and `pr-title.yml`, required
 checks of the ruleset, keep running on every event; `workflow_call`
 stays unfiltered so `release.yml` gates on the suite. `make lint`
-keeps the `paths-ignore` lists equal to `BOOKKEEPING_PATHS`.
+keeps the `paths-ignore` lists equal to `bookkeeping_paths`.
 
 ### 1.3 Design decisions
 
