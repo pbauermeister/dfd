@@ -1,7 +1,7 @@
 name: CI
 
-# Commits confined to bookkeeping paths (BOOKKEEPING_PATHS in
-# tools/conventional-commits.py; `make lint` keeps the lists equal) run
+# Commits confined to bookkeeping paths (bookkeeping_paths in
+# pyproject.toml; `make lint` keeps the lists equal) run
 # nothing: CI is not a required check of the main ruleset, so a skipped
 # run does not block a merge. The workflow_call trigger stays unfiltered:
 # release.yml always gates on the suite.
