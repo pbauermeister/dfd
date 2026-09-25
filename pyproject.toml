@@ -97,6 +97,21 @@ default_bump_level = 0
 # one PR is one entry: never split a squash body into commits
 parse_squash_commits = false
 
+# Paths that ship nothing: a commit confined to them is bookkeeping and
+# carries a type that bumps nothing (engineering/RELEASING.md
+# "Bookkeeping commits"); tools/conventional-commits.py enforces it in
+# the commit-msg hook. Directories end with a slash.
+[tool.conventional-commits]
+bookkeeping_paths = [
+    "TODO.md",
+    "CLAUDE.md",
+    ".claude/",
+    "devlog/",
+    "discussions/",
+    "engineering/",
+    "templates/",
+]
+
 [tool.semantic_release.changelog]
 mode = "update"
 insertion_flag = "<!-- semantic-release -->"
