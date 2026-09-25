@@ -24,7 +24,7 @@ Five chapters and five stops. A stop is a dated line that the agent
 fills on the user's go, never before: Framed (after Invariants,
 before any mock-up or spike), Approved (after the Plan, before any
 execution), Tried (after Try it; the user may mandate a loop),
-Shipped (the ship decision, once no loop is requested and the test
+Ready (the ready decision, once no loop is requested and the test
 report is in), Closed (after the Retrospective). A loop adds steps to
 Steps, is accounted in Account and refreshes Try it. Scaffolding
 fills Context, Goal and Non-goals (and Invariants for a refactor)
@@ -211,7 +211,7 @@ Rule trace. -->
 
 ## 4. Delivery
 
-<!-- The basis of the ship decision, in order: what the work looks
+<!-- The basis of the ready decision, in order: what the work looks
 like, what the tests say, what the agent recommends, the discussion in
 which the user decides. -->
 
@@ -254,7 +254,7 @@ Reservations (for "with reservations"; for "reject", what must change):
 
 ### 4.4 Discussion
 
-<!-- Where the ship decision is taken, once no loop is requested and
+<!-- Where the ready decision is taken, once no loop is requested and
 the test report is in: what surfaced unexpectedly, what remains an
 issue. One row per point, with the decision: postpone (a TODO item,
 filed on this branch) or accept as is; a "complement now" here is a
@@ -264,10 +264,10 @@ loop. -->
 | --- | ----- | -------- |
 | 1   |       |          |
 
-<!-- Stop 3: the ship decision, once the discussion is settled. Then
+<!-- Stop 3: the ready decision, once the discussion is settled. Then
 the PR is marked ready. -->
 
-Shipped: pending
+Ready: pending
 
 ## 5. Closure
 
