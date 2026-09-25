@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 29
+Next number: 30
 
 ## Won't do
 
@@ -87,9 +87,6 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-
-
-
 ### 23. A keep filter after a replacement re-adds the replaced items as orphans
 
 Found at the stop 1 discussion of #104 (devlog 104). On `A→B→C→D`
@@ -138,3 +135,15 @@ hook revision; PRs typed `chore(deps):` (none-level, CI runs on their
 push). Against: bot noise, a merge each time, the review of release
 notes on a major still by hand. Decide the pinning policy with it:
 current major or exact tag for actions, release notes read on a major.
+
+### 29. A lint failure must block mechanically
+
+Raised at the review of #120 (2026-09-25): a commit with a `ruff`
+error (a duplicated test, F811) reached the remote because the agent
+ran `make lint` and did not read its exit. The rule "format, lint,
+test before pushing" (`engineering/RULES.md`) is manual. To discuss
+how to make it mechanical: a pre-commit hook running `make lint` on
+the staged Python files (the hook framework is installed for the
+commit-msg stage already), a pre-push hook, or CI as a required
+check (which #111 made a matter of the push-only trigger). Weigh the
+delay at each commit against the value.
