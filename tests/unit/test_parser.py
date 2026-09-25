@@ -117,6 +117,14 @@ PARSE_ERROR_CASES = [
         "!<>z1 A",
         id="filter-bad-flag",  # unrecognized neighbor flag 'z'
     ),
+    pytest.param(
+        """
+        process  A  text
+        process  B  text
+        ~=  B  A
+        """,
+        id="bare-replacer-sign",  # "=" alone: the parser used to spin forever
+    ),
 ]
 
 

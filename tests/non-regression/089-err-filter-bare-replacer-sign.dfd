@@ -1,0 +1,10 @@
+# Issue #119: a bare "=" (space before the replacer name) is an error;
+# the parser used to loop forever on it.
+
+process A
+process B
+process G
+
+A -> B ab
+
+~= G B
