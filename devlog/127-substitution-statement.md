@@ -254,8 +254,9 @@ Actions:
    `_collect_connected_names()` and `_collect_flow_ids()`.
 2. The flat map: `_register(substitution, replacer, names)` resolves
    the replacer and rewrites existing values.
-3. `_collect_kept_names()`: a `Merge` case (register, mark the
-   names unavailable, kept set untouched); `Only` and `Without` check
+3. `_collect_kept_names()`: a `Merge` case (check the replacer is
+   available, register, mark the names unavailable, and put the replacer
+   in place of kept merged items, decisions 11 and 12); `Only` and `Without` check
    their anchors against the unavailable set (removed by a `~`, or
    substituted); the `Without` case loses its replacer branch; the
    neighbor search of a `Without` reads through the map.
