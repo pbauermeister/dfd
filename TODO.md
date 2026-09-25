@@ -167,8 +167,10 @@ by the user. The shape: a set of small, well-framed items (TODO
 items, a brief); an upfront assessment with disposable mandate drafts
 that surfaces the decisions to take, taken in one exchange, and that
 also judges whether the items fit together enough to be one batch and
-which order serves them (the rule of one task feeding the commit types
-of the next; the shared files deciding the stacking); then the
+which order serves them (the two batches fit by kind, build and doc,
+then fixes, which is one way among others; the rule of one task
+feeding the commit types of the next; the shared files deciding the
+stacking); then the
 tasks run chained and unattended, one branch stacked on the previous
 when they touch the same files, issues and PRs numbered in sequence,
 each stopped at "ready for review"; then the reviews, sequential and
