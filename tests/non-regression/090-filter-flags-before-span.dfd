@@ -1,5 +1,0 @@
-# Issue #121: the flags before the span, the order of earlier versions,
-# stay accepted; same picture as fixture 033.
-#include tests/non-regression/028-filter-master.part
-
-!<>xf2 P2

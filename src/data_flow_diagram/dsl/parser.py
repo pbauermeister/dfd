@@ -108,9 +108,8 @@ RX_FILTER_ARG = re.compile(
     rf"""(
       # either a neighbor specification
       (?P<neighbors><>|<|>|\[|])    # direction
-      (?P<flags_before>[a-zA-Z]*)       # flags, the former order
+      (?P<flags>[a-zA-Z]*)              # flags
       (?: (?P<all>[{re.escape(model.ALL_NEIGHBORS)}]) | (?P<num>[0-9]+) )  # "all" distance, or decimal number
-      (?P<flags>[a-zA-Z]*)              # flags, the documented order
       |
       # or a replacer specification
       =                             # indicates replacer
@@ -150,8 +149,8 @@ def _parse_neighbor_spec(
             is_down = True
             fn.layout_direction = True
 
-    # parse optional modifier flags ("x", "f"), on either side of the span
-    for flag in m.group("flags_before") + m.group("flags"):
+    # parse optional modifier flags ("x", "f")
+    for flag in m.group("flags"):
         match flag:
             case "x":
                 fn.suppress_anchors = True

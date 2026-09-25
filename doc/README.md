@@ -1088,7 +1088,7 @@ filters, `!!<2 A` and `!>1 A`.
 
 #### 7.3.3. Neighbors syntax
 
-`DIRECTION[SPAN][FLAGS]`
+`DIRECTION[FLAGS]SPAN`
 
 - DIRECTION:
   - `>`: downstream neighbors
@@ -1102,9 +1102,6 @@ filters, `!!<2 A` and `!>1 A`.
 - FLAGS:
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
-
-The flags are also accepted before the span (`<>xf2`), the order of
-earlier versions.
 
 Two specifications may be given, one per direction: `!<1 >2 P` keeps
 one level upstream and two downstream of `P`, as `!<1 P` followed by
@@ -1299,7 +1296,7 @@ Here:
 #include #img/data-pipeline
 
 # We keep two levels of downstream neighbors, but not proc_flow itself
-!<>2x proc_flow
+!<>x2 proc_flow
 
 # Note the 'x' flag, meaning "not the item themselves, but the neighbors"
 ```
@@ -1312,7 +1309,7 @@ Here:
 #include #img/data-pipeline
 
 # Like in the previous example, and without frames
-!<>2xf proc_flow
+!<>xf2 proc_flow
 
 # Note the 'f' flag, meaning "remove involved frames"
 ```

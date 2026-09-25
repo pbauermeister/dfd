@@ -12,8 +12,8 @@ Agent: Claude Fable 5.1
 ### 1.1 Context
 
 TODO item 22 (removed in the first commit), found at the stop 1
-discussion of #104. Third of the filter batch of 2026-09-25, stacked on
-#121 (PR #122). `_parse_filter()` already consumed every leading
+discussion of #104. Third of the filter batch of 2026-09-25, first stacked
+on #121 (PR #122, cancelled at its review; see the Account). `_parse_filter()` already consumed every leading
 neighbor spec, so `!<1 >2 C` worked, undocumented, and `!<1 <3 C`
 silently kept the last spec.
 
@@ -53,6 +53,13 @@ Approved: 2026-09-25
   § 7.1, § 7.2 grammar and a § 7.3 sentence; fixtures 091, 092; five
   unit cases.
 - This devlog.
+- Review of #122 (2026-09-25): that PR was cancelled (only `<>xf2`
+  ever worked; adding `<>2xf` was a language extension for a gain of
+  taste), so this branch drops its commits by a revert commit, the
+  squash keeping the net diff; it carries the one-line correction of
+  README § 7.3.3 instead: `DIRECTION[FLAGS]SPAN`, the grammar the
+  parser and SYNTAX.md always had. Fixture 090 is gone; 091 and 092
+  keep their numbers.
 
 ## 3. Delivery
 
