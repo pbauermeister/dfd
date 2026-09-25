@@ -1,7 +1,7 @@
 # 127 — Merge statement
 
 Date: 2026-09-25
-Status: PENDING
+Status: ONGOING
 Issue: #127 · PR: #128 · Branch: `feature/127-substitution-statement`
 Task nature: change
 Track: full
@@ -177,4 +177,4 @@ Delivery filled.
 `[]` (TODO 30); the removal of `~=` (a TODO item filed here when the
 sugar lands); TODO 29 and 31.
 
-Approved: pending
+Approved: 2026-09-25
