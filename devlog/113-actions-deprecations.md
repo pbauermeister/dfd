@@ -67,6 +67,12 @@ Approved: 2026-09-24
 - `3bef6af` ci: the throwaway commit undone (`git revert --no-commit`,
   conventional subject). `dee8347` chore: TODO 12's first box ticked.
 - This devlog.
+- After the merge of #112 (2026-09-25): its squash commit carried the
+  PR body, which quoted the skip marker while reporting the trial, so
+  GitHub skipped CI on `main` for that push. A sentence in
+  RELEASING.md "Bookkeeping commits" now forbids the literal marker in
+  commit messages and PR bodies; carried by this branch as the open CI
+  task.
 
 ## 3. Delivery
 
