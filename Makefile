@@ -37,10 +37,10 @@ venv-activate: ## activate .venv and start an interactive shell
 require-system: ## install system packages (graphviz, npm) and uv
 	./recipes/require-system.sh
 
-require: ## install dev tools: Python ones in .venv (uv sync), prettier (npm), git hook
+require: ## install dev tools: Python ones in .venv (uv sync), prettier (npm), git hooks
 	uv sync
 	npm install --prefix $(VENV) --no-audit --no-fund prettier@3
-	uv run pre-commit install --hook-type commit-msg
+	uv run pre-commit install --hook-type commit-msg --hook-type pre-commit --hook-type pre-push
 
 all: require-system require format lint test doc clean ## make all, except publish
 

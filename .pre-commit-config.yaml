@@ -1,8 +1,11 @@
-# Commit messages, checked at commit time. Installed by `make require`
-# (pre-commit install --hook-type commit-msg). Conventional form: the
-# type list must equal allowed_tags in pyproject.toml; `make lint`
-# checks it. Bookkeeping: a commit confined to paths that ship nothing
-# must carry a type that bumps nothing (engineering/RELEASING.md).
+# Git hooks, installed by `make require` (pre-commit install, three
+# stages). Commit messages: conventional form, the type list must equal
+# allowed_tags in pyproject.toml, `make lint` checks it; bookkeeping, a
+# commit confined to paths that ship nothing must carry a type that
+# bumps nothing (engineering/RELEASING.md). Contents: `make lint` at
+# commit, `make test` at push, the rule of engineering/RULES.md made
+# mechanical. UV_NO_SYNC: a hook never rewrites the environment or
+# uv.lock (a release commit changes the project version).
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
@@ -17,3 +20,17 @@ repos:
         entry: uv run --no-sync ./tools/conventional-commits.py check-bookkeeping-commit
         language: system
         stages: [commit-msg]
+      - id: lint
+        name: make lint
+        entry: env UV_NO_SYNC=1 make lint
+        language: system
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+      - id: test
+        name: make test
+        entry: env UV_NO_SYNC=1 make test
+        language: system
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
