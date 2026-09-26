@@ -124,30 +124,6 @@ two filters; `[]` would be the one-filter form. New syntax, `feat:`
 (minor): after the pending patch release. Fixture, README § 7.3.3,
 SYNTAX.md § 7.3.
 
-### 31. Codify the batch of chained fast-track tasks
-
-Tried twice on 2026-09-24 and 2026-09-25 (the build batch 24, 26,
-18, 19, 25 and the filter batch 20, 21, 22, 23) and judged a success
-by the user. The shape: a set of small, well-framed items (TODO
-items, a brief); an upfront assessment with disposable mandate drafts
-that surfaces the decisions to take, taken in one exchange, and that
-also judges whether the items fit together enough to be one batch and
-which order serves them (the two batches fit by kind, build and doc,
-then fixes, which is one way among others; the rule of one task
-feeding the commit types of the next; the shared files deciding the
-stacking); then the
-tasks run chained and unattended, one branch stacked on the previous
-when they touch the same files, issues and PRs numbered in sequence,
-each stopped at "ready for review"; then the reviews, sequential and
-interactive, each merged before the next (retarget the next PR to
-`main` before merging its base; merge `main` forward into the rest);
-the review may loop a task or stop it, that stop being the valve the
-mandate anticipates (#125 ended REJECTED, #121 cancelled, both by
-the review). Codify it lightly: a short section in
-`engineering/PROCESS.md` next to "Fast track", the decision drafts as
-a scratch artifact, the ordering and merge rules, what the review may
-do. No new template.
-
 ### 32. Remove the deprecated `~=` form
 
 From #127 (2026-09-26): `~[SPEC] =R ITEMS` is desugared to `merge
