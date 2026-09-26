@@ -55,6 +55,13 @@ Approved: 2026-09-26 (the go for the batch)
   the review of #136 moved the style sheet to the head of the batch;
   the model and token budgeting asked at the review filed as TODO
   item 36, to be discussed.
+- Review loop (2026-09-26), before its own review: what the three
+  closures taught, folded in. Verification is shown even unattended
+  (test report, tests where a harness exists: the reviews of #132
+  and #134); a devlog push re-runs the required checks (#134's
+  merge); a `TODO.md` conflict resolved from `main`'s file undoes
+  the branch's edits, twice on this batch (item 29 re-added on 133,
+  item 36 dropped on 129). The ordering sentence reflowed.
 
 ## 3. Delivery
 
@@ -74,7 +81,7 @@ the merge.
 | 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it                                                                             | well     |      |
 | 3   | The assessment ordered by kind and shared files and missed the dependency between outputs: the style sheet, written last, applied to the three texts before it; the user saw it at the first review | not well |      |
 
-Process: 1 round before the go (the assessment); 1 loop so far at the reviews of the batch (the ordering rule); its own review pending.
+Process: 1 round before the go (the assessment); 2 loops from the reviews of the batch (the ordering rule; the closures' lessons); its own review pending.
 
 Closed:
 

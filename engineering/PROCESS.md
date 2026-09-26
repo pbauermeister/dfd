@@ -100,11 +100,12 @@ each small and well framed. The batch has three phases.
    presents them in one exchange, with a judgment on the batch: do the
    items fit together (by kind, by the files they share, by a rule of
    one that feeds the commit types of the next), and which order
-   serves them. A task whose output the others apply (a rule, a
-   tool, a hook) closes first whatever its size: the closing order
-   follows the dependencies between outputs before the shared files. The drafts are a scratch artifact, never committed; the
-   decisions taken land in each task's fast devlog. The user answers
-   the open rows and gives one go for the batch.
+   serves them. A task whose output the others apply (a rule, a tool,
+   a hook) closes first whatever its size: the closing order follows
+   the dependencies between outputs before the shared files. The
+   drafts are a scratch artifact, never committed; the decisions taken
+   land in each task's fast devlog. The user answers the open rows and
+   gives one go for the batch.
 2. **Chained runs.** Each task starts as in Phase 2 (issue, branch,
    draft PR), one after the other so that issues and PRs are numbered
    in sequence, and runs unattended to "ready for review" with its
@@ -112,21 +113,28 @@ each small and well framed. The batch has three phases.
    unless the assessment says otherwise. Tasks that share files are
    stacked: the branch and the PR base on the previous task in the
    closing order; the others base on `main`. The devlog's Context
-   names the batch, the task's position and its base.
+   names the batch, the task's position and its base. Unattended does
+   not mean unverified: the PR shows its trials in a test report of
+   the devlog, and a behavior that a test can pin has its test (the
+   tests folder tells which kinds exist).
 3. **Sequential reviews.** Interactive, one task at a time in the
    closing order, each merged before the next is reviewed. Before
    merging a task that serves as a base, retarget the next PR to
-   `main`; after each merge, merge `main` forward into the remaining
-   branches (a `TODO.md` conflict on adjacent removals is expected:
-   every removed item stays removed). The review may approve, loop the
-   task, or stop it: the fast track's anticipated price is that a
-   review turns into a design round. A stopped task ends `REJECTED`,
-   its devlog reaches `main` by a direct `chore:` commit with the
-   evidence, and its branch stays on `origin` as material for the
-   follow-up issue. Neither is a process failure.
+   `main`; a devlog push re-runs the required checks, so the merge
+   waits for them. After each merge, merge `main` forward into the
+   remaining branches; a `TODO.md` conflict is expected, and resolving
+   it from `main`'s file undoes the branch's own edits: re-apply the
+   branch's whole diff against the merge base, removals and additions,
+   and compare the item lists before committing. The review may
+   approve, loop the task, or stop it: the fast track's anticipated
+   price is that a review turns into a design round. A stopped task
+   ends `REJECTED`, its devlog reaches `main` by a direct `chore:`
+   commit with the evidence, and its branch stays on `origin` as
+   material for the follow-up issue. Neither is a process failure.
 
 Two batches of 2026-09-24 and 2026-09-25 (#107 to #117, #119 to #125)
-set the shape; the batch of 2026-09-26 (#129 to #136) codified it.
+set the shape; the batch of 2026-09-26 (#129 to #136) codified it and
+sharpened it at its reviews.
 
 Claude: if the user starts a task without following this process, briefly
 remind them of it.
