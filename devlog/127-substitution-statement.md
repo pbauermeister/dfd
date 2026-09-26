@@ -1,4 +1,4 @@
-# 127 — Merge statement
+# 127 — Merge is a statement of its own
 
 Date: 2026-09-25
 Status: ONGOING
