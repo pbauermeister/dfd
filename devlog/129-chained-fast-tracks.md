@@ -62,6 +62,12 @@ Approved: 2026-09-26 (the go for the batch)
   merge); a `TODO.md` conflict resolved from `main`'s file undoes
   the branch's edits, twice on this batch (item 29 re-added on 133,
   item 36 dropped on 129). The ordering sentence reflowed.
+- Review loop (2026-09-26), the hiccups report: nine hiccups, two
+  causes (the order, the TODO removals per branch). Amendments: the
+  issues filed and the TODO items removed in one commit on `main`
+  at the go, stacking reserved for files of substance; a closure as
+  one sequence; a row that lowers verification is an open row; an
+  irreversible step runs alone (Implementation workflow).
 
 ## 3. Delivery
 
@@ -75,13 +81,15 @@ the merge.
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                                                                               | Agent    | User |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track for a section written from a recorded shape                                                                                                                    | well     |      |
-| 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it                                                                             | well     |      |
-| 3   | The assessment ordered by kind and shared files and missed the dependency between outputs: the style sheet, written last, applied to the three texts before it; the user saw it at the first review | not well |      |
+| #   | Point                                                                                                                                                                                                     | Agent    | User |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: fast track for a section written from a recorded shape                                                                                                                          | well     |      |
+| 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it                                                                                   | well     |      |
+| 3   | The assessment ordered by kind and shared files and missed the dependency between outputs: the style sheet, written last, applied to the three texts before it; the user saw it at the first review       | not well |      |
+| 4   | Removing each TODO item on its branch made `TODO.md` the one shared file: three conflicts on the forward merges, two resolutions that undid the branch's edits, stacking that existed for that file alone | not well |      |
+| 5   | Chained shell commands ran on after a failure (a force push, an issue comment): the exit of a pipeline is its last command's                                                                              | not well |      |
 
-Process: 1 round before the go (the assessment); 2 loops from the reviews of the batch (the ordering rule; the closures' lessons); its own review pending.
+Process: 1 round before the go (the assessment); 3 loops from the reviews of the batch (the ordering rule; the closures' lessons; the hiccups report); its own review pending.
 
 Closed:
 

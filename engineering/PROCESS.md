@@ -104,28 +104,34 @@ each small and well framed. The batch has three phases.
    a hook) closes first whatever its size: the closing order follows
    the dependencies between outputs before the shared files. The
    drafts are a scratch artifact, never committed; the decisions taken
-   land in each task's fast devlog. The user answers the open rows and
-   gives one go for the batch.
-2. **Chained runs.** Each task starts as in Phase 2 (issue, branch,
-   draft PR), one after the other so that issues and PRs are numbered
-   in sequence, and runs unattended to "ready for review" with its
-   fast devlog committed. The closing order is the tackling order
-   unless the assessment says otherwise. Tasks that share files are
-   stacked: the branch and the PR base on the previous task in the
-   closing order; the others base on `main`. The devlog's Context
-   names the batch, the task's position and its base. Unattended does
+   land in each task's fast devlog. A row that lowers a task's
+   verification (no test, a trial by hand) is an open row, never a
+   default. The user answers the open rows and gives one go for the
+   batch.
+2. **Chained runs.** At the go, the agent files the issues in the
+   batch's order and removes their `TODO.md` items in one `chore:`
+   commit on `main` that names them (in place of Phase 2 step 4): no
+   branch touches `TODO.md`, so the squash merges cannot conflict on
+   it. Then each task runs one after the other, branch and draft PR
+   as in Phase 2, numbered in sequence, unattended to "ready for
+   review" with its fast devlog committed. The closing order is the
+   tackling order unless the assessment says otherwise. A task that
+   changes a file of substance another task changes is stacked: its
+   branch and PR base on the previous task in the closing order; the
+   others base on `main`. The devlog's Context names the batch, the
+   task's position and its base. Unattended does
    not mean unverified: the PR shows its trials in a test report of
    the devlog, and a behavior that a test can pin has its test (the
    tests folder tells which kinds exist).
 3. **Sequential reviews.** Interactive, one task at a time in the
    closing order, each merged before the next is reviewed. Before
    merging a task that serves as a base, retarget the next PR to
-   `main`; a devlog push re-runs the required checks, so the merge
-   waits for them. After each merge, merge `main` forward into the
-   remaining branches; a `TODO.md` conflict is expected, and resolving
-   it from `main`'s file undoes the branch's own edits: re-apply the
-   branch's whole diff against the merge base, removals and additions,
-   and compare the item lists before committing. The review may
+   `main`. A closure is one sequence: the devlog closed and pushed,
+   the required checks re-run and green, then the merge. After each
+   merge, merge `main` forward into the remaining branches; a conflict
+   resolved from `main`'s file undoes the branch's own edits, so
+   re-apply the branch's whole diff against the merge base and read
+   the result before committing. The review may
    approve, loop the task, or stop it: the fast track's anticipated
    price is that a review turns into a design round. A stopped task
    ends `REJECTED`, its devlog reaches `main` by a direct `chore:`
@@ -264,6 +270,10 @@ When implementing an approved plan:
   choice.
 - Before marking a PR ready, self-review the diff against the Type safety
   section of `engineering/CONVENTIONS.md`.
+- An irreversible step (a merge, a force push, a comment that states an
+  outcome) runs as a command of its own, after its precondition is
+  checked, never at the tail of a chain: a chained command does not
+  stop where one expects (a pipeline's exit is its last command's).
 
 ## Established tool vs bespoke script
 
