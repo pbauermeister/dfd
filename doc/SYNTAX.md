@@ -287,9 +287,9 @@ disappears), the items become unavailable, and the replacer takes
 their place in the kept set. Not a filter: the kept set is otherwise
 untouched; once one exists, a merge names kept items only. Processed in source order with the filters; merges
 chain (`merge B C : G` then `merge G D : H`). Frames: the merged items
-are in one frame or all unframed (else an error); the replacer takes
+are in one frame or all unframed, otherwise an error is raised; the replacer takes
 their place in it; a replacer declared in a frame that would also
-inherit one is in multiple frames, an error.
+inherit one ends up in multiple frames, which is an error.
 
 ### 7.4. Neighbour specification
 

@@ -991,14 +991,15 @@ command line.
 
 Filters (keeping or removing items) and merges (collapsing several
 items into one) derive subgraphs or simplified graphs from a master
-graph. They are only useful for that: a diagram written to be shown
-as it is has no use for them.
+graph. They are only useful for the latter; conversely, a diagram
+written to be shown as it is has no use for them.
 
 ### 7.1. Use case
 
 With a single DFD source file, filters and merges do not make a lot of sense. But when combined with the `#include` capabilities, they let you reuse parts, and apply the DRY (do not repeat yourself) principle:
 
-- You work on a complete "master" diagram, which carries all the details,
+- You work on a complete "master" diagram, which carries all the
+  details, at the risk of becoming unreadable,
 - and create subset diagrams by including the master and using filters,
   or simplified diagrams by merging groups of its items into one.
 - The subsets and the simplified views let you focus on desired aspects,
@@ -1135,13 +1136,13 @@ processed in order with the filters, and the order carries a meaning:
 
 Merges chain: `merge B C : G` then `merge G D : H` collapses B, C, G
 and D into H. Written the other way round, the second merge names an
-item already merged away, an error.
+item already merged away; this yields an error.
 
 Frames: the merged items are in one frame, or all unframed; items
 from different frames cannot be merged. The replacer takes their place
 in that frame, and a frame left empty disappears. A replacer declared
-in a frame of its own keeps it; if it would also inherit one, it is in
-two frames, an error.
+in a frame of its own keeps it; if it would also inherit one, it ends
+up in two frames, which is an error.
 
 ### 7.4. Filters example
 
