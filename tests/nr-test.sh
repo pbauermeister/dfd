@@ -3,7 +3,8 @@
 
 set -e
 
-NR_DIR=tests/non-regression
+# the fixture directory, overridable for the runner's own test
+NR_DIR="${NR_DIR:-tests/non-regression}"
 fail=0
 
 # Test .dfd files (error fixtures have their own loop below). A render

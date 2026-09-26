@@ -27,13 +27,13 @@ fails.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                                                              | Basis                                          | Alternatives considered                                   |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------- |
-| 1   | Both scripts render error fixtures with `-o` to a scratch path they delete: the root cause is the write beside the input, and `nr-test.sh` had it too | TODO 34, lesson (a) of #127 (rule)             | `rm` the `.dot` after the fact in `nr-regenerate.sh` only |
-| 2   | The plain loop of `nr-test.sh` skips `-err-` fixtures; the error loop reports a stray `.dot` as a FAIL with the remedy in the line                    | TODO 34 (rule)                                 | Delete the stray silently                                 |
-| 3   | A render that fails in the plain loop is a FAIL line with the tool's stderr, the run goes on; `set -e` stays for the rest                             | the silent abort (rule)                        | Drop `set -e`                                             |
-| 4   | Verified by hand on disposable fixtures, five scenarios; no shell test harness                                                                        | `tests/README.md` knows no shell tests (taste) | A pytest driving the scripts on a temp copy               |
-| 5   | One bullet in `tests/RULES.md`: an error fixture has no `.dot`                                                                                        | rule                                           |                                                           |
+| #   | Decision                                                                                                                                                      | Basis                                                                 | Alternatives considered                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------- |
+| 1   | Both scripts render error fixtures with `-o` to a scratch path they delete: the root cause is the write beside the input, and `nr-test.sh` had it too         | TODO 34, lesson (a) of #127 (rule)                                    | `rm` the `.dot` after the fact in `nr-regenerate.sh` only |
+| 2   | The plain loop of `nr-test.sh` skips `-err-` fixtures; the error loop reports a stray `.dot` as a FAIL with the remedy in the line                            | TODO 34 (rule)                                                        | Delete the stray silently                                 |
+| 3   | A render that fails in the plain loop is a FAIL line with the tool's stderr, the run goes on; `set -e` stays for the rest                                     | the silent abort (rule)                                               | Drop `set -e`                                             |
+| 4   | Verified first by hand on disposable fixtures, then by a pytest that drives both scripts on a temporary fixture set through an `NR_DIR` override (five cases) | user (review): effective tests; the tracing-prelude test is the model | By-hand scenarios only (the first version)                |
+| 5   | One bullet in `tests/RULES.md`: an error fixture has no `.dot`                                                                                                | rule                                                                  |                                                           |
 
 ### 1.4 Acceptance criteria
 
@@ -59,6 +59,11 @@ Approved: 2026-09-26 (the go for the batch)
   golden, FAIL "render failed" with the tool's error, 116 PASS after
   it (criterion 3); clean tree, 116 PASS, no `.tmp` (criterion 4).
 - This devlog.
+- Review loop (2026-09-26): `NR_DIR` overridable in both scripts,
+  `tests/test_nr_scripts.py` with the five cases (row 4), an entry in
+  `tests/README.md`. The merge of `main` forward re-added TODO item 29
+  (the conflict was resolved from `main`'s file); fixed in the same
+  commit.
 
 ## 3. Delivery
 
@@ -73,12 +78,13 @@ Approved: 2026-09-26 (the go for the batch)
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                        | Agent | User |
-| --- | ------------------------------------------------------------------------------------------------------------ | ----- | ---- |
-| 1   | Process and template fit: fast track; reproduce first, then five disposable-fixture scenarios in one command | well  |      |
-| 2   | The TODO named one script; reading both found the same write in the other                                    | well  |      |
+| #   | Point                                                                                                                                                                            | Agent    | User |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: fast track; reproduce first, then five disposable-fixture scenarios in one command                                                                     | well     |      |
+| 2   | The TODO named one script; reading both found the same write in the other                                                                                                        | well     |      |
+| 3   | The decision "no shell test harness" rested on a false premise: `tests/test_tracing_prelude.py` drives a script already; check the tests folder before ruling a kind of test out | not well |      |
 
-Process: 1 round before the go (the batch assessment); loops at the review: pending.
+Process: 1 round before the go (the batch assessment); 1 loop at the review (effective tests).
 
 Closed:
 

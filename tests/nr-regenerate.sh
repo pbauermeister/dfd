@@ -3,7 +3,8 @@
 
 set -e
 
-NR_DIR=tests/non-regression
+# the fixture directory, overridable for the runner's own test
+NR_DIR="${NR_DIR:-tests/non-regression}"
 
 for dfd in "$NR_DIR"/*.dfd; do
     case "$dfd" in *-err-*) continue ;; esac
