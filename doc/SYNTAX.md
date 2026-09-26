@@ -301,12 +301,13 @@ DIRECTION[FLAGS]SPAN
 
 | Part        | Values                                                         |
 | ----------- | -------------------------------------------------------------- |
-| `DIRECTION` | `>` downstream, `<` upstream, `<>` both, `[` left, `]` right   |
-| `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames |
-| `SPAN`      | `*` = unlimited, or integer distance                           |
+| `DIRECTION` | `>` downstream, `<` upstream, `<>` both; `[` left, `]` right, `[]` both |
+| `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames          |
+| `SPAN`      | `*` = unlimited, or integer distance                                    |
 
-A filter takes one specification, and `<>` counts as one; a second is an
-error. Another neighbourhood is another filter with the same items.
+A filter takes one specification, and `<>` or `[]` counts as one; a
+second is an error. Another neighbourhood is another filter with the
+same items.
 
 Examples: `>*` (all downstream), `<>2` (two levels in both directions),
 `<>xf2` (two levels, neighbors only, suppress frames).
