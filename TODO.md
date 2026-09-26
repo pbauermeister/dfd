@@ -101,6 +101,18 @@ push). Against: bot noise, a merge each time, the review of release
 notes on a major still by hand. Decide the pinning policy with it:
 current major or exact tag for actions, release notes read on a major.
 
+### 29. A lint failure must block mechanically
+
+Raised at the review of #120 (2026-09-25): a commit with a `ruff`
+error (a duplicated test, F811) reached the remote because the agent
+ran `make lint` and did not read its exit. The rule "format, lint,
+test before pushing" (`engineering/RULES.md`) is manual. To discuss
+how to make it mechanical: a pre-commit hook running `make lint` on
+the staged Python files (the hook framework is installed for the
+commit-msg stage already), a pre-push hook, or CI as a required
+check (which #111 made a matter of the push-only trigger). Weigh the
+delay at each commit against the value.
+
 ### 30. A symmetrical layout neighborhood `[]`
 
 Raised at the review of #124 (2026-09-25). `<>` is the symmetrical
@@ -159,31 +171,3 @@ that touches code only, with no change to the tests:
   whole-line parser (`_parse_style`) from a part parser
   (`_parse_item_name`): a prefix per kind, or static methods of two
   classes.
-
-### 35. A style sheet for the prose of software projects
-
-Raised at the review of #128 (2026-09-26): the docs written by the
-agent carried "AI smells" (elliptic appositions such as "..., an
-error.", "It is X: a Y" openers, staccato corrections). The author's
-blog-post style rules, `~/dev-pb/on-ai/style/authorial-style-rules.md`,
-name the tics to avoid (em-dashes, "not A, it is B", the pivot that
-counters the previous sentence, "Furthermore"/"It's worth noting",
-tricolons by reflex, inflated vocabulary) and the forms preferred
-(short sentences varied on purpose, full clauses, "i.e."/"e.g."
-glosses on first use, "So"/"Hence" pivots, parentheses for asides,
-the point first, one idea per paragraph, lists for the enumerable and
-prose for the rest). They target blog posts (anecdotes, humour,
-storytelling). Extract the subset that fits technical documentation
-and the devlogs of a software project like this one, as a style
-sheet under `engineering/` (or in `CONVENTIONS.md` "Markdown"), and
-point `CLAUDE.md`'s map at it. Applied by hand to `doc/` at #128.
-
-Shape agreed (2026-09-26): the sheet takes "The Elements of Style"
-(Strunk & White) as read, the author being a proponent; then the
-departures kept on purpose (no em-dash even for an abrupt break;
-"So"/"Hence" as sentence openers; "i.e."/"e.g." in running text;
-parentheses as a frequent device); then what the book has and the
-blog rules lack, to carry: the active voice; keep related words
-together; the emphatic words at the end of the sentence; one tense
-in a passage; a rule serves clarity, never the reverse; then the
-AI-tell list as the additions the book could not foresee.
