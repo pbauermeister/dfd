@@ -250,7 +250,7 @@ xdg-open devlog/127-try-it/1-merge.svg devlog/127-try-it/3-merge.svg \
 make nr-review                    # fixtures 093-106, the frame cases 103-106
 ```
 
-Tried: pending
+Tried: 2026-09-26 (the fixtures and their pictures reviewed twice, the second review after four points were taken)
 
 ### 4.2 Test report
 
@@ -285,9 +285,9 @@ Reservations:
 
 ### 4.4 Discussion
 
-| #   | Point                                                   | Decision |
-| --- | ------------------------------------------------------- | -------- |
-| 1   | 036's golden line                                       |          |
-| 2   | The runner's stray `.dot` on a succeeding error fixture |          |
+| #   | Point                                                   | Decision                                                               |
+| --- | ------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 1   | 036's golden line; 064's message                        | accept as is: a duplicated frame member gone, the cause in the message |
+| 2   | The runner's stray `.dot` on a succeeding error fixture | postpone: TODO 34                                                      |
 
-Ready: pending
+Ready: 2026-09-26
