@@ -43,7 +43,7 @@ Compute   -->  API        records
 | **SA/RT** support           | Signals, control processes, and channels for real-time and embedded systems                                                                     |
 | **Context** diagrams        | Generate a top-level SA/SD context diagram (`style context`)                                                                                    |
 | **Frames** and grouping     | Visually group related items                                                                                                                    |
-| **Filters**                 | Render focused subsets of a large master diagram (neighborhood, only/without)                                                                   |
+| **Filters and merge**       | Render focused subsets of a large master diagram (neighborhood, only/without), or simplified views (items merged into one)                      |
 | **Dependency** checking     | Verify that all referenced includes and items are consistent                                                                                    |
 | **Includes** and reuse      | Split large diagrams across files, share common item definitions via `include`                                                                  |
 | **Markdown** embedding      | Embed diagrams directly in Markdown files and generate all images in one pass (`--markdown` mode)                                               |
@@ -148,7 +148,7 @@ Full syntax reference, examples, and advanced features:
 - [4. Markdown snippets](doc/README.md#4-markdown-snippets)
 - [5. Including](doc/README.md#5-including)
 - [6. Dependencies](doc/README.md#6-dependencies)
-- [7. Filters](doc/README.md#7-filters)
+- [7. Filters and merge](doc/README.md#7-filters-and-merge)
 - [8. Influencing the layout](doc/README.md#8-influencing-the-layout)
 
 <!-- /AUTO:doc-toc -->

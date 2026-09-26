@@ -11,4 +11,4 @@ P1 -> P3
 ~ P3
 
 process Group
-~=Group P1 P2
+merge P1 P2 : Group

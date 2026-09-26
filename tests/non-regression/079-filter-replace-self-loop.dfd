@@ -15,4 +15,4 @@ AB -> B  from my replacer
 E -> E   genuine self-loop
 A -> E   out of the group
 
-~=AB A B
+merge A B : AB
