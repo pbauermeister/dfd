@@ -205,3 +205,69 @@ Approved: 2026-09-25
   succeeds under a mutation leaves a stray `.dot` that makes the runner
   abort silently, and one hand run without `-o` overwrote 098's golden;
   both found and repaired, the runs redone.
+- Step 3 (unattended): chapter 7 of both docs as decision 8; the
+  README's own § 7.2 example re-added a removed item, which decision 5
+  forbids: rewritten as the availability rule. The group example no
+  longer lists the super DB in its keep filter (decision 11 makes it
+  take the merged DBs' place) and renders the same image; the
+  merge-first variant gets `img/filter-merge-first.svg`. The seven
+  fixtures migrated, their goldens byte-identical; fixture 094 stays
+  the sugar twin. TODO 32 filed for the removal of `~=`.
+- Step 4: `devlog/127-try-it/`, the three cases of #125 in both forms
+  and two more (keep then merge, the chain), rendered.
+
+## 4. Delivery
+
+### 4.1 Try it
+
+```bash
+xdg-open doc/img/filter-replace.svg doc/img/filter-merge-first.svg
+                                  # the README's group example, both orders
+xdg-open devlog/127-try-it/2-merge.svg    # no such file: case 2 is an error
+./data-flow-diagram devlog/127-try-it/2-sugar.dfd   # the error, and the warning
+./data-flow-diagram devlog/127-try-it/1-sugar.dfd   # the warning names the new form
+xdg-open devlog/127-try-it/1-merge.svg devlog/127-try-it/3-merge.svg \
+         devlog/127-try-it/4-keep-then-merge.svg devlog/127-try-it/5-chain.svg
+make nr-review                    # fixtures 093-106, the frame cases 103-106
+```
+
+Tried: pending
+
+### 4.2 Test report
+
+1. Unit: `test_parse_merge`, five parse-error cases, the two
+   deprecated forms with their warning (`capsys`): green.
+2. Fixtures 093–106 as decided (Account); the seven migrations
+   byte-identical; 094 equals 095 but for the title; mutations per
+   mechanism bite (Account). Chain, strict and availability cases fail
+   on `main`'s code by construction: `main` has no `merge`.
+3. The sugar removes A and E (094); the mutation that ignores the
+   merges in the neighbor search fails 094, 095 and 096.
+4. Frames: 103 (inherit), 104 (split), 105 (framed replacer), 106
+   (error).
+5. `make doc`: one new image, no other changed; 144 pytest, 110 NR
+   fixtures, lint and format clean; RULES.md 107+.
+
+### 4.3 Verdict
+
+**Recommendation:** accept with reservations
+
+- Every decision has a fixture, and the try-it cases of #125 render as
+  the review decided, in both forms.
+
+Reservations:
+
+1. Fixture 036's golden moved by one line (a duplicated frame member
+   the old code produced); the rendered layout is identical.
+2. The `-err-` runner leaves a stray `.dot` when an error fixture
+   succeeds, which hides the failure behind a silent abort; met twice
+   during the mutation runs. A TODO item if you want it fixed.
+
+### 4.4 Discussion
+
+| #   | Point                                                   | Decision |
+| --- | ------------------------------------------------------- | -------- |
+| 1   | 036's golden line                                       |          |
+| 2   | The runner's stray `.dot` on a succeeding error fixture |          |
+
+Ready: pending

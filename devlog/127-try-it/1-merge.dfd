@@ -1,0 +1,4 @@
+#include devlog/127-try-it/base.dfd
+
+merge B C : G
+~<x1 G

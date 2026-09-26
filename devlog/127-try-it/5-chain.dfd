@@ -1,0 +1,5 @@
+#include devlog/127-try-it/base.dfd
+
+process H Super
+merge B C : G
+merge G D : H

@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 32
+Next number: 33
 
 ## Won't do
 
@@ -182,3 +182,12 @@ the review). Codify it lightly: a short section in
 `engineering/PROCESS.md` next to "Fast track", the decision drafts as
 a scratch artifact, the ordering and merge rules, what the review may
 do. No new template.
+
+### 32. Remove the deprecated `~=` form
+
+From #127 (2026-09-26): `~[SPEC] =R ITEMS` is desugared to `merge
+ITEMS : R` (then `~SPECx R`) with a stderr warning; the docs no longer
+show it. Its removal is a breaking change (major), to be done when a
+major comes for a stronger reason: drop `_desugar_replacer()` and the
+replacer branch of `_parse_filter()` in `dsl/parser.py`, fixture 094
+(the sugar twin) and 089 (the bare `=`), the unit cases of the warning.
