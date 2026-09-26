@@ -1098,6 +1098,7 @@ filters, `!!<2 A` and `!>1 A`.
   - `<>`: all directions
   - `[`: left neighbors
   - `]`: right neighbors
+  - `[]`: left and right neighbors
 - SPAN:
   - `*`: all neighbors in the given direction
   - _number_: this number of neighbors in the given direction
@@ -1105,9 +1106,9 @@ filters, `!!<2 A` and `!>1 A`.
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
 
-A filter takes one neighbors specification, and `<>` counts as one. A
-second specification is an error, because a stream direction and a
-layout direction do not compose: they agree only where the arrows are
+A filter takes one neighbors specification, and `<>` or `[]` counts as
+one. A second specification is an error, because a stream direction and
+a layout direction do not compose: they agree only where the arrows are
 drawn in the stream's direction. Hence another neighborhood is another
 filter, with the same items:
 

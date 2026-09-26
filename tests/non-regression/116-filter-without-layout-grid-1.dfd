@@ -1,0 +1,4 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# remove the center and one level each side in the layout direction
+~[]1 N33

@@ -1,0 +1,4 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# several items of interest: the two corners and one layout level
+![]1 N11 N55

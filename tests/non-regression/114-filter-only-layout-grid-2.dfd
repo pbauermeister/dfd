@@ -1,0 +1,5 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# keep the center and two levels each side; on a 5 x 5 grid this is
+# already the whole neighborhood of 112
+![]2 N33

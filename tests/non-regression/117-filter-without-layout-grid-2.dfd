@@ -1,0 +1,4 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# remove the center and two levels each side, the complement of 114
+~[]2 N33

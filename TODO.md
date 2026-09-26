@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 37
+Next number: 38
 
 ## Won't do
 
@@ -112,3 +112,19 @@ that touches code only, with no change to the tests:
   whole-line parser (`_parse_style`) from a part parser
   (`_parse_item_name`): a prefix per kind, or static methods of two
   classes.
+
+### 37. A combinatorial matrix of fixtures for the filters
+
+Raised at the review of #140 (2026-09-26). The neighborhood fixtures
+(028 master, 110 to 112) cover cases by example; a matrix would cover
+them by construction: arrow direction (drawn with or against the
+flow), turns along a chain, constraint edges, the `x` and `f` flags,
+spans 1, 2 and `*`, anchor position, for the stream and the layout
+directions, and later the merge combinations. Evaluate the count and
+prune by branch coverage: a case earns a row only if it exercises a
+branch of `dsl/filters.py` that no other row does. Generating the
+inputs programmatically is safe; the expected outputs are not, since
+computing them means re-implementing the search, so the renders are
+read once by hand and the goldens committed (the NR workflow). The
+diagram of a matrix fixture reads as rows of disconnected chains, as
+111 shows.

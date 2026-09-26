@@ -1,0 +1,94 @@
+# Master for the layout neighborhood tests (112 to 120), a fixture
+# itself so that the review renders it.
+#
+# A 5 x 5 grid of processes Nrc (row r, column c), laid out top-down
+# ("style vertical"). The column flows are constrained and lay out the
+# rows; the row flows are relaxed ("?") so that they do not shift the
+# grid. Columns 1, 3, 5 flow downward and rows 1, 3, 5 rightward, with
+# the drawing; columns 2, 4 flow upward and rows 2, 4 leftward ("<--"),
+# against it, so that the stream and the layout directions differ
+# there. The two diagonals through the center N33 flow away from it;
+# they are constrained, since a diagonal to the next row agrees with
+# the ranks (relaxed, they let Graphviz permute the columns).
+
+style vertical
+
+process N11
+process N12
+process N13
+process N14
+process N15
+process N21
+process N22
+process N23
+process N24
+process N25
+process N31
+process N32
+process N33
+process N34
+process N35
+process N41
+process N42
+process N43
+process N44
+process N45
+process N51
+process N52
+process N53
+process N54
+process N55
+
+# columns, constrained: 1, 3, 5 downward; 2, 4 upward
+N11 --> N21
+N21 --> N31
+N31 --> N41
+N41 --> N51
+N12 <-- N22
+N22 <-- N32
+N32 <-- N42
+N42 <-- N52
+N13 --> N23
+N23 --> N33
+N33 --> N43
+N43 --> N53
+N14 <-- N24
+N24 <-- N34
+N34 <-- N44
+N44 <-- N54
+N15 --> N25
+N25 --> N35
+N35 --> N45
+N45 --> N55
+
+# rows, relaxed: 1, 3, 5 rightward; 2, 4 leftward
+N11 -->? N12
+N12 -->? N13
+N13 -->? N14
+N14 -->? N15
+N21 <--? N22
+N22 <--? N23
+N23 <--? N24
+N24 <--? N25
+N31 -->? N32
+N32 -->? N33
+N33 -->? N34
+N34 -->? N35
+N41 <--? N42
+N42 <--? N43
+N43 <--? N44
+N44 <--? N45
+N51 -->? N52
+N52 -->? N53
+N53 -->? N54
+N54 -->? N55
+
+# diagonals through the center, flowing away from N33
+N33 --> N44
+N44 --> N55
+N22 <-- N33
+N11 <-- N22
+N42 <-- N33
+N51 <-- N42
+N24 <-- N33
+N15 <-- N24

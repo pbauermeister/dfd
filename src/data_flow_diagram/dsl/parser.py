@@ -109,7 +109,7 @@ def _parse_attrib(source: model.SourceLine) -> model.Statement:
 RX_FILTER_ARG = re.compile(
     rf"""(
       # either a neighbor specification
-      (?P<neighbors><>|<|>|\[|])    # direction
+      (?P<neighbors><>|<|>|\[]|\[|])  # direction
       (?P<flags>[a-zA-Z]*)              # flags
       (?: (?P<all>[{re.escape(model.ALL_NEIGHBORS)}]) | (?P<num>[0-9]+) )  # "all" distance, or decimal number
       |
@@ -149,6 +149,9 @@ def _parse_neighbor_spec(
             fn.layout_direction = True
         case "]":
             is_down = True
+            fn.layout_direction = True
+        case "[]":
+            is_up = is_down = True
             fn.layout_direction = True
 
     # parse optional modifier flags ("x", "f")
