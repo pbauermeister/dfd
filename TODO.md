@@ -236,3 +236,13 @@ storytelling). Extract the subset that fits technical documentation
 and the devlogs of a software project like this one, as a style
 sheet under `engineering/` (or in `CONVENTIONS.md` "Markdown"), and
 point `CLAUDE.md`'s map at it. Applied by hand to `doc/` at #128.
+
+Shape agreed (2026-09-26): the sheet takes "The Elements of Style"
+(Strunk & White) as read, the author being a proponent; then the
+departures kept on purpose (no em-dash even for an abrupt break;
+"So"/"Hence" as sentence openers; "i.e."/"e.g." in running text;
+parentheses as a frequent device); then what the book has and the
+blog rules lack, to carry: the active voice; keep related words
+together; the emphatic words at the end of the sentence; one tense
+in a passage; a rule serves clarity, never the reverse; then the
+AI-tell list as the additions the book could not foresee.
