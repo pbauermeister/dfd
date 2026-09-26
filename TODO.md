@@ -87,61 +87,6 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-### 28. Study the dependency updates: detection, blast radius, timing
-
-Raised at the review of #114 (2026-09-25): four actions had drifted
-a year, and the surprise was not the bumps but the rules underneath
-(setup-uv's immutable releases, no moving major tag past v7). Regular
-small updates are cheaper than one accumulated migration. Reframed on
-2026-09-26 as a study, not a configuration: the situation and its
-consequences first, measures after. The package has no runtime
-dependency, so the blast radius is the pipeline (CI, release, lint,
-tests, hooks), never the users; Graphviz and Python are system
-dependencies outside any bot. The goal is not the latest version of
-each package but the stable and secure one, and to learn of a CVE
-against a dependency when it is published and tackle it. Aspects:
-
-- Detecting outdated dependencies: Dependabot version updates,
-  Renovate, `uv lock --upgrade` and `pre-commit autoupdate` by hand,
-  GitHub's security alerts alone.
-- The blast radius of each dependency, one by one: what it touches,
-  how the tests and CI would show a break (semantic-release and the
-  release workflow are the widest, ruff and mypy the noisiest, pytest
-  and pyyaml the narrowest), and which have no test at all.
-- When to update, by compatibility and risk and by the release state:
-  bumps are `chore(deps)`, none-level, so they never force a release
-  and the merge gate never blocks them; a bump of the release tooling
-  is exercised by the dry run from a branch (item 12).
-- Whether a finding calls for a test on our side, and which kind.
-- Security: how a CVE reaches us (GitHub security alerts on the
-  dependency graph, Dependabot security updates as distinct from
-  version updates, `pip-audit` or `uv`'s audit in CI), the delay
-  between publication and notice, and the response: a bump on its
-  own, outside the cadence, with its severity read against what the
-  dependency does here (a CVE in a dev tool run only locally and in CI
-  is not the same as one in the release path). Stable over latest: a
-  major waits, a security patch does not.
-- Supply chain: tag versus commit SHA for actions, immutable releases,
-  never auto-merge a bot PR, the lockfile as the only pin of dev
-  dependencies.
-- Noise and cadence: grouping, cooldown, ignore majors, monthly versus
-  weekly, who reads the release notes of a major.
-- Pinning policy across the three kinds: actions, dev group, hooks.
-
-Deliverable: a discussion file, options with their cost; the decision
-comes at the review or later.
-
-### 30. A symmetrical layout neighborhood `[]`
-
-Raised at the review of #124 (2026-09-25). `<>` is the symmetrical
-stream neighborhood; the layout counterpart `[]` (left and right) is
-not in the grammar (`RX_FILTER_ARG` accepts `<>`, `<`, `>`, `[`,
-`]`) and is refused as an unknown name. Since #123 a filter takes one
-neighborhood specification, so `[1` and `]1` on the same items need
-two filters; `[]` would be the one-filter form. New syntax, `feat:`
-(minor): after the pending patch release. Fixture, README § 7.3.3,
-SYNTAX.md § 7.3.
-
 ### 32. Remove the deprecated `~=` form
 
 From #127 (2026-09-26): `~[SPEC] =R ITEMS` is desugared to `merge
@@ -167,21 +112,3 @@ that touches code only, with no change to the tests:
   whole-line parser (`_parse_style`) from a part parser
   (`_parse_item_name`): a prefix per kind, or static methods of two
   classes.
-
-### 36. Budget the tokens and choose the model, per task and per batch
-
-Raised at the review of #130 (2026-09-26), an addition to the mandate
-of a task and to the assessment of a batch. Per task, when the action
-plan is made: the model per phase (design and review at the top
-model, mechanical steps at a cheaper one), and an estimate of the
-tokens for the whole task. Per batch, early: an assessment of the
-tokens needed against the quota. To be discussed: the estimate needs
-the action plans, which the batch assessment precedes, so an early
-quota check may come too late to be useful; a coarse order of
-magnitude by analogy with past tasks of the same shape, refined at
-each plan, is one way. Decide the granularity, where it is recorded (a
-row of the Mandate, a line of the assessment) and how the actual
-consumption is read back for the next estimate.
-Deliverable (2026-09-26): a research, evaluation and assessment
-report; whether measures follow is decided upon its content, possibly
-none.
