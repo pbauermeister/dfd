@@ -10,6 +10,14 @@ def print_error(text: str) -> None:
     print(text, file=sys.stderr)
 
 
+def print_warning(text: str) -> None:
+    """Print a warning to stderr, in yellow if the output is a terminal."""
+
+    if sys.stderr.isatty():
+        text = f"\033[33m{text}\033[0m"
+    print(f"Warning: {text}", file=sys.stderr)
+
+
 debug = False
 
 

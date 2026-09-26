@@ -42,6 +42,8 @@ def build(
     items_by_name = checker.check(statements)
     statements = resolve_star_endpoints(statements, items_by_name)
     statements = filters.handle_filters(statements, debug=options.debug)
+    # a merge may put its replacer in a second frame
+    checker.check_frames(statements, items_by_name)
     statements = remove_unused_hidables(statements)
     statements, graph_options = handle_options(statements)
 

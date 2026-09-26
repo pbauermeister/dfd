@@ -1,0 +1,18 @@
+# Try-it of #127 (from #125): the three cases of #125, in the deprecated
+# form and in the merge form. Base graph: two sources feed B; the chain
+# goes on to D and F. G is the group to collapse B and C into.
+style horizontal
+
+process A
+process E
+process B
+process C
+process D
+process F
+process G Group
+
+A -> B ab
+E -> B eb
+B -> C bc
+C -> D cd
+D -> F df

@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 32
+Next number: 36
 
 ## Won't do
 
@@ -182,3 +182,57 @@ the review). Codify it lightly: a short section in
 `engineering/PROCESS.md` next to "Fast track", the decision drafts as
 a scratch artifact, the ordering and merge rules, what the review may
 do. No new template.
+
+### 32. Remove the deprecated `~=` form
+
+From #127 (2026-09-26): `~[SPEC] =R ITEMS` is desugared to `merge
+ITEMS : R` (then `~SPECx R`) with a stderr warning; the docs no longer
+show it. Its removal is a breaking change (major), to be done when a
+major comes for a stronger reason: drop `_desugar_replacer()` and the
+replacer branch of `_parse_filter()` in `dsl/parser.py`, fixture 094
+(the sugar twin) and 089 (the bare `=`), the unit cases of the warning.
+
+### 33. Code structure of the filters and the parser (from the review of #128)
+
+Two comments at the review of #128, deferred to a task of their own
+that touches code only, with no change to the tests:
+
+- `dsl/filters.py` holds several concepts and its functions relay the
+  same parameters (statements, the kept set, the merge map, the
+  unavailable set): assess whether classes carry them better.
+- `dsl/parser.py`: `parse()` tells a single statement from a list by
+  `isinstance()`, a smell; assess a `match`, an abstract result type,
+  or every parser returning a list. Also a naming convention telling a
+  whole-line parser (`_parse_style`) from a part parser
+  (`_parse_item_name`): a prefix per kind, or static methods of two
+  classes.
+
+### 34. The NR runner aborts silently on a stray `.dot` of an error fixture
+
+From #127 (2026-09-26). When an `-err-` fixture unexpectedly succeeds
+(a mutation, a regression), `tests/nr-regenerate.sh` reports it but
+leaves the generated `.dot` next to the fixture; the next `make
+nr-test` then treats the fixture as a plain one, finds no golden
+match and aborts on the first error with no `FAIL:` line, hiding the
+regression. Met twice during the mutation smoke-tests of #127. Fix:
+`nr-regenerate.sh` removes the `.dot` it wrote for an `-err-`
+fixture; `nr-test.sh` skips `-err-` fixtures in its plain loop and
+reports a stray `.dot` as a failure.
+
+### 35. A style sheet for the prose of software projects
+
+Raised at the review of #128 (2026-09-26): the docs written by the
+agent carried "AI smells" (elliptic appositions such as "..., an
+error.", "It is X: a Y" openers, staccato corrections). The author's
+blog-post style rules, `~/dev-pb/on-ai/style/authorial-style-rules.md`,
+name the tics to avoid (em-dashes, "not A, it is B", the pivot that
+counters the previous sentence, "Furthermore"/"It's worth noting",
+tricolons by reflex, inflated vocabulary) and the forms preferred
+(short sentences varied on purpose, full clauses, "i.e."/"e.g."
+glosses on first use, "So"/"Hence" pivots, parentheses for asides,
+the point first, one idea per paragraph, lists for the enumerable and
+prose for the rest). They target blog posts (anecdotes, humour,
+storytelling). Extract the subset that fits technical documentation
+and the devlogs of a software project like this one, as a style
+sheet under `engineering/` (or in `CONVENTIONS.md` "Markdown"), and
+point `CLAUDE.md`'s map at it. Applied by hand to `doc/` at #128.

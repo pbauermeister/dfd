@@ -1,0 +1,6 @@
+# Issue #127: the replacer is declared in a frame and the merged items
+# are unframed: it keeps its frame. Expected: F3 holds F and G.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+frame F G = F3
+merge B C : G

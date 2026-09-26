@@ -19,5 +19,5 @@ A -> D   other label
 D -> B   back
 A -> AB  to my replacer
 
-~=AB A B
-~=CD C D
+merge A B : AB
+merge C D : CD

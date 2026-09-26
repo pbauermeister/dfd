@@ -1,0 +1,5 @@
+# Issue #127: the deprecated form, sugar for 095. Expected: the upstream
+# neighbors of the group (A, E) removed: G -> D -> F. A warning on stderr.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+~<1 =G B C

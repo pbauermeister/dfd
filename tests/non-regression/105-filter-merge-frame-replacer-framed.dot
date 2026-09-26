@@ -1,0 +1,46 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/105-filter-merge-frame-replacer-framed -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=LR
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 6: process A */
+  "A" [shape=ellipse label="A" fillcolor="#eeeeee" style=filled ]
+
+  /* 7: process E */
+  "E" [shape=ellipse label="E" fillcolor="#eeeeee" style=filled ]
+
+  /* 10: process D */
+  "D" [shape=ellipse label="D" fillcolor="#eeeeee" style=filled ]
+
+  /* 11: process F */
+  "F" [shape=ellipse label="F" fillcolor="#eeeeee" style=filled ]
+
+  /* 12: process G Group */
+  "G" [shape=ellipse label="Group" fillcolor="#eeeeee" style=filled ]
+
+  /* 13: process H Super */
+  "H" [shape=ellipse label="Super" fillcolor="#eeeeee" style=filled ]
+
+  /* 15: flow A B ab */
+  "A" -> "G" [label="ab"]
+
+  /* 16: flow E B eb */
+  "E" -> "G" [label="eb"]
+
+  /* 18: flow C D cd */
+  "G" -> "D" [label="cd"]
+
+  /* 19: flow D F df */
+  "D" -> "F" [label="df"]
+
+  /* 4: frame F G = F3 */
+  subgraph cluster_0 {
+    label="F3"
+    style=dashed
+    "F"
+    "G"
+  }
+}

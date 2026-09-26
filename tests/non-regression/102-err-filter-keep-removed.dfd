@@ -1,0 +1,6 @@
+# Issue #127: an item removed by a previous filter cannot be kept
+# again (SYNTAX.md § 7.4).
+#include tests/non-regression/093-filter-merge-master.dfd
+
+~ A
+! A

@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 6: merge B C : G
+  line 1: <file:tests/non-regression/104-err-filter-merge-frames-split.dfd>
+Error:  Cannot merge items from different frames: B (F1), C (F2)

@@ -1,0 +1,6 @@
+# Issue #127: items from different frames cannot be merged.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+frame A B = F1
+frame C D = F2
+merge B C : G

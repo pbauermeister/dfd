@@ -74,7 +74,7 @@ def _check_connections(
             )
 
 
-def _check_frames(
+def check_frames(
     statements: model.Statements, items_by_name: dict[str, model.Item]
 ) -> None:
     """Validate frame membership: items must exist and not belong to multiple frames."""
@@ -129,6 +129,6 @@ def check(statements: model.Statements) -> dict[str, model.Item]:
     """Validate all statements: no duplicate items, valid connection endpoints, valid frames."""
     items_by_name = _check_items(statements)
     _check_connections(statements, items_by_name)
-    _check_frames(statements, items_by_name)
+    check_frames(statements, items_by_name)
     _check_backslashes(statements)
     return items_by_name

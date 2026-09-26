@@ -398,7 +398,7 @@ E4  ::> P   signal
 
 ![Context diagram](./img/context.svg)
 
-Note that there should be exactly one process.
+There must be exactly one process.
 
 ### 3.4. Diagram direction
 
@@ -674,7 +674,7 @@ opening ` ``` ` and the `data-flow-diagram` formatter, like:
 
     ```
 
-Note that only code blocks delimited by triple-backticks fences are considered.
+Only code blocks delimited by triple-backtick fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored:
 
         data-flow-diagram img/FILENAME.svg
@@ -922,7 +922,7 @@ This --> That
 
 - `#dfd/Feature-1` refers to the `dfd/Feature-1` snippet.
 - `:This` refers to the item named `This` in the referred snippet.
-- `process` must be used, in order to be of the same type as the referred item.
+- `process` must be used, so that the type is the same as the referred item's.
 - The referred item must be used by its item name; here `This`.
 - Since the label is omitted, the name is use instead.
 
@@ -987,17 +987,23 @@ Dependencies checking lead to error, if any of the following is found:
 To turn off the checking, specify the `--no-check-dependencies` flag to the
 command line.
 
-## 7. Filters
+## 7. Filters and merge
 
-Filtering (keeping/removing items) can be used to generate diagram subsets.
+Filters keep or remove items. Merges collapse several items into one.
+Both derive subgraphs or simplified graphs from a master graph, and
+that is their only use: a diagram written to be shown as it is has no
+need for them.
 
-### 7.1. Filters use case
+### 7.1. Use case
 
-With a single DFD source file, filters do not make a lot of sense. But when combined with the `#include` capabilities, it allows you to reuse parts, and apply the DRY (do not repeat yourself) principle:
+With a single DFD source file, filters and merges do not make a lot of sense. But when combined with the `#include` capabilities, they let you reuse parts, and apply the DRY (do not repeat yourself) principle:
 
-- You work on a complete "master" diagram,
-- and create subset diagrams by including the master and using filters.
-- The subsets let you focus on desired aspects, and the master keeps the full and continuously maintained logic.
+- You work on a complete "master" diagram, which carries all the
+  details, at the risk of becoming unreadable,
+- and create subset diagrams by including the master and using filters,
+  or simplified diagrams by merging groups of its items into one.
+- The subsets and the simplified views let you focus on desired aspects,
+  and the master keeps the full and continuously maintained logic.
 
 ### 7.2. Specifying filters
 
@@ -1032,8 +1038,9 @@ You shall think of a set of kept items, manipulated sequentially:
 
 You can combine them by sequential statements:
 
-- you can only remove items that are available at the given point,
-- you can re-add items that were previously removed.
+- you can only name items that are available at the given point. An
+  item removed by a previous filter, or merged away (see below), can
+  neither be removed again nor kept; naming it is an error.
 - Example:
 
   ```
@@ -1047,14 +1054,9 @@ You can combine them by sequential statements:
   # Remove B
   ~B
 
-  # This would fail because A is already removed
+  # These would fail because A is already removed
   ~A
-
-  # Re-add A
   ! A
-
-  # This would now succeed
-  ~A
 
   ```
 
@@ -1103,16 +1105,46 @@ filters, `!!<2 A` and `!>1 A`.
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
 
-One neighbors specification per filter, `<>` being one: a second one
-is an error, because a stream direction and a layout direction do not
-compose (they agree only where the arrows are drawn in the stream's
-direction). Another neighborhood is another filter, with the same
-items:
+A filter takes one neighbors specification, and `<>` counts as one. A
+second specification is an error, because a stream direction and a
+layout direction do not compose: they agree only where the arrows are
+drawn in the stream's direction. Hence another neighborhood is another
+filter, with the same items:
 
 ```
 !<1 P
 !>2 P
 ```
+
+#### 7.3.4. The "Merge" statement
+
+`merge ITEM_NAMES : REPLACER`
+
+The items are collapsed into the replacer, i.e. an item declared
+elsewhere to stand for the group. Their flows are rewired to it, a flow
+between two merged items disappears, and the merged items are no
+longer available to the statements that follow.
+
+A merge is not a filter. It leaves the set of kept items alone, with
+one exception: the replacer takes the place of the merged items in it.
+So once a filter has made a set of kept items, a merge can only name
+kept items.
+
+Merges are processed in order with the filters, and the order carries
+a meaning. With `!` then `merge`, the selection is made on the
+original flows, and the group is formed afterwards. With `merge` then
+`!`, the selection is made on the grouped diagram, from the replacer
+if you name it. Section 7.4.2.2 shows both orders.
+
+Merges chain. `merge B C : G` then `merge G D : H` collapses B, C, G
+and D into H. Written the other way round, the second merge names an
+item already merged away, which is an error.
+
+Frames follow one rule: the merged items must be in one frame, or all
+unframed, since items from different frames cannot be merged. The
+replacer takes their place in that frame, and a frame left empty
+disappears. A replacer declared in a frame of its own keeps it. If it
+would also inherit one, it ends up in two frames, which is an error.
 
 ### 7.4. Filters example
 
@@ -1413,16 +1445,37 @@ Then, let's collapse the DBs as a new one:
 # Declare a new super DB to later represent the other DBs
 store db_all All DBs
 
-# Keep the databases and immediate neighbors (as before), and also the super DB
-!<>1 db_aggr db_fcast db_params db_all
+# Keep the databases and immediate neighbors (as before)
+!<>1 db_aggr db_fcast db_params
 
-# Replace the DBs by the super DB
-~=db_all db_aggr db_fcast db_params
-
-# Note the "=" operator, to define a replacer, then the removed nodes
+# Merge the DBs into the super DB, which takes their place
+merge db_aggr db_fcast db_params : db_all
 ```
 
 ![Filtering](./img/filter-replace.svg)
+
+The order of the two statements carries a meaning. Above, the `!`
+selects on the original flows, and the group is formed afterwards.
+Merging first selects on the grouped diagram instead: the `!` that
+follows starts empty and walks the rewired flows, from the super DB
+itself:
+
+```data-flow-diagram img/filter-merge-first.svg
+#include #img/data-pipeline
+
+store db_all All DBs
+
+# Merge the DBs into the super DB first: nothing is kept yet
+merge db_aggr db_fcast db_params : db_all
+
+# Then keep the super DB and its immediate neighbors on the rewired flows
+!<>1 db_all
+```
+
+![Filtering](./img/filter-merge-first.svg)
+
+A merged item is no longer available to the statements that follow, so
+`! db_aggr` after the merge is an error.
 
 ## 8. Influencing the layout
 

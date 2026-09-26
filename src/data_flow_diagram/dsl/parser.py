@@ -5,7 +5,7 @@ import re
 from collections.abc import Callable
 
 from .. import config, exception, model
-from ..console import dprint
+from ..console import dprint, print_warning
 from ..model import Keyword
 
 
@@ -41,24 +41,26 @@ def parse(
             ) from None
 
         try:
-            statement = f(source)
+            parsed = f(source)
         except exception.DfdException as e:
             raise exception.DfdException(str(e), source=source) from e
 
-        # post-parse: extract inline attributes and register dependencies
-        match statement:
-            case model.Item() as item:
-                _parse_item_external(item, dependencies)
-                item.text = item.text or item.name
-                parse_drawable_attrs(item)
+        # one line yields one statement, or several for a desugared form
+        for statement in parsed if isinstance(parsed, list) else [parsed]:
+            # post-parse: extract inline attributes and register dependencies
+            match statement:
+                case model.Item() as item:
+                    _parse_item_external(item, dependencies)
+                    item.text = item.text or item.name
+                    parse_drawable_attrs(item)
 
-            case model.Drawable() as drawable:
-                parse_drawable_attrs(drawable)
+                case model.Drawable() as drawable:
+                    parse_drawable_attrs(drawable)
 
-            case model.Attrib() as attrib:
-                attribs[attrib.alias] = attrib
+                case model.Attrib() as attrib:
+                    attribs[attrib.alias] = attrib
 
-        statements.append(statement)
+            statements.append(statement)
 
     if shared_options and shared_options.debug:
         for s in statements:
@@ -174,7 +176,57 @@ def _parse_neighbor_spec(
     return fn, is_up, is_down
 
 
-def _parse_filter(source: model.SourceLine) -> model.Statement:
+def _parse_merge(source: model.SourceLine) -> model.Statement:
+    """Parse merge ITEM [ITEM...] : REPLACER"""
+    head, sep, tail = source.text.partition(":")
+    if not sep:
+        raise exception.DfdException("Expected ': REPLACER' after the items")
+    names = head.split()[1:]
+    replacers = tail.split()
+    if not names:
+        raise exception.DfdException(
+            "One or more items are expected before ':'"
+        )
+    if len(replacers) != 1:
+        raise exception.DfdException(
+            "Exactly one replacer is expected after ':'"
+        )
+    if replacers[0] in names:
+        raise exception.DfdException(
+            "The replacer cannot be one of the merged items"
+        )
+    return model.Merge(source=source, names=names, replacer=replacers[0])
+
+
+def _desugar_replacer(
+    f: model.Filter, *, replacer: str, spec: re.Match[str] | None
+) -> list[model.Statement]:
+    """The deprecated "~[SPEC] =R ITEMS": a merge, then the neighbors' removal."""
+    merge = model.Merge(source=f.source, names=f.names, replacer=replacer)
+    hint = f"merge {' '.join(f.names)} : {replacer}"
+    if spec is None:
+        print_warning(f"'~=' is deprecated, write: {hint}")
+        return [merge]
+    # the neighbors of the group, not the group: the x flag on the spec
+    f.neighbors_up.suppress_anchors = True
+    f.neighbors_down.suppress_anchors = True
+    without = model.Without(**f.__dict__)
+    without.names = [replacer]
+    spec_x = (
+        spec.group("neighbors")
+        + "x"
+        + spec.group("flags")
+        + (spec.group("all") or spec.group("num"))
+    )
+    print_warning(
+        f"'~=' is deprecated, write: {hint}, then ~{spec_x} {replacer}"
+    )
+    return [merge, without]
+
+
+def _parse_filter(
+    source: model.SourceLine,
+) -> model.Statement | list[model.Statement]:
     """Parse !/~[NEIGHBOURS] NAME[S]"""
     terms: list[str] = source.text.split()
     if len(terms) < 2:
@@ -202,6 +254,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     args = terms[1:]
     replacer = ""
     spec_given = False
+    spec: re.Match[str] | None = None
 
     # consume leading neighbor/replacer specifications before the anchor names
     while args:
@@ -235,6 +288,7 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
                     " repeat the filter for another one"
                 )
             spec_given = True
+            spec = m
 
             # assign parsed spec to the matching direction(s)
             if is_up:
@@ -251,14 +305,11 @@ def _parse_filter(source: model.SourceLine) -> model.Statement:
     f.names = args
 
     # wrap into the concrete Only or Without subclass
-    res: model.Statement
     if cmd in (Keyword.ONLY, Keyword.ONLY_STRICT):
-        res = model.Only(**f.__dict__, strict=cmd == Keyword.ONLY_STRICT)
-    else:  # cmd == Keyword.WITHOUT:
-        res = model.Without(
-            **f.__dict__, replaced_by=replacer
-        )  # replaced_by is set later by the caller
-    return res
+        return model.Only(**f.__dict__, strict=cmd == Keyword.ONLY_STRICT)
+    if replacer:
+        return _desugar_replacer(f, replacer=replacer, spec=spec)
+    return model.Without(**f.__dict__)
 
 
 def _make_item_parser(
@@ -485,7 +536,10 @@ def _parse_frame(source: model.SourceLine) -> model.Statement:
 ##############################################################################
 # Keyword-to-parser dispatch table (module-level, built once)
 
-_PARSERS: dict[Keyword, Callable[[model.SourceLine], model.Statement]] = {
+_PARSERS: dict[
+    Keyword,
+    Callable[[model.SourceLine], model.Statement | list[model.Statement]],
+] = {
     # Options
     Keyword.STYLE: _parse_style,
     Keyword.ATTRIB: _parse_attrib,
@@ -503,6 +557,8 @@ _PARSERS: dict[Keyword, Callable[[model.SourceLine], model.Statement]] = {
     Keyword.UFLOW: _make_connection_parser(keyword=Keyword.UFLOW),
     Keyword.SIGNAL: _make_connection_parser(keyword=Keyword.SIGNAL),
     Keyword.CONSTRAINT: _make_connection_parser(keyword=Keyword.CONSTRAINT),
+    # Substitution
+    Keyword.MERGE: _parse_merge,
     # Connections: reversed
     Keyword.FLOW_REVERSED: _make_connection_parser(
         keyword=Keyword.FLOW, reversed=True

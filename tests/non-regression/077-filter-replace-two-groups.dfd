@@ -17,7 +17,7 @@ B <- D  d to b
 D -> E  d to e
 
 process AB
-~=AB A B
+merge A B : AB
 
 process CD
-~=CD C D
+merge C D : CD

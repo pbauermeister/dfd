@@ -14,4 +14,4 @@ C -> D cd
 D -> B db
 
 !!<2 D G
-~=G B C
+merge B C : G

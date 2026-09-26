@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 7: !>1 A
+  line 1: <file:tests/non-regression/096-err-filter-merge-anchor-removed.dfd>
+Error:  Name(s) no longer available: A (removed at line 5: ~<x1 G)

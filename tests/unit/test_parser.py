@@ -125,6 +125,51 @@ PARSE_ERROR_CASES = [
         """,
         id="bare-replacer-sign",  # "=" alone: the parser used to spin forever
     ),
+    pytest.param(
+        """
+        process  B  text
+        process  C  text
+        process  G  text
+        merge  B  C
+        """,
+        id="merge-no-colon",
+    ),
+    pytest.param(
+        """
+        process  B  text
+        process  C  text
+        process  G  text
+        merge  :  G
+        """,
+        id="merge-no-items",
+    ),
+    pytest.param(
+        """
+        process  B  text
+        process  C  text
+        process  G  text
+        merge  B  C  :
+        """,
+        id="merge-no-replacer",
+    ),
+    pytest.param(
+        """
+        process  B  text
+        process  C  text
+        process  G  text
+        merge  B  C  :  G  B
+        """,
+        id="merge-two-replacers",
+    ),
+    pytest.param(
+        """
+        process  B  text
+        process  C  text
+        process  G  text
+        merge  B  C  :  B
+        """,
+        id="merge-into-a-merged-item",
+    ),
 ]
 
 
@@ -218,3 +263,59 @@ def test_parse_raises(dfd_text: str) -> None:
     tokens = scanner.scan(provenance=None, source_text=dfd_text)
     with pytest.raises(exception.DfdException):
         parser.parse(tokens)
+
+
+def test_parse_merge() -> None:
+    # "merge ITEMS : REPLACER" is a statement of its own
+    tokens = scanner.scan(
+        provenance=None,
+        source_text="process B\nprocess C\nprocess G\nmerge B C : G",
+    )
+    statements, _, _ = parser.parse(tokens)
+    merge = statements[-1]
+    assert isinstance(merge, model.Merge)
+    assert (merge.names, merge.replacer) == (["B", "C"], "G")
+
+
+@pytest.mark.parametrize(
+    ("line", "kinds", "hint"),
+    [
+        pytest.param(
+            "~=G B C", [model.Merge], "write: merge B C : G\n", id="alone"
+        ),
+        pytest.param(
+            "~<1 =G B C",
+            [model.Merge, model.Without],
+            "write: merge B C : G, then ~<x1 G\n",
+            id="with-spec",
+        ),
+    ],
+)
+def test_parse_deprecated_replacer(
+    *,
+    line: str,
+    kinds: list[type],
+    hint: str,
+    capsys: pytest.CaptureFixture[str],
+) -> None:  # pytest passes parameters by keyword
+    # the former "~[SPEC] =R ITEMS" yields a merge (and the neighbors'
+    # removal, "x": not the group) with one warning naming the new form
+    tokens = scanner.scan(
+        provenance=None,
+        source_text=f"process B\nprocess C\nprocess G\n{line}",
+    )
+    statements, _, _ = parser.parse(tokens)
+    tail = statements[3:]
+    assert [type(s) for s in tail] == kinds
+    merge = tail[0]
+    assert isinstance(merge, model.Merge)
+    assert (merge.names, merge.replacer) == (["B", "C"], "G")
+    if len(tail) == 2:
+        without = tail[1]
+        assert isinstance(without, model.Without)
+        assert without.names == ["G"]
+        assert without.neighbors_up.suppress_anchors
+        assert without.neighbors_up.distance == 1
+    err = capsys.readouterr().err
+    assert err.count("deprecated") == 1
+    assert err.endswith(hint)
