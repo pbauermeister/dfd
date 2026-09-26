@@ -120,6 +120,8 @@ show it. Its removal is a breaking change (major), to be done when a
 major comes for a stronger reason: drop `_desugar_replacer()` and the
 replacer branch of `_parse_filter()` in `dsl/parser.py`, fixture 094
 (the sugar twin) and 089 (the bare `=`), the unit cases of the warning.
+Constraint (2026-09-26): a breaking change, never proposed for a batch;
+it waits for a major.
 
 ### 33. Code structure of the filters and the parser (from the review of #128)
 
@@ -150,3 +152,6 @@ magnitude by analogy with past tasks of the same shape, refined at
 each plan, is one way. Decide the granularity, where it is recorded (a
 row of the Mandate, a line of the assessment) and how the actual
 consumption is read back for the next estimate.
+Deliverable (2026-09-26): a research, evaluation and assessment
+report; whether measures follow is decided upon its content, possibly
+none.
