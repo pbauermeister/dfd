@@ -1,4 +1,4 @@
-#include tests/non-regression/111-filter-layout-matrix.part
+#include tests/non-regression/111-filter-layout-matrix.master.dfd
 
 # layout neighborhood, both sides, two levels: keeps the whole chain
 # only where both arrows are drawn the same way (1 and 4), stops at a

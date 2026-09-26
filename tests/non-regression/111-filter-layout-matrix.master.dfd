@@ -1,4 +1,6 @@
-# Master for the layout neighborhood tests (111, 112).
+# Master for the layout neighborhood tests (111, 112), a fixture itself
+# so that the review renders it.
+#
 # Five chains with the same flow A -> B -> C, drawn in the four
 # combinations of arrow direction, plus one joined by a layout
 # constraint. Anchored at A with span 2, the layout neighborhood

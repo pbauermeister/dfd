@@ -7,6 +7,7 @@ Before adding or changing any test, read `tests/README.md`. It defines: how to c
 ## Non-regression tests
 
 - **Fixtures** (test inputs) live in `tests/non-regression/`: `.dfd`, `.part`, `.md` files.
+- A master shared by several fixtures through `#include` is a fixture itself, `NNN-<topic>.master.dfd` with its `.dot` golden, so that `make nr-review` renders it for visual inspection (111). The `.part` extension is for an include fragment that is not a diagram (021); 028 predates the rule.
 - **Golden files** (expected outputs): `.dot` files. Standalone tests use `NNN-name.dot`; markdown tests use `NNN-name/output.dot` subdirectories.
 - **Workflow:** `make nr-review` → inspect SVGs / error output → `make nr-regenerate` → commit fixtures and golden files together.
 - `make nr-test` runs as part of `make test`. It compares regenerated output against golden files.

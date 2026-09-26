@@ -1,7 +1,7 @@
 
 digraph D {
   graph[label="
-- tests/non-regression/111-filter-only-layout-matrix -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+- tests/non-regression/111-filter-layout-matrix.master -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
   rankdir=LR
   edge[color=gray fontname="times-italic" fontsize=10]
   node[fontname="helvetica" fontsize=10]
@@ -21,11 +21,17 @@ digraph D {
   /* 13: process B2 B2 */
   "B2" [shape=ellipse label="B2" fillcolor="#eeeeee" style=filled ]
 
+  /* 14: process C2 C2 */
+  "C2" [shape=ellipse label="C2" fillcolor="#eeeeee" style=filled ]
+
   /* 15: process A3 A3 */
   "A3" [shape=ellipse label="A3" fillcolor="#eeeeee" style=filled ]
 
   /* 16: process B3 B3 */
   "B3" [shape=ellipse label="B3" fillcolor="#eeeeee" style=filled ]
+
+  /* 17: process C3 C3 */
+  "C3" [shape=ellipse label="C3" fillcolor="#eeeeee" style=filled ]
 
   /* 18: process A4 A4 */
   "A4" [shape=ellipse label="A4" fillcolor="#eeeeee" style=filled ]
@@ -42,6 +48,9 @@ digraph D {
   /* 22: process B5 B5 */
   "B5" [shape=ellipse label="B5" fillcolor="#eeeeee" style=filled ]
 
+  /* 23: process C5 C5 */
+  "C5" [shape=ellipse label="C5" fillcolor="#eeeeee" style=filled ]
+
   /* 25: flow A1 B1 */
   "A1" -> "B1" [label=""]
 
@@ -51,8 +60,14 @@ digraph D {
   /* 28: flow A2 B2 */
   "A2" -> "B2" [label=""]
 
+  /* 29: flow.r C2 B2 */
+  "C2" -> "B2" [label="" dir=back]
+
   /* 31: flow.r B3 A3 */
   "B3" -> "A3" [label="" dir=back]
+
+  /* 32: flow B3 C3 */
+  "B3" -> "C3" [label=""]
 
   /* 34: flow.r B4 A4 */
   "B4" -> "A4" [label="" dir=back]
@@ -62,4 +77,7 @@ digraph D {
 
   /* 37: flow A5 B5 */
   "A5" -> "B5" [label=""]
+
+  /* 38: constraint B5 C5 */
+  "B5" -> "C5" [label="" style=invis dir=none]
 }
