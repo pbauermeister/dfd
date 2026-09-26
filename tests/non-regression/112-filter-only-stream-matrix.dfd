@@ -1,0 +1,5 @@
+#include tests/non-regression/111-filter-layout-matrix.part
+
+# the stream twin of 111: the flow is A -> B -> C in every chain, so
+# <>2 keeps every chain whole; the constraint (5) is still not followed
+!<>2 A1 A2 A3 A4 A5

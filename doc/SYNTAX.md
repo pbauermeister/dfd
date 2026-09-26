@@ -299,8 +299,8 @@ error.
 DIRECTION[FLAGS]SPAN
 ```
 
-| Part        | Values                                                         |
-| ----------- | -------------------------------------------------------------- |
+| Part        | Values                                                                  |
+| ----------- | ----------------------------------------------------------------------- |
 | `DIRECTION` | `>` downstream, `<` upstream, `<>` both; `[` left, `]` right, `[]` both |
 | `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames          |
 | `SPAN`      | `*` = unlimited, or integer distance                                    |

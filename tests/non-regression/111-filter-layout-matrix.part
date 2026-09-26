@@ -1,0 +1,37 @@
+# Master for the layout neighborhood tests (111, 112).
+# Five chains with the same flow A -> B -> C, drawn in the four
+# combinations of arrow direction, plus one joined by a layout
+# constraint. Anchored at A with span 2, the layout neighborhood
+# stops where the drawing turns (chains 2 and 3), the stream
+# neighborhood never does, and neither follows the constraint.
+
+process A1 A1
+process B1 B1
+process C1 C1
+process A2 A2
+process B2 B2
+process C2 C2
+process A3 A3
+process B3 B3
+process C3 C3
+process A4 A4
+process B4 B4
+process C4 C4
+process A5 A5
+process B5 B5
+process C5 C5
+
+A1 --> B1
+B1 --> C1
+
+A2 --> B2
+C2 <-- B2
+
+B3 <-- A3
+B3 --> C3
+
+B4 <-- A4
+C4 <-- B4
+
+A5 --> B5
+B5 >> C5

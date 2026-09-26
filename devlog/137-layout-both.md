@@ -26,13 +26,14 @@ with the same flags and span. Documented next to `<>`.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                             | Basis                          | Alternatives considered                   |
-| --- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------- |
-| 1   | `[]` sets both directions with `layout_direction`; one alternative in `RX_FILTER_ARG`, one case in the match         | TODO 30 (rule)                 | A second regex group for the layout forms |
-| 2   | Nothing else in the grammar moves: an unknown direction (`<]`) still fails as an unknown item name                   | TODO 30 (rule)                 | A dedicated error for a bad direction     |
-| 3   | Parser unit test over the five directions, one parametrized case each; NR fixture 110 `![]2 S2` on the filter master | `tests/README.md` (rule)       | The fixture alone                         |
-| 4   | Distance 2 for the fixture: at 1, `[]` and `<>` keep the same set (every adjacent item), the reversals show at 2     | measured (see Account)         | Distance 1, `*`                           |
-| 5   | README § 7.3.3 gains the form in the list and the "counts as one" sentence; SYNTAX.md § 7.4 the table cell           | TODO 30 (taste): no new figure | An example in § 7.4.1.2                   |
+| #   | Decision                                                                                                                                                                                                                                | Basis                                          | Alternatives considered                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------------- |
+| 1   | `[]` sets both directions with `layout_direction`; one alternative in `RX_FILTER_ARG`, one case in the match                                                                                                                            | TODO 30 (rule)                                 | A second regex group for the layout forms |
+| 2   | Nothing else in the grammar moves: an unknown direction (`<]`) still fails as an unknown item name                                                                                                                                      | TODO 30 (rule)                                 | A dedicated error for a bad direction     |
+| 3   | Parser unit test over the five directions, one parametrized case each; NR fixture 110 `![]2 S2` on the filter master                                                                                                                    | `tests/README.md` (rule)                       | The fixture alone                         |
+| 4   | Distance 2 for the fixture: at 1, `[]` and `<>` keep the same set (every adjacent item), the reversals show at 2                                                                                                                        | measured (see Account)                         | Distance 1, `*`                           |
+| 5   | README § 7.3.3 gains the form in the list and the "counts as one" sentence; SYNTAX.md § 7.4 the table cell                                                                                                                              | TODO 30 (taste): no new figure                 | An example in § 7.4.1.2                   |
+| 6   | Review loop: a matrix master (111 part) of five A→B→C chains drawn in the four arrow combinations plus a constraint, fixtures 111 (`[]2`) and 112 (`<>2` twin), 110 kept; span 2 because span 1 keeps every adjacent item in both forms | review of #140 (rule); measured before writing | Distance-1 cases; one fixture per chain   |
 
 ### 1.4 Acceptance criteria
 
@@ -43,6 +44,9 @@ with the same flags and span. Documented next to `<>`.
 3. `<]2` and `[]` with a second specification fail as before.
 4. `make format`, `make lint`, `make test` pass; the mutation
    smoke-test fails fixture 110 and the unit test.
+5. Review loop: on the matrix, `[]2` keeps chains 1 and 4 whole, cuts
+   2 and 3 at the turn and drops C5; `<>2` keeps all but C5; the
+   mutation fails 110 and 111 and leaves 112.
 
 Approved: 2026-09-26 (the go for the batch)
 
@@ -68,6 +72,13 @@ Approved: 2026-09-26 (the go for the batch)
   has it with a figure.
 
 - This devlog.
+- Review loop (2026-09-26): prettier pass on `doc/SYNTAX.md` (the
+  table); the matrix master and fixtures 111 and 112, kept sets
+  measured in the scratchpad first (111: A1..A5 B1..B5 C1 C4; 112:
+  the same plus C2 C3); TODO item 37 for the combinatorial matrix of
+  all filters, with the reservation that expected outputs cannot be
+  generated without re-implementing the search. Mutation reverted by
+  its inverse `sed` this time, parser diff against HEAD empty after.
 
 ## 3. Delivery
 
@@ -88,7 +99,9 @@ Approved: 2026-09-26 (the go for the batch)
 | 2   | Measuring the kept sets first chose the span; the item's "two filters" wording was wrong, `Only` filters intersect  | well     |      |
 | 3   | Reverting the mutation with `git checkout` took the feature edit with it; a mutation is reverted by its own inverse | not well |      |
 
-Process: 1 round before the go (the batch assessment); 0 loops.
+| 4 | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well | |
+
+Process: 1 round before the go (the batch assessment); 1 loop at the review (the matrix fixtures).
 
 Closed: pending
 
