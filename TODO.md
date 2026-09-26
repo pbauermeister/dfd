@@ -101,7 +101,6 @@ push). Against: bot noise, a merge each time, the review of release
 notes on a major still by hand. Decide the pinning policy with it:
 current major or exact tag for actions, release notes read on a major.
 
-
 ### 30. A symmetrical layout neighborhood `[]`
 
 Raised at the review of #124 (2026-09-25). `<>` is the symmetrical
