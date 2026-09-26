@@ -291,3 +291,44 @@ Reservations:
 | 2   | The runner's stray `.dot` on a succeeding error fixture | postpone: TODO 34                                                      |
 
 Ready: 2026-09-26
+
+## 5. Closure
+
+### 5.1 Retrospective
+
+| #   | Point                                                                                                                                              | Agent    | User |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: full track; stop 0 held a real design round (keyword, grammar rule, frames) and the mock-up decided the option in one go | well     |      |
+| 2   | The mock-up passed the whole suite unchanged before stop 1: the desugaring made the old fixtures the first test of the new statement               | well     |      |
+| 3   | The review of the pictures reversed two decisions taken from the mock-up (11: kept items only; 10: one frame or error): pictures decide, not code  | well     |      |
+| 4   | Stop rule miss of my own: a changed golden (036) was accepted by me at a step gate meant to stop; right in substance, wrong in form                | not well |      |
+| 5   | The NR runner's stray `.dot` cost two reruns and a lost golden before I understood it; the mutation loop had no cleanup                            | not well |      |
+| 6   | Prose: the review found AI tells in my doc text; the author's style rules now shape doc/ prose, and TODO 35 makes a project sheet of them          | surprise |      |
+| 7   | The devlog went to 321 lines and was trimmed to 180 on request; pasting the mock-up slice was the excess                                           | tension  |      |
+
+Process: 1 round before stop 0; 1 round before stop 1; 2 loops at the review (the pictures, the prose); rework after stop 1: decisions 10 and 11.
+
+Closed: pending
+
+### 5.2 Forward-looking
+
+- TODO 32: remove `~=` at a later major. TODO 33: the code-structure
+  comments (classes in filters.py, the parser's result type and naming).
+  TODO 34: the NR runner's stray `.dot`. TODO 35: a style sheet for the
+  project's prose.
+- The next tasks can rely on: a `Merge` statement in the model; one
+  accessor for a flow's ends in phase one; an unavailable set with the
+  cause of each name; the frame check callable after the filters;
+  fixtures 093–109 on a master of their own.
+- Leftovers to delete: the `mockup/127` worktree and branch; the
+  `fix/125-filters-after-replacement` branch on origin, consumed.
+
+### 5.3 Rule trace
+
+| Source                                             | Rule                                                                | Verb (applied / created) |
+| -------------------------------------------------- | ------------------------------------------------------------------- | ------------------------ |
+| `engineering/CONVENTIONS.md` "Design philosophy"   | Parser scopes: `:` a line-level fact, term regexes know no siblings | applied                  |
+| `doc/SYNTAX.md` § 7.3, § 7.5                       | Merge semantics, availability with cause, one frame or error        | created                  |
+| `engineering/PROCESS.md` "Implementation workflow" | Stop when a golden changes                                          | applied late (row 4)     |
+| `tests/RULES.md`                                   | Mutation smoke-test per mechanism                                   | applied                  |
+| Author's style rules (TODO 35)                     | Full clauses, glosses, pivots; no em-dash, no elliptic apposition   | applied                  |
