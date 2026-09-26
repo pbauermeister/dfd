@@ -1,7 +1,7 @@
 # 129 — Codify the chained fast tracks
 
 Date: 2026-09-26
-Status: ONGOING
+Status: DONE
 Issue: #129 · PR: #130 · Branch: `doc/129-chained-fast-tracks`
 Task nature: change
 Track: fast
@@ -81,17 +81,17 @@ the merge.
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                                                                                     | Agent    | User |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track for a section written from a recorded shape                                                                                                                          | well     |      |
-| 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it                                                                                   | well     |      |
-| 3   | The assessment ordered by kind and shared files and missed the dependency between outputs: the style sheet, written last, applied to the three texts before it; the user saw it at the first review       | not well |      |
-| 4   | Removing each TODO item on its branch made `TODO.md` the one shared file: three conflicts on the forward merges, two resolutions that undid the branch's edits, stacking that existed for that file alone | not well |      |
-| 5   | Chained shell commands ran on after a failure (a force push, an issue comment): the exit of a pipeline is its last command's                                                                              | not well |      |
+| #   | Point                                                                                                                                                                                                     | Agent    | User       |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: fast track for a section written from a recorded shape                                                                                                                          | well     | well       |
+| 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it                                                                                   | well     | well       |
+| 3   | The assessment ordered by kind and shared files and missed the dependency between outputs: the style sheet, written last, applied to the three texts before it; the user saw it at the first review       | not well | ended well |
+| 4   | Removing each TODO item on its branch made `TODO.md` the one shared file: three conflicts on the forward merges, two resolutions that undid the branch's edits, stacking that existed for that file alone | not well | ended well |
+| 5   | Chained shell commands ran on after a failure (a force push, an issue comment): the exit of a pipeline is its last command's                                                                              | not well | ended well |
 
-Process: 1 round before the go (the assessment); 3 loops from the reviews of the batch (the ordering rule; the closures' lessons; the hiccups report); its own review pending.
+Process: 1 round before the go (the assessment); 3 loops from the reviews of the batch (the ordering rule; the closures' lessons; the hiccups report); its own review: 1 round, the hiccups report.
 
-Closed:
+Closed: 2026-09-26
 
 ### 4.2 Rule trace
 
