@@ -87,19 +87,39 @@ it as a dev dependency from `make-doc.sh`. Brief, measured survey
 of existing tools and requirements in
 `discussions/md-titles-renumberer-tool.md` (from #90).
 
-### 28. Examine Dependabot for the actions and the dev dependencies
+### 28. Study the dependency updates: detection, blast radius, timing
 
 Raised at the review of #114 (2026-09-25): four actions had drifted
 a year, and the surprise was not the bumps but the rules underneath
 (setup-uv's immutable releases, no moving major tag past v7). Regular
-small updates are cheaper than one accumulated migration. Examine
-the pros and cons of `.github/dependabot.yml`: the `github-actions`
-ecosystem, grouped so the actions arrive as one PR, weekly or
-monthly; a `uv` entry for the dev dependency group and the pre-commit
-hook revision; PRs typed `chore(deps):` (none-level, CI runs on their
-push). Against: bot noise, a merge each time, the review of release
-notes on a major still by hand. Decide the pinning policy with it:
-current major or exact tag for actions, release notes read on a major.
+small updates are cheaper than one accumulated migration. Reframed on
+2026-09-26 as a study, not a configuration: the situation and its
+consequences first, measures after. The package has no runtime
+dependency, so the blast radius is the pipeline (CI, release, lint,
+tests, hooks), never the users; Graphviz and Python are system
+dependencies outside any bot. Aspects:
+
+- Detecting outdated dependencies: Dependabot version updates,
+  Renovate, `uv lock --upgrade` and `pre-commit autoupdate` by hand,
+  GitHub's security alerts alone.
+- The blast radius of each dependency, one by one: what it touches,
+  how the tests and CI would show a break (semantic-release and the
+  release workflow are the widest, ruff and mypy the noisiest, pytest
+  and pyyaml the narrowest), and which have no test at all.
+- When to update, by compatibility and risk and by the release state:
+  bumps are `chore(deps)`, none-level, so they never force a release
+  and the merge gate never blocks them; a bump of the release tooling
+  is exercised by the dry run from a branch (item 12).
+- Whether a finding calls for a test on our side, and which kind.
+- Supply chain: tag versus commit SHA for actions, immutable releases,
+  never auto-merge a bot PR, the lockfile as the only pin of dev
+  dependencies.
+- Noise and cadence: grouping, cooldown, ignore majors, monthly versus
+  weekly, who reads the release notes of a major.
+- Pinning policy across the three kinds: actions, dev group, hooks.
+
+Deliverable: a discussion file, options with their cost; the decision
+comes at the review or later.
 
 ### 30. A symmetrical layout neighborhood `[]`
 
