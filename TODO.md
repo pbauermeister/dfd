@@ -97,7 +97,9 @@ small updates are cheaper than one accumulated migration. Reframed on
 consequences first, measures after. The package has no runtime
 dependency, so the blast radius is the pipeline (CI, release, lint,
 tests, hooks), never the users; Graphviz and Python are system
-dependencies outside any bot. Aspects:
+dependencies outside any bot. The goal is not the latest version of
+each package but the stable and secure one, and to learn of a CVE
+against a dependency when it is published and tackle it. Aspects:
 
 - Detecting outdated dependencies: Dependabot version updates,
   Renovate, `uv lock --upgrade` and `pre-commit autoupdate` by hand,
@@ -111,6 +113,14 @@ dependencies outside any bot. Aspects:
   and the merge gate never blocks them; a bump of the release tooling
   is exercised by the dry run from a branch (item 12).
 - Whether a finding calls for a test on our side, and which kind.
+- Security: how a CVE reaches us (GitHub security alerts on the
+  dependency graph, Dependabot security updates as distinct from
+  version updates, `pip-audit` or `uv`'s audit in CI), the delay
+  between publication and notice, and the response: a bump on its
+  own, outside the cadence, with its severity read against what the
+  dependency does here (a CVE in a dev tool run only locally and in CI
+  is not the same as one in the release path). Stable over latest: a
+  major waits, a security patch does not.
 - Supply chain: tag versus commit SHA for actions, immutable releases,
   never auto-merge a bot PR, the lockfile as the only pin of dev
   dependencies.
