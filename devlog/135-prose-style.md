@@ -1,7 +1,7 @@
 # 135 — A prose style sheet for the project's documents
 
 Date: 2026-09-26
-Status: ONGOING
+Status: DONE
 Issue: #135 · PR: #136 · Branch: `doc/135-prose-style`
 Task nature: change
 Track: fast
@@ -13,8 +13,11 @@ Agent: Claude Fable 5.1
 
 TODO item 35 (removed in the first commit), raised at the review of
 #128 where the agent's doc prose carried "AI smells", its shape agreed
-the same day. Last of the batch 31, 29, 34, 35 of 2026-09-26, stacked
-on #133 (PR #134); reviewed third. Source: the author's blog-post
+the same day. Written last in the batch 31, 29, 34, 35 of 2026-09-26, stacked on
+#133 (PR #134); at the review the user moved it first, since its
+rule applies to the three others, so the branch was rebuilt off
+`main` with its own commits (backup ref `refs/backup/doc-135-stacked`)
+and PR #136 retargeted. Source: the author's blog-post
 style rules (`~/dev-pb/on-ai/style/authorial-style-rules.md`, out of
 the repo), a signature guide for posts with anecdotes, humor and
 storytelling, of which a subset fits technical documentation.
@@ -69,14 +72,14 @@ Approved: 2026-09-26 (the go for the batch)
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                       | Agent   | User |
-| --- | --------------------------------------------------------------------------------------------------------------------------- | ------- | ---- |
-| 1   | Process and template fit: fast track for a document whose shape was agreed before the batch                                 | well    |      |
-| 2   | The sheet was written last in the batch, so the three earlier texts were written without it; the reviews will tell the cost | pending |      |
+| #   | Point                                                                                                                                                                                                                   | Agent    | User |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: fast track for a document whose shape was agreed before the batch                                                                                                                             | well     |      |
+| 2   | The sheet was written last in the batch, so the three earlier texts were written without it: a task whose output is a rule for the others closes first, and the assessment should have ordered it so (folded into #129) | not well |      |
 
-Process: 1 round before the go (the batch assessment); loops at the review: pending.
+Process: 1 round before the go (the batch assessment); 1 loop at the review (the closing order, no change to the sheet).
 
-Closed:
+Closed: 2026-09-26
 
 ### 4.2 Rule trace
 
