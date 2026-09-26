@@ -12,5 +12,5 @@ Before adding or changing any test, read `tests/README.md`. It defines: how to c
 - **Workflow:** `make nr-review` → inspect SVGs / error output → `make nr-regenerate` → commit fixtures and golden files together.
 - `make nr-test` runs as part of `make test`. It compares regenerated output against golden files.
 - An error fixture has a `.stderr` golden and no `.dot`: a `.dot` next to an `-err-` fixture is a leftover of a run where it succeeded, and `make nr-test` reports it as a failure. Both scripts render error fixtures to a scratch path they delete.
-- Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 113+).
+- Test numbering follows `doc/README.md` section order. When adding a new test case, use the next available number (currently 121+).
 - **Mutation smoke-test:** After adding or changing NR fixtures, verify they are effective by introducing a tiny, deliberate mutation in the code path under test, running `make nr-test` to confirm the relevant fixtures fail, then reverting the mutation. This guards against golden files that silently pass because they don't actually exercise the intended code.

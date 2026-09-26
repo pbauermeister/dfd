@@ -1,0 +1,5 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# the stream twin of 114: two levels up and down the flows; differs
+# from 114 where a row or a column flows against the drawing
+!<>2 N33

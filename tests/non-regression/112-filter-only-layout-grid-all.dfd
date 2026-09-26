@@ -1,0 +1,5 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# keep the center and its whole layout neighborhood: N25 and N41 are
+# reachable only by turning against the drawing, so they drop
+![]* N33

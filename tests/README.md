@@ -111,7 +111,7 @@ Generate them with `make nr-regenerate` after visually checking `make nr-review`
 **Shared master:** when several fixtures `#include` the same diagram, the
 master is a fixture of its own, `NNN-<topic>.master.dfd` with its golden, so
 that `make nr-review` renders it next to the fixtures that filter it
-(`111-filter-layout-matrix.master.dfd`, filtered by 111 and 112).
+(`111-filter-layout-grid.master.dfd`, filtered by 112 to 120).
 
 ### Non-regression test — error (failure)
 

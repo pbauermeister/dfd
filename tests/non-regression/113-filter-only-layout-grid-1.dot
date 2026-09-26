@@ -1,0 +1,83 @@
+
+digraph D {
+  graph[label="
+- tests/non-regression/113-filter-only-layout-grid-1 -" fontname="helvetica" fontsize=9 fontcolor="#000060"]
+  rankdir=TB
+  edge[color=gray fontname="times-italic" fontsize=10]
+  node[fontname="helvetica" fontsize=10]
+
+  /* 21: process N22 */
+  "N22" [shape=ellipse label="N22" fillcolor="#eeeeee" style=filled ]
+
+  /* 22: process N23 */
+  "N23" [shape=ellipse label="N23" fillcolor="#eeeeee" style=filled ]
+
+  /* 23: process N24 */
+  "N24" [shape=ellipse label="N24" fillcolor="#eeeeee" style=filled ]
+
+  /* 26: process N32 */
+  "N32" [shape=ellipse label="N32" fillcolor="#eeeeee" style=filled ]
+
+  /* 27: process N33 */
+  "N33" [shape=ellipse label="N33" fillcolor="#eeeeee" style=filled ]
+
+  /* 28: process N34 */
+  "N34" [shape=ellipse label="N34" fillcolor="#eeeeee" style=filled ]
+
+  /* 31: process N42 */
+  "N42" [shape=ellipse label="N42" fillcolor="#eeeeee" style=filled ]
+
+  /* 32: process N43 */
+  "N43" [shape=ellipse label="N43" fillcolor="#eeeeee" style=filled ]
+
+  /* 33: process N44 */
+  "N44" [shape=ellipse label="N44" fillcolor="#eeeeee" style=filled ]
+
+  /* 47: flow.r N22 N32 */
+  "N22" -> "N32" [label="" dir=back]
+
+  /* 48: flow.r N32 N42 */
+  "N32" -> "N42" [label="" dir=back]
+
+  /* 51: flow N23 N33 */
+  "N23" -> "N33" [label=""]
+
+  /* 52: flow N33 N43 */
+  "N33" -> "N43" [label=""]
+
+  /* 55: flow.r N24 N34 */
+  "N24" -> "N34" [label="" dir=back]
+
+  /* 56: flow.r N34 N44 */
+  "N34" -> "N44" [label="" dir=back]
+
+  /* 69: flow.r? N22 N23 */
+  "N22" -> "N23" [label="" dir=back constraint=false]
+
+  /* 70: flow.r? N23 N24 */
+  "N23" -> "N24" [label="" dir=back constraint=false]
+
+  /* 73: flow? N32 N33 */
+  "N32" -> "N33" [label="" constraint=false]
+
+  /* 74: flow? N33 N34 */
+  "N33" -> "N34" [label="" constraint=false]
+
+  /* 77: flow.r? N42 N43 */
+  "N42" -> "N43" [label="" dir=back constraint=false]
+
+  /* 78: flow.r? N43 N44 */
+  "N43" -> "N44" [label="" dir=back constraint=false]
+
+  /* 86: flow N33 N44 */
+  "N33" -> "N44" [label=""]
+
+  /* 88: flow.r N22 N33 */
+  "N22" -> "N33" [label="" dir=back]
+
+  /* 90: flow.r N42 N33 */
+  "N42" -> "N33" [label="" dir=back]
+
+  /* 92: flow.r N24 N33 */
+  "N24" -> "N33" [label="" dir=back]
+}

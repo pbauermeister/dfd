@@ -1,0 +1,4 @@
+#include tests/non-regression/111-filter-layout-grid.master.dfd
+
+# remove the center and its whole layout neighborhood: N25 and N41 stay
+~[]* N33
