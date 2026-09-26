@@ -50,6 +50,11 @@ Approved: 2026-09-26 (the go for the batch)
 - First commit: TODO 31 removed, filed as #129.
 - `fef6d7a` chore: the section and the pointer in "Fast track".
 - This devlog.
+- Review loop (2026-09-26): the ordering rule sharpened in the
+  section (a task whose output the others apply closes first), after
+  the review of #136 moved the style sheet to the head of the batch;
+  the model and token budgeting asked at the review filed as TODO
+  item 36, to be discussed.
 
 ## 3. Delivery
 
@@ -63,12 +68,13 @@ the merge.
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                   | Agent | User |
-| --- | ----------------------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: fast track for a section written from a recorded shape                                        | well  |      |
-| 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it | well  |      |
+| #   | Point                                                                                                                                                                                               | Agent    | User |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
+| 1   | Process and template fit: fast track for a section written from a recorded shape                                                                                                                    | well     |      |
+| 2   | The assessment of this batch was drafted before the section existed and served as its test: the phases were read off it                                                                             | well     |      |
+| 3   | The assessment ordered by kind and shared files and missed the dependency between outputs: the style sheet, written last, applied to the three texts before it; the user saw it at the first review | not well |      |
 
-Process: 1 round before the go (the assessment); loops at the review: pending.
+Process: 1 round before the go (the assessment); 1 loop so far at the reviews of the batch (the ordering rule); its own review pending.
 
 Closed:
 

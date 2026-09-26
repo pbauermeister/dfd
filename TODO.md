@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 36
+Next number: 37
 
 ## Won't do
 
@@ -159,3 +159,18 @@ regression. Met twice during the mutation smoke-tests of #127. Fix:
 `nr-regenerate.sh` removes the `.dot` it wrote for an `-err-`
 fixture; `nr-test.sh` skips `-err-` fixtures in its plain loop and
 reports a stray `.dot` as a failure.
+
+### 36. Budget the tokens and choose the model, per task and per batch
+
+Raised at the review of #130 (2026-09-26), an addition to the mandate
+of a task and to the assessment of a batch. Per task, when the action
+plan is made: the model per phase (design and review at the top
+model, mechanical steps at a cheaper one), and an estimate of the
+tokens for the whole task. Per batch, early: an assessment of the
+tokens needed against the quota. To be discussed: the estimate needs
+the action plans, which the batch assessment precedes, so an early
+quota check may come too late to be useful; a coarse order of
+magnitude by analogy with past tasks of the same shape, refined at
+each plan, is one way. Decide the granularity, where it is recorded (a
+row of the Mandate, a line of the assessment) and how the actual
+consumption is read back for the next estimate.

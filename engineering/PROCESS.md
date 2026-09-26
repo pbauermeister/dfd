@@ -100,7 +100,9 @@ each small and well framed. The batch has three phases.
    presents them in one exchange, with a judgment on the batch: do the
    items fit together (by kind, by the files they share, by a rule of
    one that feeds the commit types of the next), and which order
-   serves them. The drafts are a scratch artifact, never committed; the
+   serves them. A task whose output the others apply (a rule, a
+   tool, a hook) closes first whatever its size: the closing order
+   follows the dependencies between outputs before the shared files. The drafts are a scratch artifact, never committed; the
    decisions taken land in each task's fast devlog. The user answers
    the open rows and gives one go for the batch.
 2. **Chained runs.** Each task starts as in Phase 2 (issue, branch,
