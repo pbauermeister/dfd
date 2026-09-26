@@ -88,6 +88,10 @@ commits were undone, the branch holds none of them.
 
 3. The commit of this report and its push: both hooks `Passed`
    (criteria 1 and 2, the passing side).
+4. Observed on the other branches of the batch: pre-commit reads the
+   hook config of the checkout, so a branch without this PR's config
+   runs the `commit-msg` hooks only and nothing at push. The hooks
+   cover every branch once this PR is merged forward.
 
 ### 3.2 Verdict
 
