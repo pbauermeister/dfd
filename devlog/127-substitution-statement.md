@@ -1,7 +1,7 @@
 # 127 — Merge is a statement of its own
 
 Date: 2026-09-25
-Status: ONGOING
+Status: DONE
 Issue: #127 · PR: #128 · Branch: `feature/127-substitution-statement`
 Task nature: change
 Track: full
@@ -296,19 +296,19 @@ Ready: 2026-09-26
 
 ### 5.1 Retrospective
 
-| #   | Point                                                                                                                                              | Agent    | User |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: full track; stop 0 held a real design round (keyword, grammar rule, frames) and the mock-up decided the option in one go | well     |      |
-| 2   | The mock-up passed the whole suite unchanged before stop 1: the desugaring made the old fixtures the first test of the new statement               | well     |      |
-| 3   | The review of the pictures reversed two decisions taken from the mock-up (11: kept items only; 10: one frame or error): pictures decide, not code  | well     |      |
-| 4   | Stop rule miss of my own: a changed golden (036) was accepted by me at a step gate meant to stop; right in substance, wrong in form                | not well |      |
-| 5   | The NR runner's stray `.dot` cost two reruns and a lost golden before I understood it; the mutation loop had no cleanup                            | not well |      |
-| 6   | Prose: the review found AI tells in my doc text; the author's style rules now shape doc/ prose, and TODO 35 makes a project sheet of them          | surprise |      |
-| 7   | The devlog went to 321 lines and was trimmed to 180 on request; pasting the mock-up slice was the excess                                           | tension  |      |
+| #   | Point                                                                                                                                              | Agent    | User       |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: full track; stop 0 held a real design round (keyword, grammar rule, frames) and the mock-up decided the option in one go | well     | well       |
+| 2   | The mock-up passed the whole suite unchanged before stop 1: the desugaring made the old fixtures the first test of the new statement               | well     | well       |
+| 3   | The review of the pictures reversed two decisions taken from the mock-up (11: kept items only; 10: one frame or error): pictures decide, not code  | well     | well       |
+| 4   | Stop rule miss of my own: a changed golden (036) was accepted by me at a step gate meant to stop; right in substance, wrong in form                | not well | ended well |
+| 5   | The NR runner's stray `.dot` cost two reruns and a lost golden before I understood it; the mutation loop had no cleanup                            | not well | not well   |
+| 6   | Prose: the review found AI tells in my doc text; the author's style rules now shape doc/ prose, and TODO 35 makes a project sheet of them          | surprise | well       |
+| 7   | The devlog went to 321 lines and was trimmed to 180 on request; pasting the mock-up slice was the excess                                           | tension  | don't care |
 
 Process: 1 round before stop 0; 1 round before stop 1; 2 loops at the review (the pictures, the prose); rework after stop 1: decisions 10 and 11.
 
-Closed: pending
+Closed: 2026-09-26
 
 ### 5.2 Forward-looking
 
