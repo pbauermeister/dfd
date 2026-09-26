@@ -87,7 +87,60 @@ unattended after one go; the devlog is written at closure in its fast
 form (see the template's "Track") and committed on the branch for the
 user's approval before the merge. If the discussion or the work
 inflate, the agent writes the devlog then and the full track resumes
-at the stop reached.
+at the stop reached. Several fast tracks may run as a batch, see
+"Chained fast tracks".
+
+### Chained fast tracks
+
+Several fast-track items may run as one batch: TODO items or a brief,
+each small and well framed. The batch has three phases.
+
+1. **Upfront assessment.** The agent drafts, for every item, the
+   decisions to take (rows marked rule or taste, as in a Mandate) and
+   presents them in one exchange, with a judgment on the batch: do the
+   items fit together (by kind, by the files they share, by a rule of
+   one that feeds the commit types of the next), and which order
+   serves them. A task whose output the others apply (a rule, a tool,
+   a hook) closes first whatever its size: the closing order follows
+   the dependencies between outputs before the shared files. The
+   drafts are a scratch artifact, never committed; the decisions taken
+   land in each task's fast devlog. A row that lowers a task's
+   verification (no test, a trial by hand) is an open row, never a
+   default. The user answers the open rows and gives one go for the
+   batch.
+2. **Chained runs.** At the go, the agent files the issues in the
+   batch's order and removes their `TODO.md` items in one `chore:`
+   commit on `main` that names them (in place of Phase 2 step 4): no
+   branch touches `TODO.md`, so the squash merges cannot conflict on
+   it. Then each task runs one after the other, branch and draft PR
+   as in Phase 2, numbered in sequence, unattended to "ready for
+   review" with its fast devlog committed. The closing order is the
+   tackling order unless the assessment says otherwise. A task that
+   changes a file of substance another task changes is stacked: its
+   branch and PR base on the previous task in the closing order; the
+   others base on `main`. The devlog's Context names the batch, the
+   task's position and its base. Unattended does
+   not mean unverified: the PR shows its trials in a test report of
+   the devlog, and a behavior that a test can pin has its test (the
+   tests folder tells which kinds exist).
+3. **Sequential reviews.** Interactive, one task at a time in the
+   closing order, each merged before the next is reviewed. Before
+   merging a task that serves as a base, retarget the next PR to
+   `main`. A closure is one sequence: the devlog closed and pushed,
+   the required checks re-run and green, then the merge. After each
+   merge, merge `main` forward into the remaining branches; a conflict
+   resolved from `main`'s file undoes the branch's own edits, so
+   re-apply the branch's whole diff against the merge base and read
+   the result before committing. The review may
+   approve, loop the task, or stop it: the fast track's anticipated
+   price is that a review turns into a design round. A stopped task
+   ends `REJECTED`, its devlog reaches `main` by a direct `chore:`
+   commit with the evidence, and its branch stays on `origin` as
+   material for the follow-up issue. Neither is a process failure.
+
+Two batches of 2026-09-24 and 2026-09-25 (#107 to #117, #119 to #125)
+set the shape; the batch of 2026-09-26 (#129 to #136) codified it and
+sharpened it at its reviews.
 
 Claude: if the user starts a task without following this process, briefly
 remind them of it.
@@ -217,6 +270,10 @@ When implementing an approved plan:
   choice.
 - Before marking a PR ready, self-review the diff against the Type safety
   section of `engineering/CONVENTIONS.md`.
+- An irreversible step (a merge, a force push, a comment that states an
+  outcome) runs as a command of its own, after its precondition is
+  checked, never at the tail of a chain: a chained command does not
+  stop where one expects (a pipeline's exit is its last command's).
 
 ## Established tool vs bespoke script
 
