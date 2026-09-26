@@ -85,6 +85,16 @@ in a brace group, in a function), and compares the merged output with
 `expected.txt` byte for byte. Extend the trial when a new context bites; regenerate
 `expected.txt` by running the trial from the repository root, and review the diff.
 
+### NR runner scripts test
+
+**File:** `tests/test_nr_scripts.py`
+
+Drives `tests/nr-test.sh` and `tests/nr-regenerate.sh` on a small fixture set
+built in a temporary directory, through the scripts' `NR_DIR` override, and
+checks the verdicts: stray `.dot` beside an error fixture, error fixture that
+succeeds, plain fixture whose render fails, clean set. Extend it when a runner
+anomaly bites.
+
 ### Non-regression test — nominal (success)
 
 **Fixtures (inputs):** `tests/non-regression/NNN-name.dfd` (standalone) or
