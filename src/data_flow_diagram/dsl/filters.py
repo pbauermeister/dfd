@@ -199,16 +199,72 @@ def _check_filter_names(
         )
 
 
-def _check_not_merged(
-    *, names: set[str], merged: dict[str, str], source: model.SourceLine
+def _cause(what: str, source: model.SourceLine) -> str:
+    """How a name became unavailable: the statement that did it."""
+    text = (source.raw_text or source.text).strip()
+    return f"{what} at line {source.line_nr}: {text}"
+
+
+def _check_available(
+    *, names: set[str], unavailable: dict[str, str], source: model.SourceLine
 ) -> None:
-    """Refuse a name that a previous merge took away."""
-    gone = sorted(names & merged.keys())
+    """Refuse a name that a previous statement removed or merged away."""
+    gone = sorted(names & unavailable.keys())
     if gone:
-        diff = ", ".join(f"{name} (into {merged[name]})" for name in gone)
+        diff = "; ".join(f"{name} ({unavailable[name]})" for name in gone)
         raise exception.DfdException(
-            f" Name(s) merged by a previous statement: {diff}", source=source
+            f" Name(s) no longer available: {diff}", source=source
         )
+
+
+def _check_kept(
+    *, names: set[str], kept_names: set[str], source: model.SourceLine
+) -> None:
+    """A merge names kept items only, once a kept set exists."""
+    missing = sorted(names - kept_names)
+    if missing:
+        raise exception.DfdException(
+            f" Name(s) not kept, cannot be merged: {', '.join(missing)}",
+            source=source,
+        )
+
+
+def _frame_of_items(statements: model.Statements) -> dict[str, model.Frame]:
+    """Item name -> the frame declaring it."""
+    frame_of: dict[str, model.Frame] = {}
+    for statement in statements:
+        if isinstance(statement, model.Frame):
+            for name in statement.items:
+                frame_of[name] = statement
+    return frame_of
+
+
+def _check_one_frame(
+    *,
+    names: set[str],
+    frame_of: dict[str, model.Frame],
+    source: model.SourceLine,
+) -> model.Frame | None:
+    """Items merged together are in one frame, or all unframed.
+
+    Returns the frame the replacer inherits, if any.
+    """
+    frames = {
+        id(frame_of[name]) if name in frame_of else None for name in names
+    }
+    if len(frames) > 1:
+        diff = ", ".join(
+            f"{name} ({frame_of[name].text if name in frame_of else 'no frame'})"
+            for name in sorted(names)
+        )
+        raise exception.DfdException(
+            f" Cannot merge items from different frames: {diff}",
+            source=source,
+        )
+    (frame_id,) = frames
+    if frame_id is None:
+        return None
+    return frame_of[next(iter(names & frame_of.keys()))]
 
 
 def _collect_frame_skips(
@@ -238,6 +294,7 @@ class _FilterDecisions:
     only_names: set[str]  # anchors of "only" filters, made non-hidable
     replacement: dict[str, str]  # merged name -> replacer (flat)
     merged_names: set[str]  # names merged away: never kept
+    inherited_frames: dict[str, int]  # replacer -> id of the frame it joins
     skip_frames_for_names: set[str]
     vetoed_ids: set[int]  # flows touching a strict selection
     allowed_ids: set[int]  # path flows, and flows joining a plain selection
@@ -253,7 +310,9 @@ def _collect_kept_names(
     kept_names: set[str] | None = None
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
-    unavailable: set[str] = set()  # removed by a "~" or merged away
+    unavailable: dict[str, str] = {}  # removed or merged away -> cause
+    frame_of = _frame_of_items(statements)
+    inherited_frames: dict[str, int] = {}
     skip_frames_for_names: set[str] = set()
     vetoed_ids: set[int] = set()
     allowed_ids: set[int] = set()
@@ -271,13 +330,15 @@ def _collect_kept_names(
 
                 # validate filter names: known, and not removed or merged
                 names = set(f.names)
-                _check_not_merged(
-                    names=names, merged=replacement, source=statement.source
-                )
                 _check_filter_names(
                     names=names,
-                    in_names=all_names - unavailable,
+                    in_names=all_names,
                     all_names=all_names,
+                    source=statement.source,
+                )
+                _check_available(
+                    names=names,
+                    unavailable=unavailable,
                     source=statement.source,
                 )
 
@@ -335,42 +396,66 @@ def _collect_kept_names(
             case model.Merge() as m:
                 # a substitution: the items merged away into the replacer
                 names = set(m.names)
-                _check_not_merged(
-                    names=names | {m.replacer},
-                    merged=replacement,
-                    source=statement.source,
-                )
                 _check_filter_names(
                     names=names | {m.replacer},
-                    in_names=all_names - unavailable,
+                    in_names=all_names,
                     all_names=all_names,
                     source=statement.source,
                 )
+                _check_available(
+                    names=names | {m.replacer},
+                    unavailable=unavailable,
+                    source=statement.source,
+                )
+                if kept_names is not None:
+                    _check_kept(
+                        names=names,
+                        kept_names=kept_names,
+                        source=statement.source,
+                    )
+                frame = _check_one_frame(
+                    names=names, frame_of=frame_of, source=statement.source
+                )
                 dprint("MERGE:", names, "->", m.replacer)
                 _register_merge(replacement, names=names, replacer=m.replacer)
-                unavailable |= names
-                # the substitution rewrites the kept set too: the replacer
-                # takes the place of the merged items it stands for
-                if kept_names is not None and kept_names & names:
+                cause = _cause(f"merged into {m.replacer}", statement.source)
+                unavailable.update({name: cause for name in names})
+                # the replacer takes the merged items' place: in the kept set
+                # and in their frame (when it is declared in none)
+                if kept_names is not None:
                     kept_names -= names
                     kept_names.add(m.replacer)
+                if frame is not None:
+                    # a replacer declared in another frame is then in two:
+                    # the frame check re-run after the filters reports it
+                    inherited_frames[m.replacer] = id(frame)
+                    frame_of.setdefault(m.replacer, frame)
 
             case model.Without() as f:
                 # Without is subtractive: first Without starts with all names
                 if kept_names is None:
-                    kept_names = all_names - unavailable
+                    kept_names = all_names - unavailable.keys()
 
-                # validate filter names: known, and not removed or merged
+                # validate filter names: known, not removed or merged, kept
                 names = set(f.names)
-                _check_not_merged(
-                    names=names, merged=replacement, source=statement.source
-                )
                 _check_filter_names(
                     names=names,
-                    in_names=kept_names - unavailable,
+                    in_names=all_names,
                     all_names=all_names,
                     source=statement.source,
                 )
+                _check_available(
+                    names=names,
+                    unavailable=unavailable,
+                    source=statement.source,
+                )
+                _check_filter_names(
+                    names=names,
+                    in_names=kept_names,
+                    all_names=all_names,
+                    source=statement.source,
+                )
+                cause = _cause("removed", statement.source)
 
                 # remove anchor names (suppressed by "x" flag: neighbors only)
                 if (
@@ -379,7 +464,7 @@ def _collect_kept_names(
                 ):
                     dprint("WITHOUT: removing items:", names)
                     kept_names.difference_update(names)
-                    unavailable |= names
+                    unavailable.update({name: cause for name in names})
 
                 # remove upstream/downstream neighbor names
                 downs, ups, _ = find_neighbors(
@@ -392,7 +477,7 @@ def _collect_kept_names(
                 dprint("WITHOUT: removing neighbors:", downs, ups)
                 kept_names.difference_update(downs)
                 kept_names.difference_update(ups)
-                unavailable |= downs | ups
+                unavailable.update({name: cause for name in downs | ups})
 
                 _collect_frame_skips(
                     f=f,
@@ -410,6 +495,7 @@ def _collect_kept_names(
         only_names=only_names,
         replacement=replacement,
         merged_names=set(replacement),
+        inherited_frames=inherited_frames,
         skip_frames_for_names=skip_frames_for_names,
         vetoed_ids=vetoed_ids,
         allowed_ids=allowed_ids,
@@ -425,34 +511,6 @@ def _mark_non_hidable(
             case model.Item() as item:
                 if item.name in only_names:
                     item.hidable = False
-
-
-def _inherited_frames(
-    statements: model.Statements, replacement: dict[str, str]
-) -> dict[str, int]:
-    """Replacer -> id of the one frame it inherits.
-
-    A replacer inherits a frame only when every item merged into it is in
-    that frame; otherwise it inherits none (unnamed frames cannot be
-    chosen). A replacer also declared in another frame is then in two
-    frames: the frame check run after the filters reports it.
-    """
-    frame_of: dict[str, int] = {}
-    for statement in statements:
-        if isinstance(statement, model.Frame):
-            for name in statement.items:
-                frame_of[name] = id(statement)
-    members: dict[str, set[str]] = {}
-    for name, replacer in replacement.items():
-        members.setdefault(replacer, set()).add(name)
-    inherited: dict[str, int] = {}
-    for replacer, names in members.items():
-        frames = {frame_of.get(name) for name in names}
-        if len(frames) == 1 and None not in frames:
-            (frame_id,) = frames
-            assert frame_id is not None
-            inherited[replacer] = frame_id
-    return inherited
 
 
 def _merge_frame_items(
@@ -479,6 +537,7 @@ def _apply_filters(
     statements: model.Statements,
     kept_names: set[str],
     replacement: dict[str, str],
+    inherited_frames: dict[str, int],
     skip_frames_for_names: set[str],
     hidden_ids: set[int],
 ) -> tuple[list[model.Statement], dict[str, model.Connection]]:
@@ -488,7 +547,6 @@ def _apply_filters(
     """
     new_statements: list[model.Statement] = []
     replaced_connections: dict[str, model.Connection] = {}
-    inherited_frames = _inherited_frames(statements, replacement)
     for statement in statements:
         dprint(f"\nHandling statement: {statement}")
         match statement:
@@ -603,6 +661,7 @@ def handle_filters(
         statements=statements,
         kept_names=kept_names,
         replacement=decisions.replacement,
+        inherited_frames=decisions.inherited_frames,
         skip_frames_for_names=decisions.skip_frames_for_names,
         hidden_ids=decisions.vetoed_ids - decisions.allowed_ids,
     )

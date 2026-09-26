@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 6: merge B C : G
+  line 1: <file:tests/non-regression/108-err-filter-keep-then-merge-unkept.dfd>
+Error:  Name(s) not kept, cannot be merged: C

@@ -1,0 +1,6 @@
+# Issue #127: a merge names kept items only, once a kept set exists:
+# C is not kept.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+!>1 A
+merge B C : G

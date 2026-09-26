@@ -1,4 +1,4 @@
 ERROR: (most recent first)
   line 6: merge B C : G
   line 1: <file:tests/non-regression/100-err-filter-merge-chain-reversed.dfd>
-Error:  Name(s) merged by a previous statement: G (into H)
+Error:  Name(s) no longer available: G (merged into H at line 4: merge G D : H)

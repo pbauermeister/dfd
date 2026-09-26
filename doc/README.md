@@ -1124,7 +1124,8 @@ The items are collapsed into the replacer, an item declared elsewhere
 a flow between two merged items disappears, and the merged items are
 no longer available to the statements that follow. A merge is not a
 filter: it does not touch the set of kept items, except that the
-replacer takes the place of a merged item that was kept. Merges are
+replacer takes the place of the merged items in it. Once a filter has
+made a set of kept items, a merge names kept items only. Merges are
 processed in order with the filters, and the order carries a meaning:
 
 - `!` then `merge`: the selection is made on the original flows, then
@@ -1136,11 +1137,11 @@ Merges chain: `merge B C : G` then `merge G D : H` collapses B, C, G
 and D into H. Written the other way round, the second merge names an
 item already merged away, an error.
 
-Frames: the replacer takes the place of the merged items in a frame
-only when all of them were in that one frame; otherwise it inherits no
-frame, and a frame left empty disappears. A replacer declared in a
-frame of its own keeps it; if it would also inherit one, it is in two
-frames, an error.
+Frames: the merged items are in one frame, or all unframed; items
+from different frames cannot be merged. The replacer takes their place
+in that frame, and a frame left empty disappears. A replacer declared
+in a frame of its own keeps it; if it would also inherit one, it is in
+two frames, an error.
 
 ### 7.4. Filters example
 

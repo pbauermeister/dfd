@@ -283,13 +283,13 @@ merge ITEM_NAME [ITEM_NAME...] : REPLACER
 
 Collapses the items into the replacer, an item declared elsewhere: their
 connections are rewired to it (a connection between two merged items
-disappears), the items become unavailable, and a kept merged item is
-replaced by the replacer in the kept set. Not a filter: the kept set is
-otherwise untouched. Processed in source order with the filters; merges
-chain (`merge B C : G` then `merge G D : H`). Frames: the replacer
-inherits a frame only when all merged items were in that one frame; a
-replacer declared in a frame that would also inherit one is in multiple
-frames, an error.
+disappears), the items become unavailable, and the replacer takes
+their place in the kept set. Not a filter: the kept set is otherwise
+untouched; once one exists, a merge names kept items only. Processed in source order with the filters; merges
+chain (`merge B C : G` then `merge G D : H`). Frames: the merged items
+are in one frame or all unframed (else an error); the replacer takes
+their place in it; a replacer declared in a frame that would also
+inherit one is in multiple frames, an error.
 
 ### 7.4. Neighbour specification
 
@@ -319,7 +319,9 @@ Filters and merges are processed **sequentially** in source order:
    the filters that follow read the connections as rewired.
 4. Anchors referenced by a filter, and the items and replacer of a merge,
    must exist and be available: not removed by a previous `~`, not merged
-   away; otherwise an error is raised.
+   away; the items of a merge must be kept once a kept set exists;
+   otherwise an error is raised, naming the statement that removed or
+   merged the item.
 5. After all statements are processed, the diagram is filtered: items not
    in the kept set (and merged items) are dropped, connections with missing
    endpoints are dropped, frames are trimmed or dropped (a replacer takes

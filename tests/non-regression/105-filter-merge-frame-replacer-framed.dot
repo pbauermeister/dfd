@@ -36,22 +36,8 @@ digraph D {
   /* 19: flow D F df */
   "D" -> "F" [label="df"]
 
-  /* 4: frame A B = F1 */
+  /* 4: frame F G = F3 */
   subgraph cluster_0 {
-    label="F1"
-    style=dashed
-    "A"
-  }
-
-  /* 5: frame C D = F2 */
-  subgraph cluster_1 {
-    label="F2"
-    style=dashed
-    "D"
-  }
-
-  /* 6: frame F G = F3 */
-  subgraph cluster_2 {
     label="F3"
     style=dashed
     "F"
