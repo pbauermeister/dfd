@@ -39,6 +39,7 @@ covers pytest; smoke-test the other two by hand).
 | Filling a devlog                                             | `templates/devlog.md` (guidance comments) |
 | Naming, structure, type safety, design, scripts, Markdown    | `engineering/CONVENTIONS.md`              |
 | Commenting code                                              | `engineering/COMMENTING.md`               |
+| Writing prose: doc, devlog, discussion, PR or commit body    | `engineering/PROSE-STYLE.md`              |
 | Writing or changing a test                                   | `tests/RULES.md`, then `tests/README.md`  |
 | Versioning, commit types, merge gate, releasing              | `engineering/RELEASING.md`                |
 

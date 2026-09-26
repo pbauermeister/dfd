@@ -159,31 +159,3 @@ regression. Met twice during the mutation smoke-tests of #127. Fix:
 `nr-regenerate.sh` removes the `.dot` it wrote for an `-err-`
 fixture; `nr-test.sh` skips `-err-` fixtures in its plain loop and
 reports a stray `.dot` as a failure.
-
-### 35. A style sheet for the prose of software projects
-
-Raised at the review of #128 (2026-09-26): the docs written by the
-agent carried "AI smells" (elliptic appositions such as "..., an
-error.", "It is X: a Y" openers, staccato corrections). The author's
-blog-post style rules, `~/dev-pb/on-ai/style/authorial-style-rules.md`,
-name the tics to avoid (em-dashes, "not A, it is B", the pivot that
-counters the previous sentence, "Furthermore"/"It's worth noting",
-tricolons by reflex, inflated vocabulary) and the forms preferred
-(short sentences varied on purpose, full clauses, "i.e."/"e.g."
-glosses on first use, "So"/"Hence" pivots, parentheses for asides,
-the point first, one idea per paragraph, lists for the enumerable and
-prose for the rest). They target blog posts (anecdotes, humour,
-storytelling). Extract the subset that fits technical documentation
-and the devlogs of a software project like this one, as a style
-sheet under `engineering/` (or in `CONVENTIONS.md` "Markdown"), and
-point `CLAUDE.md`'s map at it. Applied by hand to `doc/` at #128.
-
-Shape agreed (2026-09-26): the sheet takes "The Elements of Style"
-(Strunk & White) as read, the author being a proponent; then the
-departures kept on purpose (no em-dash even for an abrupt break;
-"So"/"Hence" as sentence openers; "i.e."/"e.g." in running text;
-parentheses as a frequent device); then what the book has and the
-blog rules lack, to carry: the active voice; keep related words
-together; the emphatic words at the end of the sentence; one tense
-in a passage; a rule serves clarity, never the reverse; then the
-AI-tell list as the additions the book could not foresee.
