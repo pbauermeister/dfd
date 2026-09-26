@@ -26,14 +26,15 @@ with the same flags and span. Documented next to `<>`.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                                                                                                                                                | Basis                                          | Alternatives considered                   |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------------- |
-| 1   | `[]` sets both directions with `layout_direction`; one alternative in `RX_FILTER_ARG`, one case in the match                                                                                                                            | TODO 30 (rule)                                 | A second regex group for the layout forms |
-| 2   | Nothing else in the grammar moves: an unknown direction (`<]`) still fails as an unknown item name                                                                                                                                      | TODO 30 (rule)                                 | A dedicated error for a bad direction     |
-| 3   | Parser unit test over the five directions, one parametrized case each; NR fixture 110 `![]2 S2` on the filter master                                                                                                                    | `tests/README.md` (rule)                       | The fixture alone                         |
-| 4   | Distance 2 for the fixture: at 1, `[]` and `<>` keep the same set (every adjacent item), the reversals show at 2                                                                                                                        | measured (see Account)                         | Distance 1, `*`                           |
-| 5   | README § 7.3.3 gains the form in the list and the "counts as one" sentence; SYNTAX.md § 7.4 the table cell                                                                                                                              | TODO 30 (taste): no new figure                 | An example in § 7.4.1.2                   |
-| 6   | Review loop: a matrix master (111 part) of five A→B→C chains drawn in the four arrow combinations plus a constraint, fixtures 111 (`[]2`) and 112 (`<>2` twin), 110 kept; span 2 because span 1 keeps every adjacent item in both forms | review of #140 (rule); measured before writing | Distance-1 cases; one fixture per chain   |
+| #   | Decision                                                                                                                                                                                                                                    | Basis                                                  | Alternatives considered                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------- |
+| 1   | `[]` sets both directions with `layout_direction`; one alternative in `RX_FILTER_ARG`, one case in the match                                                                                                                                | TODO 30 (rule)                                         | A second regex group for the layout forms |
+| 2   | Nothing else in the grammar moves: an unknown direction (`<]`) still fails as an unknown item name                                                                                                                                          | TODO 30 (rule)                                         | A dedicated error for a bad direction     |
+| 3   | Parser unit test over the five directions, one parametrized case each; NR fixture 110 `![]2 S2` on the filter master                                                                                                                        | `tests/README.md` (rule)                               | The fixture alone                         |
+| 4   | Distance 2 for the fixture: at 1, `[]` and `<>` keep the same set (every adjacent item), the reversals show at 2                                                                                                                            | measured (see Account)                                 | Distance 1, `*`                           |
+| 5   | README § 7.3.3 gains the form in the list and the "counts as one" sentence; SYNTAX.md § 7.4 the table cell                                                                                                                                  | TODO 30 (taste): no new figure                         | An example in § 7.4.1.2                   |
+| 6   | Review loop: a matrix master (111 part) of five A→B→C chains drawn in the four arrow combinations plus a constraint, fixtures 111 (`[]2`) and 112 (`<>2` twin), 110 kept; span 2 because span 1 keeps every adjacent item in both forms     | review of #140 (rule); measured before writing         | Distance-1 cases; one fixture per chain   |
+| 7   | Second loop: the master is a fixture itself, `111-filter-layout-matrix.master.dfd` with its golden, so that the review renders it; the rule codified in `tests/RULES.md` and `tests/README.md` (028 stays a `.part`, 093 predates the name) | review of #140, the same remark at #127 (rule created) | Keep the `.part` and render it by hand    |
 
 ### 1.4 Acceptance criteria
 
@@ -79,6 +80,10 @@ Approved: 2026-09-26 (the go for the batch)
   all filters, with the reservation that expected outputs cannot be
   generated without re-implementing the search. Mutation reverted by
   its inverse `sed` this time, parser diff against HEAD empty after.
+- Second loop (2026-09-26): the master renamed to a `.master.dfd`
+  fixture with its golden, the rule written in `tests/RULES.md` and
+  `tests/README.md`; the devlog lines of this loop landed one commit
+  late, an edit script stopped on a table re-padded by prettier.
 
 ## 3. Delivery
 
@@ -101,13 +106,14 @@ Approved: 2026-09-26 (the go for the batch)
 
 | 4 | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well | |
 
-Process: 1 round before the go (the batch assessment); 1 loop at the review (the matrix fixtures).
+Process: 1 round before the go (the batch assessment); 2 loops at the review (the matrix fixtures, the master as a fixture).
 
 Closed: pending
 
 ### 4.2 Rule trace
 
-| Source            | Rule                                                      | Verb (applied / created) |
-| ----------------- | --------------------------------------------------------- | ------------------------ |
-| `tests/RULES.md`  | Mutation smoke-test after adding an NR fixture            | applied                  |
-| `tests/README.md` | Unit test for the parser, NR fixture for the nominal case | applied                  |
+| Source            | Rule                                                                          | Verb (applied / created) |
+| ----------------- | ----------------------------------------------------------------------------- | ------------------------ |
+| `tests/RULES.md`  | Mutation smoke-test after adding an NR fixture                                | applied                  |
+| `tests/README.md` | Unit test for the parser, NR fixture for the nominal case                     | applied                  |
+| `tests/RULES.md`  | A shared master is a fixture itself, `NNN-<topic>.master.dfd` with its golden | created                  |
