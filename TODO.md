@@ -160,18 +160,6 @@ that touches code only, with no change to the tests:
   (`_parse_item_name`): a prefix per kind, or static methods of two
   classes.
 
-### 34. The NR runner aborts silently on a stray `.dot` of an error fixture
-
-From #127 (2026-09-26). When an `-err-` fixture unexpectedly succeeds
-(a mutation, a regression), `tests/nr-regenerate.sh` reports it but
-leaves the generated `.dot` next to the fixture; the next `make
-nr-test` then treats the fixture as a plain one, finds no golden
-match and aborts on the first error with no `FAIL:` line, hiding the
-regression. Met twice during the mutation smoke-tests of #127. Fix:
-`nr-regenerate.sh` removes the `.dot` it wrote for an `-err-`
-fixture; `nr-test.sh` skips `-err-` fixtures in its plain loop and
-reports a stray `.dot` as a failure.
-
 ### 35. A style sheet for the prose of software projects
 
 Raised at the review of #128 (2026-09-26): the docs written by the
