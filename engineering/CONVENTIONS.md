@@ -282,6 +282,7 @@ stay respected, never the other way round.
   cells in a column are the same width, and the separator dashes to the
   same width, so that the user's format-on-save produces no diff. Other
   elements follow CommonMark.
+- The prose itself follows `engineering/PROSE-STYLE.md`.
 
 ## Instruction files
 
