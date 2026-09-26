@@ -110,13 +110,13 @@ B1 --? C2 b1c2
 #!!>2 A1
 #~ A3 C1
 
-##### J. The reversed group order, TODO item 23, not a strict-filter
-# case. Declaring the group first reads naturally but does not work
-# today: a "~" as first filter starts from the full set, so the "!" that
-# follows narrows nothing (C3 stays), and the traversal from A1 reads
-# the original flows, so B1, B2, B3 come back as orphans next to Z.
-# 10 items, 12 flows. Expected once fixed: recorded in TODO item 23.
-#~=Z B1 B2 B3
+##### J. The reversed group order, not a strict-filter case. The group
+# is declared first, then the filter narrows around it: the merge does
+# not initialise the kept set, so the "!" starts empty and traverses
+# the rewired flows (from A1 through Z to row C). Once TODO item 23,
+# fixed by #127: before, the traversal read the original flows and B1,
+# B2, B3 came back as orphans next to Z. 7 items, 12 flows.
+#merge B1 B2 B3 : Z
 #!>2 A1 Z
 
 ##### K. The crossed pattern by paths, no plain pair: two strict filters
