@@ -398,7 +398,7 @@ E4  ::> P   signal
 
 ![Context diagram](./img/context.svg)
 
-Note that there should be exactly one process.
+There must be exactly one process.
 
 ### 3.4. Diagram direction
 
@@ -674,7 +674,7 @@ opening ` ``` ` and the `data-flow-diagram` formatter, like:
 
     ```
 
-Note that only code blocks delimited by triple-backticks fences are considered.
+Only code blocks delimited by triple-backtick fences are considered.
 Code blocks defined by quadruple-spaces indentation are ignored:
 
         data-flow-diagram img/FILENAME.svg
@@ -922,7 +922,7 @@ This --> That
 
 - `#dfd/Feature-1` refers to the `dfd/Feature-1` snippet.
 - `:This` refers to the item named `This` in the referred snippet.
-- `process` must be used, in order to be of the same type as the referred item.
+- `process` must be used, so that the type is the same as the referred item's.
 - The referred item must be used by its item name; here `This`.
 - Since the label is omitted, the name is use instead.
 
@@ -989,10 +989,10 @@ command line.
 
 ## 7. Filters and merge
 
-Filters (keeping or removing items) and merges (collapsing several
-items into one) derive subgraphs or simplified graphs from a master
-graph. They are only useful for the latter; conversely, a diagram
-written to be shown as it is has no use for them.
+Filters keep or remove items. Merges collapse several items into one.
+Both derive subgraphs or simplified graphs from a master graph, and
+that is their only use: a diagram written to be shown as it is has no
+need for them.
 
 ### 7.1. Use case
 
@@ -1038,9 +1038,9 @@ You shall think of a set of kept items, manipulated sequentially:
 
 You can combine them by sequential statements:
 
-- you can only name items that are available at the given point: an
-  item removed by a previous filter (or merged away, see below) is an
-  error, whether you try to remove it again or to keep it.
+- you can only name items that are available at the given point. An
+  item removed by a previous filter, or merged away (see below), can
+  neither be removed again nor kept; naming it is an error.
 - Example:
 
   ```
@@ -1105,11 +1105,11 @@ filters, `!!<2 A` and `!>1 A`.
   - `x`: select only the neighbors, not the listed items
   - `f`: when selected items belong to a frame, remove the frame
 
-One neighbors specification per filter, `<>` being one: a second one
-is an error, because a stream direction and a layout direction do not
-compose (they agree only where the arrows are drawn in the stream's
-direction). Another neighborhood is another filter, with the same
-items:
+A filter takes one neighbors specification, and `<>` counts as one. A
+second specification is an error, because a stream direction and a
+layout direction do not compose: they agree only where the arrows are
+drawn in the stream's direction. Hence another neighborhood is another
+filter, with the same items:
 
 ```
 !<1 P
@@ -1120,29 +1120,31 @@ items:
 
 `merge ITEM_NAMES : REPLACER`
 
-The items are collapsed into the replacer, an item declared elsewhere
-(a "super" item standing for the group): their flows are rewired to it,
-a flow between two merged items disappears, and the merged items are
-no longer available to the statements that follow. A merge is not a
-filter: it does not touch the set of kept items, except that the
-replacer takes the place of the merged items in it. Once a filter has
-made a set of kept items, a merge names kept items only. Merges are
-processed in order with the filters, and the order carries a meaning:
+The items are collapsed into the replacer, i.e. an item declared
+elsewhere to stand for the group. Their flows are rewired to it, a flow
+between two merged items disappears, and the merged items are no
+longer available to the statements that follow.
 
-- `!` then `merge`: the selection is made on the original flows, then
-  the group is formed (§ 7.4.2.2 shows both orders);
-- `merge` then `!`: the selection is made on the grouped diagram, from
-  the replacer if you name it.
+A merge is not a filter. It leaves the set of kept items alone, with
+one exception: the replacer takes the place of the merged items in it.
+So once a filter has made a set of kept items, a merge can only name
+kept items.
 
-Merges chain: `merge B C : G` then `merge G D : H` collapses B, C, G
+Merges are processed in order with the filters, and the order carries
+a meaning. With `!` then `merge`, the selection is made on the
+original flows, and the group is formed afterwards. With `merge` then
+`!`, the selection is made on the grouped diagram, from the replacer
+if you name it. Section 7.4.2.2 shows both orders.
+
+Merges chain. `merge B C : G` then `merge G D : H` collapses B, C, G
 and D into H. Written the other way round, the second merge names an
-item already merged away; this yields an error.
+item already merged away, which is an error.
 
-Frames: the merged items are in one frame, or all unframed; items
-from different frames cannot be merged. The replacer takes their place
-in that frame, and a frame left empty disappears. A replacer declared
-in a frame of its own keeps it; if it would also inherit one, it ends
-up in two frames, which is an error.
+Frames follow one rule: the merged items must be in one frame, or all
+unframed, since items from different frames cannot be merged. The
+replacer takes their place in that frame, and a frame left empty
+disappears. A replacer declared in a frame of its own keeps it. If it
+would also inherit one, it ends up in two frames, which is an error.
 
 ### 7.4. Filters example
 
@@ -1453,9 +1455,10 @@ merge db_aggr db_fcast db_params : db_all
 ![Filtering](./img/filter-replace.svg)
 
 The order of the two statements carries a meaning. Above, the `!`
-selects on the original flows, then the group is formed. Merging first
-selects on the grouped diagram: the `!` that follows starts empty and
-walks the rewired flows, from the super DB itself:
+selects on the original flows, and the group is formed afterwards.
+Merging first selects on the grouped diagram instead: the `!` that
+follows starts empty and walks the rewired flows, from the super DB
+itself:
 
 ```data-flow-diagram img/filter-merge-first.svg
 #include #img/data-pipeline
@@ -1471,7 +1474,7 @@ merge db_aggr db_fcast db_params : db_all
 
 ![Filtering](./img/filter-merge-first.svg)
 
-A merged item is no longer available to the statements that follow:
+A merged item is no longer available to the statements that follow, so
 `! db_aggr` after the merge is an error.
 
 ## 8. Influencing the layout

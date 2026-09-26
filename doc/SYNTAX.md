@@ -14,15 +14,15 @@ documentation, and commit messages.
 
 ### Core concepts
 
-| Term           | Definition                                                                  |
-| -------------- | --------------------------------------------------------------------------- |
-| **statement**  | A single logical line of DFD source (after preprocessing).                  |
-| **item**       | A node in the diagram. Never use "node" in prose — that is a Graphviz term. |
-| **connection** | A directed or undirected link between two items.                            |
-| **endpoint**   | The source or destination item of a connection (`SRC` / `DST`).             |
-| **frame**      | A visual grouping (subgraph) of items.                                      |
-| **name**       | The unique identifier of an item (no whitespace).                           |
-| **label**      | The display text of an item or connection. Defaults to the name.            |
+| Term           | Definition                                                                 |
+| -------------- | -------------------------------------------------------------------------- |
+| **statement**  | A single logical line of DFD source (after preprocessing).                 |
+| **item**       | A node in the diagram. Never use "node" in prose; that is a Graphviz term. |
+| **connection** | A directed or undirected link between two items.                           |
+| **endpoint**   | The source or destination item of a connection (`SRC` / `DST`).            |
+| **frame**      | A visual grouping (subgraph) of items.                                     |
+| **name**       | The unique identifier of an item (no whitespace).                          |
+| **label**      | The display text of an item or connection. Defaults to the name.           |
 
 ### Item types
 
@@ -245,9 +245,9 @@ Handled by the scanner before parsing.
 
 ## 7. Filters and merge
 
-Filters manipulate the **kept set** to produce diagram subsets; a merge
+Filters manipulate the **kept set** to produce diagram subsets. A merge
 collapses items into one. Both serve to derive subgraphs or simplified
-graphs from a master graph carrying all the details (see § 6).
+graphs from a master graph that carries all the details (see § 6).
 
 ### 7.1. Only filter (`!`)
 
@@ -281,15 +281,17 @@ removes the anchors (and optionally their neighbors).
 merge ITEM_NAME [ITEM_NAME...] : REPLACER
 ```
 
-Collapses the items into the replacer, an item declared elsewhere: their
-connections are rewired to it (a connection between two merged items
-disappears), the items become unavailable, and the replacer takes
-their place in the kept set. Not a filter: the kept set is otherwise
-untouched; once one exists, a merge names kept items only. Processed in source order with the filters; merges
-chain (`merge B C : G` then `merge G D : H`). Frames: the merged items
-are in one frame or all unframed, otherwise an error is raised; the replacer takes
-their place in it; a replacer declared in a frame that would also
-inherit one ends up in multiple frames, which is an error.
+Collapses the items into the replacer, i.e. an item declared elsewhere.
+Their connections are rewired to it, and a connection between two merged
+items disappears. The items become unavailable, and the replacer takes
+their place in the kept set. A merge is not a filter: the kept set is
+otherwise untouched, and once a kept set exists, a merge can only name
+kept items. Merges are processed in source order with the filters, and
+they chain (`merge B C : G` then `merge G D : H`). The merged items must
+be in one frame or all unframed, otherwise an error is raised; the
+replacer takes their place in that frame. A replacer declared in a frame
+that would also inherit one ends up in multiple frames, which is an
+error.
 
 ### 7.4. Neighbour specification
 
@@ -303,8 +305,8 @@ DIRECTION[FLAGS]SPAN
 | `FLAGS`     | `x` = suppress anchors (neighbors only), `f` = suppress frames |
 | `SPAN`      | `*` = unlimited, or integer distance                           |
 
-One specification per filter (`<>` is one); a second is an error.
-Another neighbourhood is another filter with the same items.
+A filter takes one specification, and `<>` counts as one; a second is an
+error. Another neighbourhood is another filter with the same items.
 
 Examples: `>*` (all downstream), `<>2` (two levels in both directions),
 `<>xf2` (two levels, neighbors only, suppress frames).
