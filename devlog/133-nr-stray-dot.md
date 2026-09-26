@@ -1,7 +1,7 @@
 # 133 — The NR runner reports a stray `.dot` of an error fixture
 
 Date: 2026-09-26
-Status: ONGOING
+Status: DONE
 Issue: #133 · PR: #134 · Branch: `test/133-nr-stray-dot`
 Task nature: change
 Track: fast
@@ -78,15 +78,15 @@ Approved: 2026-09-26 (the go for the batch)
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                                                            | Agent    | User |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track; reproduce first, then five disposable-fixture scenarios in one command                                                                     | well     |      |
-| 2   | The TODO named one script; reading both found the same write in the other                                                                                                        | well     |      |
-| 3   | The decision "no shell test harness" rested on a false premise: `tests/test_tracing_prelude.py` drives a script already; check the tests folder before ruling a kind of test out | not well |      |
+| #   | Point                                                                                                                                                                            | Agent    | User       |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: fast track; reproduce first, then five disposable-fixture scenarios in one command                                                                     | well     | well       |
+| 2   | The TODO named one script; reading both found the same write in the other                                                                                                        | well     | well       |
+| 3   | The decision "no shell test harness" rested on a false premise: `tests/test_tracing_prelude.py` drives a script already; check the tests folder before ruling a kind of test out | not well | ended well |
 
 Process: 1 round before the go (the batch assessment); 1 loop at the review (effective tests).
 
-Closed:
+Closed: 2026-09-26
 
 ### 4.2 Rule trace
 
