@@ -1,7 +1,7 @@
 # 131 — Git hooks run `make lint` at commit and `make test` at push
 
 Date: 2026-09-26
-Status: ONGOING
+Status: DONE
 Issue: #131 · PR: #132 · Branch: `build/131-lint-test-hooks`
 Task nature: change
 Track: fast
@@ -106,12 +106,12 @@ commits were undone, the branch holds none of them.
 
 | #   | Point                                                                                                                               | Agent | User |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: fast track, decisions from the batch assessment, one measurement settled the whole-lint question          | well  |      |
-| 2   | A negative trial that exits non-zero is not yet a proof: read why it failed (the first refusal was the framework's, not the lint's) | well  |      |
+| 1   | Process and template fit: fast track, decisions from the batch assessment, one measurement settled the whole-lint question          | well  | well |
+| 2   | A negative trial that exits non-zero is not yet a proof: read why it failed (the first refusal was the framework's, not the lint's) | well  | well |
 
 Process: 1 round before the go (the batch assessment); 1 loop at the review (the trials made visible).
 
-Closed:
+Closed: 2026-09-26
 
 ### 4.2 Rule trace
 
