@@ -57,10 +57,39 @@ Approved: 2026-09-26 (the go for the batch)
   (criterion 1). Its push ran `make test` in 13 s (criterion 2). The
   three stages installed by the `make require` line (criterion 3).
 - This devlog, through both hooks.
+- Review loop (2026-09-26): the test report above, the failing-test
+  trial at push added to the failing-lint one at commit.
 
 ## 3. Delivery
 
-### 3.1 Verdict
+### 3.1 Test report
+
+Trials on this branch, 2026-09-26, at the review's request; the trial
+commits were undone, the branch holds none of them.
+
+1. A staged `src/data_flow_diagram/_trial.py` with `import os` twice,
+   `git commit`: refused, exit 1, `HEAD` unchanged (criterion 1).
+
+   ```
+   make lint................................................................Failed
+   F811 [*] Redefinition of unused `os` from line 1
+   F401 [*] `os` imported but unused
+   ```
+
+2. A committed `tests/unit/test_trial.py` asserting `False` (lint
+   passes, the commit goes through), `git push`: refused, exit 1, the
+   remote branch unchanged (criterion 2, the refusal side).
+
+   ```
+   make test................................................................Failed
+   FAILED tests/unit/test_trial.py::test_trial - AssertionError: a trial failure
+   error: failed to push some refs to 'github.com:pbauermeister/dfd.git'
+   ```
+
+3. The commit of this report and its push: both hooks `Passed`
+   (criteria 1 and 2, the passing side).
+
+### 3.2 Verdict
 
 **Recommendation:** accept
 
@@ -76,7 +105,7 @@ Approved: 2026-09-26 (the go for the batch)
 | 1   | Process and template fit: fast track, decisions from the batch assessment, one measurement settled the whole-lint question          | well  |      |
 | 2   | A negative trial that exits non-zero is not yet a proof: read why it failed (the first refusal was the framework's, not the lint's) | well  |      |
 
-Process: 1 round before the go (the batch assessment); loops at the review: pending.
+Process: 1 round before the go (the batch assessment); 1 loop at the review (the trials made visible).
 
 Closed:
 
