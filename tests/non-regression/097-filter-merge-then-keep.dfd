@@ -1,6 +1,6 @@
 # Issue #127: merge first, then keep on the grouped graph: the keep
 # filter starts empty. Expected: A -> G.
-#include tests/non-regression/093-filter-merge-master.part
+#include tests/non-regression/093-filter-merge-master.dfd
 
 merge B C : G
 !>1 A

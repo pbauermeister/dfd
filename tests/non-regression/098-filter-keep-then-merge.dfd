@@ -1,6 +1,6 @@
 # Issue #127: keep first, then merge: the replacer takes the place of
 # the kept member B. Expected: A -> G.
-#include tests/non-regression/093-filter-merge-master.part
+#include tests/non-regression/093-filter-merge-master.dfd
 
 !>1 A
 merge B C : G

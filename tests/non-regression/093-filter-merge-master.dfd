@@ -1,4 +1,4 @@
-# Master diagram for the merge tests (#127): A and E feed B, then the
+# Master diagram for the merge tests (#127), a fixture of its own: A and E feed B, then the
 # chain B -> C -> D -> F. G is the group to merge B and C into, H a
 # super group.
 

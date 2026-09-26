@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 33
+Next number: 34
 
 ## Won't do
 
@@ -191,3 +191,18 @@ show it. Its removal is a breaking change (major), to be done when a
 major comes for a stronger reason: drop `_desugar_replacer()` and the
 replacer branch of `_parse_filter()` in `dsl/parser.py`, fixture 094
 (the sugar twin) and 089 (the bare `=`), the unit cases of the warning.
+
+### 33. Code structure of the filters and the parser (from the review of #128)
+
+Two comments at the review of #128, deferred to a task of their own
+that touches code only, with no change to the tests:
+
+- `dsl/filters.py` holds several concepts and its functions relay the
+  same parameters (statements, the kept set, the merge map, the
+  unavailable set): assess whether classes carry them better.
+- `dsl/parser.py`: `parse()` tells a single statement from a list by
+  `isinstance()`, a smell; assess a `match`, an abstract result type,
+  or every parser returning a list. Also a naming convention telling a
+  whole-line parser (`_parse_style`) from a part parser
+  (`_parse_item_name`): a prefix per kind, or static methods of two
+  classes.

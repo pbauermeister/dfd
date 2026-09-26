@@ -1,6 +1,6 @@
 # Issue #127: G is merged away by the first merge, so it cannot receive
 # the second one. A chain is written forward.
-#include tests/non-regression/093-filter-merge-master.part
+#include tests/non-regression/093-filter-merge-master.dfd
 
 merge G D : H
 merge B C : G

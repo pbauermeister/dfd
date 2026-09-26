@@ -1,4 +1,4 @@
 # Issue #127: B and C merged into G. Expected: A and E -> G -> D -> F.
-#include tests/non-regression/093-filter-merge-master.part
+#include tests/non-regression/093-filter-merge-master.dfd
 
 merge B C : G

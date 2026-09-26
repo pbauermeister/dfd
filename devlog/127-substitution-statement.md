@@ -216,6 +216,14 @@ Approved: 2026-09-25
 - Step 4: `devlog/127-try-it/`, the three cases of #125 in both forms
   and two more (keep then merge, the chain), rendered.
 
+- Review (2026-09-26): the master of the merge fixtures becomes a
+  fixture of its own, `093-filter-merge-master.dfd`, with its golden
+  and its SVG under `make nr-review`, so the filtered pictures can be
+  compared with it; the basic case is `093-filter-merge-basic`. The
+  two code-structure comments (classes in `filters.py`, the
+  `isinstance()` in `parse()` and the line/part parser naming) go to
+  TODO 33, a code-only task.
+
 ## 4. Delivery
 
 ### 4.1 Try it
