@@ -93,7 +93,12 @@ at the stop reached. Several fast tracks may run as a batch, see
 ### Chained fast tracks
 
 Several fast-track items may run as one batch: TODO items or a brief,
-each small and well framed. The batch has three phases.
+each small and well framed. The point of the batch is to group the
+user's involvement, at the go and at the reviews, so that the runs in
+between need none of it. Grouping has the priority, not running
+unattended: a task that needs a pause pauses, and the question waits
+grouped with the others where it can, at the review. The batch has
+three phases.
 
 1. **Upfront assessment.** The agent drafts, for every item, the
    decisions to take (rows marked rule or taste, as in a Mandate) and
