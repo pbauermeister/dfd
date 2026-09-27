@@ -35,17 +35,17 @@ existing golden byte-identical; three fixtures pin the rules.
 
 ### 1.3 Design decisions
 
-| #   | Decision                                                                                                                                                                                                                                                                              | Basis                                                    | Alternatives considered                              |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------- |
-| 1   | The phase 1 loop knows its position: the known names, the walk and the flow collections read `statements[:position]`; phase 2 unchanged                                                                                                                                               | spike (measured)                                         | A graph built incrementally (#143's design, later)   |
-| 2   | An item declared after a view statement is added to the kept set when one exists; before the first view statement nothing changes                                                                                                                                                     | rule 1 and 3 of #145                                     | Declarations always positional (drops `! A` after Z) |
-| 3   | A connection declared after a view statement with an end in the unavailable record raises " Name(s) no longer available: B (removed at line N: ...)" from the filters, the same message as for an anchor                                                                              | user (taste, strict over silent drop)                    | Drop the flow as any flow with an unkept end         |
-| 4   | A frame declared after a view statement is trimmed by phase 2 as today                                                                                                                                                                                                                | rule 3 of #145                                           | An error for a merged member                         |
-| 5   | A merge still rewires every connection in phase 2, a flow declared after it included; its merged items are unavailable to a later connection (decision 3)                                                                                                                             | § 7.5 rule 6, unchanged                                  |                                                      |
-| 6   | Fixtures, the next free numbers after 111 (`tests/RULES.md`): a declaration joining the view after `!` (item, flow, frame), the walk bounded by the position (`!>1 A` with a flow declared below), an `-err-` fixture for a connection to a removed item; mutation smoke-test on each | `tests/README.md` (rule)                                 | A unit test only                                     |
-| 7   | Both docs, § 7.5: one paragraph stating the three rules; `doc/README.md` example built from the first fixture                                                                                                                                                                         | rule: a language rule is documented where the others are |                                                      |
-| 8   | Commit type `fix:`, the author's reading of the current state                                                                                                                                                                                                                         | user                                                     | `feat:` (the #121 test: "was X possible before?")    |
-| 9   | On the way: the one-frame check of a merge reads the frames declared above it too, plus the frames its replacers inherited; a frame declared below a merge is trimmed by phase 2 (decision 4)                                                                                         | rule 2 of #145, extended to frames                       | The frames of the whole file, as before              |
+| #   | Decision                                                                                                                                                                                                                                                                                                                                            | Basis                                                                   | Alternatives considered                                                                                |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 1   | The phase 1 loop knows its position: the known names, the walk and the flow collections read `statements[:position]`; phase 2 unchanged                                                                                                                                                                                                             | spike (measured)                                                        | A graph built incrementally (#143's design, later)                                                     |
+| 2   | An item declared after a view statement is added to the kept set when one exists; before the first view statement nothing changes                                                                                                                                                                                                                   | rule 1 and 3 of #145                                                    | Declarations always positional (drops `! A` after Z)                                                   |
+| 3   | A connection declared after a view statement names items of the view: an end declared above it that is not kept, removed or merged away is an error, with the messages of an anchor ("no longer available due to previous filters", "no longer available: B (removed at line N: ...)"); an end declared below joins the view at its declaration     | user (review of 2026-09-27: "should be error", the silent drop refused) | Drop the flow as any flow with an unkept end (the first version: an error for removed and merged only) |
+| 4   | A frame declared after a view statement is trimmed by phase 2 as today                                                                                                                                                                                                                                                                              | rule 3 of #145                                                          | An error for a merged member                                                                           |
+| 5   | A merge still rewires every connection in phase 2, a flow declared after it included; its merged items are unavailable to a later connection (decision 3)                                                                                                                                                                                           | § 7.5 rule 6, unchanged                                                 |                                                                                                        |
+| 6   | Fixtures, the next free numbers after 111 (`tests/RULES.md`): 112 a declaration joining the view after `!` (item, flow, frame), 113 a declaration below joining beyond the walk's reach, 114 `-err-` a flow to a removed item, 115 `-err-` a flow to an item the walk did not reach (the walk bounded by the position); mutation smoke-test on each | `tests/README.md` (rule)                                                | A unit test only                                                                                       |
+| 7   | Both docs, § 7.5: one paragraph stating the three rules; `doc/README.md` example built from the first fixture                                                                                                                                                                                                                                       | rule: a language rule is documented where the others are                |                                                                                                        |
+| 8   | Commit type `fix:`, the author's reading of the current state                                                                                                                                                                                                                                                                                       | user                                                                    | `feat:` (the #121 test: "was X possible before?")                                                      |
+| 9   | On the way: the one-frame check of a merge reads the frames declared above it too, plus the frames its replacers inherited; a frame declared below a merge is trimmed by phase 2 (decision 4)                                                                                                                                                       | rule 2 of #145, extended to frames                                      | The frames of the whole file, as before                                                                |
 
 ### 1.4 Acceptance criteria
 
@@ -82,6 +82,19 @@ Z`, `frame Z D` (frame trimmed to Z); 113 Y above `!>1 A`, Z below,
   as 112), SYNTAX § 7.5 one paragraph; `make doc` clean, the
   renumberer and the sections idempotent. `tests/RULES.md` counter to 115.
 - This devlog.
+- Review loop (2026-09-27): Pascal read the review folder and refused
+  the silent drop of `A -> Y` in 113 ("should be error: Y no longer
+  available, and was neither kept by a `! Y`"). Decision 3 extended:
+  the ends of a connection declared after a view statement, when
+  declared above it, must be in the view, checked with the anchor
+  check of `~` (same message); an end declared below joins at its
+  declaration, since a connection may name an item declared later
+  (measured: `A -> B` then the items renders). 113 rewritten to the
+  joining case alone, 115 the error; the goldens still identical.
+  Mutation (the connection's names emptied): 114 and 115 succeed
+  where they must fail; a first, broader mutation on the four
+  `kept_names` guards failed six fixtures. Rule 3 reworded in both
+  docs; counter to 116.
 
 ## 3. Delivery
 
@@ -95,17 +108,20 @@ Z`, `frame Z D` (frame trimmed to Z); 113 Y above `!>1 A`, Z below,
 - Reservation, not a criterion: an anchor declared below its filter
   now fails as "Name(s) unknown", the message of a name absent from
   the file. Precise enough for the rule, imprecise on the cause.
+- After the loop: a flow declared after a view statement is either in
+  the view or an error, never dropped; the drop of phase 2 stays for
+  the flows declared above.
 
 ## 4. Closure
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                                                                                  | Agent | User |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ---- |
-| 1   | Process and template fit: fast track after the spike, one work commit, no question raised on the way                                                                   | well  |      |
-| 2   | The spike measured before the fix was decided: the change landed at the spike's size, and the goldens said nothing moved                                               | well  |      |
-| 3   | Fixture 113 pins two rules in one diagram (the walk bounded, the declaration joining); a single-rule fixture would have shown the same output before and after the fix | well  |      |
-| 4   | The frames of a merge read positionally too (decision 9): a small extension of the recorded decisions, taken without a pause, consistent with rule 2                   | well  |      |
+| #   | Point                                                                                                                                                                                              | Agent | User |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ---- |
+| 1   | Process and template fit: fast track after the spike, one work commit, no question raised on the way                                                                                               | well  |      |
+| 2   | The spike measured before the fix was decided: the change landed at the spike's size, and the goldens said nothing moved                                                                           | well  |      |
+| 3   | The review folder (093 first, dfd/dot/stderr and SVG) got the disagreement in one reading: fixture 113 mixed a rule with a silent drop that the picture made visible; one loop, the rule sharpened | well  |      |
+| 4   | The frames of a merge read positionally too (decision 9): a small extension of the recorded decisions, taken without a pause, consistent with rule 2                                               | well  |      |
 
 Closed: pending
 
