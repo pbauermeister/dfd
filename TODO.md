@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 38
+Next number: 39
 
 ## Won't do
 
@@ -117,3 +117,16 @@ computing them means re-implementing the search, so the renders are
 read once by hand and the goldens committed (the NR workflow). The
 diagram of a matrix fixture reads as rows of disconnected chains, as
 111 shows.
+
+### 38. A merge into a connected item (from the review of #145)
+
+At the second review of #145 the author read `merge B C : D` with
+`C -> D` declared above as an error, "D has connections", where the
+tool collapses the flow to a self-loop and drops it, as #100 decided
+at its Try it (fixtures 078 and 079, "a flow to the replacer itself").
+The two readings contradict each other; the error was implemented on
+the branch of #145 and removed once 078 and 079 failed (decision 11 of
+its devlog). To settle: is a replacer an item declared for the group
+(then a connection declared to it above the merge is an error, and
+078 and 079 change) or any item (the current rule)? A rule change is
+breaking for the two fixtures' shape.

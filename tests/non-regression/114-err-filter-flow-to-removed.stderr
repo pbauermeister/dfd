@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 7: B -> Z bz
+  line 1: <file:tests/non-regression/114-err-filter-flow-to-removed.dfd>
+Error:  Name(s) no longer available: B (removed at line 4: ~ B)

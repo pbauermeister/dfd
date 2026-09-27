@@ -6,6 +6,12 @@ vetoes them. A strict filter vetoes every flow touching an item it
 selects; a flow shows anyway when it is a path flow (followed by some
 strict filter to reach its neighbors) or joins two items a plain "!"
 selects together. Flows vetoed and allowed by none are the stray flows.
+
+Position: a view statement (filter or merge) reads the statements before
+it, so its anchors are declared above and its walk follows the flows
+declared above. An item declared after a view statement joins the kept
+set; a connection or a frame declared after one names items of the
+view, or is an error (#145).
 """
 
 from dataclasses import dataclass
@@ -217,6 +223,29 @@ def _check_available(
         )
 
 
+def _check_in_view(
+    *,
+    names: set[str],
+    all_names: set[str],
+    unavailable: dict[str, str],
+    kept_names: set[str] | None,
+    source: model.SourceLine,
+) -> None:
+    """A statement declared after a view statement names items of the
+    view: of its names declared so far, none removed or merged away,
+    and all kept once a kept set exists (a name declared below joins
+    the view at its declaration)."""
+    names = names & all_names
+    _check_available(names=names, unavailable=unavailable, source=source)
+    if kept_names is not None:
+        _check_filter_names(
+            names=names,
+            in_names=kept_names,
+            all_names=all_names,
+            source=source,
+        )
+
+
 def _check_kept(
     *, names: set[str], kept_names: set[str], source: model.SourceLine
 ) -> None:
@@ -229,13 +258,18 @@ def _check_kept(
         )
 
 
-def _frame_of_items(statements: model.Statements) -> dict[str, model.Frame]:
-    """Item name -> the frame declaring it."""
+def _frame_of_items(
+    statements: model.Statements, *, inherited: dict[str, model.Frame]
+) -> dict[str, model.Frame]:
+    """Item name -> the frame declaring it; a replacer declared in no
+    frame is in the one it inherited."""
     frame_of: dict[str, model.Frame] = {}
     for statement in statements:
         if isinstance(statement, model.Frame):
             for name in statement.items:
                 frame_of[name] = statement
+    for name, frame in inherited.items():
+        frame_of.setdefault(name, frame)
     return frame_of
 
 
@@ -302,27 +336,58 @@ class _FilterDecisions:
 
 def _collect_kept_names(
     statements: model.Statements,
-    all_names: set[str],
     *,
     debug: bool,
 ) -> _FilterDecisions:
-    """Process filter statements to determine which names to keep."""
+    """Process filter statements to determine which names to keep.
+
+    A view statement reads the statements before it (`seen`), and the
+    declarations after it join the view (see the module docstring).
+    """
     kept_names: set[str] | None = None
     only_names: set[str] = set()
     replacement: dict[str, str] = {}
     unavailable: dict[str, str] = {}  # removed or merged away -> cause
-    frame_of = _frame_of_items(statements)
+    all_names: set[str] = set()  # the items declared so far
+    frame_of_replacers: dict[str, model.Frame] = {}  # inherited by a merge
     inherited_frames: dict[str, int] = {}
     skip_frames_for_names: set[str] = set()
     vetoed_ids: set[int] = set()
     allowed_ids: set[int] = set()
 
-    for statement in statements:
+    for position, statement in enumerate(statements):
+        seen = statements[:position]
         if isinstance(statement, model.Filter):
             dprint("*** Filter:", statement)
             dprint("    before:", kept_names)
 
         match statement:
+            case model.Item() as item:
+                # declared after a view statement: joins the current view
+                all_names.add(item.name)
+                if kept_names is not None:
+                    kept_names.add(item.name)
+
+            case model.Connection() as conn:
+                # declared after a view statement: its ends are in the view
+                _check_in_view(
+                    names={conn.src, conn.dst},
+                    all_names=all_names,
+                    unavailable=unavailable,
+                    kept_names=kept_names,
+                    source=statement.source,
+                )
+
+            case model.Frame() as frame:
+                # declared after a view statement: its items are in the view
+                _check_in_view(
+                    names=set(frame.items),
+                    all_names=all_names,
+                    unavailable=unavailable,
+                    kept_names=kept_names,
+                    source=statement.source,
+                )
+
             case model.Only() as f:
                 # Only is additive: first Only starts with an empty kept set
                 if kept_names is None:
@@ -354,7 +419,7 @@ def _collect_kept_names(
                 # add upstream/downstream neighbor names
                 downs, ups, path_ids = find_neighbors(
                     filter=f,
-                    statements=statements,
+                    statements=seen,
                     max_neighbors=len(all_names),
                     merged=replacement,
                     debug=debug,
@@ -374,12 +439,12 @@ def _collect_kept_names(
                     selection |= names
                 if f.strict:
                     vetoed_ids |= _collect_flow_ids(
-                        statements, selection, touching=True, merged=replacement
+                        seen, selection, touching=True, merged=replacement
                     )
                     allowed_ids |= path_ids
                 else:
                     allowed_ids |= _collect_flow_ids(
-                        statements,
+                        seen,
                         selection,
                         touching=False,
                         merged=replacement,
@@ -413,6 +478,7 @@ def _collect_kept_names(
                         kept_names=kept_names,
                         source=statement.source,
                     )
+                frame_of = _frame_of_items(seen, inherited=frame_of_replacers)
                 frame = _check_one_frame(
                     names=names, frame_of=frame_of, source=statement.source
                 )
@@ -429,7 +495,7 @@ def _collect_kept_names(
                     # a replacer declared in another frame is then in two:
                     # the frame check re-run after the filters reports it
                     inherited_frames[m.replacer] = id(frame)
-                    frame_of.setdefault(m.replacer, frame)
+                    frame_of_replacers.setdefault(m.replacer, frame)
 
             case model.Without() as f:
                 # Without is subtractive: first Without starts with all names
@@ -469,7 +535,7 @@ def _collect_kept_names(
                 # remove upstream/downstream neighbor names
                 downs, ups, _ = find_neighbors(
                     filter=f,
-                    statements=statements,
+                    statements=seen,
                     max_neighbors=len(all_names),
                     merged=replacement,
                     debug=debug,
@@ -645,7 +711,7 @@ def handle_filters(
     all_names = {s.name for s in statements if isinstance(s, model.Item)}
 
     # phase 1: collect filtered names
-    decisions = _collect_kept_names(statements, all_names, debug=debug)
+    decisions = _collect_kept_names(statements, debug=debug)
 
     _mark_non_hidable(statements, decisions.only_names)
 
