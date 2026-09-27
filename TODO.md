@@ -102,21 +102,6 @@ replacer branch of `_parse_filter()` in `dsl/parser.py`, fixture 094
 Constraint (2026-09-26): a breaking change, never proposed for a batch;
 it waits for a major.
 
-### 33. Code structure of the filters and the parser (from the review of #128)
-
-Two comments at the review of #128, deferred to a task of their own
-that touches code only, with no change to the tests:
-
-- `dsl/filters.py` holds several concepts and its functions relay the
-  same parameters (statements, the kept set, the merge map, the
-  unavailable set): assess whether classes carry them better.
-- `dsl/parser.py`: `parse()` tells a single statement from a list by
-  `isinstance()`, a smell; assess a `match`, an abstract result type,
-  or every parser returning a list. Also a naming convention telling a
-  whole-line parser (`_parse_style`) from a part parser
-  (`_parse_item_name`): a prefix per kind, or static methods of two
-  classes.
-
 ### 37. A combinatorial matrix of fixtures for the filters
 
 Raised at the review of #140 (2026-09-26). The neighborhood fixtures
