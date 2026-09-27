@@ -336,6 +336,14 @@ Filters and merges are processed **sequentially** in source order:
    nor joins two items named together by a `!` filter. Constraints are never
    stray flows. Without any `!!`, nothing is dropped by this step.
 
+The statements are positional. A filter or a merge reads the statements
+above it: its anchors are declared above, and its walk follows the flows
+declared above. A declaration above the first filter or merge belongs to
+the master only. A declaration below one joins the master and the
+current view: an item is kept, a frame is trimmed as in step 5, and a
+connection with an end removed or merged away is an error naming the
+cause, as in step 4.
+
 ### 7.6. Syntactic sugar
 
 The `!`, `!!` or `~` mnemonic may be written without a separating space

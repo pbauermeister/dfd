@@ -1,0 +1,12 @@
+# Issue #145: a filter's walk reads the flows declared above it, and a
+# declaration below joins the view. Y (declared above the filter) is not
+# reached through the flow declared below: out. Z (declared below) is
+# in by declaration, two flows away from A, out of the walk's reach.
+# Expected: A -> B -> Z.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+process Y
+!>1 A
+process Z
+A -> Y ay
+B -> Z bz

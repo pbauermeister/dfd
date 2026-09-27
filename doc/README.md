@@ -1478,6 +1478,35 @@ merge db_aggr db_fcast db_params : db_all
 A merged item is no longer available to the statements that follow, so
 `! db_aggr` after the merge is an error.
 
+### 7.5. Declarations after a filter or a merge
+
+A filter or a merge reads the diagram as declared above it, and the
+declarations below it join the view it makes. Three rules:
+
+1. A declaration above the first filter or merge belongs to the master
+   only: `process Z` then `! A` drops Z.
+2. A filter or a merge reads the statements above it: its anchors are
+   declared above, and its walk follows the flows declared above.
+3. A declaration below a filter or a merge joins the master and the
+   view: `! A` then `process Z` keeps Z; a frame is trimmed to the
+   kept items as usual; a flow to an item removed or merged away is an
+   error naming the statement that removed it.
+
+Here Z, its flow and its frame join the view of `! A B`; D, out of the
+view, leaves the frame:
+
+```data-flow-diagram img/filter-declared-after.svg
+#include #img/filter-strict-master
+
+! A B
+
+process Z
+A -> Z  declared after
+frame Z D = declared after
+```
+
+![Declarations after a filter](./img/filter-declared-after.svg)
+
 ## 8. Influencing the layout
 
 Let us consider this diagram:
