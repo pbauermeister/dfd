@@ -84,6 +84,12 @@ Approved: 2026-09-26 (the go for the batch)
   fixture with its golden, the rule written in `tests/RULES.md` and
   `tests/README.md`; the devlog lines of this loop landed one commit
   late, an edit script stopped on a table re-padded by prettier.
+- Third loop (2026-09-26), reverted (2026-09-27): a 5 x 5 grid master
+  with nine fixtures replaced the three-chain matrix (b839a5d); at the
+  re-review the grid brought no clarity, on the contrary, and the loop
+  was reverted to the matrix of the second loop. The commit keeps the
+  layout measurements (relaxed diagonals let Graphviz permute the
+  grid; constrained ones pin it in the vertical style) for TODO 37.
 
 ## 3. Delivery
 
@@ -106,7 +112,7 @@ Approved: 2026-09-26 (the go for the batch)
 
 | 4 | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well | |
 
-Process: 1 round before the go (the batch assessment); 2 loops at the review (the matrix fixtures, the master as a fixture).
+Process: 1 round before the go (the batch assessment); 3 loops at the review (the matrix fixtures, the master as a fixture, a grid reverted).
 
 Closed: pending
 
