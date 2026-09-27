@@ -51,9 +51,11 @@ Release path (`make release`, `release.yml`):
       and the script stops before any commit.
 - [ ] Abort at the prompt: local release commit and tag removed,
       tree equal to `origin/main`.
-- [ ] A minor release (first `feat:` PR) and, when it comes, a
-      major one (`!` or `BREAKING CHANGE:` footer in the PR body,
-      which the squash setting carries into the commit).
+- [x] A minor release (first `feat:` PR): 1.19.0 (2026-09-27, #127
+      and #137, run 36307877125, PyPI and the GitHub release
+      published). Still open: a major one (`!` or `BREAKING CHANGE:`
+      footer in the PR body, which the squash setting carries into
+      the commit).
 - [ ] Preflight refusal, provoked: a `v*` tag pushed on a commit
       that is not on `main` (delete the tag afterwards).
 - [ ] Recovery forward after a failed run past TestPyPI, when it
@@ -69,7 +71,9 @@ Merge gate (`merge-gate.yml`, ruleset on `main`):
       on the next PR event. Occurred on #105 (2026-09-24, "release
       1.17.10 first"); passed after the release and a merge of
       `main` into the branch.
-- [ ] Allowed at or below: a `fix:` PR on a pending minor.
+- [x] Allowed at or below: #140 (`feat:`) passed on the pending minor
+      of #127 (2026-09-27), the "at" case; a `fix:` PR on a pending
+      minor, the "below" case, not yet seen.
 - [ ] None-level pending counts as empty: a `chore:` commit on
       `main`, then a `feat:` PR passes.
 - [ ] A title edit re-runs `conventional` and `gate`; a
