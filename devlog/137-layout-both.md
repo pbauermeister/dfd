@@ -35,6 +35,7 @@ with the same flags and span. Documented next to `<>`.
 | 5   | README § 7.3.3 gains the form in the list and the "counts as one" sentence; SYNTAX.md § 7.4 the table cell                                                                                                                                  | TODO 30 (taste): no new figure                         | An example in § 7.4.1.2                   |
 | 6   | Review loop: a matrix master (111 part) of five A→B→C chains drawn in the four arrow combinations plus a constraint, fixtures 111 (`[]2`) and 112 (`<>2` twin), 110 kept; span 2 because span 1 keeps every adjacent item in both forms     | review of #140 (rule); measured before writing         | Distance-1 cases; one fixture per chain   |
 | 7   | Second loop: the master is a fixture itself, `111-filter-layout-matrix.master.dfd` with its golden, so that the review renders it; the rule codified in `tests/RULES.md` and `tests/README.md` (028 stays a `.part`, 093 predates the name) | review of #140, the same remark at #127 (rule created) | Keep the `.part` and render it by hand    |
+| 8   | Fourth loop: fixture 111, `![]2 P2` on the filter master, the P2 counterpart of 110; its set equals `<>2 P2` (031), which shows where the two forms agree                                                                                   | review of #140 (rule)                                  |                                           |
 
 ### 1.4 Acceptance criteria
 
@@ -45,8 +46,9 @@ with the same flags and span. Documented next to `<>`.
 3. `<]2` and `[]` with a second specification fail as before.
 4. `make format`, `make lint`, `make test` pass; the mutation
    smoke-test fails fixture 110 and the unit test.
-5. After the reverted loops: fixture 110 alone, the mutation failing
-   it; no file of the matrix or the grid left in the fixtures folder.
+5. After the reverted loops: fixtures 110 and 111 on the filter
+   master, the mutation failing both; no file of the matrix or the
+   grid left in the fixtures folder.
 
 Approved: 2026-09-26 (the go for the batch)
 
@@ -95,6 +97,12 @@ Approved: 2026-09-26 (the go for the batch)
   `doc/SYNTAX.md`, TODO item 37, and the master-as-fixture rule, whose
   example is now 093. Both matrices remain in the history of this
   branch (b2b5c70, b839a5d) as material for TODO 37.
+- Fourth loop (2026-09-27, `b8e2382`): fixture 111, the same test on
+  P2. Measured first: `[]2 P2` keeps C2 E2 P1 P2 P3 P4 P5 S1 S2, the
+  set of `<>2 P2` (031), since no reversed connection lies within two
+  levels of P2; `[2 P2` keeps P1 P2 S1 and `]2 P2` the rest. The
+  devlog lines of this loop landed one commit late again, the edit
+  script named a row the grid revert had removed.
 
 ## 3. Delivery
 
@@ -117,7 +125,7 @@ Approved: 2026-09-26 (the go for the batch)
 
 | 4 | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well | |
 
-Process: 1 round before the go (the batch assessment); 3 loops at the review, two of them reverted (the matrix, the grid); the master-as-fixture rule kept.
+Process: 1 round before the go (the batch assessment); 4 loops at the review, two of them reverted (the matrix, the grid); the master-as-fixture rule kept; the P2 fixture.
 
 Closed: pending
 
