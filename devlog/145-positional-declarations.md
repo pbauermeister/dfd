@@ -1,7 +1,7 @@
 # 145 — Declarations after a view statement join the view
 
 Date: 2026-09-27
-Status: ONGOING
+Status: DONE
 Issue: #145 · PR: #146 · Branch: `fix/145-positional-declarations`
 Task nature: change
 Track: fast
@@ -136,10 +136,10 @@ Z`, `frame Z D` (frame trimmed to Z); 113 Y above `!>1 A`, Z below,
 | 1   | Process and template fit: fast track after the spike, one work commit, no question raised on the way                                                                                                                                      | well     | well       |
 | 2   | The spike measured before the fix was decided: the change landed at the spike's size, and the goldens said nothing moved                                                                                                                  | well     | well       |
 | 3   | The review folder (093 first, dfd/dot/stderr and SVG) got the disagreement in one reading: fixture 113 mixed a rule with a silent drop that the picture made visible; one loop, the rule sharpened                                        | well     | well       |
-| 5   | The second bug of the issue was found by chance; enumerating the statement kinds after a view statement and running them on both sides found the frame gap in one pass: do the enumeration before the first fixture, not after the review | not well | ended well |
 | 4   | The frames of a merge read positionally too (decision 9): a small extension of the recorded decisions, taken without a pause, consistent with rule 2                                                                                      | well     | well       |
+| 5   | The second bug of the issue was found by chance; enumerating the statement kinds after a view statement and running them on both sides found the frame gap in one pass: do the enumeration before the first fixture, not after the review | not well | ended well |
 
-Closed: pending
+Closed: 2026-09-27
 
 ### 4.2 Rule trace
 
