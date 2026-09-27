@@ -117,15 +117,16 @@ Approved: 2026-09-26 (the go for the batch)
 
 ### 4.1 Retrospective
 
-| #   | Point                                                                                                               | Agent    | User |
-| --- | ------------------------------------------------------------------------------------------------------------------- | -------- | ---- |
-| 1   | Process and template fit: fast track, three files of substance, one commit                                          | well     |      |
-| 2   | Measuring the kept sets first chose the span; the item's "two filters" wording was wrong, `Only` filters intersect  | well     |      |
-| 3   | Reverting the mutation with `git checkout` took the feature edit with it; a mutation is reverted by its own inverse | not well |      |
-
-| 4 | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well | |
+| #   | Point                                                                                                                                                                   | Agent    | User       |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 1   | Process and template fit: fast track, three files of substance, one commit                                                                                              | well     | well       |
+| 2   | Measuring the kept sets first chose the span; the item's "two filters" wording was wrong, `Only` filters intersect                                                      | well     | well       |
+| 3   | Reverting the mutation with `git checkout` took the feature edit with it; a mutation is reverted by its own inverse                                                     | not well | don't care |
+| 4   | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well     | not well   |
 
 Process: 1 round before the go (the batch assessment); 4 loops at the review, two of them reverted (the matrix, the grid); the master-as-fixture rule kept; the P2 fixture.
+
+On 4: User asked for tests in 3x3 then 5x5 matrix, but this did not bring value, therefore reverting.
 
 Closed: 2026-09-27
 
