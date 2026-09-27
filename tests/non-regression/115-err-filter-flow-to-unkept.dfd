@@ -1,0 +1,9 @@
+# Issue #145: a filter's walk reads the flows declared above it, and a
+# connection declared below a view statement names items of the view.
+# Y is declared above "!>1 A" and reached by no flow above it: not kept,
+# so the flow to it is an error.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+process Y
+!>1 A
+A -> Y ay
