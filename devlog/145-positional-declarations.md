@@ -2,7 +2,7 @@
 
 Date: 2026-09-27
 Status: PENDING
-Issue: #145 · PR: #PPP · Branch: `fix/145-positional-declarations`
+Issue: #145 · PR: #146 · Branch: `fix/145-positional-declarations`
 Task nature: change
 Track: fast
 Agent: Claude Fable 5.1
