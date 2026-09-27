@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 9: A -> Y ay
+  line 1: <file:tests/non-regression/115-err-filter-flow-to-unkept.dfd>
+Error:  Name(s) no longer available due to previous filters: Y

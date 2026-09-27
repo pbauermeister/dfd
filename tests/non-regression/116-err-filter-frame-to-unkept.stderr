@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 6: frame B D = F1
+  line 1: <file:tests/non-regression/116-err-filter-frame-to-unkept.dfd>
+Error:  Name(s) no longer available due to previous filters: D

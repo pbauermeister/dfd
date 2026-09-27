@@ -1,0 +1,9 @@
+# Issue #145: a declaration after a view statement joins the view. Z,
+# its flow and its frame are declared after "! A B" and kept.
+# Expected: A -> B, A -> Z, frame F1 = Z B.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+! A B
+process Z
+A -> Z az
+frame Z B = F1
