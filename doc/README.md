@@ -1488,12 +1488,11 @@ declarations below it join the view it makes. Three rules:
 2. A filter or a merge reads the statements above it: its anchors are
    declared above, and its walk follows the flows declared above.
 3. A declaration below a filter or a merge joins the master and the
-   view: `! A` then `process Z` keeps Z; a frame is trimmed to the
-   kept items as usual; a flow names items of the view, so a flow to
-   an item not kept, removed or merged away is an error.
+   view: `! A` then `process Z` keeps Z; a flow or a frame names
+   items of the view, so one naming an item not kept, removed or
+   merged away is an error.
 
-Here Z, its flow and its frame join the view of `! A B`; D, out of the
-view, leaves the frame:
+Here Z, its flow and its frame join the view of `! A B`:
 
 ```data-flow-diagram img/filter-declared-after.svg
 #include #img/filter-strict-master
@@ -1502,7 +1501,7 @@ view, leaves the frame:
 
 process Z
 A -> Z  declared after
-frame Z D = declared after
+frame Z B = declared after
 ```
 
 ![Declarations after a filter](./img/filter-declared-after.svg)

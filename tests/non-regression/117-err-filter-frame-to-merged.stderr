@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 6: frame B A = F1
+  line 1: <file:tests/non-regression/117-err-filter-frame-to-merged.dfd>
+Error:  Name(s) no longer available: B (merged into G at line 4: merge B C : G)

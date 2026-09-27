@@ -10,8 +10,8 @@ selects together. Flows vetoed and allowed by none are the stray flows.
 Position: a view statement (filter or merge) reads the statements before
 it, so its anchors are declared above and its walk follows the flows
 declared above. An item declared after a view statement joins the kept
-set; a connection declared after one names items of the view, or is
-an error (#145).
+set; a connection or a frame declared after one names items of the
+view, or is an error (#145).
 """
 
 from dataclasses import dataclass
@@ -223,6 +223,29 @@ def _check_available(
         )
 
 
+def _check_in_view(
+    *,
+    names: set[str],
+    all_names: set[str],
+    unavailable: dict[str, str],
+    kept_names: set[str] | None,
+    source: model.SourceLine,
+) -> None:
+    """A statement declared after a view statement names items of the
+    view: of its names declared so far, none removed or merged away,
+    and all kept once a kept set exists (a name declared below joins
+    the view at its declaration)."""
+    names = names & all_names
+    _check_available(names=names, unavailable=unavailable, source=source)
+    if kept_names is not None:
+        _check_filter_names(
+            names=names,
+            in_names=kept_names,
+            all_names=all_names,
+            source=source,
+        )
+
+
 def _check_kept(
     *, names: set[str], kept_names: set[str], source: model.SourceLine
 ) -> None:
@@ -346,21 +369,24 @@ def _collect_kept_names(
                     kept_names.add(item.name)
 
             case model.Connection() as conn:
-                # declared after a view statement: an end declared above
-                # is in the view (an end declared below joins it then)
-                names = {conn.src, conn.dst} & all_names
-                _check_available(
-                    names=names,
+                # declared after a view statement: its ends are in the view
+                _check_in_view(
+                    names={conn.src, conn.dst},
+                    all_names=all_names,
                     unavailable=unavailable,
+                    kept_names=kept_names,
                     source=statement.source,
                 )
-                if kept_names is not None:
-                    _check_filter_names(
-                        names=names,
-                        in_names=kept_names,
-                        all_names=all_names,
-                        source=statement.source,
-                    )
+
+            case model.Frame() as frame:
+                # declared after a view statement: its items are in the view
+                _check_in_view(
+                    names=set(frame.items),
+                    all_names=all_names,
+                    unavailable=unavailable,
+                    kept_names=kept_names,
+                    source=statement.source,
+                )
 
             case model.Only() as f:
                 # Only is additive: first Only starts with an empty kept set

@@ -21,10 +21,11 @@ digraph D {
   /* 7: flow A Z az */
   "A" -> "Z" [label="az"]
 
-  /* 8: frame Z D = F1 */
+  /* 8: frame Z B = F1 */
   subgraph cluster_0 {
     label="F1"
     style=dashed
     "Z"
+    "B"
   }
 }

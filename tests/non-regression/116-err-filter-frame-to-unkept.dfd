@@ -1,0 +1,6 @@
+# Issue #145: a frame declared below a view statement names items of
+# the view, as a flow does. D is not kept by "! A B": error.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+! A B
+frame B D = F1
