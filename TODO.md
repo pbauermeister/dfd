@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 39
+Next number: 41
 
 ## Won't do
 
@@ -130,3 +130,27 @@ its devlog). To settle: is a replacer an item declared for the group
 (then a connection declared to it above the merge is an error, and
 078 and 079 change) or any item (the current rule)? A rule change is
 breaking for the two fixtures' shape.
+
+### 39. A neighbor walk re-adds an item removed by a `~` (from #143)
+
+Found at the analysis of #143 (2026-09-27), still there after #145:
+`~ B` then `!>1 A` with `A -> B` keeps B, since the neighbors found
+by the walk join the kept set without the availability check that
+anchors go through (`_check_available`). The strict reading of § 7.5
+rule 4 would skip a removed neighbor, or refuse the walk; to settle
+with a fixture on the 093 master. Related: TODO 38.
+
+### 40. Structure that the tests pin (from #143)
+
+`discussions/code-structure.md` § 5 lists the proposals that a test
+line blocks, since #143 changes no test: `ItemKind` and
+`ConnectionKind` enums in place of the `Literal` subsets of `Keyword`
+(`tests/unit/test_pipeline.py`, twelve constructions with
+`model.Keyword.X` as a type), `remove_unused_hidables` moved to the
+filters (three calls), `handle_filters` and `handle_options` renamed
+for their effect (fifteen calls), `model.Options` renamed
+`CliOptions` (two), `dependency_checker.check` without `options`
+(six), `filters.py` renamed for the view stage (the import), and the
+graph as the carrier through the pipeline in place of the statement
+list (`handle_filters`, `remove_unused_hidables`, `generate_dot`). A
+task allowed to edit the tests takes them together.
