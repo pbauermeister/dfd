@@ -1,7 +1,7 @@
 # 137 — A symmetrical layout neighborhood `[]`
 
 Date: 2026-09-26
-Status: ONGOING
+Status: DONE
 Issue: #137 · PR: #140 · Branch: `feature/137-layout-both`
 Task nature: change
 Track: fast
@@ -127,7 +127,7 @@ Approved: 2026-09-26 (the go for the batch)
 
 Process: 1 round before the go (the batch assessment); 4 loops at the review, two of them reverted (the matrix, the grid); the master-as-fixture rule kept; the P2 fixture.
 
-Closed: pending
+Closed: 2026-09-27
 
 ### 4.2 Rule trace
 
