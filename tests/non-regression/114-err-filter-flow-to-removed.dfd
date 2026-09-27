@@ -1,0 +1,7 @@
+# Issue #145: a connection declared after a view statement may not
+# touch an item that a previous statement removed or merged away.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+~ B
+process Z
+B -> Z bz

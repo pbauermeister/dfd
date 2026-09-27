@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 38
+Next number: 39
 
 ## Won't do
 
@@ -51,9 +51,11 @@ Release path (`make release`, `release.yml`):
       and the script stops before any commit.
 - [ ] Abort at the prompt: local release commit and tag removed,
       tree equal to `origin/main`.
-- [ ] A minor release (first `feat:` PR) and, when it comes, a
-      major one (`!` or `BREAKING CHANGE:` footer in the PR body,
-      which the squash setting carries into the commit).
+- [x] A minor release (first `feat:` PR): 1.19.0 (2026-09-27, #127
+      and #137, run 36307877125, PyPI and the GitHub release
+      published). Still open: a major one (`!` or `BREAKING CHANGE:`
+      footer in the PR body, which the squash setting carries into
+      the commit).
 - [ ] Preflight refusal, provoked: a `v*` tag pushed on a commit
       that is not on `main` (delete the tag afterwards).
 - [ ] Recovery forward after a failed run past TestPyPI, when it
@@ -69,7 +71,9 @@ Merge gate (`merge-gate.yml`, ruleset on `main`):
       on the next PR event. Occurred on #105 (2026-09-24, "release
       1.17.10 first"); passed after the release and a merge of
       `main` into the branch.
-- [ ] Allowed at or below: a `fix:` PR on a pending minor.
+- [x] Allowed at or below: #140 (`feat:`) passed on the pending minor
+      of #127 (2026-09-27), the "at" case; a `fix:` PR on a pending
+      minor, the "below" case, not yet seen.
 - [ ] None-level pending counts as empty: a `chore:` commit on
       `main`, then a `feat:` PR passes.
 - [ ] A title edit re-runs `conventional` and `gate`; a
@@ -128,3 +132,16 @@ computing them means re-implementing the search, so the renders are
 read once by hand and the goldens committed (the NR workflow). The
 diagram of a matrix fixture reads as rows of disconnected chains, as
 111 shows.
+
+### 38. A merge into a connected item (from the review of #145)
+
+At the second review of #145 the author read `merge B C : D` with
+`C -> D` declared above as an error, "D has connections", where the
+tool collapses the flow to a self-loop and drops it, as #100 decided
+at its Try it (fixtures 078 and 079, "a flow to the replacer itself").
+The two readings contradict each other; the error was implemented on
+the branch of #145 and removed once 078 and 079 failed (decision 11 of
+its devlog). To settle: is a replacer an item declared for the group
+(then a connection declared to it above the merge is an error, and
+078 and 079 change) or any item (the current rule)? A rule change is
+breaking for the two fixtures' shape.

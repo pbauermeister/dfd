@@ -1,0 +1,8 @@
+# Issue #145: a declaration below a filter joins the view whatever the
+# walk: Z is two flows away from A, out of reach of ">1", and is in by
+# declaration, with its flow. Expected: A -> B -> Z.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+!>1 A
+process Z
+B -> Z bz

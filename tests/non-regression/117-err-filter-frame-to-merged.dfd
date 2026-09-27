@@ -1,0 +1,6 @@
+# Issue #145: a frame declared below a merge names an item merged away:
+# error naming the merge.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+merge B C : G
+frame B A = F1
