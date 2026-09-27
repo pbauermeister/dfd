@@ -1,5 +1,18 @@
 <!-- semantic-release -->
 
+## v1.19.1 (2026-09-27)
+
+### Bug Fixes
+
+- Declarations after a filter or a merge join the view
+  ([`862a595`](https://github.com/pbauermeister/dfd/commit/862a595867c0fd8777233f648bab62d8386e68b2))
+
+### Chores
+
+- TODO 12, the minor release and the at-level PR ticked by 1.19.0
+  ([`fcc3753`](https://github.com/pbauermeister/dfd/commit/fcc37535d4eaa9ae8d14e048a056bc767de924cf))
+
+
 ## v1.19.0 (2026-09-27)
 
 ### Build System
