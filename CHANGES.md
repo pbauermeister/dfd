@@ -1,5 +1,55 @@
 <!-- semantic-release -->
 
+## v1.19.0 (2026-09-27)
+
+### Build System
+
+- Git hooks run make lint at commit and make test at push
+  ([`333b007`](https://github.com/pbauermeister/dfd/commit/333b007bc02bed3e70f944c7888a1bf6bfcaa0ab))
+
+### Chores
+
+- A prose style sheet for the project's documents
+  ([`9754296`](https://github.com/pbauermeister/dfd/commit/97542963319da10d71adfb083ca02e526c841cc5))
+
+- Chained fast tracks, the point is to group the user's involvement
+  ([`d2bbc97`](https://github.com/pbauermeister/dfd/commit/d2bbc970e86fd54fa54f6a900baa340c886c5832))
+
+- Codify the chained fast tracks
+  ([`8932604`](https://github.com/pbauermeister/dfd/commit/8932604470a16a04206c9159e6c6402ec78bc56b))
+
+- File the batch 30, 28, 36 as #137, #138, #139
+  ([`5f9ff68`](https://github.com/pbauermeister/dfd/commit/5f9ff68df25ad006b4542d0fab5c02567ac3a6bc))
+
+- TODO 23 removed, fixed by #127
+  ([`d9dc5f6`](https://github.com/pbauermeister/dfd/commit/d9dc5f6dee271dcd7636fa8df19b01a93b668726))
+
+- TODO 28 adds the security aspects, stable over latest and CVE response
+  ([`5e5ff25`](https://github.com/pbauermeister/dfd/commit/5e5ff25cd58f3b8fb5c2637415d4850b7bb22150))
+
+- TODO 28 reframed as a study of the dependency updates
+  ([`bab497d`](https://github.com/pbauermeister/dfd/commit/bab497d0bda87a20d1e56af4d8ca41ff17565bad))
+
+- TODO 32 is never batched, TODO 36 delivers a report
+  ([`fe70761`](https://github.com/pbauermeister/dfd/commit/fe7076135fe8462c2b848712b998508db5b83742))
+
+- TODO 35, the style sheet takes Strunk & White as read
+  ([`a797751`](https://github.com/pbauermeister/dfd/commit/a797751588fa0d0d54d295292841d2303d2d7b93))
+
+### Features
+
+- A symmetrical layout neighborhood `[]`
+  ([`5d93492`](https://github.com/pbauermeister/dfd/commit/5d934920fabf1c2dc408c85cd9cd0de52a70b94e))
+
+- Merge is a statement of its own
+  ([`860ae9f`](https://github.com/pbauermeister/dfd/commit/860ae9f4246f27867c151c49f76b08f249e9def2))
+
+### Testing
+
+- The NR runner reports a stray .dot of an error fixture instead of aborting
+  ([`58c3dd3`](https://github.com/pbauermeister/dfd/commit/58c3dd34779178fe1bc657a1eaf738a68b96d149))
+
+
 ## v1.18.1 (2026-09-25)
 
 ### Bug Fixes
