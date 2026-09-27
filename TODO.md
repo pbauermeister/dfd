@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 41
+Next number: 42
 
 ## Won't do
 
@@ -142,7 +142,7 @@ with a fixture on the 093 master. Related: TODO 38.
 
 ### 40. Structure that the tests pin (from #143)
 
-`discussions/code-structure.md` § 5 lists the proposals that a test
+`discussions/code-structure.md` § 6 lists the proposals that a test
 line blocks, since #143 changes no test: `ItemKind` and
 `ConnectionKind` enums in place of the `Literal` subsets of `Keyword`
 (`tests/unit/test_pipeline.py`, twelve constructions with
@@ -154,3 +154,17 @@ for their effect (fifteen calls), `model.Options` renamed
 graph as the carrier through the pipeline in place of the statement
 list (`handle_filters`, `remove_unused_hidables`, `generate_dot`). A
 task allowed to edit the tests takes them together.
+
+### 41. Code structure, families B to H (from #143)
+
+The analysis of #143 (`discussions/code-structure.md`, § 4 to § 6)
+proposed eight families of structural improvements to the application
+code, each with a mock-up green on the four checks. #143 was reframed
+to the graph and the derivation of the view (family I) and took D1
+with it; the rest waits here: C (the parser's result type and its
+names by scope), D2 to D4 (typed selection, `Literal` subsets,
+explicit copies), E (`styles.py`, `dsl/stars.py`), F (Graphviz
+raises, the CLI exits; one debug mechanism), G (the naming sweep) and
+H (21 small smells). § 5 of the discussion gives the order; the taste
+rows are in the devlog of #143 as first drafted (git history). Related:
+TODO 40 for what the tests pin.

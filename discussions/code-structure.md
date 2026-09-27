@@ -13,6 +13,13 @@ application code under `src/data_flow_diagram/`, the build, test and
 tool scripts being for a later task: a thorough analysis, with the
 proposals grouped by families of improvements, before any decision.
 
+**Reframing (2026-09-27).** At the family-by-family review the user
+reshaped the design: the graph, a data structure the code never had,
+is the head family (I, § 3), and #143 is the graph and the derivation
+of the view only. Family A is absorbed by the derivation; families B
+to H wait for a task of their own (TODO 41), with § 4 to § 6 as the
+brief; § 4 opens with what this task takes from them.
+
 ## 1. Method
 
 The eighteen modules were read in full (3239 lines). An AST script
@@ -37,7 +44,7 @@ point (`scanner.scan`, `parser.parse`, `checker.check`,
 classes the tests construct (`Item`, `Connection`, `Frame`, `Snippet`,
 `SourceLine`, `Options`, `GraphOptions`, `GraphDependency`) with
 `Keyword` members as item and connection types. A proposal that a
-test pins is marked "blocked" and goes to § 5.
+test pins is marked "blocked" and goes to § 6.
 
 ## 2. Measurements
 
@@ -95,14 +102,146 @@ Strict optional typing (`mypy --strict` without the recipe's
 `--no-strict-optional`) raises zero errors on `src/`: the exemption
 serves the tests only, a note for the scripts task.
 
-## 3. Families of proposals
+## 3. Family I: the graph and its derivation
+
+### 3.1 Finding
+
+The code has no graph. The statement list is the carrier through the
+pipeline, and every stage that needs the items or the flows walks the
+list: the checker (`items_by_name`), the star resolution, the filters
+(five walks over `statements[:position]`), the DOT generator. The
+filters pay the most. The view they compute is a kept set of names
+plus four side tables (the merges as a flat map, the flows' ends read
+through it, the vetoed and allowed flow ids, the frames a replacer
+inherits), applied in a second pass over the master by mutating the
+statements in place. Three symptoms at the analysis: TODO 39 (a walk
+re-adds a removed item), #145 (positional semantics patched with
+slices), and the 200-line loop of § 2.
+
+### 3.2 The user's model
+
+Vocabulary, adopted: the **view** is the diagram derived from the
+declarations by the **view statements**, a filter (`!`, `!!`, `~`)
+or a merge; the **derivation** is the fold over the statements that
+computes it. Three glossary rows in `doc/SYNTAX.md`.
+
+The model, in the user's words (2026-09-27):
+
+- There is no master view, just a current one. A declaration (item,
+  connection, frame) adds to the current view.
+- `!` and `!!` walk their neighborhood in the current view and add
+  what they find to a keep list: items, flows per strictness, frames.
+  Adjacent `!`/`!!` are one compound keep filter; the keep list is
+  the state between them.
+- At a `~`, a merge or a declaration, a keep list that exists is
+  realized: the new current view is the current view induced on the
+  keep list, and the keep list is flushed.
+- Then `~` and merge derive a new view from the current one; a
+  declaration enhances it.
+
+What stays of the master: a record of the items declared, for a
+merge's replacer declared outside the view (it rejoins in the merged
+items' place, fixture 098) and for the error messages; and the
+tombstones (`unavailable`, name to cause, the last record wins) for
+the names a `~` or a merge took out. Settled with the user on
+2026-09-28: no audit log, the tombstones are enough; no name reuse
+after a destruction, the checker's global duplicate-name error stays.
+
+### 3.3 Consequences, measured
+
+Each consequence is a probe on the 093 master (A and E feed B, then
+B, C, D, F in a chain; G and H isolated), run on `main` (1.19.1) and
+on mock-up 3; the review folder `/tmp/dfd-review-143/` holds the
+sources, the DOT, the errors and the SVGs of both sides.
+
+| #   | Consequence                                                         | Probe | Statements, then `main`                              | Mock-up 3                             |
+| --- | ------------------------------------------------------------------- | ----- | ---------------------------------------------------- | ------------------------------------- |
+| 1   | A keep filter after a realization narrows the view to its selection | c1a   | `!>2 A`, `~ C`, `! A`: A, B                          | A                                     |
+| 1   | A keep filter naming an item the view dropped is an error           | c1b   | `!>1 A`, `~ B`, `! C`: C re-added                    | error, no longer available            |
+| 1   | Same after a realization by a declaration                           | c8    | `! A`, `process Z`, `! Z`: A, Z                      | Z                                     |
+| 2   | A stray flow dropped at a realization stays dropped                 | c2    | `!!<1 D`, `! B`, `process Z`, `! B C D Z`: B->C back | B->C gone                             |
+| 3   | TODO 39: the walk never re-adds a removed item                      | c3    | `~ B`, `!>1 A`: everything, B re-added               | A (rule 1 applies: `~` then `!`)      |
+| 4   | The `~` walk reads the view                                         | c4    | `! A C`, `~>2 A`: nothing (C reached through B)      | C                                     |
+| 5   | A replacer outside the view rejoins in the merged items' place      | c5    | fixture 098                                          | identical                             |
+| 7   | The replacer's own frame left the view at the realization           | c6    | `frame G H`, `frame B C`, `!>2 A`, merge: error, G in two frames | G in the merged items' frame |
+| 8   | The `f` flag holds through a later merge                            | c7    | `frame B C`, `!>f2 A`, `merge B C : G`: the frame drawn with G | no frame                     |
+| -   | Adjacent keeps are one compound                                     | c9    | `! A`, `! D`: A, D                                   | identical                             |
+
+Consequence 6 (name reuse) was dropped by the user. Rows 1 to 4
+change the language where a view statement follows a realization;
+the NR set barely explores that interleaving, and the 124 goldens are
+byte-identical on mock-up 3, as the user predicted. Rows 7 and 8 were
+found by the probes, both in the model's favor: the old behavior is a
+leak of the master into the view (a frame the view had dropped comes
+back, a suppressed frame is drawn again).
+
+### 3.4 Mock-ups
+
+Three, in the worktree `wt-graph` of the scratchpad (session
+21dbbdaa, snapshots in `snap/`), each green on ruff, mypy strict, the
+154 unit tests and the 124 goldens:
+
+| Mock-up | Design                                                                                                    | `filters.py` + `graph.py` |
+| ------- | --------------------------------------------------------------------------------------------------------- | ------------------------- |
+| base    | `main`: kept set, side tables, second pass by mutation                                                    | 736                       |
+| 1       | The kept set as an immutable `_View` per statement                                                        | 585 + 141                 |
+| 2       | Master graph, pending selection, realized current view; walks in the master through the merges' `ends`   | 514 + 145                 |
+| 3       | The user's model: the current view only, walks in the view, keep list, record of the items and tombstones | 467 + 108                 |
+
+Mock-up 3 is the design. What it removes by construction: the flat
+merge map and the `ends` reader (the view's flows are rewired
+copies), the inherited-frames table (the replacer is in the frame's
+copy), the `id()` sets (statements compare by identity, D1), the
+mutation of the statements (a changed element is a copy by
+`replace`), the second pass over the master (`_apply_filters`, 80
+lines), the `statements[:position]` slices of #145 (the fold is
+positional), the `merged_names` subtraction and the `kept_names is
+None` states.
+
+`graph.py`, top level, imported by `dsl/` (and by `rendering/` once
+TODO 40 lets the graph through the pipeline): `Element`, the union
+of the three declarations, and a frozen `Graph` of `items` by name,
+`connections`, `frames`, with `empty`, `build`, `with_element`,
+`names`, `frame_of`, `adjacent(names, *, downstream, layout)` and
+`flows_touching(names, *, both_ends)`. `filters.py`: `_KeepList`,
+`_Derivation` (the fold: `_declare`, `_keep`, `_remove`, `_merge`,
+`_realize`, `_induce`, the checks, the walk), `_deduplicate_flows`,
+and `handle_filters` with its signature kept: the view's elements in
+source order, the other statements passed through.
+
+Traces: one "Items to keep" block per derivation instead of one at
+the end; the user accepts equivalent traces (review folder,
+`trace-037-*.txt` and `trace-098-*.txt`).
+
+### 3.5 Open, for stops 0 and 1
+
+- Row 1's form: an error (the user's rule of thumb from #145) or a
+  no-op. Mock-up 3 errors with the message of `~`.
+- Rows 7 and 8: accepted as the model's, with a fixture each.
+- The PR type: `fix:` if the user classes rows 1 to 4 as a wrong
+  semantic corrected (his reading in #145), else `feat:`; decided at
+  the end.
+
+## 4. Families A to H: the analysis, and what this task takes
+
+This task takes D1 (the identity of the statements, for the sets of
+connections the derivation keeps) and family A, which the derivation
+absorbs: its five concepts become the graph, the keep list, the
+tombstones and the fold. B is settled in passing (`filters.py` stays
+one module, `graph.py` is a top-level one). Deferred to TODO 41 with
+the sections below as the brief: C, D2 to D4, E, F, G and H. The
+texts stay as analyzed on 2026-09-27; where the graph changes a
+proposal, a note in italics says so.
+
 
 Each family states the finding, the options with a mock-up where a
 listing decides, and a recommendation. The basis of each
 recommendation is a convention (cited) or a measurement; a taste
 decision is marked as such for the user.
 
-### 3.1 Family A: the filters' concepts as objects
+### 4.1 Family A: the filters' concepts as objects
+
+_Absorbed by § 3: the `_Graph` of A3 is the top-level `Graph`, `_Merges` and `_FlowGate` vanish with the side tables, `_Selection` is the keep list and the tombstones, `_Filtering` is the derivation._
 
 **Finding.** `dsl/filters.py` mixes five concepts, each spread over
 functions that relay the same parameters (§ 2): the merges (a flat
@@ -158,9 +297,9 @@ today's measurement (shared mutable state accumulating across the
 loop); CONVENTIONS "Classes" (a role name for the driver, data
 containers for the rest); YAGNI + open door (each class can move to a
 module of its own without rework, which answers the question of a
-package split: not now, § 3.2).
+package split: not now, § 4.2).
 
-### 3.2 Family B: one module or a package for the filters
+### 4.2 Family B: one module or a package for the filters
 
 **Finding.** With A3 the module holds six classes and five functions,
 591 lines: the largest module of the package, as it was.
@@ -175,7 +314,7 @@ package split: not now, § 3.2).
 door). Basis: YAGNI + open door; the test import
 `from data_flow_diagram.dsl import filters` holds either way.
 
-### 3.3 Family C: the parser's result type and its names by scope
+### 4.3 Family C: the parser's result type and its names by scope
 
 **Finding.** `parse()` tells one statement from a list by
 `isinstance(parsed, list)`; the one parser returning a list is
@@ -246,7 +385,9 @@ C6 rejected: the lists vanish for free when TODO 32 removes `~=`.
 Basis: CONVENTIONS "Parser scopes" and "Functions and methods"
 (rule); the choice of verbs is a taste row for the user.
 
-### 3.4 Family D: typing precision and identity of the model
+### 4.4 Family D: typing precision and identity of the model
+
+_D1 is taken by #143 (the derivation keeps sets of connections); D2 to D4 are deferred._
 
 **Finding.** Four symptoms of one cause, a model typed wider than its
 values: `dsl/filters.py` keeps sets of `id(connection)` and
@@ -276,7 +417,7 @@ run (a `StrEnum` member compares by value) but the tests construct
 `model.Item(type=model.Keyword.PROCESS, ...)` and mypy runs over
 `tests/`: `tests/unit/test_pipeline.py` lines 222, 230, 247, 255,
 279, 301, 326, 334, 365 (`Item`), 263, 342 (`Connection`) and 373
-(`Frame`). Listed in § 5.
+(`Frame`). Listed in § 6.
 
 **Options for D2.**
 
@@ -284,7 +425,7 @@ run (a `StrEnum` member compares by value) but the tests construct
 | ------ | ------------------------------------------------ | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D2a    | Status quo: `case _: raise`                      | No convention question                                           | The convention's rule unmet; a new kind fails at run time on the first diagram using it                                                                                                                    |
 | D2b    | `Literal[...]` subsets of the one enum (mock-up) | Exhaustiveness proven by mypy; the tests untouched; twelve lines | CONVENTIONS "`Literal[...]` is for strings owned by an external API": here the members are enum members, the `Literal` is a type-level subset, which the rule did not foresee; the rule needs one sentence |
-| D2c    | Split enums                                      | The cleanest model                                               | Blocked by the tests (§ 5)                                                                                                                                                                                 |
+| D2c    | Split enums                                      | The cleanest model                                               | Blocked by the tests (§ 6)                                                                                                                                                                                 |
 
 **Recommendation.** D1, D3, D4 as they are; D2b now with the
 convention amended ("a `Literal` of enum members names a subset of an
@@ -293,7 +434,9 @@ the tests. Basis: CONVENTIONS "Type safety" (rule, `assert_never`);
 the `Literal` row is a taste decision for the user, since it amends
 the convention.
 
-### 3.5 Family E: the home of each stage
+### 4.5 Family E: the home of each stage
+
+_`graph.py` is a new top-level home, decided by § 3; E1 and E2 are deferred._
 
 **Finding.** CONVENTIONS "Target package structure" names `dfd.py`
 the orchestrator, `model.py` the data types, `dsl/` the stages from
@@ -312,7 +455,7 @@ goldens and the dev wrapper; `dfd.py` 177 to 100 lines.
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | E1   | `styles.py` (top level): `StyleKind`, `StyleSpec`, `_build_style_specs`, `STYLE_SPECS`, `get_style_int`, `apply_style`. `GraphOptions` and its field declarations stay in `model` (they are the dataclass's own metadata; moving them makes a cycle). `dfd.handle_options` stays (test-pinned) and calls `styles.apply_style` | No re-export; `styles` imports `model` and `exception`. One reader retargeted, `tools/doc-print-style-table.py`, a one-line consequence in the scripts (the doc-sync test runs it as a subprocess and passes) |
 | E2   | `dsl/stars.py`: `resolve_star_endpoints`, unchanged signature; `templates.STAR_ITEM_FMT` becomes `config.ITEM_STAR_NAME_FMT` next to `ITEM_STAR_ATTRS`                                                                                                                                                                        | `dfd.py` imports neither `config` nor `templates`; the resolve stage of `build`'s docstring has its module                                                                                                    |
-| E3   | `remove_unused_hidables` to `dsl/filters.py` (the `?` is an implicit filter run after the explicit ones)                                                                                                                                                                                                                      | Blocked: `tests/unit/test_pipeline.py` lines 237, 270, 286 call `dfd.remove_unused_hidables`. A wrapper kept for the tests would be a re-export in disguise: not done, § 5                                    |
+| E3   | `remove_unused_hidables` to `dsl/filters.py` (the `?` is an implicit filter run after the explicit ones)                                                                                                                                                                                                                      | Blocked: `tests/unit/test_pipeline.py` lines 237, 270, 286 call `dfd.remove_unused_hidables`. A wrapper kept for the tests would be a re-export in disguise: not done, § 6                                    |
 
 The orchestrator after E1 and E2, as the body of `build` reads:
 
@@ -341,7 +484,7 @@ statements, graph_options = handle_options(statements)
 "Modules" and "Target package structure" (rule); the star constant
 follows CONVENTIONS "Constants" (parse-time values in `config.py`).
 
-### 3.6 Family F: the process boundaries
+### 4.6 Family F: the process boundaries
 
 **Finding.** Three mechanisms live below the CLI that belong to it.
 `rendering/graphviz.py` exits the process (`sys.exit(2)` when
@@ -375,7 +518,7 @@ CLAUDE.md's layout (`cli.py` is the I/O module); F2 is a taste
 decision, a global being the thing the type-safety preference
 tolerates least, so the row is open for the user.
 
-### 3.7 Family G: names against the conventions
+### 4.7 Family G: names against the conventions
 
 **Finding.** A sweep of every identifier against CONVENTIONS
 "Functions and methods", "Classes" and the glossary. Mechanical, one
@@ -404,7 +547,7 @@ table; the tests pin the public ones marked so.
 step, except the pinned names and the rows that another family
 absorbs. Basis: CONVENTIONS "Functions and methods" (rule).
 
-### 3.8 Family H: small smells, one line each
+### 4.8 Family H: small smells, one line each
 
 Found by the sweep, none worth a family; each is a few lines, applied
 in the step of the family whose file it touches.
@@ -433,7 +576,9 @@ in the step of the family whose file it touches.
 | 20  | `model.py`                   | `Connection.signature()` dumps the dataclass to JSON to compare flows after a rewrite                                           | A tuple of the compared fields; or identity plus `(type, src, dst, text, attrs, reversed, relaxed)`                                                                                                                                        |
 | 21  | `dsl/scanner.py`             | `scan(...)` builds a default provenance `SourceLine` that `cli.handle_dfd_source` and `markdown` also build                     | One factory `SourceLine.root(raw_text)` in `model`                                                                                                                                                                                         |
 
-## 4. Dependencies between the families, and an order
+## 5. Dependencies between the families, and an order
+
+_Written for the eight-family plan. For the deferred task the order holds, with I and D1 done by #143._
 
 The families share files, so the order follows what each builds on,
 then the files they touch (the rule of the chained batches):
@@ -464,7 +609,7 @@ the branch in this order rather than merged from the worktrees, since
 each was built on the base and they overlap in `filters.py`,
 `model.py` and `dfd.py`.
 
-## 5. What the tests pin
+## 6. What the tests pin
 
 Proposals a test line blocks, for a task allowed to edit the tests:
 
@@ -481,32 +626,29 @@ pin; none is proposed.
 
 ## Executive summary
 
-The TODO's two findings hold and generalize: the filters relay four
-parameters through four hops and mutate eight loop variables, the
-parser's list result exists for one deprecated form, and the same
-widening shows in the model (`id()` sets, `case _: raise`, ten
-class-selection loops), the orchestrator (four stages in `dfd.py`)
-and the boundaries (exits in `rendering`). Eight families, four
-mock-ups, all green on 154 unit tests and 118 goldens: the filters as
-six concept classes (670 to 591 lines, four-parameter functions 8 to
-1), uniform parser results with names by scope, identity semantics
-and typed selection in the model, `styles.py` and `dsl/stars.py`
-extracted, Graphviz's exits moved to the CLI, one debug mechanism.
-Rejected with numbers: the text-level desugaring of `~=` (a scope
-violation for no size gain) and a filters package. Three structural
-proposals are pinned by fifteen test lines and wait for a task that
-may edit the tests.
+The TODO's two findings hold and generalize, and the review found the
+root: the code has no graph, so every stage walks the statement list
+and the filters keep the view as a kept set plus four side tables
+applied by mutation. The user's model (§ 3.2) replaces it: one
+current view, a derivation folding the statements into it, a keep
+list realized at the next statement of another kind. Mock-up 3
+implements it: 736 lines to 575 (`filters.py` 467, `graph.py` 108),
+no side table, no `id()`, no mutation, no slice; 124 goldens
+byte-identical; ten probes measure the consequences, six of which
+change the language where a view statement follows a realization (a
+fixture each). Families B to H, analyzed with their own mock-ups
+(§ 4), are deferred to TODO 41; three of their proposals are pinned
+by fifteen test lines (§ 6, TODO 40).
 
 ## Outcomes and measures
 
-- The Plan of `devlog/143-code-structure.md`: five steps in the
-  order of § 4, decided at stop 1 with the taste rows (D2b's `Literal`
-  subset, F2's global, the parser verbs).
-- `engineering/CONVENTIONS.md`, in the step that ships each: the
-  package tree gains `styles.py` and `dsl/stars.py`; "Type safety"
-  gains the sentence on a `Literal` of enum members; "Constants" says
-  why Graphviz attribute strings read at parse time stay in
-  `config.py`; "Parser scopes" names the verbs per scope.
-- A TODO item for § 5, the test-pinned structure.
+- The Mandate and Plan of `devlog/143-code-structure.md`: the graph
+  and the derivation, the fixtures of § 3.3, § 7.5 and the glossary
+  in both docs; TODO 39 closed by it.
+- TODO 41: families B to H, this file as the brief, § 5 as the order.
+- TODO 40 (unchanged): the test-pinned structure of § 6.
+- `engineering/CONVENTIONS.md`: the package tree gains `graph.py` in
+  step 1 of #143; the other amendments (a `Literal` of enum members,
+  "Constants", "Parser scopes") go with TODO 41.
 - For the scripts task: `--no-strict-optional` is unneeded on `src/`;
   `tools/doc-print-style-table.py` reads the registry from `styles`.

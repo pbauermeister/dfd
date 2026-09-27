@@ -1,4 +1,4 @@
-# 143 — Code structure of the application
+# 143 — The graph and the derivation of the view
 
 Date: 2026-09-27
 Status: PENDING
@@ -12,209 +12,201 @@ Agent: Claude Fable 5.1
 ### 1.1 Context
 
 TODO 33, from the review of #128: `dsl/filters.py` holds several
-concepts and its functions relay the same parameters (assess classes);
-`dsl/parser.py` tells one statement from a list by `isinstance()`
-(assess a `match`, a result type, or a list always) and names a
-whole-line parser like a part parser (assess a prefix per kind, or
-two classes). Extended at filing to the whole application code under
-`src/data_flow_diagram/`; the build, test and tool scripts are for a
-later task. Predecessor: #47 (devlog 047, lesson 5) rejected a
-`FilterEngine` class when `filters.py` was 260 lines; it is 670 today,
-after #100 to #137. The user mandated the analysis before stop 0:
-proposals grouped by families, built on measurements and mock-ups in
-scratch worktrees, presented in one round with the frame. The
-analysis is `discussions/code-structure.md`; this file keeps the
-decisions.
+concepts and its functions relay the same parameters; extended at
+filing to the whole application code. The user mandated an analysis
+before stop 0, `discussions/code-structure.md`: eight families of
+proposals (A to H) on measurements and four mock-ups. At its review
+(2026-09-27) he reshaped the design: the graph, a data structure the
+code never had, is the head family (I), and #143 is the graph and the
+derivation of the view only. Family A (the filters' concepts as
+classes) is absorbed by the derivation; B to H wait in TODO 41 with
+the discussion as their brief. Predecessors: #47 rejected a
+`FilterEngine` when the module was 260 lines; #100, #104, #127, #137
+and #145 brought it to 736, the last one patching the positional
+semantics of § 7.5 with `statements[:position]` slices.
 
 ### 1.2 Goal
 
-The retained proposals are applied, one step per family, and the
-application reads as one design: each concept has one home, the
-parameters that a chain of functions relays travel as one object, a
-dispatch on kind is a `match` ending with `assert_never`, and the
-names say the scope they parse. No test changes, every golden is
-byte-identical, the three import contexts work.
+A `Graph` (top-level `graph.py`) carries the items, connections and
+frames, and the view stage is a derivation that folds the statements
+into the current view, per the user's model (discussion § 3.2): a
+declaration joins the view; a keep filter walks the view and fills a
+keep list, realized at the next statement of another kind; a `~` and
+a merge derive the next view from the current one. The semantics
+that follow (discussion § 3.3) are pinned by one fixture each and
+stated in § 7.5 of both docs; the glossary gains view, view statement
+and derivation. `filters.py` loses its side tables, its second pass
+and its in-place mutations; the existing goldens stay byte-identical.
 
 ### 1.3 Non-goals
 
-- The build, test and tool scripts (`recipes/`, `tools/`, `tests/`,
-  the Makefile): a later task, per the user's extension of the scope.
-- Any change of behavior or of the DSL, including the removal of
-  `~=` (TODO 32, a major) and the debug output's format (open,
-  § 1.5).
-- A test changed, added or removed: the TODO's constraint. A proposal
-  that needs one is rejected or postponed, never bent around.
-- The documentation of the DSL (`doc/`): untouched; the package tree
-  in `engineering/CONVENTIONS.md` follows a module move, which is
-  bookkeeping.
+- Families B to H: TODO 41, the discussion § 4 to § 6 as the brief.
+- Name reuse after a `~` or a merge (consequence 6): dropped by the
+  user on 2026-09-28; the checker's duplicate-name error stays.
+- An audit log of the disappearances: the tombstones (name to cause,
+  the last record wins) suffice, same date.
+- The graph as the carrier through the whole pipeline (checker, star
+  resolution, generator): the tests pin the statement list (TODO 40);
+  this task builds the graph in the view stage.
+- TODO 38 (a merge into a connected item), TODO 32 (`~=`), TODO 37
+  (the fixture matrix).
+- The existing tests and fixtures: untouched. New fixtures only.
 
 ### 1.4 Invariants
 
 - Every call the tests make stays valid, module, name and arguments:
   `scanner.scan`, `parser.parse`, `checker.check`,
-  `filters.handle_filters`, `dependency_checker.check` (with
-  `file_texts`), `dfd.build`, `dfd.handle_options`,
-  `dfd.remove_unused_hidables`, `markdown.extract_snippets`,
-  `rendering.dot.Generator` and `generate_dot`, `main`, `parse_args`,
-  and the `model` classes the tests construct with their fields
-  (`Item`, `Connection`, `Frame`, `Only`, `Without`, `Merge`,
-  `FilterNeighbors`, `Style`, `Snippet`, `SourceLine`, `Options`,
-  `GraphOptions`, `GraphDependency`, `Keyword`, `Statements`).
-- Every golden (`.dot`, `.stderr`) byte-identical: error texts, the
-  `~=` warning and the DOT echo comments included.
+  `filters.handle_filters`, `dependency_checker.check`, `dfd.build`,
+  `dfd.handle_options`, `dfd.remove_unused_hidables`,
+  `markdown.extract_snippets`, `rendering.dot.Generator`,
+  `generate_dot`, `main`, `parse_args`, and the `model` classes the
+  tests construct with their fields.
+- The 124 existing goldens (`.dot`, `.stderr`) byte-identical.
 - The three import contexts of `CLAUDE.md` ("Import compatibility");
-  `dsl/` and `rendering/` import from the parent only.
-- `engineering/CONVENTIONS.md`: naming, type safety, parser scopes,
-  YAGNI + open door; `engineering/COMMENTING.md` for the comments.
-- `make format`, `make lint`, `make test` green at every step.
+  `dsl/` and `rendering/` import from the parent only, `graph.py` is
+  a top-level module.
+- The positional rules 1 to 3 of § 7.5 (#145) hold.
+- `engineering/CONVENTIONS.md` and `COMMENTING.md`; `make format`,
+  `make lint`, `make test` green at every step.
 
 Framed: pending
 
 ### 1.5 Taste
 
-- Debug output (`dprint` lines): open. Kept byte for byte, or free to
-  change with the structure (no golden pins it). Recalled: the
-  `--debug` flag is the author's own tool.
-- Recalled (047, lesson 5): explicit parameters between module-level
-  functions over `self`-mediated state when the state flows linearly;
-  a class when shared mutable state accumulates across calls
-  (`Generator`). The analysis measures which case `filters.py` is now.
-- Recalled (#73): Python as a fully type-safe language; a record is a
-  dataclass, a closed set an enum, a dispatch a `match` ending with
-  `assert_never`.
+- The user's model is the specification, in his words (discussion
+  § 3.2). His rule of thumb from #145: a statement after a view
+  statement names items of the view or is an error, never a silent
+  drop.
+- Fixtures: few, readable, on the 093 master, one per rule of the
+  model. Traces: equivalent, not identical. The line count before and
+  after is a Try it item.
+- Recalled (047, lesson 5): a class when shared mutable state
+  accumulates across calls. Recalled (#73): a record is a dataclass,
+  a dispatch a `match` ending with `assert_never`.
 
 ### 1.6 Set-based design
 
-Triggers: an inventory classifying existing items; a thing that could
-live in two places (the stages, the style registry); a new container
-name (`_Merges`, `styles.py`, `dsl/stars.py`); an intent inherited
-from a prior task (047's ruling on classes).
-Mock-up: yes, four, in scratch worktrees, each green on ruff, mypy
-strict, the 154 unit tests and the 118 goldens; the listings that
-decide are in `discussions/code-structure.md` § 3, the families and
-their options there. The user mandated the mock-ups before stop 0.
-Design question: which option per family; the taste rows below.
-Options: per family, in the discussion; summarized here.
+Triggers: a new container name (`Graph`, `_KeepList`); a thing that
+could live in two places (the walk, in the master or in the view); an
+intent inherited from a prior task (047's ruling).
+Mock-up: yes, three, in one scratch worktree, each green on ruff,
+mypy strict, 154 unit tests and 124 goldens (discussion § 3.4).
+Design question: which view the walks read, and what state the
+derivation keeps.
+Options: the three mock-ups.
 
-| Family                      | Options              | Recommended  | Decides                                                        |
-| --------------------------- | -------------------- | ------------ | -------------------------------------------------------------- |
-| A filters' concepts         | A0 A1 A2 A3          | A3           | six concept classes, a driver class; 670 to 591 lines          |
-| B filters module or package | B0 B1 B2             | B0           | one module, revisited when a concept grows                     |
-| C parser result and names   | C0 C1 C2 C3 C6       | C1           | lists always; verbs per scope; C6 rejected on the scopes rule  |
-| D model typing and identity | D1 D2a D2b D2c D3 D4 | D1 D2b D3 D4 | `eq=False`, `Literal` subsets, typed generators, `replace`     |
-| E stage homes               | E0, E1+E2, E1        | E1+E2        | `styles.py`, `dsl/stars.py`; E3 test-pinned                    |
-| F process boundaries        | F1, F2a F2b          | F1 F2a       | Graphviz exits in `cli`; the global as the one debug mechanism |
-| G names                     | one table            | apply        | mechanical, pinned names kept                                  |
-| H small smells              | 21 rows              | apply        | in the step of the family whose file they touch                |
+| Option | What differs                                                                            | For                                                      | Against                                                  |
+| ------ | --------------------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| 1      | The kept set as an immutable `_View` per statement; walks in the master                 | Small change of the semantics                            | The side tables stay (merges, gate, inherited frames)    |
+| 2      | Master graph, pending selection, realized current view; walks in the master             | Today's semantics kept                                   | Two graphs to keep consistent; an `ends` reader          |
+| 3      | The user's model: the current view only, walks in it, keep list, tombstones (recommend) | No side table, no second pass, no mutation; TODO 39 gone | Changes the language where a filter follows a realization |
 
 ### 1.7 Spikes
 
-None: every decision reads off a listing, a count or a diff.
+Ten probes on the 093 master, run on `main` (1.19.1) and on mock-up 3
+with `--no-graph-title`, DOT and SVG on both sides in
+`/tmp/dfd-review-143/` (discussion § 3.3): six differ as the model
+predicts, two are identical, two found consequences 7 and 8.
 
 ### 1.8 Design decisions
 
 Rows marked taste are the user's; the rest cite the convention.
 
-| #   | Decision                                                                                                                                           | Basis                                                          | Alternatives considered                        |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------- |
-| 1   | Filters: A3, concept classes and a driver class                                                                                                    | 047 lesson 5 re-measured (rule); CONVENTIONS "Classes"         | A1 one class; A2 objects passed to functions   |
-| 2   | Filters stay one module                                                                                                                            | YAGNI + open door (rule)                                       | B1, B2                                         |
-| 3   | Parser: every line parser returns a list; a frozen parsed-spec record; a no-neighbors factory                                                      | C1 (option); CONVENTIONS "Type safety" (a record, not a splat) | C2, C3, C6 (rejected, § 3.3 of the discussion) |
-| 4   | Parser names: `_parse_` for a line, `_read_` for a term, `_split_` for the cut, `_extract_` for a pass, `_desugar_` for the text stage             | taste (the review asked for a prefix or classes)               | A scope noun after the verb; two classes       |
-| 5   | Statements compare by identity (`eq=False` on `Base`, `Statement` and its subclasses)                                                              | D1 (option); the `id()` sets are the symptom                   | Keep `id()`                                    |
-| 6   | `ItemType` and `ConnectionType` as `Literal` subsets of `Keyword`; `assert_never` closes the two dispatches; CONVENTIONS amended with one sentence | taste (amends a convention)                                    | D2a status quo; D2c split enums, test-pinned   |
-| 7   | `items_of`, `connections_of`, `frames_of` in `model`                                                                                               | D3 (option), ten sites, net −22 lines                          | Keep the idiom                                 |
-| 8   | `styles.py` and `dsl/stars.py`; `STAR_ITEM_FMT` to `config`                                                                                        | CONVENTIONS "Target package structure", "Constants" (rule)     | E0; E1 only                                    |
-| 9   | Graphviz raises, `cli.main` exits; same stderr and codes                                                                                           | CLAUDE.md layout, `cli.py` is the I/O module (rule)            | Status quo                                     |
-| 10  | The global is the one debug mechanism; `debug`/`options` parameters dropped where no test passes them                                              | taste (a global against the type-safety preference)            | F2b the parameter alone                        |
-| 11  | Naming sweep and 21 smells applied in the step of their file; pinned names kept                                                                    | CONVENTIONS "Functions and methods" (rule)                     |                                                |
-| 12  | The debug output stays byte-identical (checked under a fixed hash seed), since the mock-ups showed it costs nothing                                | taste, § 1.5 closed                                            | Free to change                                 |
+| #   | Decision                                                                                                                                          | Basis                                                                | Alternatives considered                     |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| 1   | `graph.py` at the top level: a frozen `Graph` of items by name, connections, frames; `with_element`, `names`, `frame_of`, `adjacent`, `flows_touching` | user ("the most important factoring"); CLAUDE.md layout (rule)       | A graph inside `dsl/`; the statement list   |
+| 2   | The derivation per the user's model, option 3; vocabulary view, view statement, derivation, three glossary rows                                   | taste                                                                | Options 1 and 2                             |
+| 3   | Adjacent keep filters are one compound; a keep list is realized at a `~`, a merge, a declaration or the end                                       | taste (the model)                                                    | A realization at every statement            |
+| 4   | A keep filter naming an item the view dropped is an error, with the message of `~` ("no longer available due to previous filters")                 | taste, to confirm at stop 0                                          | A no-op                                     |
+| 5   | Consequences 1 to 4 are the language: one fixture each, a § 7.5 sentence in both docs                                                             | taste                                                                | A prior fix PR                              |
+| 6   | Consequences 7 and 8 (a frame the view dropped stays dropped through a merge) are the model's, one fixture each                                   | taste, to confirm at stop 0                                          | Reproduce the old behavior                  |
+| 7   | Consequence 6 dropped; tombstones, no audit log                                                                                                   | user, 2026-09-28                                                     | Name reuse; an audit log                    |
+| 8   | Statements compare by identity (`eq=False` on `Base`, `Statement` and its subclasses): the derivation keeps sets of connections                    | option D1 of the discussion; the `id()` sets are the symptom (rule)  | Keep `id()`                                 |
+| 9   | `handle_filters` keeps its signature and returns the view's elements in source order, the other statements passed through                        | the tests pin it (rule)                                              | Return the graph (TODO 40)                  |
+| 10  | Traces equivalent: one "Items to keep" block per derivation                                                                                       | taste                                                                | Byte-identical traces                       |
+| 11  | TODO 39 removed in the step that closes it; TODO 41 filed for B to H                                                                              | PROCESS.md "TODO.md" (rule)                                          |                                             |
+| 12  | The PR type decided at the end, `fix:` or `feat:`, never `refactor:`, since the language changes                                                  | RELEASING.md, the user's reading of a wrong semantic as a bug (#145) | `refactor:`                                 |
 
 ### 1.9 Acceptance criteria
 
-1. `make format`, `make lint`, `make test` pass at every step; no file
-   under `tests/` differs from `main`.
-2. `make nr-test`: 118 fixtures pass, goldens byte-identical (no
-   `nr-regenerate` on the branch).
-3. `--debug` output identical to `main` on the 107 diagram fixtures
-   under `PYTHONHASHSEED=0`.
-4. The three import contexts: `make test` (pytest), the dev wrapper
-   on a fixture, the wheel's console script (`make smoke-test-wheel`
-   or the installed script on a fixture).
-5. Measured on the branch: `dsl/filters.py` has one function with
-   four or more parameters and no parameter relayed past one hop;
-   `parse()` has no `isinstance`; `src/` has no `id(`, no `__dict__`,
-   no `getattr`/`setattr` on a statement, no `sys.exit` outside
-   `cli.py`, no `case _: raise` on a kind.
-6. `tests/unit/test_pipeline.py` lines listed in § 5 of the
-   discussion are untouched; the pinned proposals are in a TODO item.
+1. `make format`, `make lint`, `make test` pass at every step; no
+   file under `tests/` that exists on `main` differs from `main`.
+2. `make nr-test`: the 124 existing goldens byte-identical, the new
+   fixtures pass, each caught by a mutation smoke test.
+3. The three import contexts: `make test`, the dev wrapper on a
+   fixture, the installed script on a fixture.
+4. Measured on the branch: `src/` has no `id(` and no
+   `statements[:position]`; `dsl/filters.py` mutates no statement
+   (`conn.src =`, `frame.items =`, `item.hidable =` absent);
+   `filters.py` plus `graph.py` under 600 lines (736 today).
+5. The ten probes give the mock-up 3 column of the discussion § 3.3
+   on the branch.
+6. § 7.5 of `doc/README.md` and `doc/SYNTAX.md` and the glossary state
+   the model; the doc sync test passes.
 
 ## 2. Plan
 
 ### 2.1 Steps
 
 One pushed commit per step; the steps share one gate (unattended),
-each ends with the four checks and criterion 3's diff.
+each ends with the four checks.
 
-**Step 1 — Model foundations** (`refactor:`): D1, D3, D4. Files:
-`model.py`, `dsl/checker.py`, `dsl/dependency_checker.py`, `dfd.py`,
-`dsl/filters.py` (the `id()` sites), `rendering/dot.py`.
+**Step 1 — The graph and the derivation** (`refactor:`)
 
-**Step 2 — Filters as concept classes** (`refactor:`): A3 on step 1,
-smells 1 to 3. Files: `dsl/filters.py`.
+Files: `model.py`, `graph.py` (new), `dsl/filters.py`,
+`engineering/CONVENTIONS.md` (the package tree), `TODO.md` (39 out).
 
-**Step 3 — Parser result and names** (`refactor:`): C1, the naming,
-D2 (`model.py`, `rendering/dot.py`, the two factory annotations),
-smells 4 to 8, CONVENTIONS "Type safety" and "Parser scopes"
-sentences. Files: `dsl/parser.py`, `model.py`, `rendering/dot.py`,
-`engineering/CONVENTIONS.md`.
+Actions: `eq=False` on the statement classes (mock-up 3's diff);
+`graph.py` and `filters.py` from mock-up 3, reviewed against
+`COMMENTING.md`; the tree gains `graph.py`; TODO 39 removed.
 
-**Step 4 — Stage homes and boundaries** (`refactor:`): E1, E2, F1,
-F2a, smells 12 to 16, 19, 21; CONVENTIONS tree and "Constants".
-Files: `dfd.py`, `styles.py` (new), `dsl/stars.py` (new),
-`config.py`, `rendering/templates.py`, `rendering/graphviz.py`,
-`exception.py`, `cli.py`, `dsl/scanner.py`, `dsl/parser.py`,
-`dsl/filters.py`, `dsl/dependency_checker.py`,
-`tools/doc-print-style-table.py` (one line), `engineering/CONVENTIONS.md`.
+Verify: the four checks; 124 goldens identical; the greps of
+criterion 4; the probes rerun from the review folder.
 
-**Step 5 — Names and small smells** (`refactor:`): G, the remaining
-rows of H, the TODO item of § 5. Files: as the tables say.
+**Step 2 — Fixtures and documentation** (`fix:` or `feat:`, decision 12)
+
+Files: `tests/non-regression/118-*` to `125-*` (`.dfd`, `.dot` or
+`.stderr`), `doc/README.md`, `doc/SYNTAX.md`, `doc/img/` if a doc
+example changes.
+
+Actions: one fixture per row of § 3.3 on the 093 master (c1a, c1b
+error, c2, c3, c4, c6, c7, c8), its comment naming the rule; goldens
+generated, the SVGs gathered in the review folder for Try it; a
+mutation smoke test per fixture; § 7.5 rewritten in both docs (rules
+1 to 3 kept, the model's rules added); three glossary rows.
+
+Verify: `make nr-test`; the mutation caught; `make test` (doc sync).
+
+**Step 3 — Try it material** (`chore:`)
+
+Files: `devlog/143-*.md`, the PR body.
+
+Actions: the review folder refreshed from the branch (probes, SVGs,
+traces of 037 and 098 old and new); the line counts before and after
+in Try it; the Account.
 
 ### 2.2 Inventory
 
-Produced by `tools/`-free greps quoted in the discussion (§ 2 script,
-`grep -rn "id(\|__dict__\|getattr\|setattr\|sys.exit"`); the sweep
-at each step repeats them.
+Produced by reading mock-up 3's diff against the base and
+`grep -rn "id(\|statements\[:" src`.
 
-| File                             | Change                                                                                         |
-| -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `model.py`                       | `eq=False`; `ItemType`, `ConnectionType`; `items_of` and siblings; registry out; `repr` folded |
-| `styles.py`                      | New: the style registry and `apply_style`, `get_style_int`                                     |
-| `dsl/stars.py`                   | New: `resolve_star_endpoints`                                                                  |
-| `dfd.py`                         | Orchestrator only, plus the two test-pinned stages                                             |
-| `dsl/filters.py`                 | Six classes, three functions, `handle_filters`                                                 |
-| `dsl/parser.py`                  | Lists, record, factory, names by scope, sugar table, sections                                  |
-| `dsl/checker.py`                 | Typed generators                                                                               |
-| `dsl/dependency_checker.py`      | Typed generators; the gate; `_find_item`                                                       |
-| `dsl/scanner.py`                 | `debug` out; `_include`; docstring; `line`                                                     |
-| `rendering/dot.py`               | `assert_never`; `replace`; dead `Style` branch out; names                                      |
-| `rendering/graphviz.py`          | Raises `GraphvizException`                                                                     |
-| `rendering/templates.py`         | `STAR_ITEM_FMT` out                                                                            |
-| `config.py`                      | `ITEM_STAR_NAME_FMT` in                                                                        |
-| `exception.py`                   | `exit_code`, `GraphvizException`, `has_errors()`, `_make_prefix`                               |
-| `cli.py`                         | Exits and the DOT listing; keyword-only `handle_markdown_source`                               |
-| `console.py`                     | The name the debug decision gives it                                                           |
-| `markdown.py`                    | `make_snippet_contexts`; the `StringIO` name                                                   |
-| `engineering/CONVENTIONS.md`     | Tree, "Type safety", "Constants", "Parser scopes"                                              |
-| `tools/doc-print-style-table.py` | Reads `styles.STYLE_SPECS`                                                                     |
-| `TODO.md`                        | The test-pinned item                                                                           |
+| File                         | Change                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| `model.py`                   | `eq=False` on `Base`, `Statement` and the ten subclasses; the `Merge` docstring reworded      |
+| `graph.py`                   | New: `Element`, `Graph` (`empty`, `build`, `with_element`, `names`, `frame_of`, `adjacent`, `flows_touching`) |
+| `dsl/filters.py`             | Rewritten: `_KeepList`, `_Derivation`, `_deduplicate_flows`, `handle_filters`                |
+| `engineering/CONVENTIONS.md` | The package tree gains `graph.py`                                                            |
+| `TODO.md`                    | 39 removed (closed by step 1); 41 added at scaffolding                                        |
+| `tests/non-regression/`      | Eight new fixtures with goldens, 118 to 125                                                  |
+| `doc/README.md`              | § 7.5 rewritten                                                                              |
+| `doc/SYNTAX.md`              | § 7.5 rewritten; glossary rows view, view statement, derivation                              |
 
 ### 2.3 Scope boundary
 
-Not touched even if friction appears: any file under `tests/` (§ 5
-of the discussion goes to a TODO item); `doc/`; the scripts beyond the
-one line of `tools/doc-print-style-table.py`; the DSL and its error
-texts; `~=` (TODO 32).
+Not touched even if friction appears: any file under `tests/` that
+exists on `main`; `dfd.py`, `checker.py`, `rendering/` (the graph
+reaches them with TODO 40); the parser and the DSL syntax; `~=`
+(TODO 32); the merge into a connected item (TODO 38).
 
 Approved: pending
 
