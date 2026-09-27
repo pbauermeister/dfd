@@ -108,6 +108,12 @@ anomaly bites.
 
 Generate them with `make nr-regenerate` after visually checking `make nr-review`.
 
+**Shared master:** when several fixtures `#include` the same diagram, the
+master is a fixture of its own, `NNN-<topic>.master.dfd` with its golden, so
+that `make nr-review` renders it next to the fixtures that filter it
+(`093-filter-merge-master.dfd`, filtered by 093 to 109, named before the
+rule).
+
 ### Non-regression test — error (failure)
 
 **Fixtures (inputs):** `tests/non-regression/NNN-err-description.dfd` — the

@@ -235,6 +235,33 @@ def test_parse_filter_second_spec_raises(specs: str) -> None:
         parser.parse(tokens)
 
 
+@pytest.mark.parametrize(
+    ("spec", "layout", "up", "down"),
+    [
+        pytest.param("<>2", False, True, True, id="stream-both"),
+        pytest.param("[2", True, True, False, id="layout-left"),
+        pytest.param("]2", True, False, True, id="layout-right"),
+        pytest.param("[]2", True, True, True, id="layout-both"),
+        pytest.param("[]xf*", True, True, True, id="layout-both-flags"),
+    ],
+)
+def test_parse_filter_direction(
+    spec: str, *, layout: bool, up: bool, down: bool
+) -> None:  # pytest passes parameters by keyword
+    # "[]" is the layout counterpart of "<>": both sides in one filter
+    tokens = scanner.scan(provenance=None, source_text=f"process A\n!{spec} A")
+    statements, _, _ = parser.parse(tokens)
+    only = statements[1]
+    assert isinstance(only, model.Only)
+    for fn, given in ((only.neighbors_up, up), (only.neighbors_down, down)):
+        assert (fn.distance != 0) == given
+        if given:
+            assert fn.layout_direction == layout
+            assert fn.distance == (-1 if spec.endswith("*") else 2)
+            assert fn.suppress_anchors == ("x" in spec)
+            assert fn.suppress_frames == ("f" in spec)
+
+
 def test_parse_filter_second_replacer_raises() -> None:
     # the loop consumes every leading spec: a second replacer used to win
     tokens = scanner.scan(
