@@ -1,0 +1,5 @@
+#include tests/non-regression/028-filter-master.part
+
+# keep P2 and 2 levels of neighbors to the left and to the right (layout direction)
+# the same set as <>2 P2 (031): no reversed connection lies within two levels of P2
+![]2 P2
