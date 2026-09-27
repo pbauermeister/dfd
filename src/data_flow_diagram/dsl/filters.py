@@ -10,8 +10,8 @@ selects together. Flows vetoed and allowed by none are the stray flows.
 Position: a view statement (filter or merge) reads the statements before
 it, so its anchors are declared above and its walk follows the flows
 declared above. An item declared after a view statement joins the kept
-set; a connection declared after one may not touch a name removed or
-merged away (#145).
+set; a connection declared after one names items of the view, or is
+an error (#145).
 """
 
 from dataclasses import dataclass
@@ -346,12 +346,21 @@ def _collect_kept_names(
                     kept_names.add(item.name)
 
             case model.Connection() as conn:
-                # declared after a view statement: its ends are available
+                # declared after a view statement: an end declared above
+                # is in the view (an end declared below joins it then)
+                names = {conn.src, conn.dst} & all_names
                 _check_available(
-                    names={conn.src, conn.dst},
+                    names=names,
                     unavailable=unavailable,
                     source=statement.source,
                 )
+                if kept_names is not None:
+                    _check_filter_names(
+                        names=names,
+                        in_names=kept_names,
+                        all_names=all_names,
+                        source=statement.source,
+                    )
 
             case model.Only() as f:
                 # Only is additive: first Only starts with an empty kept set

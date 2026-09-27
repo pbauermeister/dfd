@@ -15,9 +15,9 @@ digraph D {
   /* 15: flow A B ab */
   "A" -> "B" [label="ab"]
 
-  /* 9: process Z */
+  /* 6: process Z */
   "Z" [shape=ellipse label="Z" fillcolor="#eeeeee" style=filled ]
 
-  /* 11: flow B Z bz */
+  /* 7: flow B Z bz */
   "B" -> "Z" [label="bz"]
 }

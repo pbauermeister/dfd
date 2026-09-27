@@ -341,8 +341,8 @@ above it: its anchors are declared above, and its walk follows the flows
 declared above. A declaration above the first filter or merge belongs to
 the master only. A declaration below one joins the master and the
 current view: an item is kept, a frame is trimmed as in step 5, and a
-connection with an end removed or merged away is an error naming the
-cause, as in step 4.
+connection names items of the view, as a filter names anchors in step
+4: an end not kept, removed or merged away is an error.
 
 ### 7.6. Syntactic sugar
 

@@ -1489,8 +1489,8 @@ declarations below it join the view it makes. Three rules:
    declared above, and its walk follows the flows declared above.
 3. A declaration below a filter or a merge joins the master and the
    view: `! A` then `process Z` keeps Z; a frame is trimmed to the
-   kept items as usual; a flow to an item removed or merged away is an
-   error naming the statement that removed it.
+   kept items as usual; a flow names items of the view, so a flow to
+   an item not kept, removed or merged away is an error.
 
 Here Z, its flow and its frame join the view of `! A B`; D, out of the
 view, leaves the frame:
