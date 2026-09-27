@@ -45,9 +45,8 @@ with the same flags and span. Documented next to `<>`.
 3. `<]2` and `[]` with a second specification fail as before.
 4. `make format`, `make lint`, `make test` pass; the mutation
    smoke-test fails fixture 110 and the unit test.
-5. Review loop: on the matrix, `[]2` keeps chains 1 and 4 whole, cuts
-   2 and 3 at the turn and drops C5; `<>2` keeps all but C5; the
-   mutation fails 110 and 111 and leaves 112.
+5. After the reverted loops: fixture 110 alone, the mutation failing
+   it; no file of the matrix or the grid left in the fixtures folder.
 
 Approved: 2026-09-26 (the go for the batch)
 
@@ -90,6 +89,12 @@ Approved: 2026-09-26 (the go for the batch)
   was reverted to the matrix of the second loop. The commit keeps the
   layout measurements (relaxed diagonals let Graphviz permute the
   grid; constrained ones pin it in the vertical style) for TODO 37.
+- Second loop reverted too (2026-09-27): "it was better before"; the
+  three-chain matrix and its master removed, 110 stays as the one
+  fixture of the feature. Kept from the loops: the prettier pass on
+  `doc/SYNTAX.md`, TODO item 37, and the master-as-fixture rule, whose
+  example is now 093. Both matrices remain in the history of this
+  branch (b2b5c70, b839a5d) as material for TODO 37.
 
 ## 3. Delivery
 
@@ -112,7 +117,7 @@ Approved: 2026-09-26 (the go for the batch)
 
 | 4 | The review asked for the cases the item did not name (drawn with and against the flow, a constraint); the matrix master answered them in one diagram that reads as rows | well | |
 
-Process: 1 round before the go (the batch assessment); 3 loops at the review (the matrix fixtures, the master as a fixture, a grid reverted).
+Process: 1 round before the go (the batch assessment); 3 loops at the review, two of them reverted (the matrix, the grid); the master-as-fixture rule kept.
 
 Closed: pending
 
