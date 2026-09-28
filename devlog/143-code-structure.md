@@ -214,13 +214,56 @@ Approved: 2026-09-28
 
 ### 3.1 Account
 
+| Step | Commit    | Summary                                                                                                                   |
+| ---- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 1    | `82c0703` | `graph.py`, the derivation in `filters.py`, `eq=False`; 124 goldens identical; TODO 39 closed; CONVENTIONS tree           |
+| 2    | `cab8ea1` | Fixtures 118 to 125, each caught by one of four mutations; § 7.5 in both docs; four glossary rows                          |
+| 3    |           | Try it material: the review folder, this chapter                                                                          |
+
+Two findings on the way. The revert of a mutation by exact text missed
+once (two identical `if self.keep is None:` lines): the kept check was
+restored by a unique anchor and `git diff --stat HEAD -- src` checked
+empty before the step's commit, per the 2026-09-27 lesson. The `f`
+flag on a `~` is a no-op today (the removed names cannot be kept), not
+filed.
+
 ## 4. Delivery
 
 ### 4.1 Try it
 
+Review folder `/tmp/dfd-review-143/`, `README.md` first: the ten
+probes with `main` and the branch side by side (`out-base/`,
+`out-branch/`, DOT, stderr, SVG, a `.diff` where they differ), the
+eight fixtures with the master (`fixtures/`, SVG and stderr), the
+debug traces of 037 and 098 on both sides (`trace-*`). The mock-up
+against `main` on GitHub: `mockup/143-graph-derivation`, to delete
+after the review.
+
+Line counts, `wc -l`:
+
+| File             | `main` | Branch |
+| ---------------- | ------ | ------ |
+| `dsl/filters.py` | 736    | 467    |
+| `graph.py`       |        | 111    |
+| Total            | 736    | 578    |
+
+Gone by construction: the flat merge map and its `ends` reader, the
+inherited-frames table, the `id()` sets, the in-place mutations, the
+second pass over the master, the `statements[:position]` slices, the
+`merged_names` subtraction and the `kept_names is None` states.
+
 Tried: pending
 
 ### 4.2 Test report
+
+| #   | Criterion                                                    | Result                                                                                                          |
+| --- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| 1   | Four checks at every step; existing tests untouched          | Green at steps 1 and 2 (hooks at commit and push); `git diff main -- tests` shows only the eight new fixtures    |
+| 2   | 124 goldens identical; new fixtures pass, each caught        | 132 pass; four mutations, every new fixture in at least one failure list (Account)                              |
+| 3   | Three import contexts                                        | pytest (`make test`), the dev wrapper on 098, the venv script (`.venv/bin/data-flow-diagram`) on the probes     |
+| 4   | No `id(`, no slice, no mutation; under 600 lines             | The three greps empty; 578 lines                                                                                |
+| 5   | The ten probes give the mock-up's column on the branch       | `out-branch/` identical to `out-graph/` on all ten                                                              |
+| 6   | § 7.5 and the glossary state the model; doc sync test passes | README rules 4 to 6, SYNTAX eight rules, four glossary rows; `test_doc_sync` in the 154                         |
 
 ### 4.3 Verdict
 
