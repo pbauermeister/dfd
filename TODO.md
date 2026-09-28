@@ -131,15 +131,6 @@ its devlog). To settle: is a replacer an item declared for the group
 078 and 079 change) or any item (the current rule)? A rule change is
 breaking for the two fixtures' shape.
 
-### 39. A neighbor walk re-adds an item removed by a `~` (from #143)
-
-Found at the analysis of #143 (2026-09-27), still there after #145:
-`~ B` then `!>1 A` with `A -> B` keeps B, since the neighbors found
-by the walk join the kept set without the availability check that
-anchors go through (`_check_available`). The strict reading of § 7.5
-rule 4 would skip a removed neighbor, or refuse the walk; to settle
-with a fixture on the 093 master. Related: TODO 38.
-
 ### 40. Structure that the tests pin (from #143)
 
 `discussions/code-structure.md` § 6 lists the proposals that a test

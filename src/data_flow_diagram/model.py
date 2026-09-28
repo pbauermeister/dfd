@@ -22,7 +22,7 @@ def repr(o: Base) -> str:
 # Classes representing elements, statements, and internal data structures
 
 
-@dataclass
+@dataclass(eq=False)
 class Base:
     def __repr__(self) -> str:
         return (
@@ -52,8 +52,10 @@ class SourceLine(Base):
     is_container: bool = False
 
 
-# Statements
-@dataclass(kw_only=True)
+# Statements: compared by identity and hashable (eq=False, which every
+# subclass repeats, since @dataclass regenerates __eq__), so that a stage
+# keeps sets of connections and frames instead of their ids
+@dataclass(eq=False, kw_only=True)
 class Statement(Base):
     source: SourceLine
 
@@ -244,13 +246,13 @@ def _build_style_specs() -> dict[str, StyleSpec]:
 STYLE_SPECS = _build_style_specs()  # keyword -> spec, in doc order
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Style(Statement):
     style: str
     value: str = ""
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Attrib(Statement):
     alias: str
     text: str
@@ -260,20 +262,20 @@ Attribs = dict[str, Attrib]
 
 
 # Statements: elements
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Drawable(Statement):
     type: Keyword
     text: str
     attrs: str
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Item(Drawable):
     name: str
     hidable: bool
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Connection(Drawable):
     src: str
     dst: str
@@ -286,7 +288,7 @@ class Connection(Drawable):
         return json.dumps(d, sort_keys=True)
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Frame(Drawable):
     items: list[str]
 
@@ -301,19 +303,19 @@ class FilterNeighbors:
     suppress_frames: bool  # "f" flag: suppress frames involving selected items
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Filter(Statement):
     names: list[str]
     neighbors_up: FilterNeighbors
     neighbors_down: FilterNeighbors
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Only(Filter):
     strict: bool  # "!!": selected items show only their path flows
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Merge(Statement):
     """Substitution: the items' flows are rewired to the replacer, the
     items become unavailable; the kept set is not touched. Ordered with
@@ -323,7 +325,7 @@ class Merge(Statement):
     replacer: str  # an item declared elsewhere
 
 
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class Without(Filter):
     pass
 
