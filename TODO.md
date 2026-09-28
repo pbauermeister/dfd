@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 39
+Next number: 44
 
 ## Won't do
 
@@ -102,21 +102,6 @@ replacer branch of `_parse_filter()` in `dsl/parser.py`, fixture 094
 Constraint (2026-09-26): a breaking change, never proposed for a batch;
 it waits for a major.
 
-### 33. Code structure of the filters and the parser (from the review of #128)
-
-Two comments at the review of #128, deferred to a task of their own
-that touches code only, with no change to the tests:
-
-- `dsl/filters.py` holds several concepts and its functions relay the
-  same parameters (statements, the kept set, the merge map, the
-  unavailable set): assess whether classes carry them better.
-- `dsl/parser.py`: `parse()` tells a single statement from a list by
-  `isinstance()`, a smell; assess a `match`, an abstract result type,
-  or every parser returning a list. Also a naming convention telling a
-  whole-line parser (`_parse_style`) from a part parser
-  (`_parse_item_name`): a prefix per kind, or static methods of two
-  classes.
-
 ### 37. A combinatorial matrix of fixtures for the filters
 
 Raised at the review of #140 (2026-09-26). The neighborhood fixtures
@@ -145,3 +130,57 @@ its devlog). To settle: is a replacer an item declared for the group
 (then a connection declared to it above the merge is an error, and
 078 and 079 change) or any item (the current rule)? A rule change is
 breaking for the two fixtures' shape.
+
+### 40. Structure that the tests pin (from #143)
+
+`discussions/code-structure.md` § 6 lists the proposals that a test
+line blocks, since #143 changes no test: `ItemKind` and
+`ConnectionKind` enums in place of the `Literal` subsets of `Keyword`
+(`tests/unit/test_pipeline.py`, twelve constructions with
+`model.Keyword.X` as a type), `remove_unused_hidables` moved to the
+filters (three calls), `handle_filters` and `handle_options` renamed
+for their effect (fifteen calls), `model.Options` renamed
+`CliOptions` (two), `dependency_checker.check` without `options`
+(six), `filters.py` renamed for the view stage (the import), and the
+graph as the carrier through the pipeline in place of the statement
+list (`handle_filters`, `remove_unused_hidables`, `generate_dot`). A
+task allowed to edit the tests takes them together.
+
+### 41. Code structure, families B to H (from #143)
+
+The analysis of #143 (`discussions/code-structure.md`, § 4 to § 6)
+proposed eight families of structural improvements to the application
+code, each with a mock-up green on the four checks. #143 was reframed
+to the graph and the derivation of the view (family I) and took D1
+with it; the rest waits here: C (the parser's result type and its
+names by scope), D2 to D4 (typed selection, `Literal` subsets,
+explicit copies), E (`styles.py`, `dsl/stars.py`), F (Graphviz
+raises, the CLI exits; one debug mechanism), G (the naming sweep) and
+H (21 small smells). § 5 of the discussion gives the order; the taste
+rows are in the devlog of #143 as first drafted (git history). Related:
+TODO 40 for what the tests pin.
+
+### 42. Distinctive types for the identifiers (from #143)
+
+`Item.name`, `Connection.src` and `.dst`, `Frame.items`,
+`Filter.names`, `Merge.names` and `.replacer` are `str`; so are
+`Style.style` and `Attrib.alias`. A distinctive type based on `str`
+(a `NewType`, or a subclass) says they are identifiers and lets mypy
+tell a name from a label. Born at the parser and carried through
+every stage, so it touches all modules and the unit tests' literal
+constructions (mypy checks `tests/`): a task of its own, first among
+the deferred typing rows of TODO 41 (family D). To decide: `NewType`
+or subclass; the names (`ItemName`, `StyleName`, `AttribAlias`);
+whether the `Literal` subsets of `Keyword` (D2) ride along. Asked by
+the user at the review of #143's mock-up, 2026-09-28.
+
+### 43. The `f` flag is not available on `~` (from #143)
+
+The `f` flag (suppress the frames of the selected items) has no
+effect on a `~`: the selected items are removed, so their frames are
+trimmed anyway, and no frame is drawn again since #143. The user wants
+the flag refused by the syntax on `~`, as `x` and `f` are for `!`.
+Fixture 044 (`~<>xf2 P2`) accepts the form today, so this is a
+breaking change: a major, with TODO 32 (`~=`), never batched; 044
+becomes an error fixture and the FLAGS list of `doc/README.md` § 7.2
+says which filter takes which flag.

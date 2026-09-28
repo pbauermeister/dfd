@@ -1,0 +1,9 @@
+# Issue #143: a declaration realizes the compound before it; a keep
+# filter after it narrows the view: "! Z" keeps Z alone, A left the
+# view. Expected: Z.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+! A
+process Z
+A -> Z az
+! Z

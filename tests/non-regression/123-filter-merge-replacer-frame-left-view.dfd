@@ -1,0 +1,9 @@
+# Issue #143: a frame the view dropped never comes back. FG left the
+# view at the realization (G and H are not kept); the replacer G
+# rejoins in the merged items' frame FB only. Expected: A -> G, G in FB.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+frame G H = FG
+frame B C = FB
+!>2 A
+merge B C : G

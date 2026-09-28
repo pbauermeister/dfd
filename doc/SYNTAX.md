@@ -93,6 +93,10 @@ documentation, and commit messages.
 | **"x" flag**                  | Suppress anchors: select only neighbors, not the listed items themselves.                                      |
 | **"f" flag**                  | Suppress frames: remove frames involving the selected items.                                                   |
 | **merge**                     | A statement collapsing items into a replacer, which takes over their connections (`merge ITEMS : REPLACER`).   |
+| **view**                      | The diagram drawn: the declarations as the view statements leave them. There is one, the current view.        |
+| **view statement**            | A filter (`!`, `!!`, `~`) or a merge: a statement that derives the next view from the current one.            |
+| **derivation**                | The pass that reads the statements in source order and folds them into the view.                              |
+| **keep list**                 | What a compound of `!` and `!!` filters selects, realized as the next view at the next statement of another kind. |
 
 ## Overview
 
@@ -314,35 +318,44 @@ Examples: `>*` (all downstream), `<>2` (two levels in both directions),
 
 ### 7.5. Filter and merge semantics
 
-Filters and merges are processed **sequentially** in source order:
+Filters and merges are the view statements: they derive the view, the
+diagram drawn, from the declarations. The derivation reads the
+statements **sequentially** in source order, and there is one view,
+the current one:
 
-1. Each `!` adds anchors (and their neighbors) to the kept set.
-2. Each `~` removes anchors (and their neighbors) from the kept set.
-3. Each `merge` rewires the connections of its items to the replacer;
-   the filters that follow read the connections as rewired.
-4. Anchors referenced by a filter, and the items and replacer of a merge,
-   must exist and be available: not removed by a previous `~`, not merged
-   away; the items of a merge must be kept once a kept set exists;
-   otherwise an error is raised, naming the statement that removed or
-   merged the item.
-5. After all statements are processed, the diagram is filtered: items not
-   in the kept set (and merged items) are dropped, connections with missing
-   endpoints are dropped, frames are trimmed or dropped (a replacer takes
-   the place of merged items in the one frame that held them all).
-6. Connections whose endpoints were merged are rewritten; duplicates from
-   merging are deduplicated.
-7. Stray flows are dropped. A flow is a stray flow when it touches an item
-   selected by a `!!` filter, and neither is a path flow of some `!!` filter
-   nor joins two items named together by a `!` filter. Constraints are never
-   stray flows. Without any `!!`, nothing is dropped by this step.
+1. A declaration (item, connection, frame) joins the current view.
+2. A `!` or `!!` walks its neighborhood in the current view and adds
+   what it finds to a keep list: items, flows, frames. Adjacent `!`
+   and `!!` filters share one keep list: they are one compound.
+3. At a `~`, a merge, a declaration or the end of the statements, the
+   keep list is realized: the next view is the current one reduced to
+   the kept items (an anchor is made non-hidable), then the keep list
+   is flushed. A flow is kept when both its ends are, unless it is a
+   stray flow (rule 7); a frame is trimmed to the kept items, and
+   dropped when none is left or when the `f` flag suppresses it.
+4. A `~` removes its anchors and their neighbors, walked in the current
+   view.
+5. A `merge` rewires the flows of its items to the replacer, which takes
+   their place, in their frame too; a replacer declared outside the view
+   rejoins it. A flow collapsed onto one item is dropped; duplicates
+   from merging are deduplicated.
+6. The anchors of a filter, the items and the replacer of a merge, and
+   the ends or members of a connection or frame declared after a view
+   statement, must be items of the current view. An unknown name, a
+   name removed by a `~` or merged away, or a name the view dropped is
+   an error, naming the statement that took it out where one did.
+7. A stray flow touches an item selected by a `!!` filter and is neither
+   a path flow of some `!!` filter nor joins two items named together by
+   a `!` filter of the same compound. Constraints are never stray flows.
+   Stray flows are dropped at the realization.
+8. What leaves the view never comes back: an item, a flow, a frame.
 
 The statements are positional. A filter or a merge reads the statements
 above it: its anchors are declared above, and its walk follows the flows
 declared above. A declaration above the first filter or merge belongs to
 the master only. A declaration below one joins the master and the
 current view: an item is kept, and a connection or a frame names items
-of the view, as a filter names anchors in step 4: an end or a member
-not kept, removed or merged away is an error.
+of the view, as rule 6 says.
 
 ### 7.6. Syntactic sugar
 

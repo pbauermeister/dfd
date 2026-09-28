@@ -1,0 +1,8 @@
+# Issue #143: a keep filter after a realization narrows the view to its
+# selection: "!>2 A" keeps A, B, C; "~ C" realizes it and removes C;
+# "! A" walks the view and keeps A alone. Expected: A.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+!>2 A
+~ C
+! A

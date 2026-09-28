@@ -93,6 +93,7 @@ src/data_flow_diagram/
     console.py              # debug/error output utilities
     exception.py            # DfdException class
     model.py                # data types, enums
+    graph.py                # the graph: items, connections, frames, and their queries
     markdown.py             # markdown snippet extraction
     dfd.py                  # pipeline orchestrator (build)
     dsl/
@@ -100,7 +101,7 @@ src/data_flow_diagram/
         scanner.py          # preprocessing: includes, line continuations
         parser.py           # DSL parsing: keyword dispatch, syntactic sugar
         checker.py          # statement validation: items, connections, frames
-        filters.py          # filter engine: only/without, neighbors
+        filters.py          # the view stage: the derivation by filters and merges
         dependency_checker.py  # cross-document dependency validation
     rendering/
         __init__.py

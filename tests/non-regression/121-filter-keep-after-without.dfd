@@ -1,0 +1,7 @@
+# Issue #143 (TODO 39): the walk of a keep filter reads the view, so it
+# never re-adds an item a "~" removed: B is gone, A has no neighbor
+# left, and the keep filter narrows the view to A. Expected: A.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+~ B
+!>1 A
