@@ -117,7 +117,7 @@ Rows marked taste are the user's; the rest cite the convention.
 | 1   | `graph.py` at the top level: a frozen `Graph` of items by name, connections, frames; `with_element`, `names`, `frame_of`, `adjacent`, `flows_touching` | user ("the most important factoring"); CLAUDE.md layout (rule)       | A graph inside `dsl/`; the statement list   |
 | 2   | The derivation per the user's model, option 3; vocabulary view, view statement, derivation, three glossary rows                                   | taste                                                                | Options 1 and 2                             |
 | 3   | Adjacent keep filters are one compound; a keep list is realized at a `~`, a merge, a declaration or the end                                       | taste (the model)                                                    | A realization at every statement            |
-| 4   | A keep filter naming an item the view dropped is an error, with the message of `~` ("no longer available due to previous filters")                 | taste, to confirm at stop 0                                          | A no-op                                     |
+| 4   | A keep filter naming an item the view dropped is an error, with the message of `~` ("no longer available due to previous filters")                 | taste (user, 2026-09-28: explicit over implicit) | A no-op                                     |
 | 5   | Consequences 1 to 4 are the language: one fixture each, a § 7.5 sentence in both docs                                                             | taste                                                                | A prior fix PR                              |
 | 6   | Consequences 7 and 8 (a frame the view dropped stays dropped through a merge) are the model's, one fixture each                                   | taste, to confirm at stop 0                                          | Reproduce the old behavior                  |
 | 7   | Consequence 6 dropped; tombstones, no audit log                                                                                                   | user, 2026-09-28                                                     | Name reuse; an audit log                    |
@@ -125,7 +125,7 @@ Rows marked taste are the user's; the rest cite the convention.
 | 9   | `handle_filters` keeps its signature and returns the view's elements in source order, the other statements passed through                        | the tests pin it (rule)                                              | Return the graph (TODO 40)                  |
 | 10  | Traces equivalent: one "Items to keep" block per derivation                                                                                       | taste                                                                | Byte-identical traces                       |
 | 11  | TODO 39 removed in the step that closes it; TODO 41 filed for B to H                                                                              | PROCESS.md "TODO.md" (rule)                                          |                                             |
-| 12  | The PR type decided at the end, `fix:` or `feat:`, never `refactor:`, since the language changes                                                  | RELEASING.md, the user's reading of a wrong semantic as a bug (#145) | `refactor:`                                 |
+| 12  | The PR is a `fix:`: the old behaviors are model flaws with missing tests, not features                                                  | user, 2026-09-28; RELEASING.md | `feat:`, `refactor:`                                 |
 
 ### 1.9 Acceptance criteria
 
@@ -163,7 +163,7 @@ Actions: `eq=False` on the statement classes (mock-up 3's diff);
 Verify: the four checks; 124 goldens identical; the greps of
 criterion 4; the probes rerun from the review folder.
 
-**Step 2 — Fixtures and documentation** (`fix:` or `feat:`, decision 12)
+**Step 2 — Fixtures and documentation** (`fix:`, decision 12)
 
 Files: `tests/non-regression/118-*` to `125-*` (`.dfd`, `.dot` or
 `.stderr`), `doc/README.md`, `doc/SYNTAX.md`, `doc/img/` if a doc
