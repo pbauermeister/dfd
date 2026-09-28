@@ -1,0 +1,7 @@
+# Issue #143: the walk of a "~" reads the view. A and C are kept with
+# no flow between them (B left the view), so "~>2 A" removes A alone,
+# not C, which the master reaches through B. Expected: C.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+! A C
+~>2 A

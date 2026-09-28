@@ -1,0 +1,11 @@
+# Issue #143: a stray flow dropped at a realization stays dropped. The
+# strict filter vetoes B -> C (it touches C, D's upstream neighbor, and
+# is no path flow); "process Z" realizes the compound; the plain filter
+# of the next compound cannot re-allow B -> C, gone from the view.
+# Expected: B, C, D, Z, and C -> D only.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+!!<1 D
+! B
+process Z
+! B C D Z

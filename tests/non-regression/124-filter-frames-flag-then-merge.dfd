@@ -1,0 +1,8 @@
+# Issue #143: the "f" flag holds through a later merge: FB is suppressed
+# at the realization and never comes back, so the replacer G joins no
+# frame. Expected: A -> G, no frame.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+frame B C = FB
+!>f2 A
+merge B C : G

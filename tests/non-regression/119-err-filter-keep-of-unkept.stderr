@@ -1,0 +1,4 @@
+ERROR: (most recent first)
+  line 8: ! C
+  line 1: <file:tests/non-regression/119-err-filter-keep-of-unkept.dfd>
+Error:  Name(s) no longer available due to previous filters: C

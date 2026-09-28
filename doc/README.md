@@ -1492,6 +1492,23 @@ declarations below it join the view it makes. Three rules:
    items of the view, so one naming an item not kept, removed or
    merged away is an error.
 
+Filters and merges derive the view one from the other, so three more
+rules follow (the full sequence is in `SYNTAX.md`, "Filter and merge
+semantics"):
+
+4. Adjacent `!` and `!!` filters form one compound, applied together
+   at the next statement of another kind (a `~`, a merge, a
+   declaration, or the end): the view becomes what the compound
+   keeps, out of the view as it was. So a `!` after a `~`, a merge or
+   a declaration narrows the view; it never brings back an item the
+   view had dropped, and naming one is an error.
+5. Filters walk the view, not the master: a `~` reaches an item only
+   through the flows the view still has, and a `!` never re-adds an
+   item a `~` removed.
+6. What leaves the view is gone: a stray flow dropped by a `!!`, a
+   frame trimmed away or suppressed by the `f` flag, even when a
+   later merge puts the replacer where the frame's items were.
+
 Here Z, its flow and its frame join the view of `! A B`:
 
 ```data-flow-diagram img/filter-declared-after.svg

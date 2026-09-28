@@ -1,0 +1,8 @@
+# Issue #143: a keep filter names items of the view: C left it at the
+# realization by "~ B", neither removed nor merged; naming it is an
+# error, never a re-addition from the master.
+#include tests/non-regression/093-filter-merge-master.dfd
+
+!>1 A
+~ B
+! C
