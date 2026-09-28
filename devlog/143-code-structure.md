@@ -218,7 +218,7 @@ Approved: 2026-09-28
 | ---- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
 | 1    | `82c0703` | `graph.py`, the derivation in `filters.py`, `eq=False`; 124 goldens identical; TODO 39 closed; CONVENTIONS tree           |
 | 2    | `cab8ea1` | Fixtures 118 to 125, each caught by one of four mutations; § 7.5 in both docs; four glossary rows                          |
-| 3    |           | Try it material: the review folder, this chapter                                                                          |
+| 3    | `cbf0416` | Try it material: the review folder, this chapter                                                                          |
 
 Two findings on the way. The revert of a mutation by exact text missed
 once (two identical `if self.keep is None:` lines): the kept check was
