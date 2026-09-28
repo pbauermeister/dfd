@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 42
+Next number: 43
 
 ## Won't do
 
@@ -168,3 +168,17 @@ raises, the CLI exits; one debug mechanism), G (the naming sweep) and
 H (21 small smells). § 5 of the discussion gives the order; the taste
 rows are in the devlog of #143 as first drafted (git history). Related:
 TODO 40 for what the tests pin.
+
+### 42. Distinctive types for the identifiers (from #143)
+
+`Item.name`, `Connection.src` and `.dst`, `Frame.items`,
+`Filter.names`, `Merge.names` and `.replacer` are `str`; so are
+`Style.style` and `Attrib.alias`. A distinctive type based on `str`
+(a `NewType`, or a subclass) says they are identifiers and lets mypy
+tell a name from a label. Born at the parser and carried through
+every stage, so it touches all modules and the unit tests' literal
+constructions (mypy checks `tests/`): a task of its own, first among
+the deferred typing rows of TODO 41 (family D). To decide: `NewType`
+or subclass; the names (`ItemName`, `StyleName`, `AttribAlias`);
+whether the `Literal` subsets of `Keyword` (D2) ride along. Asked by
+the user at the review of #143's mock-up, 2026-09-28.

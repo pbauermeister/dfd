@@ -1,7 +1,7 @@
 # 143 — The graph and the derivation of the view
 
 Date: 2026-09-27
-Status: PENDING
+Status: ONGOING
 Issue: #143 · PR: #144 · Branch: `refactor/143-code-structure`
 Task nature: refactor
 Track: full
@@ -69,7 +69,7 @@ and its in-place mutations; the existing goldens stay byte-identical.
 - `engineering/CONVENTIONS.md` and `COMMENTING.md`; `make format`,
   `make lint`, `make test` green at every step.
 
-Framed: pending
+Framed: 2026-09-28
 
 ### 1.5 Taste
 
@@ -208,7 +208,7 @@ exists on `main`; `dfd.py`, `checker.py`, `rendering/` (the graph
 reaches them with TODO 40); the parser and the DSL syntax; `~=`
 (TODO 32); the merge into a connected item (TODO 38).
 
-Approved: pending
+Approved: 2026-09-28
 
 ## 3. Execution
 
