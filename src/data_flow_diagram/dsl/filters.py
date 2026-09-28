@@ -1,208 +1,39 @@
-"""Filter engine: only/without, neighbor expansion, strict flows.
+"""The view stage: the view statements (filters and merges) derive the
+view, the diagram drawn, from the declarations.
 
-Items: a kept set built statement by statement ("!" adds, "~" removes).
-Flows: kept when both ends are kept, unless a strict only filter ("!!")
-vetoes them. A strict filter vetoes every flow touching an item it
-selects; a flow shows anyway when it is a path flow (followed by some
-strict filter to reach its neighbors) or joins two items a plain "!"
-selects together. Flows vetoed and allowed by none are the stray flows.
+There is one view, the current one, and the derivation (_Derivation)
+folds the statements in source order into it. A declaration (item,
+connection, frame) joins the current view. A keep filter ("!", "!!")
+walks its neighborhood in the current view and adds what it finds to
+a keep list: items, flows per its strictness, frames; adjacent keep
+filters share one keep list, a compound. At a statement of another
+kind, a "~", a merge or a declaration, the keep list is realized: the
+next view is the current one induced on the kept items, then the keep
+list is flushed. A "~" derives the next view less its anchors and
+their neighbors, walked in the current view; a merge derives it with
+the merged items' flows rewired to the replacer, which takes their
+place, in their frame too.
 
-Position: a view statement (filter or merge) reads the statements before
-it, so its anchors are declared above and its walk follows the flows
-declared above. An item declared after a view statement joins the kept
-set; a connection or a frame declared after one names items of the
-view, or is an error (#145).
+Flows at a realization: kept when both ends are kept, unless a strict
+keep filter ("!!") vetoes them. A strict filter vetoes every flow
+touching an item it selects; a flow shows anyway when it is a path
+flow (followed by some strict filter to reach its neighbors) or joins
+two items a plain "!" selects together. Flows vetoed and allowed by
+none are the stray flows, dropped for good.
+
+A name leaving the view is recorded with its cause (removed, merged
+into), for the error a later statement naming it gets; a statement
+names items of the current view, or it is an error (#145). The items
+declared stay on record for one more purpose: a merge's replacer
+declared outside the view rejoins it.
 """
 
-from dataclasses import dataclass
+from collections.abc import Set as AbstractSet
+from dataclasses import dataclass, field, replace
 
 from .. import exception, model
 from ..console import dprint
-
-
-def _ends(conn: model.Connection, merged: dict[str, str]) -> tuple[str, str]:
-    """A flow's ends as merged so far: what a rewrite would have written.
-
-    The map is flat (see _register_merge), so one lookup per end.
-    """
-    return merged.get(conn.src, conn.src), merged.get(conn.dst, conn.dst)
-
-
-def _register_merge(
-    merged: dict[str, str], *, names: set[str], replacer: str
-) -> None:
-    """Add a merge to the map and keep it flat: a chain resolves in one hop."""
-    target = merged.get(replacer, replacer)
-    for name in names:
-        merged[name] = target
-    for name, value in merged.items():
-        if value in names:
-            merged[name] = target
-
-
-def _collect_connected_names(
-    *,
-    statements: model.Statements,
-    names: set[str],
-    search_downstream: bool,
-    use_layout_direction: bool,
-    merged: dict[str, str],
-) -> tuple[set[str], list[model.Connection]]:
-    """Find items connected to a set of names in one direction.
-
-    Returns (found_names, connections followed).
-    """
-    found_names: set[str] = set()
-    followed: list[model.Connection] = []
-    for statement in statements:
-        match statement:
-            case model.Connection() as conn:
-                # constraints do not define neighborhood
-                if conn.type == model.Keyword.CONSTRAINT:
-                    continue
-
-                src, dst = _ends(conn, merged)
-                if src == dst:
-                    continue  # collapsed by a merge
-                if conn.reversed and not use_layout_direction:
-                    src, dst = dst, src
-
-                if conn.type in (model.Keyword.BFLOW, model.Keyword.UFLOW):
-                    if dst in names:
-                        found_names.add(src)
-                        followed.append(conn)
-                    if src in names:
-                        found_names.add(dst)
-                        followed.append(conn)
-                else:
-                    if search_downstream:
-                        if src in names:
-                            found_names.add(dst)
-                            followed.append(conn)
-                    else:
-                        if dst in names:
-                            found_names.add(src)
-                            followed.append(conn)
-            case _:
-                continue
-    return found_names, followed
-
-
-def _resolve_distance(distance: int, max_neighbors: int) -> int:
-    """Resolve a neighbor distance, treating negative as unlimited."""
-    if distance < 0:
-        return max_neighbors
-    return distance
-
-
-def _expand_neighbors_in_dir(
-    *,
-    statements: model.Statements,
-    anchor_names: list[str],
-    max_neighbors: int,
-    fn: model.FilterNeighbors,
-    down: bool,
-    merged: dict[str, str],
-) -> tuple[set[str], set[int]]:
-    """Expand neighbors in one direction by successive waves of connections.
-
-    Returns (neighbor_names, ids of the connections followed: the path flows).
-    """
-    names = set(anchor_names)
-    neighbor_names: set[str] = set()
-    path_ids: set[int] = set()
-    for i in range(_resolve_distance(fn.distance, max_neighbors)):
-        names, followed = _collect_connected_names(
-            statements=statements,
-            names=names,
-            search_downstream=down,
-            use_layout_direction=fn.layout_direction,
-            merged=merged,
-        )
-        if not names:
-            break
-        dprint(f"  - {i} {down} {fn}")
-        dprint("     :", neighbor_names)
-        dprint("   + :", names)
-        neighbor_names.update(names)
-        path_ids.update(id(c) for c in followed)
-        dprint("   = :", neighbor_names)
-    return neighbor_names, path_ids
-
-
-def find_neighbors(
-    *,
-    filter: model.Filter,
-    statements: model.Statements,
-    max_neighbors: int,
-    merged: dict[str, str],
-    debug: bool,
-) -> tuple[set[str], set[str], set[int]]:
-    """Collect neighbor names by following connections outward from filter anchors.
-
-    Returns (downstream names, upstream names, ids of the path flows).
-    """
-    downs, down_ids = _expand_neighbors_in_dir(
-        statements=statements,
-        anchor_names=filter.names,
-        max_neighbors=max_neighbors,
-        fn=filter.neighbors_down,
-        down=True,
-        merged=merged,
-    )
-    ups, up_ids = _expand_neighbors_in_dir(
-        statements=statements,
-        anchor_names=filter.names,
-        max_neighbors=max_neighbors,
-        fn=filter.neighbors_up,
-        down=False,
-        merged=merged,
-    )
-    return downs, ups, down_ids | up_ids
-
-
-def _collect_flow_ids(
-    statements: model.Statements,
-    names: set[str],
-    *,
-    touching: bool,
-    merged: dict[str, str],
-) -> set[int]:
-    """Ids of the flows joining (or touching) a set of names, ends read
-    through the merges."""
-    ids: set[int] = set()
-    for statement in statements:
-        match statement:
-            case model.Connection() as conn:
-                src, dst = _ends(conn, merged)
-                if src == dst:
-                    continue
-                ends_in = (src in names) + (dst in names)
-                if ends_in == 2 or (touching and ends_in == 1):
-                    ids.add(id(conn))
-            case _:
-                continue
-    return ids
-
-
-def _check_filter_names(
-    *,
-    names: set[str],
-    in_names: set[str],
-    all_names: set[str],
-    source: model.SourceLine,
-) -> None:
-    """Validate that filter names exist and are still available."""
-    if not names.issubset(all_names):
-        diff = ", ".join(names - all_names)
-        raise exception.DfdException(f' Name(s) unknown: {diff}', source=source)
-
-    if not names.issubset(in_names):
-        diff = ", ".join(names - in_names)
-        raise exception.DfdException(
-            f' Name(s) no longer available due to previous filters: {diff}',
-            source=source,
-        )
+from ..graph import Element, Graph
 
 
 def _cause(what: str, source: model.SourceLine) -> str:
@@ -211,526 +42,426 @@ def _cause(what: str, source: model.SourceLine) -> str:
     return f"{what} at line {source.line_nr}: {text}"
 
 
-def _check_available(
-    *, names: set[str], unavailable: dict[str, str], source: model.SourceLine
-) -> None:
-    """Refuse a name that a previous statement removed or merged away."""
-    gone = sorted(names & unavailable.keys())
-    if gone:
-        diff = "; ".join(f"{name} ({unavailable[name]})" for name in gone)
-        raise exception.DfdException(
-            f" Name(s) no longer available: {diff}", source=source
-        )
+@dataclass(kw_only=True)
+class _KeepList:
+    """What a compound of keep filters selects in the current view,
+    realized at the next statement of another kind: the names kept,
+    the anchors (made non-hidable), the strict filters' gate on the
+    flows, the names whose frames the "f" flag suppresses."""
+
+    names: set[str] = field(default_factory=set)
+    anchors: set[str] = field(default_factory=set)
+    vetoed: set[model.Connection] = field(default_factory=set)
+    allowed: set[model.Connection] = field(default_factory=set)
+    skip_frames: set[str] = field(default_factory=set)
+
+    @property
+    def hidden(self) -> set[model.Connection]:
+        """The stray flows: vetoed, allowed by none."""
+        return self.vetoed - self.allowed
 
 
-def _check_in_view(
-    *,
-    names: set[str],
-    all_names: set[str],
-    unavailable: dict[str, str],
-    kept_names: set[str] | None,
-    source: model.SourceLine,
-) -> None:
-    """A statement declared after a view statement names items of the
-    view: of its names declared so far, none removed or merged away,
-    and all kept once a kept set exists (a name declared below joins
-    the view at its declaration)."""
-    names = names & all_names
-    _check_available(names=names, unavailable=unavailable, source=source)
-    if kept_names is not None:
-        _check_filter_names(
-            names=names,
-            in_names=kept_names,
-            all_names=all_names,
-            source=source,
-        )
+# a connection as compared after a merge: every field but its source
+_FlowKey = tuple[model.Keyword, str, str, str, str, bool, bool]
 
 
-def _check_kept(
-    *, names: set[str], kept_names: set[str], source: model.SourceLine
-) -> None:
-    """A merge names kept items only, once a kept set exists."""
-    missing = sorted(names - kept_names)
-    if missing:
-        raise exception.DfdException(
-            f" Name(s) not kept, cannot be merged: {', '.join(missing)}",
-            source=source,
-        )
-
-
-def _frame_of_items(
-    statements: model.Statements, *, inherited: dict[str, model.Frame]
-) -> dict[str, model.Frame]:
-    """Item name -> the frame declaring it; a replacer declared in no
-    frame is in the one it inherited."""
-    frame_of: dict[str, model.Frame] = {}
-    for statement in statements:
-        if isinstance(statement, model.Frame):
-            for name in statement.items:
-                frame_of[name] = statement
-    for name, frame in inherited.items():
-        frame_of.setdefault(name, frame)
-    return frame_of
-
-
-def _check_one_frame(
-    *,
-    names: set[str],
-    frame_of: dict[str, model.Frame],
-    source: model.SourceLine,
-) -> model.Frame | None:
-    """Items merged together are in one frame, or all unframed.
-
-    Returns the frame the replacer inherits, if any.
-    """
-    frames = {
-        id(frame_of[name]) if name in frame_of else None for name in names
-    }
-    if len(frames) > 1:
-        diff = ", ".join(
-            f"{name} ({frame_of[name].text if name in frame_of else 'no frame'})"
-            for name in sorted(names)
-        )
-        raise exception.DfdException(
-            f" Cannot merge items from different frames: {diff}",
-            source=source,
-        )
-    (frame_id,) = frames
-    if frame_id is None:
-        return None
-    return frame_of[next(iter(names & frame_of.keys()))]
-
-
-def _collect_frame_skips(
-    *,
-    f: model.Filter,
-    names: set[str],
-    downs: set[str],
-    ups: set[str],
-    skip_frames_for_names: set[str],
-) -> None:
-    """Record names whose frames should be suppressed (neighbors-only mode)."""
-    if f.neighbors_up.suppress_frames:
-        skip_frames_for_names.update(ups)
-        if not f.neighbors_up.suppress_anchors:
-            skip_frames_for_names.update(names)
-    if f.neighbors_down.suppress_frames:
-        skip_frames_for_names.update(downs)
-        if not f.neighbors_down.suppress_anchors:
-            skip_frames_for_names.update(names)
-
-
-@dataclass(frozen=True, kw_only=True)
-class _FilterDecisions:
-    """Outcome of the filter statements, consumed by _apply_filters()."""
-
-    kept_names: set[str] | None  # None: no filter statement encountered
-    only_names: set[str]  # anchors of "only" filters, made non-hidable
-    replacement: dict[str, str]  # merged name -> replacer (flat)
-    merged_names: set[str]  # names merged away: never kept
-    inherited_frames: dict[str, int]  # replacer -> id of the frame it joins
-    skip_frames_for_names: set[str]
-    vetoed_ids: set[int]  # flows touching a strict selection
-    allowed_ids: set[int]  # path flows, and flows joining a plain selection
-
-
-def _collect_kept_names(
-    statements: model.Statements,
-    *,
-    debug: bool,
-) -> _FilterDecisions:
-    """Process filter statements to determine which names to keep.
-
-    A view statement reads the statements before it (`seen`), and the
-    declarations after it join the view (see the module docstring).
-    """
-    kept_names: set[str] | None = None
-    only_names: set[str] = set()
-    replacement: dict[str, str] = {}
-    unavailable: dict[str, str] = {}  # removed or merged away -> cause
-    all_names: set[str] = set()  # the items declared so far
-    frame_of_replacers: dict[str, model.Frame] = {}  # inherited by a merge
-    inherited_frames: dict[str, int] = {}
-    skip_frames_for_names: set[str] = set()
-    vetoed_ids: set[int] = set()
-    allowed_ids: set[int] = set()
-
-    for position, statement in enumerate(statements):
-        seen = statements[:position]
-        if isinstance(statement, model.Filter):
-            dprint("*** Filter:", statement)
-            dprint("    before:", kept_names)
-
-        match statement:
-            case model.Item() as item:
-                # declared after a view statement: joins the current view
-                all_names.add(item.name)
-                if kept_names is not None:
-                    kept_names.add(item.name)
-
-            case model.Connection() as conn:
-                # declared after a view statement: its ends are in the view
-                _check_in_view(
-                    names={conn.src, conn.dst},
-                    all_names=all_names,
-                    unavailable=unavailable,
-                    kept_names=kept_names,
-                    source=statement.source,
-                )
-
-            case model.Frame() as frame:
-                # declared after a view statement: its items are in the view
-                _check_in_view(
-                    names=set(frame.items),
-                    all_names=all_names,
-                    unavailable=unavailable,
-                    kept_names=kept_names,
-                    source=statement.source,
-                )
-
-            case model.Only() as f:
-                # Only is additive: first Only starts with an empty kept set
-                if kept_names is None:
-                    kept_names = set()
-
-                # validate filter names: known, and not removed or merged
-                names = set(f.names)
-                _check_filter_names(
-                    names=names,
-                    in_names=all_names,
-                    all_names=all_names,
-                    source=statement.source,
-                )
-                _check_available(
-                    names=names,
-                    unavailable=unavailable,
-                    source=statement.source,
-                )
-
-                # add anchor names (suppressed by "x" flag: neighbors only)
-                if (
-                    not f.neighbors_up.suppress_anchors
-                    and not f.neighbors_down.suppress_anchors
-                ):
-                    dprint("ONLY: adding items:", names)
-                    kept_names.update(f.names)
-                    only_names.update(f.names)
-
-                # add upstream/downstream neighbor names
-                downs, ups, path_ids = find_neighbors(
-                    filter=f,
-                    statements=seen,
-                    max_neighbors=len(all_names),
-                    merged=replacement,
-                    debug=debug,
-                )
-                dprint("ONLY: adding neighbors:", downs, ups)
-                kept_names.update(downs)
-                kept_names.update(ups)
-
-                # flows: a strict filter vetoes the flows touching its
-                # selection and allows its path flows; a plain filter
-                # allows the flows joining its selection
-                selection = downs | ups
-                if not (
-                    f.neighbors_up.suppress_anchors
-                    or f.neighbors_down.suppress_anchors
-                ):
-                    selection |= names
-                if f.strict:
-                    vetoed_ids |= _collect_flow_ids(
-                        seen, selection, touching=True, merged=replacement
-                    )
-                    allowed_ids |= path_ids
-                else:
-                    allowed_ids |= _collect_flow_ids(
-                        seen,
-                        selection,
-                        touching=False,
-                        merged=replacement,
-                    )
-
-                _collect_frame_skips(
-                    f=f,
-                    names=names,
-                    downs=downs,
-                    ups=ups,
-                    skip_frames_for_names=skip_frames_for_names,
-                )
-
-            case model.Merge() as m:
-                # a substitution: the items merged away into the replacer
-                names = set(m.names)
-                _check_filter_names(
-                    names=names | {m.replacer},
-                    in_names=all_names,
-                    all_names=all_names,
-                    source=statement.source,
-                )
-                _check_available(
-                    names=names | {m.replacer},
-                    unavailable=unavailable,
-                    source=statement.source,
-                )
-                if kept_names is not None:
-                    _check_kept(
-                        names=names,
-                        kept_names=kept_names,
-                        source=statement.source,
-                    )
-                frame_of = _frame_of_items(seen, inherited=frame_of_replacers)
-                frame = _check_one_frame(
-                    names=names, frame_of=frame_of, source=statement.source
-                )
-                dprint("MERGE:", names, "->", m.replacer)
-                _register_merge(replacement, names=names, replacer=m.replacer)
-                cause = _cause(f"merged into {m.replacer}", statement.source)
-                unavailable.update({name: cause for name in names})
-                # the replacer takes the merged items' place: in the kept set
-                # and in their frame (when it is declared in none)
-                if kept_names is not None:
-                    kept_names -= names
-                    kept_names.add(m.replacer)
-                if frame is not None:
-                    # a replacer declared in another frame is then in two:
-                    # the frame check re-run after the filters reports it
-                    inherited_frames[m.replacer] = id(frame)
-                    frame_of_replacers.setdefault(m.replacer, frame)
-
-            case model.Without() as f:
-                # Without is subtractive: first Without starts with all names
-                if kept_names is None:
-                    kept_names = all_names - unavailable.keys()
-
-                # validate filter names: known, not removed or merged, kept
-                names = set(f.names)
-                _check_filter_names(
-                    names=names,
-                    in_names=all_names,
-                    all_names=all_names,
-                    source=statement.source,
-                )
-                _check_available(
-                    names=names,
-                    unavailable=unavailable,
-                    source=statement.source,
-                )
-                _check_filter_names(
-                    names=names,
-                    in_names=kept_names,
-                    all_names=all_names,
-                    source=statement.source,
-                )
-                cause = _cause("removed", statement.source)
-
-                # remove anchor names (suppressed by "x" flag: neighbors only)
-                if (
-                    not f.neighbors_up.suppress_anchors
-                    and not f.neighbors_down.suppress_anchors
-                ):
-                    dprint("WITHOUT: removing items:", names)
-                    kept_names.difference_update(names)
-                    unavailable.update({name: cause for name in names})
-
-                # remove upstream/downstream neighbor names
-                downs, ups, _ = find_neighbors(
-                    filter=f,
-                    statements=seen,
-                    max_neighbors=len(all_names),
-                    merged=replacement,
-                    debug=debug,
-                )
-                dprint("WITHOUT: removing neighbors:", downs, ups)
-                kept_names.difference_update(downs)
-                kept_names.difference_update(ups)
-                unavailable.update({name: cause for name in downs | ups})
-
-                _collect_frame_skips(
-                    f=f,
-                    names=names,
-                    downs=downs,
-                    ups=ups,
-                    skip_frames_for_names=skip_frames_for_names,
-                )
-
-        if isinstance(statement, model.Filter):
-            dprint("    after:", kept_names)
-
-    return _FilterDecisions(
-        kept_names=kept_names,
-        only_names=only_names,
-        replacement=replacement,
-        merged_names=set(replacement),
-        inherited_frames=inherited_frames,
-        skip_frames_for_names=skip_frames_for_names,
-        vetoed_ids=vetoed_ids,
-        allowed_ids=allowed_ids,
+def _flow_key(conn: model.Connection) -> _FlowKey:
+    return (
+        conn.type,
+        conn.text,
+        conn.attrs,
+        conn.src,
+        conn.dst,
+        conn.reversed,
+        conn.relaxed,
     )
 
 
-def _mark_non_hidable(
-    statements: model.Statements, only_names: set[str]
-) -> None:
-    """Make items in the only_names set non-hidable so they don't vanish."""
-    for statement in statements:
-        match statement:
+# the view's elements by the declaration each derives from
+_View = dict[Element, Element]
+
+
+class _Derivation:
+    """The statements folded in source order into the current view (see
+    the module docstring)."""
+
+    def __init__(self) -> None:
+        self.declared: dict[str, model.Item] = {}  # every item, by name
+        self.unavailable: dict[str, str] = {}  # removed or merged -> cause
+        self.view: _View = {}
+        self.current = Graph.empty()
+        self.keep: _KeepList | None = None
+
+    # the fold
+
+    def run(self, statements: model.Statements) -> _View:
+        """Read the statements; return the view's elements by origin."""
+        for statement in statements:
+            match statement:
+                case model.Item() | model.Connection() | model.Frame():
+                    self._declare(statement)
+                case model.Only() as f:
+                    self._keep(f)
+                case model.Merge() as m:
+                    self._merge(m)
+                case model.Without() as f:
+                    self._remove(f)
+                case _:
+                    pass  # a style, an attrib: not a view matter
+        self._realize()
+        return self.view
+
+    def _declare(self, element: Element) -> None:
+        """A declaration joins the current view, naming items of it."""
+        self._realize()
+        match element:
             case model.Item() as item:
-                if item.name in only_names:
-                    item.hidable = False
-
-
-def _merge_frame_items(
-    frame: model.Frame,
-    *,
-    replacement: dict[str, str],
-    inherited: dict[str, int],
-) -> list[str]:
-    """A frame's items once merged: merged names out, an inheriting
-    replacer in, at the place of its first merged item."""
-    items: list[str] = []
-    for name in frame.items:
-        replacer = replacement.get(name)
-        if replacer is None:
-            if name not in items:
-                items.append(name)
-        elif inherited.get(replacer) == id(frame) and replacer not in items:
-            items.append(replacer)
-    return items
-
-
-def _apply_filters(
-    *,
-    statements: model.Statements,
-    kept_names: set[str],
-    replacement: dict[str, str],
-    inherited_frames: dict[str, int],
-    skip_frames_for_names: set[str],
-    hidden_ids: set[int],
-) -> tuple[list[model.Statement], dict[str, model.Connection]]:
-    """Apply kept/replacement/skip decisions to produce filtered statements.
-
-    Returns (new_statements, replaced_connections).
-    """
-    new_statements: list[model.Statement] = []
-    replaced_connections: dict[str, model.Connection] = {}
-    for statement in statements:
-        dprint(f"\nHandling statement: {statement}")
-        match statement:
-            case model.Item() as item:
-                # skip items not in the kept set
-                if item.name not in kept_names:
-                    dprint("=> Skipping item: its name is not in the kept list")
-                    continue
-
+                self.declared[item.name] = item
             case model.Connection() as conn:
-                replaced = conn.src in replacement or conn.dst in replacement
-                if replaced:
-                    # rewrite replaced endpoint(s)
-                    conn.src = replacement.get(conn.src, conn.src)
-                    conn.dst = replacement.get(conn.dst, conn.dst)
-                    # skip if both ends collapsed to one item (self-loop):
-                    # both in one group, or one end being the replacer
-                    if conn.src == conn.dst:
-                        dprint(
-                            "=> Skipping connection: collapsed by replacement"
-                        )
-                        continue
-
-                # skip if either endpoint was filtered out, replaced or not
-                if conn.src not in kept_names or conn.dst not in kept_names:
-                    dprint(
-                        "=> Skipping connection: some end is not in the kept list"
-                    )
-                    continue
-
-                # skip stray flows: vetoed by a strict filter, allowed by none
-                if id(conn) in hidden_ids:
-                    dprint("=> Skipping connection: stray flow")
-                    continue
-
-                if replaced:
-                    replaced_connections[conn.signature()] = conn
-
+                self._check_in_view({conn.src, conn.dst}, conn.source)
             case model.Frame() as frame:
-                # merged names leave the frame; a replacer takes their place
-                # only in the one frame holding all the items merged into it
-                frame.items = _merge_frame_items(
-                    frame, replacement=replacement, inherited=inherited_frames
-                )
+                self._check_in_view(set(frame.items), frame.source)
+        self.view[element] = element
+        self.current = self.current.with_element(element)
 
-                # skip frames with no remaining kept items
-                names = set(frame.items)
-                if not names.intersection(kept_names):
-                    dprint("=> Skipping frame: no items are in the kept list")
-                    continue
-                else:
-                    # trim frame to kept items only
-                    new_items = [n for n in frame.items if n in kept_names]
-                    dprint(
-                        f"=> Adjusting frame items: {frame.items} -> {new_items}"
-                    )
-                    frame.items = new_items
+    def _keep(self, f: model.Only) -> None:
+        """A keep filter: its selection joins the keep list."""
+        dprint("*** Filter:", f)
+        names = set(f.names)
+        self._check_known(names, f.source)
+        self._check_available(names, f.source)
+        self._check_kept(names, f.source)
+        if self.keep is None:
+            self.keep = _KeepList()
+        keep = self.keep
 
-                    # skip frames containing items selected via "f" flag
-                    if set(new_items).intersection(skip_frames_for_names):
-                        dprint(
-                            "=> Skipping frame: some items are in the skip-frames list"
-                        )
+        # add anchor names (suppressed by "x" flag: neighbors only)
+        anchors_kept = not (
+            f.neighbors_up.suppress_anchors or f.neighbors_down.suppress_anchors
+        )
+        if anchors_kept:
+            dprint("ONLY: adding items:", names)
+            keep.names |= names
+            keep.anchors |= names
+
+        # add upstream/downstream neighbor names
+        downs, ups, path_flows = self._neighbors(f)
+        dprint("ONLY: adding neighbors:", downs, ups)
+        keep.names |= downs | ups
+
+        # flows: a strict filter vetoes the flows touching its selection
+        # and allows its path flows; a plain filter allows the flows
+        # joining its selection
+        selected = downs | ups
+        if anchors_kept:
+            selected |= names
+        if f.strict:
+            keep.vetoed |= self.current.flows_touching(
+                selected, both_ends=False
+            )
+            keep.allowed |= path_flows
+        else:
+            keep.allowed |= self.current.flows_touching(
+                selected, both_ends=True
+            )
+
+        # the "f" flag: the frames of the selected items are suppressed
+        if f.neighbors_up.suppress_frames:
+            keep.skip_frames |= ups
+            if not f.neighbors_up.suppress_anchors:
+                keep.skip_frames |= names
+        if f.neighbors_down.suppress_frames:
+            keep.skip_frames |= downs
+            if not f.neighbors_down.suppress_anchors:
+                keep.skip_frames |= names
+
+    def _remove(self, f: model.Without) -> None:
+        """A without filter: the next view is the current one less the
+        anchors and their neighbors."""
+        self._realize()
+        dprint("*** Filter:", f)
+        names = set(f.names)
+        self._check_known(names, f.source)
+        self._check_available(names, f.source)
+        self._check_kept(names, f.source)
+        cause = _cause("removed", f.source)
+
+        # remove anchor names (suppressed by "x" flag: neighbors only)
+        removed: set[str] = set()
+        if not (
+            f.neighbors_up.suppress_anchors or f.neighbors_down.suppress_anchors
+        ):
+            dprint("WITHOUT: removing items:", names)
+            removed |= names
+
+        # remove upstream/downstream neighbor names
+        downs, ups, _ = self._neighbors(f)
+        dprint("WITHOUT: removing neighbors:", downs, ups)
+        removed |= downs | ups
+        self.unavailable.update({name: cause for name in removed})
+        self._induce(self.current.names - removed)
+
+    def _merge(self, m: model.Merge) -> None:
+        """A merge: the next view has the merged items' flows rewired to
+        the replacer, which takes their place, in their frame too."""
+        self._realize()
+        names = set(m.names)
+        self._check_known(names | {m.replacer}, m.source)
+        self._check_available(names | {m.replacer}, m.source)
+        missing = sorted(names - self.current.names)
+        if missing:
+            raise exception.DfdException(
+                f" Name(s) not kept, cannot be merged: {', '.join(missing)}",
+                source=m.source,
+            )
+        frame = self._check_one_frame(names, m.source)
+        dprint("MERGE:", names, "->", m.replacer)
+        cause = _cause(f"merged into {m.replacer}", m.source)
+        self.unavailable.update({name: cause for name in names})
+
+        view: _View = {}
+        rewired: set[_FlowKey] = set()  # keys of the flows rewired
+        for origin, element in self.view.items():
+            dprint(f"\nHandling statement: {element}")
+            match element:
+                case model.Item() as item:
+                    if item.name in names:
+                        dprint("=> Skipping item: merged away")
                         continue
 
-        # keep statement
-        dprint("=> Keeping statement")
-        new_statements.append(statement)
+                case model.Connection() as conn:
+                    if conn.src in names or conn.dst in names:
+                        src = m.replacer if conn.src in names else conn.src
+                        dst = m.replacer if conn.dst in names else conn.dst
+                        if src == dst:
+                            dprint(
+                                "=> Skipping connection: collapsed by the merge"
+                            )
+                            continue
+                        element = replace(conn, src=src, dst=dst)
+                        rewired.add(_flow_key(element))
 
-    return new_statements, replaced_connections
+                case model.Frame() as fr:
+                    # merged names leave the frame; the replacer takes
+                    # their place in the frame holding them all
+                    items: list[str] = []
+                    for name in fr.items:
+                        if name not in names:
+                            if name not in items:
+                                items.append(name)
+                        elif fr is frame and m.replacer not in items:
+                            items.append(m.replacer)
+                    if not items:
+                        dprint("=> Skipping frame: no item left")
+                        continue
+                    dprint(f"=> Adjusting frame items: {fr.items} -> {items}")
+                    element = replace(fr, items=items)
+
+            dprint("=> Keeping statement")
+            view[origin] = element
+
+        if m.replacer not in self.current.names:
+            # declared outside the view: rejoins it
+            replacer = self.declared[m.replacer]
+            view[replacer] = replacer
+        self._set_view(_deduplicate_flows(view, rewired))
+
+    # the realization
+
+    def _realize(self) -> None:
+        """Derive the next view from the keep list, if any."""
+        if self.keep is None:
+            return
+        keep, self.keep = self.keep, None
+        self._induce(
+            keep.names,
+            anchors=keep.anchors,
+            hidden=keep.hidden,
+            skip_frames=keep.skip_frames,
+        )
+
+    def _induce(
+        self,
+        names: set[str],
+        *,
+        anchors: AbstractSet[str] = frozenset(),
+        hidden: AbstractSet[model.Connection] = frozenset(),
+        skip_frames: AbstractSet[str] = frozenset(),
+    ) -> None:
+        """The current view induced on a set of names: the items (an
+        anchor made non-hidable), the flows joining them (the hidden
+        ones out), the frames trimmed to them (a suppressed one out)."""
+        dprint("\nItems to keep", names)
+        view: _View = {}
+        for origin, element in self.view.items():
+            dprint(f"\nHandling statement: {element}")
+            match element:
+                case model.Item() as item:
+                    if item.name not in names:
+                        dprint("=> Skipping item: not kept")
+                        continue
+                    # An anchor may lose its connections and, if it is
+                    # hidable, vanish: made non-hidable to keep it.
+                    if item.name in anchors and item.hidable:
+                        element = replace(item, hidable=False)
+
+                case model.Connection() as conn:
+                    if conn.src not in names or conn.dst not in names:
+                        dprint("=> Skipping connection: an end is not kept")
+                        continue
+                    if conn in hidden:
+                        dprint("=> Skipping connection: stray flow")
+                        continue
+
+                case model.Frame() as frame:
+                    items = [n for n in frame.items if n in names]
+                    if not items:
+                        dprint("=> Skipping frame: no kept item")
+                        continue
+                    dprint(
+                        f"=> Adjusting frame items: {frame.items} -> {items}"
+                    )
+                    if set(items) & skip_frames:
+                        dprint(
+                            "=> Skipping frame: an item's frame is suppressed"
+                        )
+                        continue
+                    element = replace(frame, items=items)
+
+            dprint("=> Keeping statement")
+            view[origin] = element
+        self._set_view(view)
+
+    def _set_view(self, view: _View) -> None:
+        self.view = view
+        self.current = Graph.build(view.values())
+
+    # the checks a statement's names go through
+
+    def _check_known(self, names: set[str], source: model.SourceLine) -> None:
+        """Every name is an item declared so far."""
+        unknown = names - self.declared.keys()
+        if unknown:
+            raise exception.DfdException(
+                f' Name(s) unknown: {", ".join(unknown)}', source=source
+            )
+
+    def _check_available(
+        self, names: set[str], source: model.SourceLine
+    ) -> None:
+        """Refuse a name that a previous statement removed or merged away."""
+        gone = sorted(names & self.unavailable.keys())
+        if gone:
+            diff = "; ".join(
+                f"{name} ({self.unavailable[name]})" for name in gone
+            )
+            raise exception.DfdException(
+                f" Name(s) no longer available: {diff}", source=source
+            )
+
+    def _check_kept(self, names: set[str], source: model.SourceLine) -> None:
+        """Every name is an item of the current view."""
+        unkept = names - self.current.names
+        if unkept:
+            raise exception.DfdException(
+                " Name(s) no longer available due to previous filters:"
+                f' {", ".join(unkept)}',
+                source=source,
+            )
+
+    def _check_in_view(self, names: set[str], source: model.SourceLine) -> None:
+        """A connection or a frame names items of the current view: of
+        its names declared so far, none removed or merged away, all kept
+        (a name declared below joins the view at its declaration)."""
+        names = names & self.declared.keys()
+        self._check_available(names, source)
+        self._check_kept(names, source)
+
+    def _check_one_frame(
+        self, names: set[str], source: model.SourceLine
+    ) -> model.Frame | None:
+        """Items merged together are in one frame, or all unframed.
+
+        Returns the frame the replacer takes their place in, if any.
+        """
+        frame_of = {name: self.current.frame_of(name) for name in names}
+        frames = set(frame_of.values())
+        if len(frames) > 1:
+            diff = ", ".join(
+                f"{name} ({frame_of[name].text if frame_of[name] else 'no frame'})"
+                for name in sorted(names)
+            )
+            raise exception.DfdException(
+                f" Cannot merge items from different frames: {diff}",
+                source=source,
+            )
+        (frame,) = frames
+        return frame
+
+    # the walk
+
+    def _neighbors(
+        self, f: model.Filter
+    ) -> tuple[set[str], set[str], set[model.Connection]]:
+        """The neighbors of the filter's anchors in the current view.
+        Returns (downstream, upstream, the path flows)."""
+        downs, down_flows = self._expand(f, f.neighbors_down, down=True)
+        ups, up_flows = self._expand(f, f.neighbors_up, down=False)
+        return downs, ups, down_flows | up_flows
+
+    def _expand(
+        self, f: model.Filter, fn: model.FilterNeighbors, *, down: bool
+    ) -> tuple[set[str], set[model.Connection]]:
+        """Expand neighbors in one direction by successive waves of
+        connections. Returns (neighbor names, the flows followed)."""
+        # a negative distance is the unlimited span: every item at most
+        span = len(self.current.items) if fn.distance < 0 else fn.distance
+        names = set(f.names)
+        neighbor_names: set[str] = set()
+        path_flows: set[model.Connection] = set()
+        for i in range(span):
+            names, followed = self.current.adjacent(
+                names, downstream=down, layout=fn.layout_direction
+            )
+            if not names:
+                break
+            dprint(f"  - {i} {down} {fn}")
+            dprint("   + :", names)
+            neighbor_names |= names
+            path_flows |= followed
+        return neighbor_names, path_flows
 
 
-def _deduplicate_connections(
-    statements: list[model.Statement],
-    replaced_connections: dict[str, model.Connection],
-) -> list[model.Statement]:
-    """Remove duplicate connections created by replacements."""
-    kept_statements: list[model.Statement] = []
-    skipped_signatures: set[str] = set()
-    for statement in statements:
-        match statement:
+def _deduplicate_flows(view: _View, rewired: set[_FlowKey]) -> _View:
+    """Remove the duplicates a merge created: of the flows equal to a
+    rewired one, the first stays."""
+    kept: _View = {}
+    seen: set[_FlowKey] = set()
+    for origin, element in view.items():
+        match element:
             case model.Connection() as conn:
-                sig = conn.signature()
-                if sig in skipped_signatures:
+                key = _flow_key(conn)
+                if key in seen:
                     continue
-                if sig in replaced_connections:
-                    skipped_signatures.add(sig)
-        kept_statements.append(statement)
-    return kept_statements
+                if key in rewired:
+                    seen.add(key)
+        kept[origin] = element
+    return kept
 
 
 def handle_filters(
     statements: model.Statements, *, debug: bool = False
 ) -> model.Statements:
-    """Apply only/without filters to a statement list."""
-    all_names = {s.name for s in statements if isinstance(s, model.Item)}
-
-    # phase 1: collect filtered names
-    decisions = _collect_kept_names(statements, debug=debug)
-
-    _mark_non_hidable(statements, decisions.only_names)
-
-    # default to keeping all names if no filter was encountered; a merged
-    # name is never kept, whichever filter initialised the set
-    kept_names = (
-        decisions.kept_names if decisions.kept_names is not None else all_names
-    ) - decisions.merged_names
-    dprint("\nItems to keep", kept_names)
-
-    # phase 2: apply filters to statements
-    new_statements, replaced_connections = _apply_filters(
-        statements=statements,
-        kept_names=kept_names,
-        replacement=decisions.replacement,
-        inherited_frames=decisions.inherited_frames,
-        skip_frames_for_names=decisions.skip_frames_for_names,
-        hidden_ids=decisions.vetoed_ids - decisions.allowed_ids,
-    )
-
-    # phase 3: deduplicate connections created by replacements
-    return _deduplicate_connections(new_statements, replaced_connections)
+    """Derive the view the view statements describe: its elements in
+    the source order, the other statements (styles, attribs, the view
+    statements themselves) passed through in their place."""
+    view = _Derivation().run(statements)
+    result: model.Statements = []
+    for statement in statements:
+        match statement:
+            case model.Item() | model.Connection() | model.Frame():
+                if statement in view:
+                    result.append(view[statement])
+            case _:
+                result.append(statement)
+    return result
