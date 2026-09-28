@@ -16,7 +16,7 @@ issue is filed or when it is dropped; the commit message names the
 issue or the reason, and `git log -S'### NN.' -- TODO.md` retrieves
 the text. The numbers of removed items are never reused.
 
-Next number: 43
+Next number: 44
 
 ## Won't do
 
@@ -173,3 +173,14 @@ the deferred typing rows of TODO 41 (family D). To decide: `NewType`
 or subclass; the names (`ItemName`, `StyleName`, `AttribAlias`);
 whether the `Literal` subsets of `Keyword` (D2) ride along. Asked by
 the user at the review of #143's mock-up, 2026-09-28.
+
+### 43. The `f` flag is not available on `~` (from #143)
+
+The `f` flag (suppress the frames of the selected items) has no
+effect on a `~`: the selected items are removed, so their frames are
+trimmed anyway, and no frame is drawn again since #143. The user wants
+the flag refused by the syntax on `~`, as `x` and `f` are for `!`.
+Fixture 044 (`~<>xf2 P2`) accepts the form today, so this is a
+breaking change: a major, with TODO 32 (`~=`), never batched; 044
+becomes an error fixture and the FLAGS list of `doc/README.md` § 7.2
+says which filter takes which flag.
